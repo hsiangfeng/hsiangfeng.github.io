@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;hsiangfeng.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Pisces&quot;,&quot;version&quot;:&quot;8.5.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;right&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:true,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:false,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;},&quot;algolia&quot;:{&quot;appID&quot;:&quot;MU7N4K4R36&quot;,&quot;apiKey&quot;:&quot;110ed15d0a4842310bafc6fdfda119c4&quot;,&quot;indexName&quot;:&quot;blog&quot;,&quot;hits&quot;:{&quot;per_page&quot;:10}}}</script><script src="/js/config.js"></script>
+<meta name="description" content="接下來講講製作分頁邏輯的部分，好在本身 API 就已經有判斷分頁了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue 出一個女友吧!-製作分頁邏輯-1">
+<meta property="og:url" content="https://hsiangfeng.github.io/vue/20190729/2401395670/index.html">
+<meta property="og:site_name" content="Welcome.Web.World">
+<meta property="og:description" content="接下來講講製作分頁邏輯的部分，好在本身 API 就已經有判斷分頁了">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/acT4HNs.png">
+<meta property="og:image" content="https://i.imgur.com/97pwEOj.png">
+<meta property="og:image" content="https://i.imgur.com/QtGqWCR.png">
+<meta property="og:image" content="https://i.imgur.com/tyL1xoU.png">
+<meta property="og:image" content="https://i.imgur.com/sJlH5Az.png">
+<meta property="og:image" content="https://i.imgur.com/Aty2wNF.png">
+<meta property="og:image" content="https://i.imgur.com/Dwzm69O.png">
+<meta property="og:image" content="https://i.imgur.com/TePEeEg.png">
+<meta property="og:image" content="https://i.imgur.com/9g1deg5.png">
+<meta property="og:image" content="https://i.imgur.com/ziKyHhx.png">
+<meta property="og:image" content="https://i.imgur.com/l80g1sW.png">
+<meta property="og:image" content="https://i.imgur.com/XqsxWnY.png">
+<meta property="og:image" content="https://i.imgur.com/GxIhQxc.png">
+<meta property="article:published_time" content="2019-07-29T01:47:57.000Z">
+<meta property="article:modified_time" content="2020-12-27T13:46:04.481Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="Vue 出一個女友吧">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/acT4HNs.png">
+
+
+<link rel="canonical" href="https://hsiangfeng.github.io/vue/20190729/2401395670/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;https:&#x2F;&#x2F;hsiangfeng.github.io&#x2F;vue&#x2F;20190729&#x2F;2401395670&#x2F;&quot;,&quot;path&quot;:&quot;vue&#x2F;20190729&#x2F;2401395670&#x2F;&quot;,&quot;title&quot;:&quot;Vue 出一個女友吧!-製作分頁邏輯-1&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>Vue 出一個女友吧!-製作分頁邏輯-1 | Welcome.Web.World</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138292040-1"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{&quot;tracking_id&quot;:&quot;UA-138292040-1&quot;,&quot;only_pageview&quot;:false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    $(function() {
+      if(!$('ins[class="adsbygoogle"]').data('adsbygoogleStatus')) {
+        console.clear();
+        console.log('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.log('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        $('.message-block').css('display', 'flex');
+      } else {
+        console.clear();
+        console.log('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.log('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+      }
+    })
+  }
+</script><link rel="manifest" href="/manifest.json" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Welcome.Web.World" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Welcome.Web.World</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">歡迎來到網路世界。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%8F%E8%BC%AF%E6%80%9D%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">邏輯思考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.</span> <span class="nav-text">模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pagination-1-vue-%E6%89%80%E6%9C%89%E8%B3%87%E6%96%99-API"><span class="nav-number">4.</span> <span class="nav-text">Pagination_1.vue (所有資料 API)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E9%A0%81%E9%82%8F%E8%BC%AF"><span class="nav-number">5.</span> <span class="nav-text">分頁邏輯</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E9%A0%81%E5%85%83%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">分頁元件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%9C%E5%85%85"><span class="nav-number">7.</span> <span class="nav-text">補充</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">576</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">187</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hsiangfeng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hsiangfeng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/HsiangFengWeb" title="Facebook → https:&#x2F;&#x2F;www.facebook.com&#x2F;HsiangFengWeb" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>Facebook</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/isray_notarray" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;isray_notarray" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://hsiangfeng.github.io/vue/20190729/2401395670/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome.Web.World">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vue 出一個女友吧!-製作分頁邏輯-1
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2019-07-29 09:47:57" itemprop="dateCreated datePublished" datetime="2019-07-29T09:47:57+08:00">2019-07-29</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2020-12-27 21:46:04" itemprop="dateModified" datetime="2020-12-27T21:46:04+08:00">2020-12-27</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  <div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="4334720581"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+</div>
+
+            <div class="post-description">接下來講講製作分頁邏輯的部分，好在本身 API 就已經有判斷分頁了</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來講講製作分頁邏輯的部分，好在本身 API 就已經有判斷分頁了</p>
+<h2 id="邏輯思考"><a href="#邏輯思考" class="headerlink" title="邏輯思考"></a>邏輯思考</h2><p>一般來講我們要製作分頁的時候動作是滿多是在的分頁的邏輯上面，首先會有這幾個重點</p>
+<ul>
+<li>總共有幾頁 - total_pages</li>
+<li>當前在第幾頁 - current_pages</li>
+<li>每一頁呈現多少資料 - per_page</li>
+<li>頁面頁數</li>
+</ul>
+<p>以這個範例 API 來講可以有兩種做法，一種是所有資料的 api，另一種則是使用後端幫我們處理好的 api，但是在製作之前我們會先建立一個 Pagination_1.vue 與 Pagination_2.vue 的檔案，這兩支分別會有兩種做法</p>
+<ul>
+<li>Pagination_1.vue - 比較原生較重邏輯的方式製作，所以會使用取得全部資料來製作</li>
+<li>Pagination_2.vue - 使用後端處理好的現成分頁邏輯製作</li>
+</ul>
+<p>所以這章節將會拆成兩部分，一部分是講解自己處理資料，另一部分是由後端處理好的方式</p>
+<h2 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h2><p>這邊會直接使用 bootstrap 所提供的 Pagination 模板做開發 (已轉 pug)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">nav(aria-label=&#x27;Page navigation example&#x27;)</span><br><span class="line">  ul.pagination</span><br><span class="line">    li.page-item</span><br><span class="line">      a.page-link(href=&#x27;#&#x27;) Previous</span><br><span class="line">    li.page-item</span><br><span class="line">      a.page-link(href=&#x27;#&#x27;) 1</span><br><span class="line">    li.page-item</span><br><span class="line">      a.page-link(href=&#x27;#&#x27;) 2</span><br><span class="line">    li.page-item</span><br><span class="line">      a.page-link(href=&#x27;#&#x27;) 3</span><br><span class="line">    li.page-item</span><br><span class="line">      a.page-link(href=&#x27;#&#x27;) Next</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/acT4HNs.png" alt="分頁邏輯"></p>
+<h2 id="Pagination-1-vue-所有資料-API"><a href="#Pagination-1-vue-所有資料-API" class="headerlink" title="Pagination_1.vue (所有資料 API)"></a>Pagination_1.vue (所有資料 API)</h2><p>這邊我們將會使用取得所有資料的 API 來製作</p>
+<p><img src="https://i.imgur.com/97pwEOj.png" alt="取得所有資料"></p>
+<p>AJAX 的方法我就直接提供在下方，主要是修改再 Products.vue，所以原本的 <code>getProduct</code> 就會有點不太一樣</p>
+<p><img src="https://i.imgur.com/QtGqWCR.png" alt="getProduct"></p>
+<p>將會調整成改取得所有資料的 API，那這與原本的 API 是有差異的，原本的 API 拉回來的資料是像這樣子</p>
+<p><img src="https://i.imgur.com/tyL1xoU.png" alt="陣列型態"></p>
+<p>但取得所有資料的 API 就變成了物件型態，是不太一樣的</p>
+<p><img src="https://i.imgur.com/sJlH5Az.png" alt="物件型態"></p>
+<p>首先要將原本儲存資料的 products 改成陣列</p>
+<p><img src="https://i.imgur.com/Aty2wNF.png" alt="改成陣列"></p>
+<p>然後將拉回資料的部分改成 <code>push</code> 的方式</p>
+<p><img src="https://i.imgur.com/Dwzm69O.png" alt="push"></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm = <span class="built_in">this</span>;</span><br><span class="line"><span class="keyword">const</span> url = <span class="string">`<span class="subst">$&#123;process.env.VUE_APP_HEXURL&#125;</span>/api/<span class="subst">$&#123;process.env.VUE_APP_HEXNAME&#125;</span>/admin/products/all`</span>;</span><br><span class="line">vm.isLoading = <span class="literal">true</span>;</span><br><span class="line">vm.$http.get(url)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (response.data.success) &#123;</span><br><span class="line">      vm.products.push(response.data.products);</span><br><span class="line">    &#125;</span><br><span class="line">    vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    vm.$bus.$emit(<span class="string">&#x27;message:push&#x27;</span>, error, <span class="string">&#x27;danger&#x27;</span>);</span><br><span class="line">    vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>但是你會發現不能正常顯示資料，原因是出在第一層跑出迴圈是拉出所有陣列的第一層導致，所以正確程式碼部分要多做迴圈處理，但是這邊要注意資料是 object 型態，所以要使用 <code>for...in...</code> 來處理物件資料</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm = <span class="built_in">this</span>;</span><br><span class="line"><span class="keyword">const</span> url = <span class="string">`<span class="subst">$&#123;process.env.VUE_APP_HEXURL&#125;</span>/api/<span class="subst">$&#123;process.env.VUE_APP_HEXNAME&#125;</span>/admin/products/all`</span>;</span><br><span class="line">vm.isLoading = <span class="literal">true</span>;</span><br><span class="line">vm.$http.get(url)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (response.data.success) &#123;</span><br><span class="line">      <span class="keyword">let</span> objectProducts = response.data.products;</span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">let</span> item <span class="keyword">in</span> objectProducts) &#123;</span><br><span class="line">        vm.products.push(objectProducts[item]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    vm.$bus.$emit(<span class="string">&#x27;message:push&#x27;</span>, error, <span class="string">&#x27;danger&#x27;</span>);</span><br><span class="line">    vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>那麼這邊就將資料處理方面給完成了</p>
+<h2 id="分頁邏輯"><a href="#分頁邏輯" class="headerlink" title="分頁邏輯"></a>分頁邏輯</h2><p>這邊分頁的邏輯是比較長的，也比較複雜唷</p>
+<p>首先我們要先取得設置相關的資料欄位(該這樣講嗎?)，所以 <code>data</code> 中會新增 <code>pagination</code> 的物件資料</p>
+<p><img src="https://i.imgur.com/TePEeEg.png" alt="pagination"></p>
+<p>在前面有講到我們會需要這幾個資料</p>
+<ul>
+<li>總共有幾頁 - total_pages</li>
+<li>當前在第幾頁 - current_pages</li>
+<li>每一頁呈現多少資料 - per_page</li>
+<li>頁面頁數</li>
+</ul>
+<p>但是這邊還少一個 <strong>全部資料數量</strong>，所以程式碼就可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm = <span class="built_in">this</span>;</span><br><span class="line"><span class="keyword">const</span> url = <span class="string">`<span class="subst">$&#123;process.env.VUE_APP_HEXURL&#125;</span>/api/<span class="subst">$&#123;process.env.VUE_APP_HEXNAME&#125;</span>/admin/products/all`</span>;</span><br><span class="line">vm.isLoading = <span class="literal">true</span>;</span><br><span class="line">vm.$http.get(url)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (response.data.success) &#123;</span><br><span class="line">    <span class="keyword">let</span> objectProducts = response.data.products;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">let</span> item <span class="keyword">in</span> objectProducts) &#123;</span><br><span class="line">      vm.products.push(objectProducts[item]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 迴圈結束後才開始來取得資料長度</span></span><br><span class="line">    vm.pagination.totalResult = vm.products.length;</span><br><span class="line">    <span class="comment">// 設置每一頁資料數量</span></span><br><span class="line">    vm.pagination.per_page = <span class="number">10</span>;</span><br><span class="line">    <span class="comment">// 統計總頁數</span></span><br><span class="line">    <span class="comment">// 公式:總長度 / 每一頁數量，另外這裡會出現小數點，所以要使用 Math.ceil 來無條件進位</span></span><br><span class="line">    vm.pagination.pageTotal = <span class="built_in">Math</span>.ceil(vm.pagination.totalResult / vm.pagination.per_page);</span><br><span class="line">    <span class="comment">// 接下來定義當前頁數</span></span><br><span class="line">    <span class="comment">// 通常是 1</span></span><br><span class="line">    vm.pagination.currentPage = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 但是要注意，當前頁數是不可能超過總頁數，所以需要做一個判斷來避免</span></span><br><span class="line">    <span class="keyword">if</span> (vm.pagination.currentPage &gt; vm.pagination.pageTotal) &#123;</span><br><span class="line">      vm.pagination.currentPage = vm.pagination.pageTotal;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 接下來當我們目前位於第二頁時，資料會是 11~20</span></span><br><span class="line">    <span class="comment">// 所以這邊會有一段公式來做計算</span></span><br><span class="line">    <span class="comment">// 假設當前位於第二頁，所以就是 (10 * 2) - 10 = 10，最後 + 1，所以最小頁數就是 11 開始</span></span><br><span class="line">    <span class="comment">// 如果不清楚的時候可以使用結果反推</span></span><br><span class="line">    <span class="keyword">const</span> minPage = (vm.pagination.currentPage * vm.pagination.per_page) - vm.pagination.per_page + <span class="number">1</span>; <span class="comment">// 11</span></span><br><span class="line">    <span class="keyword">const</span> maxPage = (vm.pagination.currentPage * vm.pagination.per_page); <span class="comment">// 20</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`總資料數量:<span class="subst">$&#123;vm.pagination.totalResult&#125;</span>,每頁數量:<span class="subst">$&#123;vm.pagination.per_page&#125;</span>,總頁數:<span class="subst">$&#123;vm.pagination.pageTotal&#125;</span>,當前頁數:<span class="subst">$&#123;vm.pagination.currentPage&#125;</span>,每頁第一筆:<span class="subst">$&#123;minPage&#125;</span>,每頁最後一筆<span class="subst">$&#123;maxPage&#125;</span>`</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">&#125;)</span><br><span class="line">.catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">  vm.$bus.$emit(<span class="string">&#x27;message:push&#x27;</span>, error, <span class="string">&#x27;danger&#x27;</span>);</span><br><span class="line">  vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>那麼結果就會像這樣</p>
+<p><img src="https://i.imgur.com/9g1deg5.png" alt="結果"></p>
+<p>接下來就準備來做資料處理哩</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 開始做資料處理</span></span><br><span class="line"><span class="comment">// 首先要將所有資料拉出來</span></span><br><span class="line">vm.products = [];</span><br><span class="line">vm.cacheProducts.forEach(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 由於 index 是從 0 開始，所以要建立一個變數儲存正確的數量</span></span><br><span class="line">  <span class="keyword">let</span> num = index + <span class="number">1</span>;</span><br><span class="line">  <span class="comment">// 接下來寫上判斷式</span></span><br><span class="line">  <span class="comment">// 當 num 比 minPage 大並且比 maxPage 小的時候，就 push 資料進去</span></span><br><span class="line">  <span class="keyword">if</span> (num &gt;= minPage &amp;&amp; num &lt;= maxPage) &#123;</span><br><span class="line">    vm.products.push(item);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這樣子就成功地將資料做了分頁篩選</p>
+<p><img src="https://i.imgur.com/ziKyHhx.png" alt="分頁篩選"></p>
+<p>但是這邊還有幾個地方還沒有做調整，首先我們必須透過 components 來切換分頁，所以會有一個 Pagination_1.vue 接收我們的當前分頁，另外 <code>getProduct()</code> 也必須額外傳入參數，也就是當前分頁參數，所以這邊的完整程式碼就會變成這樣 (請小心服用很長)</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">getProduct</span>(<span class="params">currentPage = <span class="number">1</span></span>)</span> &#123; <span class="comment">// ES6 預設值</span></span><br><span class="line">  <span class="keyword">const</span> vm = <span class="built_in">this</span>;</span><br><span class="line">  <span class="keyword">const</span> url = <span class="string">`<span class="subst">$&#123;process.env.VUE_APP_HEXURL&#125;</span>/api/<span class="subst">$&#123;process.env.VUE_APP_HEXNAME&#125;</span>/admin/products/all`</span>;</span><br><span class="line">  vm.isLoading = <span class="literal">true</span>;</span><br><span class="line">  vm.$http.get(url)</span><br><span class="line">    .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (response.data.success) &#123;</span><br><span class="line">        <span class="keyword">const</span> objectProducts = response.data.products;</span><br><span class="line">        vm.cacheProducts = [];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">in</span> objectProducts) &#123;</span><br><span class="line">          vm.cacheProducts.push(objectProducts[item]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 迴圈結束後才開始來取得資料長度</span></span><br><span class="line">        vm.pagination.totalResult = vm.cacheProducts.length;</span><br><span class="line">        <span class="comment">// 設置每一頁資料數量</span></span><br><span class="line">        vm.pagination.per_page = <span class="number">10</span>;</span><br><span class="line">        <span class="comment">// 統計總頁數</span></span><br><span class="line">        <span class="comment">// 公式:總長度 / 每一頁數量，另外這裡會出現小數點，所以要使用 Math.ceil 來無條件進位</span></span><br><span class="line">        vm.pagination.pageTotal = <span class="built_in">Math</span>.ceil(vm.pagination.totalResult / vm.pagination.per_page);</span><br><span class="line">        <span class="comment">// 接下來定義當前頁數</span></span><br><span class="line">        <span class="comment">// 通常會是 1</span></span><br><span class="line">        vm.pagination.currentPage = currentPage;</span><br><span class="line">        <span class="comment">// 但是要注意，當前頁數是不可能超過總頁數，所以需要做一個判斷來避免</span></span><br><span class="line">        <span class="keyword">if</span> (vm.pagination.currentPage &gt; vm.pagination.pageTotal) &#123;</span><br><span class="line">          vm.pagination.currentPage = vm.pagination.pageTotal;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 接下來當我們目前位於第二頁時，資料會是 11~20</span></span><br><span class="line">        <span class="comment">// 所以這邊會有一段公式來做計算</span></span><br><span class="line">        <span class="comment">// 假設當前位於第二頁，所以就是 (10 * 2) - 10 = 10，最後 + 1，所以最小頁數就是 11 開始</span></span><br><span class="line">        <span class="comment">// 如果不清楚的時候可以使用結果反推</span></span><br><span class="line">        <span class="keyword">const</span> minPage = (vm.pagination.currentPage * vm.pagination.per_page) - vm.pagination.per_page + <span class="number">1</span>; <span class="comment">// 11</span></span><br><span class="line">        <span class="keyword">const</span> maxPage = (vm.pagination.currentPage * vm.pagination.per_page); <span class="comment">// 20</span></span><br><span class="line">        <span class="comment">// 開始做資料處理</span></span><br><span class="line">        <span class="comment">// 首先要將所有資料拉出來</span></span><br><span class="line">        vm.products = [];</span><br><span class="line">        vm.cacheProducts.forEach(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 由於 index 是從 0 開始，所以要建立一個變數儲存正確的數量</span></span><br><span class="line">          <span class="keyword">const</span> num = index + <span class="number">1</span>;</span><br><span class="line">          <span class="comment">// 接下來寫上判斷式</span></span><br><span class="line">          <span class="comment">// 當 num 比 minPage 大並且比 maxPage 小的時候，就 push 資料進去</span></span><br><span class="line">          <span class="keyword">if</span> (num &gt;= minPage &amp;&amp; num &lt;= maxPage) &#123;</span><br><span class="line">            vm.products.push(item);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">      vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">      vm.$bus.$emit(<span class="string">&#x27;message:push&#x27;</span>, error, <span class="string">&#x27;danger&#x27;</span>);</span><br><span class="line">      vm.isLoading = <span class="literal">false</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<h2 id="分頁元件"><a href="#分頁元件" class="headerlink" title="分頁元件"></a>分頁元件</h2><p>接下來準備製作分頁元件，這邊會使用到的觀念式 props、emit，這邊直接提供模板 template</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;template lang=&quot;pug&quot;&gt;</span><br><span class="line">  div</span><br><span class="line">    nav(aria-label=&#x27;Page navigation example&#x27;)</span><br><span class="line">      ul.pagination.justify-content-center</span><br><span class="line">        li.page-item(v-for=&#x27;pages in paginationService.pageTotal&#x27;, :key=&#x27;pages&#x27;, :class=&quot;&#123;&#x27;active&#x27;: paginationService.currentPage === pages&#125;&quot;)</span><br><span class="line">          a.page-link(href=&#x27;#&#x27;, @click.prevent=&#x27;getPagesService(pages)&#x27;) &#123;&#123; pages &#125;&#125;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  props: &#123;</span><br><span class="line">    paginationService: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    getPagesService(item) &#123;</span><br><span class="line">      this.$emit(&#x27;pageService&#x27;, item);</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然後回到 products.vue，將 Pagination_1.vue 引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pagination1Components <span class="keyword">from</span> <span class="string">&#x27;../shared/Pagination_1.vue&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>(請記得插入模板內)</p>
+<p>那模板那邊插入就是這樣</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pagination1Components(:paginationService=&#x27;pagination&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/l80g1sW.png" alt="Image"></p>
+<p>接下來就是切頁做調整，當我們點擊第二頁時，<code>Pagination_1</code> 要將資料往外傳給 <code>getProduct</code> 來做切頁動作，所以就會這樣寫</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pagination1Components(:paginationService=&#x27;pagination&#x27;, v-on:pageService=&quot;getProduct&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>那麼這樣子就成功做出分頁功能哩~</p>
+<p><img src="https://i.imgur.com/XqsxWnY.png" alt="切頁"></p>
+<p>並且也可以切換頁面</p>
+<p><img src="https://i.imgur.com/GxIhQxc.png" alt="切頁"></p>
+<h2 id="補充"><a href="#補充" class="headerlink" title="補充"></a>補充</h2><p>如果對於 props 與 emit 不熟悉的話，可以看看我所撰寫的這一篇文章</p>
+<p><a href="https://hsiangfeng.github.io/vue/20190510/1766915506/">props 與 emit 的傳遞方式</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div>
+    <h4>
+      <i class="fas fa-heart"></i>
+      Liker 讚賞 (拍手)
+    </h4>
+    <p>
+      如果這一篇筆記文章對你有幫助，希望可以求點支持或
+      <del>牡蠣</del>
+      <ins>鼓勵</ins>
+      (ノД`)・゜・。
+    </p>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/lo" +
+        "veyou520babytw/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+  <small>Liker 是一個按讚(拍手)的讚賞機制，每一篇文章最多可以按五下拍手，過程你只需要登入，如果你願意按個讚，對於創作者來講是一個莫大的鼓勵與支持。</small>
+</div>
+<div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postfooter -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+          <div class="post-tags">
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+              <a href="/tags/Vue-%E5%87%BA%E4%B8%80%E5%80%8B%E5%A5%B3%E5%8F%8B%E5%90%A7/" rel="tag"># Vue 出一個女友吧</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20190728/313613648/" rel="prev" title="關於我逃出胡立的異世界 R30 這件事之攻略包">
+                  <i class="fa fa-chevron-left"></i> 關於我逃出胡立的異世界 R30 這件事之攻略包
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/vue/20190729/371929708/" rel="next" title="Vue 出一個女友吧!-製作分頁邏輯-2">
+                  Vue 出一個女友吧!-製作分頁邏輯-2 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.9.1/dist/algoliasearch-lite.umd.js" integrity="sha256-nsOZ0hN8nehDzx3JBvvEM0RrxgDhZVihR8EI+hYxnh8=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.21.0/dist/instantsearch.production.min.js" integrity="sha256-wbxAqbeBbXYS1TyTiSutvpECRaZqDIv1mfEjgpmheR8=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;welcome-web-world&quot;,&quot;count&quot;:false,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+
+</body>
+</html>

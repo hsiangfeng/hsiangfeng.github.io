@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;hsiangfeng.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Pisces&quot;,&quot;version&quot;:&quot;8.5.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;right&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:true,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:false,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;},&quot;algolia&quot;:{&quot;appID&quot;:&quot;MU7N4K4R36&quot;,&quot;apiKey&quot;:&quot;110ed15d0a4842310bafc6fdfda119c4&quot;,&quot;indexName&quot;:&quot;blog&quot;,&quot;hits&quot;:{&quot;per_page&quot;:10}}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前一篇我們學習透過 Model 來新增資料，那麼查詢呢?查詢資料該怎麼做呢?所以這一篇將會來講該如何使用 Model 做查詢動作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day15-從基礎學習 ThinkPHP-Model 基礎操作(3)">
+<meta property="og:url" content="https://hsiangfeng.github.io/php/20190916/2939346668/index.html">
+<meta property="og:site_name" content="Welcome.Web.World">
+<meta property="og:description" content="前一篇我們學習透過 Model 來新增資料，那麼查詢呢?查詢資料該怎麼做呢?所以這一篇將會來講該如何使用 Model 做查詢動作。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/gNeUYQ3.png">
+<meta property="og:image" content="https://i.imgur.com/Rkh5t2j.png">
+<meta property="og:image" content="https://i.imgur.com/nC7I4OU.png">
+<meta property="og:image" content="https://i.imgur.com/UtmsGyd.png">
+<meta property="og:image" content="https://i.imgur.com/uvMSEXv.png">
+<meta property="article:published_time" content="2019-09-15T16:01:10.000Z">
+<meta property="article:modified_time" content="2020-12-27T13:29:52.639Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="第 11 屆 iT邦幫忙鐵人賽">
+<meta property="article:tag" content="ThinkPHP 5.1">
+<meta property="article:tag" content="從基礎學習 ThinkPHP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/gNeUYQ3.png">
+
+
+<link rel="canonical" href="https://hsiangfeng.github.io/php/20190916/2939346668/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;https:&#x2F;&#x2F;hsiangfeng.github.io&#x2F;php&#x2F;20190916&#x2F;2939346668&#x2F;&quot;,&quot;path&quot;:&quot;php&#x2F;20190916&#x2F;2939346668&#x2F;&quot;,&quot;title&quot;:&quot;Day15-從基礎學習 ThinkPHP-Model 基礎操作(3)&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>Day15-從基礎學習 ThinkPHP-Model 基礎操作(3) | Welcome.Web.World</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138292040-1"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{&quot;tracking_id&quot;:&quot;UA-138292040-1&quot;,&quot;only_pageview&quot;:false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    $(function() {
+      if(!$('ins[class="adsbygoogle"]').data('adsbygoogleStatus')) {
+        console.clear();
+        console.log('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.log('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        $('.message-block').css('display', 'flex');
+      } else {
+        console.clear();
+        console.log('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.log('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+      }
+    })
+  }
+</script><link rel="manifest" href="/manifest.json" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Welcome.Web.World" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Welcome.Web.World</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">歡迎來到網路世界。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E6%89%8B%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">起手式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%89%E5%8F%96%E5%96%AE%E4%B8%80%E8%B3%87%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">拉取單一資料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E6%B8%85%E5%96%AE"><span class="nav-number">4.</span> <span class="nav-text">資料清單</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E5%B0%BE"><span class="nav-number">5.</span> <span class="nav-text">結尾</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">576</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">187</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hsiangfeng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hsiangfeng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/HsiangFengWeb" title="Facebook → https:&#x2F;&#x2F;www.facebook.com&#x2F;HsiangFengWeb" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>Facebook</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/isray_notarray" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;isray_notarray" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://hsiangfeng.github.io/php/20190916/2939346668/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome.Web.World">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day15-從基礎學習 ThinkPHP-Model 基礎操作(3)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2019-09-16 00:01:10" itemprop="dateCreated datePublished" datetime="2019-09-16T00:01:10+08:00">2019-09-16</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2020-12-27 21:29:52" itemprop="dateModified" datetime="2020-12-27T21:29:52+08:00">2020-12-27</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/php/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a>
+        </span>
+    </span>
+
+  <div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="4334720581"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+</div>
+
+            <div class="post-description">前一篇我們學習透過 Model 來新增資料，那麼查詢呢?查詢資料該怎麼做呢?所以這一篇將會來講該如何使用 Model 做查詢動作。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前一篇我們學習透過 Model 來新增資料，那麼查詢呢?查詢資料該怎麼做呢?所以這一篇將會來介紹該如何使用 Model 做查詢動作。</p>
+<h2 id="起手式"><a href="#起手式" class="headerlink" title="起手式"></a>起手式</h2><p>一開始我們必須先註冊兩個路由，否則後面會無法操作：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">&#x27;/about/list&#x27;</span>, <span class="string">&#x27;about/index/all&#x27;</span>);</span><br><span class="line">Route::get(<span class="string">&#x27;/about/:id&#x27;</span>, <span class="string">&#x27;about/index/select&#x27;</span>); <span class="comment">// 這是動態路由的意思，後面會做加強補充說明。</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拉取單一資料"><a href="#拉取單一資料" class="headerlink" title="拉取單一資料"></a>拉取單一資料</h2><p>最基礎的查詢就是單一查詢，首先讓我們開啟 <code>about/controller/index.php</code> 檔案，然後我們先來製作使用 <code>id</code> 取得資料的方法，假使當我們今天訪問 URL <code>/about/1</code> 會出現資料欄位 <code>id = 1</code> 的人，<code>/about/2</code> 則會出現資料欄位 <code>id = 2</code> 的人以此類推，那麼這就是所謂的動態路由，動態路由簡單來講就是會隨著我們輸入的 URL 而變化的路由。</p>
+<p>這邊我們將會使用 <code>id</code> 來查詢資料，而 Model 的部分將會使用 <code>get</code> 方法帶入參數，所以這邊就直接附上範例程式碼會比較清楚：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">select</span>(<span class="params"><span class="variable">$id</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$user</span> = aboutModel::get(<span class="variable">$id</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="variable">$user</span>-&gt;name.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="variable">$user</span>-&gt;height.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="variable">$user</span>-&gt;weight.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我在這邊已經事先塞入約 5 筆的範例資料 ↓</p>
+<p><img src="https://i.imgur.com/gNeUYQ3.png" alt="範例資料"></p>
+<p>接下來我們可以嘗試訪問 <code>http://localhost:8000/about/1</code> ↓</p>
+<p><img src="https://i.imgur.com/Rkh5t2j.png" alt="王大名"></p>
+<p>當然你也可以嘗試隨機訪問 1 ~ 5 的任一路由，例如 <code>http://localhost:8000/about/3</code> ↓</p>
+<p><img src="https://i.imgur.com/nC7I4OU.png" alt="陳春嬌"></p>
+<p>那麼這就是拉取單一查詢的方式。</p>
+<h2 id="資料清單"><a href="#資料清單" class="headerlink" title="資料清單"></a>資料清單</h2><p>有針對 id 來做單一查詢的方式，那麼也就會有查詢全部的方法，在 Model 操作中，我們將會使用到 <code>all()</code> 方法來做查詢，所以就會這樣寫 <code>$user = aboutModel::all();</code>，但是拉出來的資料是必須使用迴圈做處理，因為拉取出來的資料是一個陣列資料，那就讓我們來看看範例程式碼吧~</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">all</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$user</span> = aboutModel::all();</span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$user</span> <span class="keyword">as</span> <span class="variable">$list</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$list</span>-&gt;name.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$list</span>-&gt;height.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$list</span>-&gt;weight.<span class="string">&#x27;&lt;br/&gt;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基本上程式碼這樣就可以拉取到全部的資料並且回傳到首頁上 ↓</p>
+<p><img src="https://i.imgur.com/UtmsGyd.png" alt="資料清單"></p>
+<p>但是我這邊額外撰寫另一種範例，我們嘗試將資料傳送至前端，所以會使用 <code>assign()</code> 並指定 <code>fetch()</code> 到特定的 HTML 上渲染畫面：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">all</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$user</span> = aboutModel::all();</span><br><span class="line">    <span class="variable">$title</span> = <span class="string">&#x27;全部使用者資料&#x27;</span>;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;assign(<span class="string">&#x27;title&#x27;</span>, <span class="variable">$title</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;assign(<span class="string">&#x27;user&#x27;</span>, <span class="variable">$user</span>)-&gt;fetch(<span class="string">&#x27;getAllUser&#x27;</span>); <span class="comment">// 最後一筆記得要 return 否則你無法看到模板唷~</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下來我們要製作一個 getAllUser.html 在 <code>about/view/index</code> 底下，內容我也直接提供，範例如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;ie=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>&#123;$title&#125;<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;$title&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  &#123;volist name=&quot;user&quot; id=&quot;list&quot;&#125;</span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>姓名:&#123;$list.name&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>體重:&#123;$list.weight&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>身高:&#123;$list.height&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">  &#123;/volist&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>看到陌生的東西不用擔心，稍後我會講解，建立完成後我們可以訪問 <code>http://localhost:8000/about/list</code> 看資料是否可以成功取得 ↓</p>
+<p><img src="https://i.imgur.com/uvMSEXv.png" alt="前端渲染資料清單"></p>
+<p>這樣子我們就成功取得所有使用者資料並且是渲染在前端。</p>
+<p>最後讓我們回頭講一下 HTML 裡面有一小段奇怪的東西，也就是 <code>&#123;volist name=&quot;user&quot; id=&quot;list&quot;&#125;</code>，<code>volist</code> 是 ThinkPHP 提供的一個內建標籤，它可以將我們從後端傳過來的資料做迴圈處理，當然後面會慢慢陸續講到這些內建標籤，但是實際上最常使用的其實是 <code>volist</code> 以及 <code>eq</code>，目前這邊暫時不講 <code>eq</code>，後面還會有機會使用的，並且在後面章節我也會針對這些內建標籤有比較詳細的介紹。</p>
+<h2 id="結尾"><a href="#結尾" class="headerlink" title="結尾"></a>結尾</h2><p>下一個章節我會稍微先脫離一下 <strong>Model 基礎操作</strong> 系列，先讓我們跳到資料操作，畢竟有時候我們可能不想透過 Model 來操作資料，只想在 Controller 中操作，所以下一篇就會跳到資料操作稍微了解一下透過 Model 操控與自己寫 SQL 語法的差異在哪裡，介紹完之後我們再繼續接續講 <strong>Model 基礎操作</strong> 系列。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div>
+    <h4>
+      <i class="fas fa-heart"></i>
+      Liker 讚賞 (拍手)
+    </h4>
+    <p>
+      如果這一篇筆記文章對你有幫助，希望可以求點支持或
+      <del>牡蠣</del>
+      <ins>鼓勵</ins>
+      (ノД`)・゜・。
+    </p>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/lo" +
+        "veyou520babytw/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+  <small>Liker 是一個按讚(拍手)的讚賞機制，每一篇文章最多可以按五下拍手，過程你只需要登入，如果你願意按個讚，對於創作者來講是一個莫大的鼓勵與支持。</small>
+</div>
+<div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postfooter -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E7%AC%AC-11-%E5%B1%86-iT%E9%82%A6%E5%B9%AB%E5%BF%99%E9%90%B5%E4%BA%BA%E8%B3%BD/" rel="tag"># 第 11 屆 iT邦幫忙鐵人賽</a>
+              <a href="/tags/ThinkPHP-5-1/" rel="tag"># ThinkPHP 5.1</a>
+              <a href="/tags/%E5%BE%9E%E5%9F%BA%E7%A4%8E%E5%AD%B8%E7%BF%92-ThinkPHP/" rel="tag"># 從基礎學習 ThinkPHP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20190915/57691927/" rel="prev" title="EP.0 RE：從零開始的學習 JS 生活-轉生之目錄">
+                  <i class="fa fa-chevron-left"></i> EP.0 RE：從零開始的學習 JS 生活-轉生之目錄
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/javascript/20190916/2364388999/" rel="next" title="EP.1 RE：從零開始的學習 JS 生活-第一日之 JavaScript 介紹">
+                  EP.1 RE：從零開始的學習 JS 生活-第一日之 JavaScript 介紹 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.9.1/dist/algoliasearch-lite.umd.js" integrity="sha256-nsOZ0hN8nehDzx3JBvvEM0RrxgDhZVihR8EI+hYxnh8=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.21.0/dist/instantsearch.production.min.js" integrity="sha256-wbxAqbeBbXYS1TyTiSutvpECRaZqDIv1mfEjgpmheR8=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;welcome-web-world&quot;,&quot;count&quot;:false,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+
+</body>
+</html>

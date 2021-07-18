@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;hsiangfeng.github.io&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Pisces&quot;,&quot;version&quot;:&quot;8.5.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;right&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:true,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:false,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜尋...&quot;,&quot;empty&quot;:&quot;我們無法找到任何有關 ${query} 的搜索結果&quot;,&quot;hits_time&quot;:&quot;${hits} 找到 ${time} 個結果&quot;,&quot;hits&quot;:&quot;找到 ${hits} 個結果&quot;},&quot;algolia&quot;:{&quot;appID&quot;:&quot;MU7N4K4R36&quot;,&quot;apiKey&quot;:&quot;110ed15d0a4842310bafc6fdfda119c4&quot;,&quot;indexName&quot;:&quot;blog&quot;,&quot;hits&quot;:{&quot;per_page&quot;:10}}}</script><script src="/js/config.js"></script>
+<meta name="description" content="CSRF 雖然滿常見的，大多時候都可以解決，但是在完全前後分離下的處理方式又是另一回事。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前後端分離下的 CSRF&#x2F;XSRF">
+<meta property="og:url" content="https://hsiangfeng.github.io/nodejs/20210527/2874571028/index.html">
+<meta property="og:site_name" content="Welcome.Web.World">
+<meta property="og:description" content="CSRF 雖然滿常見的，大多時候都可以解決，但是在完全前後分離下的處理方式又是另一回事。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2F%E6%88%AA%E5%9C%96%202021-05-27%2011.04.02.png?alt=media&token=5aae529c-3b93-48b5-b1b4-4a7cda4f7c70">
+<meta property="article:published_time" content="2021-05-27T02:48:11.000Z">
+<meta property="article:modified_time" content="2021-06-24T13:10:25.459Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="CSRF">
+<meta property="article:tag" content="XSRF">
+<meta property="article:tag" content="前後端分離">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2F%E6%88%AA%E5%9C%96%202021-05-27%2011.04.02.png?alt=media&token=5aae529c-3b93-48b5-b1b4-4a7cda4f7c70">
+
+
+<link rel="canonical" href="https://hsiangfeng.github.io/nodejs/20210527/2874571028/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-TW&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;https:&#x2F;&#x2F;hsiangfeng.github.io&#x2F;nodejs&#x2F;20210527&#x2F;2874571028&#x2F;&quot;,&quot;path&quot;:&quot;nodejs&#x2F;20210527&#x2F;2874571028&#x2F;&quot;,&quot;title&quot;:&quot;前後端分離下的 CSRF&#x2F;XSRF&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>前後端分離下的 CSRF/XSRF | Welcome.Web.World</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138292040-1"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{&quot;tracking_id&quot;:&quot;UA-138292040-1&quot;,&quot;only_pageview&quot;:false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    $(function() {
+      if(!$('ins[class="adsbygoogle"]').data('adsbygoogleStatus')) {
+        console.clear();
+        console.log('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.log('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        $('.message-block').css('display', 'flex');
+      } else {
+        console.clear();
+        console.log('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.log('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+      }
+    })
+  }
+</script><link rel="manifest" href="/manifest.json" />
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Welcome.Web.World" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Welcome.Web.World</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">歡迎來到網路世界。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+        <li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSRF"><span class="nav-number">2.</span> <span class="nav-text">CSRF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Client-Double-Submit-Cookie"><span class="nav-number">3.</span> <span class="nav-text">Client Double Submit Cookie</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">4.</span> <span class="nav-text">參考文獻</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">576</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">187</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hsiangfeng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hsiangfeng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/HsiangFengWeb" title="Facebook → https:&#x2F;&#x2F;www.facebook.com&#x2F;HsiangFengWeb" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>Facebook</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/isray_notarray" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;isray_notarray" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://hsiangfeng.github.io/nodejs/20210527/2874571028/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Welcome.Web.World">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          前後端分離下的 CSRF/XSRF
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-05-27 10:48:11" itemprop="dateCreated datePublished" datetime="2021-05-27T10:48:11+08:00">2021-05-27</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新於</span>
+        <time title="修改時間：2021-06-24 21:10:25" itemprop="dateModified" datetime="2021-06-24T21:10:25+08:00">2021-06-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  <div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="4334720581"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+</div>
+
+            <div class="post-description">CSRF 雖然滿常見的，大多時候都可以解決，但是在完全前後分離下的處理方式又是另一回事。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CSRF 雖然滿常見的，大多時候都可以解決，但是在完全前後分離下的處理方式又是另一回事。</p>
+<h2 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h2><p>由於先前的文章 <a href="/nodejs/20190704/2336420619/">全端勇士之路 Node.js 基礎學習-CSRF 篇</a> 已經有描述相關的例子，所以這邊就直接貼上先前的描述</p>
+<blockquote>
+<p>CSRF 簡單來講就是利用使用者瀏覽器對於網站的信任來達到攻擊，假設我們已經知道某某某 API 路徑，例如刪除帳號的API <code>https:/www.example.com/delete?id=XXX</code>，然後黑客就傳給你一個句話「快看!點這個網址可以取得一個比特幣」(屁)</p>
+</blockquote>
+<p>因此其實在 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0">維基百科</a> 上也有特別粗體黑字標示 CSRF 的重點觀念</p>
+<blockquote>
+<p><strong>這利用了web中使用者身分驗證的一個漏洞：簡單的身分驗證只能保證請求發自某個使用者的瀏覽器，卻不能保證請求本身是使用者自願發出的。</strong></p>
+</blockquote>
+<h2 id="Client-Double-Submit-Cookie"><a href="#Client-Double-Submit-Cookie" class="headerlink" title="Client Double Submit Cookie"></a>Client Double Submit Cookie</h2><p>在前面的文章中，就有描述到在沒有前後端分離的狀況下是如何處理 CSRF 的，基本上簡單來講就是透過 SSR 渲染畫面時，同時後端往前端丟一個 CSRF Token 的隨機字串，並儲存在畫面某個地方(通常是隱藏表單)，所以當你打開開發者工具時，是可以找到一個畫面看不到的隱藏 input 欄位的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;hidden&quot;</span> <span class="attr">name</span>=<span class="string">&quot;_csrf&quot;</span> <span class="attr">value</span>=<span class="string">&quot;BUMy6bl3-wtVBYgP9zA8xZLtFEP68mqNbQ-w&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2F%E6%88%AA%E5%9C%96%202021-05-27%2011.04.02.png?alt=media&token=5aae529c-3b93-48b5-b1b4-4a7cda4f7c70" alt="JavaScript 直播班 API"></p>
+<p>透過這種方式後端則必須暫存一個 CSRF Token，當前端往後端送資料時，就會取出該欄位來做比對，值若相同時才會繼續往下動作(新增、編輯等行為)。</p>
+<p>在上面所講的主要都是在「沒有完整的前後端分離」狀況下實作，這一段可能沒有什麼太大問題，但是在完整的前後端分離的狀況，那麼狀況就會完全不同，畢竟我們已經脫離了後端環境，因此前端的畫面就不是透過後端來渲染，那這樣子我們該如何取得 CSRF Token 呢？所以這邊這句話就是重點了</p>
+<p>「透過瀏覽器來生成 CSRF Token」</p>
+<p>這時候你可能會很疑惑，難道有 CORS 沒用嗎？或者開一個後端 API 來取得 CSRF Token 不就好了嗎？</p>
+<p>可以試著思考一下，網路上的 CORS 都有可能被繞過的，畢竟 CORS 最多只能防禦 XMLHttpRequest，而若特別開一個 API 來取得 CSRF Token 也相當奇怪，不就代表著我如果可以繞過 CORS 那麼不就可以一直請求拿到 CSRF Token？</p>
+<p>那麼回歸正題講講 Client 的 Double Submit Cookie，前面有講到會「透過瀏覽器來生成 CSRF Token」，那麼這一段可以怎麼做呢？舉例來講我們可以寫一個隨機字串產生器</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>  <span class="title">generateRandomString</span> (<span class="params">num</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> characters =<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&#x27;</span>;</span><br><span class="line">  <span class="keyword">let</span> result1= <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">  <span class="keyword">const</span> charactersLength = characters.length;</span><br><span class="line">  <span class="keyword">for</span> ( <span class="keyword">let</span> i = <span class="number">0</span>; i &lt; num; i++ ) &#123;</span><br><span class="line">      result1 += characters.charAt(<span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random() * charactersLength));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.cookie = <span class="string">`XSRF-TOKEN=<span class="subst">$&#123;generateRandomString&#125;</span>`</span>;</span><br></pre></td></tr></table></figure>
+
+<p>那麼這邊 XSRF-TOKEN 其實就是 CSRF-TOKEN，可以看到 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-tw/aspnet/core/security/anti-request-forgery?view=aspnetcore-5.0">微軟官方</a> 描述也是相同的：</p>
+<blockquote>
+<p>跨網站要求偽造 (也稱為 XSRF 或 CSRF) 是針對 web 裝載的應用程式進行攻擊</p>
+</blockquote>
+<p>接下來再請求往後端打的時候將存在 Cookie 的 XSRF-TOKEN 一起往後端送，如果你使用的是 axios 套件的話，只需要這樣子設定即可(不得不說 axios 超方便)：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">axios.defaults.xsrfCookieName: <span class="string">&#x27;XSRF-TOKEN&#x27;</span>, <span class="comment">// 名稱請與儲存在 cookies 相同，axios 預設是 &#x27;XSRF-TOKEN&#x27;</span></span><br><span class="line">axios.defaults.xsrfHeaderName = <span class="string">&#x27;X-XSRF-TOKEN&#x27;</span>; <span class="comment">// 這一個主要是請求時，會帶在 header 的名稱，建議與後端溝通，有些後端接收是接收 XSRF-TOKEN，axios 預設是 &#x27;X-XSRF-TOKEN&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你是在 Vue Cli 環境的話則是以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">this</span>.$http.defaults.xsrfCookieName: <span class="string">&#x27;XSRF-TOKEN&#x27;</span>,</span><br><span class="line"><span class="built_in">this</span>.$http.defaults.xsrfHeaderName = <span class="string">&#x27;XSRF-TOKEN&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>透過上面設置之後，每一次請求 axios 到後端時就會預設帶上由 Client 生成的 CSRF Token，而這個方式也可以避免 CSRF 攻擊問題。</p>
+<p>那麼你可能會疑惑為什麼這樣子可以預防 CSRF 攻擊，你可以試想一下，當使用者點了這個網址後的狀況會是如何</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href=<span class="string">&quot;https:/www.example.com/delete?id=1&quot;</span>&gt;取得比特幣&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>會因為使用者是直接點連結進入到該頁面，因此並不會有 axios 行為所以就不會有 Client 產生得 XSRF-TOKEN，這樣子後端就不會執行這個刪除行為，因此如果要達到正確的刪除行為你就必須需持有 Token 之外也必須持有 XSRF-TOKEN，這樣子就可以避免這種狀況。</p>
+<p>但你可能也會疑惑「可是通常登入的功能必須有 Token 才能夠刪除啊？」</p>
+<p>基本上是的，但是如果你傳送時如果能夠多這個保護，是可以減少被攻擊的機會，而這個 CSRF 大部分都是在預防不需要 Token 的頁面為主哩。</p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0">跨站請求偽造</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.techbridge.cc/2017/02/25/csrf-introduction/">讓我們來談談 CSRF</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div>
+    <h4>
+      <i class="fas fa-heart"></i>
+      Liker 讚賞 (拍手)
+    </h4>
+    <p>
+      如果這一篇筆記文章對你有幫助，希望可以求點支持或
+      <del>牡蠣</del>
+      <ins>鼓勵</ins>
+      (ノД`)・゜・。
+    </p>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/lo" +
+        "veyou520babytw/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+  <small>Liker 是一個按讚(拍手)的讚賞機制，每一篇文章最多可以按五下拍手，過程你只需要登入，如果你願意按個讚，對於創作者來講是一個莫大的鼓勵與支持。</small>
+</div>
+<div style="width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px black dashed;">
+    <div class="message-block">
+      <p style="font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postfooter -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/CSRF/" rel="tag"># CSRF</a>
+              <a href="/tags/XSRF/" rel="tag"># XSRF</a>
+              <a href="/tags/%E5%89%8D%E5%BE%8C%E7%AB%AF%E5%88%86%E9%9B%A2/" rel="tag"># 前後端分離</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20210525/2636910669/" rel="prev" title="軟體版本號中的 Beta?Alpha?RC?">
+                  <i class="fa fa-chevron-left"></i> 軟體版本號中的 Beta?Alpha?RC?
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20210529/2519649612/" rel="next" title="淺談 SPA、CSR、SSR、MPA 專有名詞">
+                  淺談 SPA、CSR、SSR、MPA 專有名詞 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.9.1/dist/algoliasearch-lite.umd.js" integrity="sha256-nsOZ0hN8nehDzx3JBvvEM0RrxgDhZVihR8EI+hYxnh8=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.21.0/dist/instantsearch.production.min.js" integrity="sha256-wbxAqbeBbXYS1TyTiSutvpECRaZqDIv1mfEjgpmheR8=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{&quot;enable&quot;:true,&quot;shortname&quot;:&quot;welcome-web-world&quot;,&quot;count&quot;:false,&quot;i18n&quot;:{&quot;disqus&quot;:&quot;disqus&quot;}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+
+</body>
+</html>
