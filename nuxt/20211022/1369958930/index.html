@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前面我們大致上有建立了相當多的資料夾，其中包含了動態路由、巢狀路由等等，那麼我們怎麼驗證這些東西在 Nuxt.js 運作時是正確的呢？所以接下來就要來揭秘神秘的 .nuxt 檔案囉">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nuxt.js 2.x 實戰手冊(3) - 神秘的 .nuxt 資料夾">
+<meta property="og:url" content="https://israynotarray.com/nuxt/20211022/1369958930/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="前面我們大致上有建立了相當多的資料夾，其中包含了動態路由、巢狀路由等等，那麼我們怎麼驗證這些東西在 Nuxt.js 運作時是正確的呢？所以接下來就要來揭秘神秘的 .nuxt 檔案囉">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNuxtjs%2F%E6%88%AA%E5%9C%96%202021-10-22%2022.42.13.png?alt=media&token=00e4398c-addb-47bc-b339-bdf3f3f2adbe">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNuxtjs%2F%E6%88%AA%E5%9C%96%202021-10-22%2022.45.17.png?alt=media&token=6f0ca0a8-f1be-4219-84c0-329c86853502">
+<meta property="article:published_time" content="2021-10-22T14:16:32.000Z">
+<meta property="article:modified_time" content="2021-10-22T14:16:32.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Vue.js">
+<meta property="article:tag" content="Nuxt.js">
+<meta property="article:tag" content="Nuxt.js 2.x">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNuxtjs%2F%E6%88%AA%E5%9C%96%202021-10-22%2022.42.13.png?alt=media&token=00e4398c-addb-47bc-b339-bdf3f3f2adbe">
+
+
+<link rel="canonical" href="https://israynotarray.com/nuxt/20211022/1369958930/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nuxt/20211022/1369958930/","path":"nuxt/20211022/1369958930/","title":"Nuxt.js 2.x 實戰手冊(3) - 神秘的 .nuxt 資料夾"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Nuxt.js 2.x 實戰手冊(3) - 神秘的 .nuxt 資料夾 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A5%9E%E7%A7%98%E7%9A%84-nuxt"><span class="nav-number">2.</span> <span class="nav-text">神秘的 .nuxt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#router-js"><span class="nav-number">3.</span> <span class="nav-text">router.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#index-js"><span class="nav-number">4.</span> <span class="nav-text">index.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#App-js"><span class="nav-number">5.</span> <span class="nav-text">App.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#client-amp-server"><span class="nav-number">6.</span> <span class="nav-text">client &amp; server</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">906</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">650</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nuxt/20211022/1369958930/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Nuxt.js 2.x 實戰手冊(3) - 神秘的 .nuxt 資料夾 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="前面我們大致上有建立了相當多的資料夾，其中包含了動態路由、巢狀路由等等，那麼我們怎麼驗證這些東西在 Nuxt.js 運作時是正確的呢？所以接下來就要來揭秘神秘的 .nuxt 檔案囉">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nuxt.js 2.x 實戰手冊(3) - 神秘的 .nuxt 資料夾
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-10-22 22:16:32" itemprop="dateCreated datePublished" datetime="2021-10-22T22:16:32+08:00">2021-10-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nuxt/" itemprop="url" rel="index"><span itemprop="name">Nuxt</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">前面我們大致上有建立了相當多的資料夾，其中包含了動態路由、巢狀路由等等，那麼我們怎麼驗證這些東西在 Nuxt.js 運作時是正確的呢？所以接下來就要來揭秘神秘的 .nuxt 檔案囉</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面我們大致上有建立了相當多的資料夾，其中包含了動態路由、巢狀路由等等，那麼我們怎麼驗證這些東西在 Nuxt.js 運作時是正確的呢？所以接下來就要來揭秘神秘的 <code>.nuxt</code> 檔案囉</p>
+<h2 id="神秘的-nuxt"><a href="#神秘的-nuxt" class="headerlink" title="神秘的 .nuxt"></a>神秘的 .nuxt</h2><p>前面大致瞭解了資料夾的架構以及一些寫法，但是…你有沒有想過當你輸入 <code>npm run dev</code> 的時候 Nuxt.js 做了什麼事情呢？接下來就讓我們打開神秘的 .nuxt 資料夾吧！</p>
+<p>那麼在 <code>npm run dev</code> 的時候你會看到兩條進度條，分別是</p>
+<ul>
+<li>Client</li>
+<li>Server</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNuxtjs%2F%E6%88%AA%E5%9C%96%202021-10-22%2022.42.13.png?alt=media&token=00e4398c-addb-47bc-b339-bdf3f3f2adbe" alt="dev"></p>
+<p>Client 代表的是 Webpack 而 Server 則是正在生成 Node.js Server 環境，接下來編譯完畢之後，你打開 .nuxt 應該會看到一推類似 Vue Cli 的幾個檔案又有一些不認識的檔案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNuxtjs%2F%E6%88%AA%E5%9C%96%202021-10-22%2022.45.17.png?alt=media&token=6f0ca0a8-f1be-4219-84c0-329c86853502" alt=".nuxt"></p>
+<h2 id="router-js"><a href="#router-js" class="headerlink" title="router.js"></a>router.js</h2><p>首先我們先找到一隻我們很熟悉的檔案，也就是 <code>router.js</code>。</p>
+<p>在前面我們有說過放在 pages 都會被當作一個頁面所使用，所以當你打開時，可能會看到以下自動生成得內容</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">_35be678e</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/about.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/about&quot; */</span>))</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">_4c01c8ab</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/example.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/example&quot; */</span>))</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">_61bc3a24</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/example/index.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/example/index&quot; */</span>))</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">_5fe22d04</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/example/created.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/example/created&quot; */</span>))</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">_0207c8d6</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/example/_id.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/example/_id&quot; */</span>))</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">_55764253</span> = (<span class="params"></span>) =&gt; <span class="title function_">interopDefault</span>(<span class="title function_">import</span>(<span class="string">&#x27;../pages/index.vue&#x27;</span> <span class="comment">/* webpackChunkName: &quot;pages/index&quot; */</span>))</span><br></pre></td></tr></table></figure>
+
+<p>基本上我們可以看到只要是放在 pages 資料夾下的都會被當作頁面來自動引入。</p>
+<p>接下來再往下滑，我們前面有設置巢狀路由與動態路由，你可以發現 router.js 也依然會自動幫你像是在寫 Vue Cli 一樣的規劃是在 children 裡面</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> routerOptions = &#123;</span><br><span class="line"><span class="attr">routes</span>: [&#123;</span><br><span class="line">    <span class="attr">path</span>: <span class="string">&quot;/about&quot;</span>,</span><br><span class="line">    <span class="attr">component</span>: _35be678e,</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&quot;about&quot;</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    <span class="attr">path</span>: <span class="string">&quot;/example&quot;</span>,</span><br><span class="line">    <span class="attr">component</span>: _4c01c8ab,</span><br><span class="line">    <span class="attr">children</span>: [&#123;</span><br><span class="line">      <span class="attr">path</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">      <span class="attr">component</span>: _61bc3a24,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;example&quot;</span></span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      <span class="attr">path</span>: <span class="string">&quot;created&quot;</span>,</span><br><span class="line">      <span class="attr">component</span>: _5fe22d04,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;example-created&quot;</span></span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      <span class="attr">path</span>: <span class="string">&quot;:id&quot;</span>,</span><br><span class="line">      <span class="attr">component</span>: _0207c8d6,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;example-id&quot;</span></span><br><span class="line">    &#125;]</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    <span class="attr">path</span>: <span class="string">&quot;/&quot;</span>,</span><br><span class="line">    <span class="attr">component</span>: _55764253,</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&quot;index&quot;</span></span><br><span class="line">  &#125;],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 Nuxt.js 也會生成另一個特別的檔案是 router.json 你可以很完整的看到 Nuxt.js 編譯後的檔案名稱與 .vue 哪來的檔案路徑。</p>
+<p>通常不太確定自己資料夾規劃的是否正確時，是可以來觀看 router.json 或是 router.js 了解的。</p>
+<h2 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a>index.js</h2><p>接下來是關於 Vue Cli 的進入點，也就是 main.js。</p>
+<p>本身 Nuxt.js 的 Client 編譯時，其實就是 webpack，而這個編譯的檔案就是 index.js，當你打開後會看到一些熟悉的引入方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">Meta</span> <span class="keyword">from</span> <span class="string">&#x27;vue-meta&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">ClientOnly</span> <span class="keyword">from</span> <span class="string">&#x27;vue-client-only&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">NoSsr</span> <span class="keyword">from</span> <span class="string">&#x27;vue-no-ssr&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; createRouter &#125; <span class="keyword">from</span> <span class="string">&#x27;./router.js&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">NuxtChild</span> <span class="keyword">from</span> <span class="string">&#x27;./components/nuxt-child.js&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">NuxtError</span> <span class="keyword">from</span> <span class="string">&#x27;./components/nuxt-error.vue&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">Nuxt</span> <span class="keyword">from</span> <span class="string">&#x27;./components/nuxt.js&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;./App.js&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; setContext, getLocation, getRouteData, normalizeError &#125; <span class="keyword">from</span> <span class="string">&#x27;./utils&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>還沒看到嗎？這邊我在刪除一些東西吧</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; createRouter &#125; <span class="keyword">from</span> <span class="string">&#x27;./router.js&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;./App.js&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>發現了嗎？基本上就跟我們在 main.js 撰寫時是一樣的，只是變成了 Nuxt.js 幫你自動生成了 main.js 的檔案，而這頁面你也可以看到 Nuxt.js 引入了一些套件，例如：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/vue-client-only">vue-client-only</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/vue-no-ssr">vue-no-ssr</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/vue-meta">vue-meta</a></li>
+</ul>
+<p>所以我們可以了解到 Nuxt.js 其實本身也是整合了許多開發者的套件，相信有些人可能有用過 vue-meta 來做到動態 title 的部分，早期我也有寫過類似 Vue Cli 動態路由的方式，這邊也提供給予參考</p>
+<p><a href="/vue/20200530/3823952369/">如何在 Vue 建立動態 title</a></p>
+<h2 id="App-js"><a href="#App-js" class="headerlink" title="App.js"></a>App.js</h2><p>App.js 的檔案原本是 App.vue，因此你打開時可以看到許多熟悉的語法，例如生命週期的語法等等，其中你也可以看到我們前面所使用的 layouts&#x2F;defalut.vue 也是在此引入的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _6f6c098b <span class="keyword">from</span> <span class="string">&#x27;../layouts/default.vue&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>因此其實這一隻檔案就是你所熟悉的 App.vue 只是寫法不同而已。</p>
+<h2 id="client-amp-server"><a href="#client-amp-server" class="headerlink" title="client &amp; server"></a>client &amp; server</h2><p>這兩個檔案基本上就是一個是在處理關於 client 相關的檔案而 server 就是關於 SSR 所需要的程式碼，但基本上我們不用太過深入了解，簡單了解一下這兩個檔案在幹嘛就好</p>
+<p>上面只是簡單了解一下關於 .nuxt 目錄，所以就沒有每一個都一一介紹，因為其實官方網站有簡單說明 .nuxt 以下擷取 <a target="_blank" rel="noopener" href="https://nuxtjs.org/docs/directory-structure/nuxt/">官方網站</a> 說明</p>
+<ul>
+<li>The router.js file is the generated router file that Nuxt generates for you when you put .vue files inside the pages folder. You can use this file for debugging for when you want to look up which routes are generated for vue-router and find out the names of a specific route.</li>
+<li>The router.scrollBehavior.js which is your Router ScrollBehavior</li>
+<li>The Components folder has all your Nuxt components such as NuxtChild and NuxtLink. It also contains the nuxt-build-indicator which is the page we see when your application is building and nuxt-loading which is your loading component that gets seen when we are waiting for your page to load. You will also find the nuxt-error page in here which contains the Nuxt default error page.</li>
+<li>The mixins folder has the files needed for the Nuxt $fetch method.</li>
+<li>The views folder contains your app template and your server error page.</li>
+<li>The app.js is your main application file.</li>
+<li>The client.js file is your client file needed for everything that happens client side.</li>
+<li>The empty file is intentionally left empty for no-op aliases</li>
+<li>The index.js file bootstraps your application.</li>
+<li>The loading.html is the file that is used when the page is loading.</li>
+<li>The middleware file is where your middleware is kept</li>
+<li>The server.js file is all the code that is ran on the server</li>
+<li>the utilities contains the utilities that Nuxt needs for it to work.</li>
+</ul>
+<p>我只能說真的是很簡單的說明。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Vue-js/" rel="tag"># Vue.js</a>
+              <a href="/tags/Nuxt-js/" rel="tag"># Nuxt.js</a>
+              <a href="/tags/Nuxt-js-2-x/" rel="tag"># Nuxt.js 2.x</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nuxt/20211022/3508219327/" rel="prev" title="Nuxt.js 2.x 實戰手冊(2) - Nuxt.js 架構認識">
+                  <i class="fa fa-angle-left"></i> Nuxt.js 2.x 實戰手冊(2) - Nuxt.js 架構認識
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/vue/20211024/829255545/" rel="next" title="Vue.js 重設或還原 data 初始值的小技巧">
+                  Vue.js 重設或還原 data 初始值的小技巧 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

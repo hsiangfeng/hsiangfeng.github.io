@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="有時候我們會臨時需要開一個 API 來用，但是卻又不想自己開一個後端，例如像是 Koa、Express 或是 Laravel 等等框架，因為實在太麻煩，因此這時候就可以使用 Google Apps Script 服務來達到這個需求，其中也可以用 Google Apps Script 串接 Google 試算表，將 Google 試算表當作資料庫來使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Google Apps Script 搭配 Google 試算表開一個 API">
+<meta property="og:url" content="https://israynotarray.com/other/20220211/2705866340/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="有時候我們會臨時需要開一個 API 來用，但是卻又不想自己開一個後端，例如像是 Koa、Express 或是 Laravel 等等框架，因為實在太麻煩，因此這時候就可以使用 Google Apps Script 服務來達到這個需求，其中也可以用 Google Apps Script 串接 Google 試算表，將 Google 試算表當作資料庫來使用。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F1J6Qm1Gr3RaG1oVPW5v4-0Q.png?alt=media&token=c1bbd10c-ef29-48de-b62d-f90ca4985607">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2009.57.22.png?alt=media&token=aafc14c9-8913-4268-a45c-7e775cb85698">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.00.03.png?alt=media&token=b443726f-a061-43fc-b8f7-bd6ff76af6e5">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.01.15.png?alt=media&token=0bcb9a66-1e28-45b4-84bc-125ec0e071f9">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.06.31.png?alt=media&token=4961630a-d909-489c-af9f-1fe3249317d3">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_09_21.png?alt=media&token=073da614-f7df-4954-8a68-0f752d499636">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.14.37.png?alt=media&token=5bb0fe6f-4887-4211-b7e0-de39ea501448">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.15.22.png?alt=media&token=a01ff964-6e5c-43f3-8b73-2cc28dc091c3">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2009.57.22.png?alt=media&token=aafc14c9-8913-4268-a45c-7e775cb85698">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.19.21.png?alt=media&token=68562f48-78f9-4602-b97c-3202e8007812">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.32.06.png?alt=media&token=8d9daa95-d0f0-4dfa-9cd6-46ad99a75537">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.33.26.png?alt=media&token=8487f633-2035-4b3a-8dc7-ebbdefbf3c18">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.34.03.png?alt=media&token=bc215f8f-597d-4e4b-ab1b-04b35ebe6b74">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_34_11.png?alt=media&token=83b92b03-16f8-439d-833f-124c541e47c7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_34_27.png?alt=media&token=e650098c-b24f-4d2a-973d-7d7673807ac4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.38.01.png?alt=media&token=5c0dcece-8704-4799-90f2-784f6ca83c4b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.50.44.png?alt=media&token=58a79966-8e3d-4759-a8fb-f17960603add">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.01.11.png?alt=media&token=0f6fa94a-c5f4-4090-be2d-4250c5ef0863">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.15.54.png?alt=media&token=3fe07062-47bc-4ae9-9f95-8d8a9114143a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.16.42.png?alt=media&token=dc820f32-c306-4c33-8a3c-68d79d3a0fe8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.17.18.png?alt=media&token=93266020-3f44-4780-a2b7-f87d4c6d2dea">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_18_47.png?alt=media&token=c9beb8a6-8ae4-4925-95bf-c71b9aa1dbd9">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_22_28.png?alt=media&token=d5502885-a5ac-45a0-8e1e-96186fab4046">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.24.42.png?alt=media&token=56d3b61c-9ef4-4ff7-a694-4d6d79302173">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_29_49.png?alt=media&token=e16e5a77-8935-4409-a976-8f1a03bddc19">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.31.33.png?alt=media&token=87cff943-e9c8-4ccb-9b79-4a6363080978">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.32.49.png?alt=media&token=7533438d-48c4-4d18-a93f-c5ee9d4b9bc1">
+<meta property="article:published_time" content="2022-02-11T01:48:18.000Z">
+<meta property="article:modified_time" content="2022-02-11T01:48:18.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="Google Apps Script">
+<meta property="article:tag" content="Google 試算表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F1J6Qm1Gr3RaG1oVPW5v4-0Q.png?alt=media&token=c1bbd10c-ef29-48de-b62d-f90ca4985607">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20220211/2705866340/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20220211/2705866340/","path":"other/20220211/2705866340/","title":"用 Google Apps Script 搭配 Google 試算表開一個 API"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>用 Google Apps Script 搭配 Google 試算表開一個 API | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Apps-Script"><span class="nav-number">2.</span> <span class="nav-text">Google Apps Script</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E8%A9%A6%E7%AE%97%E8%A1%A8"><span class="nav-number">3.</span> <span class="nav-text">建立試算表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Google-Apps-Script"><span class="nav-number">4.</span> <span class="nav-text">建立 Google Apps Script</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Apps-Script-%E8%B5%B7%E6%89%8B%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">Google Apps Script 起手式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%A3%E6%8E%A5%E7%89%B9%E5%AE%9A-Google-%E8%A9%A6%E7%AE%97%E8%A1%A8"><span class="nav-number">6.</span> <span class="nav-text">連接特定 Google 試算表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E6%AC%A1%E5%9F%B7%E8%A1%8C-Google-Apps-Script-%E7%9A%84%E7%8B%80%E6%B3%81"><span class="nav-number">7.</span> <span class="nav-text">初次執行 Google Apps Script 的狀況</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E5%BE%97-Google-%E8%A9%A6%E7%AE%97%E8%A1%A8%E5%85%A7%E5%AE%B9"><span class="nav-number">8.</span> <span class="nav-text">取得 Google 試算表內容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-Get-API"><span class="nav-number">9.</span> <span class="nav-text">撰寫 Get API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2-API"><span class="nav-number">10.</span> <span class="nav-text">部署 API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API-%E6%A0%BC%E5%BC%8F%E8%AA%BF%E6%95%B4"><span class="nav-number">11.</span> <span class="nav-text">API 格式調整</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">12.</span> <span class="nav-text">參考文獻</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">906</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">650</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20220211/2705866340/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="用 Google Apps Script 搭配 Google 試算表開一個 API | 是 Ray 不是 Array">
+      <meta itemprop="description" content="有時候我們會臨時需要開一個 API 來用，但是卻又不想自己開一個後端，例如像是 Koa、Express 或是 Laravel 等等框架，因為實在太麻煩，因此這時候就可以使用 Google Apps Script 服務來達到這個需求，其中也可以用 Google Apps Script 串接 Google 試算表，將 Google 試算表當作資料庫來使用。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用 Google Apps Script 搭配 Google 試算表開一個 API
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-02-11 09:48:18" itemprop="dateCreated datePublished" datetime="2022-02-11T09:48:18+08:00">2022-02-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">有時候我們會臨時需要開一個 API 來用，但是卻又不想自己開一個後端，例如像是 Koa、Express 或是 Laravel 等等框架，因為實在太麻煩，因此這時候就可以使用 Google Apps Script 服務來達到這個需求，其中也可以用 Google Apps Script 串接 Google 試算表，將 Google 試算表當作資料庫來使用。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有時候我們會臨時需要開一個 API 來用，但是卻又不想自己開一個後端，例如像是 Koa、Express 或是 Laravel 等等框架，因為實在太麻煩，因此這時候就可以使用 Google Apps Script 服務來達到這個需求，其中也可以用 Google Apps Script 串接 Google 試算表，將 Google 試算表當作資料庫來使用。</p>
+<h2 id="Google-Apps-Script"><a href="#Google-Apps-Script" class="headerlink" title="Google Apps Script"></a>Google Apps Script</h2><p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F1J6Qm1Gr3RaG1oVPW5v4-0Q.png?alt=media&token=c1bbd10c-ef29-48de-b62d-f90ca4985607" alt="Google Apps Script"></p>
+<p>首先 Google Apps Script 是什麼呢？Google Apps Script 是 Google 所開發的腳本平台，非常地輕量，起源主要是協助 Google 試算表輔助開發平台，因此 Google Apps Script 非常適合用來串接 Google 試算表，而 Google Apps Script 也非常類似小型的後端伺服器，因此也可以做一些處理。</p>
+<p>當然在前面的封面圖中，如果你有認真看你會發現 Google Apps Script 做的事情非常多，例如我先前有寫過一篇文章是「<a href="/javascript/20190617/3829122039/">使用 Google Apps Script 解決 CORS 問題</a>」，但這一篇我們就專注於串接 Google 試算表就好。</p>
+<p>除此之外 Google Apps Script 的學習成本也相當低，尤其是對於一個 JavaScript 工程師來講會更親民，因為主要語法都是採用網頁程式語言，也就是 CSS、HTML 與 JavaScript 撰寫</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2009.57.22.png?alt=media&token=aafc14c9-8913-4268-a45c-7e775cb85698" alt="使用常用的網頁程式語言"></p>
+<p>那麼接下來就讓我們試著去撰寫 <a target="_blank" rel="noopener" href="https://workspace.google.com/intl/zh-TW/products/apps-script/">Google Apps Script</a> 吧。</p>
+<h2 id="建立試算表"><a href="#建立試算表" class="headerlink" title="建立試算表"></a>建立試算表</h2><p>一開始我想先請你試著建立一個 Google 試算表，打開 Google 雲端硬碟，右鍵選擇「Google」 試算表</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.00.03.png?alt=media&token=b443726f-a061-43fc-b8f7-bd6ff76af6e5" alt="Google 試算表"></p>
+<p>建立成功後標題你可以在右上角改一下，讓自己好辨識一下</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.01.15.png?alt=media&token=0bcb9a66-1e28-45b4-84bc-125ec0e071f9" alt="重新命名"></p>
+<p>而內容你可以參考我的內容或者你自己打也可以</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.06.31.png?alt=media&token=4961630a-d909-489c-af9f-1fe3249317d3" alt="試算表內容"></p>
+<p>最後這邊紀錄一下試算表的 Url，等一下你會用到，例如：<a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0/edit#gid=0">https://docs.google.com/spreadsheets/d/1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0/edit#gid=0</a> (該試算表連結只是示範而已)。</p>
+<h2 id="建立-Google-Apps-Script"><a href="#建立-Google-Apps-Script" class="headerlink" title="建立 Google Apps Script"></a>建立 Google Apps Script</h2><p>首先回到 Google 雲端硬碟中建立一個 Google Apps Script，它的位置通常在「更多」裡面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_09_21.png?alt=media&token=073da614-f7df-4954-8a68-0f752d499636" alt="Google Apps Script 建立"></p>
+<p>名稱你也可以點一下上方重新命名一下，不然到時候你會找不到 QQ</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.14.37.png?alt=media&token=5bb0fe6f-4887-4211-b7e0-de39ea501448" alt="重新命名"></p>
+<p>接下來在下方畫面上你可以看到一個 <code>myFunction</code> 的初始地方，該處就是我們準備撰寫成程式碼的地方</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.15.22.png?alt=media&token=a01ff964-6e5c-43f3-8b73-2cc28dc091c3" alt="初始化"></p>
+<h2 id="Google-Apps-Script-起手式"><a href="#Google-Apps-Script-起手式" class="headerlink" title="Google Apps Script 起手式"></a>Google Apps Script 起手式</h2><p>那麼我們該如何起手呢？其實就如同前面所言，Google Apps Script 採用的是網頁程式語言所撰寫</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2009.57.22.png?alt=media&token=aafc14c9-8913-4268-a45c-7e775cb85698" alt="使用常用的網頁程式語言"></p>
+<p>你可以在裡面像寫 JavaScript 一樣宣告變數、<code>console.log</code> 輸出都可以</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(myName);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.19.21.png?alt=media&token=68562f48-78f9-4602-b97c-3202e8007812" alt="撰寫 Apps Script"></p>
+<p>因此完全不用太擔心我們還要額外學什麼，接下來就直接進入正題，也就是搭配 Google 試算表開一個 API。</p>
+<h2 id="連接特定-Google-試算表"><a href="#連接特定-Google-試算表" class="headerlink" title="連接特定 Google 試算表"></a>連接特定 Google 試算表</h2><p>那麼在 Google Apps Script 中有提供一個方法可以讓你開啟特定 Google 試算表，也就是 <code>SpreadsheetApp.openById</code> 語法，你可以透過這個<a target="_blank" rel="noopener" href="https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#openById(String)">連結</a>看到官方所提供的範例</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;abc1234567&quot;</span>);</span><br><span class="line"><span class="title class_">Logger</span>.<span class="title function_">log</span>(ss.<span class="title function_">getName</span>());</span><br></pre></td></tr></table></figure>
+
+<p>(附註：Google Apps Script 中大多都是用 <code>Logger.log</code> 語法，如果你想用 <code>console.log</code> 也可以，這兩者語法都有支援。)</p>
+<p>那麼 <code>openById</code> 我們要傳入什麼呢？也就是我們要開啟的試算表 ID，因此這邊就會需要剛剛我們建立的 Google 試算表 Url</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://docs.google.com/spreadsheets/d/1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0/edit#gid=0</span><br></pre></td></tr></table></figure>
+
+<p>裡面有一段 <code>1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0</code> 這個就是我們要的試算表 ID</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line"><span class="title class_">Logger</span>.<span class="title function_">log</span>(ss.<span class="title function_">getName</span>());</span><br></pre></td></tr></table></figure>
+
+<p>這樣子你就可以取得我們剛剛的 Google 試算表，你可以試著將它貼入到 Google Apps Script 中</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.32.06.png?alt=media&token=8d9daa95-d0f0-4dfa-9cd6-46ad99a75537" alt="Google Apps Script"></p>
+<p>接下來就可以來按一下上方執行按鈕囉</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.33.26.png?alt=media&token=8487f633-2035-4b3a-8dc7-ebbdefbf3c18" alt="執行"></p>
+<h2 id="初次執行-Google-Apps-Script-的狀況"><a href="#初次執行-Google-Apps-Script-的狀況" class="headerlink" title="初次執行 Google Apps Script 的狀況"></a>初次執行 Google Apps Script 的狀況</h2><p>第一次執行這個 Google Apps Script 時你會跳出一個審查權限的畫面，不用怕按下審查權限</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.34.03.png?alt=media&token=bc215f8f-597d-4e4b-ab1b-04b35ebe6b74" alt="審查權限"></p>
+<p>接下來選擇自己當前使用的帳號</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_34_11.png?alt=media&token=83b92b03-16f8-439d-833f-124c541e47c7" alt="使用帳號"></p>
+<p>最後你必須允許你當前的 Google Apps Script 檔案有權限去讀取試算表，否則你會無法使用</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_10_34_27.png?alt=media&token=e650098c-b24f-4d2a-973d-7d7673807ac4" alt="允許"></p>
+<p>都允許完畢之後，你就可以在下方看到執行結果了，而底下顯示的就是我們剛剛在試算表命名的名稱</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.38.01.png?alt=media&token=5c0dcece-8704-4799-90f2-784f6ca83c4b" alt="執行結果"></p>
+<h2 id="取得-Google-試算表內容"><a href="#取得-Google-試算表內容" class="headerlink" title="取得 Google 試算表內容"></a>取得 Google 試算表內容</h2><p>接下來我們必須設定要取得試算表的「哪一張工作表」，因為一個 Google 試算表內可能會有多個工作表，因此這邊就必須寫清楚你要取得哪一個試算表，那麼取得的方式有兩種寫法，我都直接提供上來</p>
+<p>第一種寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myFunction</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheetByName</span>(<span class="string">&#x27;工作表1&#x27;</span>);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二種寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myFunction</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheets</span>()[<span class="number">0</span>];</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一種寫法就是直接指定工作表名稱，第二種則是使用 <code>getSheets</code> 回傳一個工作表的陣列透過陣列取值的方式取得，底下我會一率用第一種的寫法。</p>
+<p>接下來如果你有嘗試輸出 <code>Logger.log(SheetName);</code> 的話，你會發現 Logger 只會出現 Sheet 的字樣，因為我們只是取得工作表而還沒取出內容，而取出來的方式非常簡單</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myFunction</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheetByName</span>(<span class="string">&#x27;工作表1&#x27;</span>);</span><br><span class="line">  <span class="title class_">Logger</span>.<span class="title function_">log</span>(<span class="title class_">SheetName</span>.<span class="title function_">getDataRange</span>().<span class="title function_">getValues</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我們要先取得工作表內的全部範圍資料(<code>getDataRange</code>)在取得裡面的內容(<code>getValues</code>)，接下來你再按一次執行就可以看到剛剛建立的 Google 試算表內容</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2010.50.44.png?alt=media&token=58a79966-8e3d-4759-a8fb-f17960603add" alt="內容"></p>
+<p>但是我們可以發現使用 <code>getDataRange</code> 語法會連標題都取進來，因此如果你不想要連標題都取得，而是你指定的範圍拉出資料的話，則可以改寫成以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myFunction</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheetByName</span>(<span class="string">&#x27;工作表1&#x27;</span>);</span><br><span class="line">  <span class="title class_">Logger</span>.<span class="title function_">log</span>(<span class="title class_">SheetName</span>.<span class="title function_">getRange</span>(<span class="string">&#x27;A2:D6&#x27;</span>).<span class="title function_">getValues</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子你就可以只取得資料而不出現標題列了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.01.11.png?alt=media&token=0f6fa94a-c5f4-4090-be2d-4250c5ef0863" alt="getRange"></p>
+<p>恭喜你到這邊已經完成八成囉。</p>
+<h2 id="撰寫-Get-API"><a href="#撰寫-Get-API" class="headerlink" title="撰寫 Get API"></a>撰寫 Get API</h2><p>那麼我們已經知道如何取得 Google 試算表內容了，那接下來該如何改成 API 形式呢？其實非常簡單，只需要命名一個 <code>doGet</code> 函式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doGet</span>(<span class="params"></span>) &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>反之如果要做 <code>Post</code> 則是 <code>doPost</code>，請務必注意這個名稱是絕對的，如果你對於 HTTP Methods 不熟悉的話，建議你閱讀「<a href="/other/20211125/356203095/">淺談 API 與 RESTful API</a>」這一篇。</p>
+<p>那麼回歸正題，我們接下來要將剛剛取得的 Google 資料做成 API，我們可以透過<a target="_blank" rel="noopener" href="https://developers.google.com/apps-script/guides/web?hl=en">官方文件</a>看到 <code>doGet</code> 的範例程式碼如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doGet</span>(<span class="params">e</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> params = <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(e);</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">HtmlService</span>.<span class="title function_">createHtmlOutput</span>(params);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此我們要將內容變成我們串接 Google 試算表的內容，但底下 <code>HtmlService.createHtmlOutput(params)</code> 我們要改用另一個方法，也就是 <code>ContentService.createTextOutput</code>，否則會出現錯誤</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doGet</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheetByName</span>(<span class="string">&#x27;工作表1&#x27;</span>);</span><br><span class="line">  <span class="keyword">const</span> values = <span class="title class_">SheetName</span>.<span class="title function_">getRange</span>(<span class="string">&#x27;A2:D6&#x27;</span>).<span class="title function_">getValues</span>();</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">ContentService</span>.<span class="title function_">createTextOutput</span>(values);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下來你可以嘗試按下執行，你會發現沒有任何問題的。</p>
+<h2 id="部署-API"><a href="#部署-API" class="headerlink" title="部署 API"></a>部署 API</h2><p>那我們 API 算是撰寫完畢了，因此接下來你要將這個 Google Apps Script 部署出去，否則你無法取得資料，因此點一下上方的「部署」按鈕，然後選擇「新增部署作業」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.15.54.png?alt=media&token=3fe07062-47bc-4ae9-9f95-8d8a9114143a" alt="新增部署作業"></p>
+<p>接下來依照提示選擇部署類型</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.16.42.png?alt=media&token=dc820f32-c306-4c33-8a3c-68d79d3a0fe8" alt="部署類型"></p>
+<p>這邊要選擇「網頁應用程式」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.17.18.png?alt=media&token=93266020-3f44-4780-a2b7-f87d4c6d2dea" alt="網頁應用程式"></p>
+<p>內容的話改成以下，唯一重點在於「誰可以存取」請改成「所有人」，否則等一下你無法測試</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_18_47.png?alt=media&token=c9beb8a6-8ae4-4925-95bf-c71b9aa1dbd9" alt="誰可以存取"></p>
+<p>沒問題後，你就可以按下部署按鈕，屆時你會在畫面上取得 API Url 複製起來</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_22_28.png?alt=media&token=d5502885-a5ac-45a0-8e1e-96186fab4046" alt="API Url"></p>
+<p>接下來你可以打開 Postman，然後使用貼上去戳戳看，不意外你會看到以下狀況</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.24.42.png?alt=media&token=56d3b61c-9ef4-4ff7-a694-4d6d79302173" alt="Postman"></p>
+<p>而這個畫面上呈現格式你會發現不太正常，主要原因是 <code>createTextOutput</code> 語法導致，因此我們要將資料先轉換成 JSON 格式並設置 content-type，否則預設會是 <code>text/html</code> 而不是我們常用的 JSON 格式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doGet</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> ss = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(<span class="string">&quot;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">SheetName</span> = ss.<span class="title function_">getSheetByName</span>(<span class="string">&#x27;工作表1&#x27;</span>);</span><br><span class="line">  <span class="keyword">const</span> values = <span class="title class_">SheetName</span>.<span class="title function_">getRange</span>(<span class="string">&#x27;A2:D6&#x27;</span>).<span class="title function_">getValues</span>();</span><br><span class="line">  <span class="keyword">const</span> dataExportFormat = <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(values);</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">ContentService</span>.<span class="title function_">createTextOutput</span>(dataExportFormat).<span class="title function_">setMimeType</span>(<span class="title class_">ContentService</span>.<span class="property">MimeType</span>.<span class="property">JSON</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>沒問題後在重新部署一次，請注意每次修正 API 內容都必須重新部署取得新的 API Url，否則你會一直取得舊的資料</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96_2022-02-11_11_29_49.png?alt=media&token=e16e5a77-8935-4409-a976-8f1a03bddc19" alt="重新部署"></p>
+<p>重新部署後請記得複製新的 API Url</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.31.33.png?alt=media&token=87cff943-e9c8-4ccb-9b79-4a6363080978" alt="API Url"></p>
+<p>最後你再拿這個 API Url 到 Postman 戳戳看就可以看到正確結果了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-apps-script%2F%E6%88%AA%E5%9C%96%202022-02-11%2011.32.49.png?alt=media&token=7533438d-48c4-4d18-a93f-c5ee9d4b9bc1" alt="正確結果"></p>
+<h2 id="API-格式調整"><a href="#API-格式調整" class="headerlink" title="API 格式調整"></a>API 格式調整</h2><p>最後我想補充調整一個地方，也就是我們剛剛有看到 API 回傳的結果是這樣子</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;原子筆&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;文具&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="number">10</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;收納櫃&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;收納&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="number">5</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>但正確來講我們要有一個屬性才對，因此程式碼要調整成以下，而這邊我就不再說明了，而是直接提供最終結果給予參考。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doGet</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> sheetId = <span class="string">&#x27;1MQPaKCV446eLXg2mDlLeKpsMc4nRnHDC7swlijAzkz0&#x27;</span>;</span><br><span class="line">  <span class="keyword">const</span> sheetName = <span class="string">&#x27;工作表1&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> spreadsheet = <span class="title class_">SpreadsheetApp</span>.<span class="title function_">openById</span>(sheetId);</span><br><span class="line">  <span class="keyword">const</span> sheet = spreadsheet.<span class="title function_">getSheetByName</span>(sheetName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> keys = sheet.<span class="title function_">getRange</span>(<span class="string">&#x27;A1:D1&#x27;</span>).<span class="title function_">getValues</span>()[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">const</span> values = sheet.<span class="title function_">getRange</span>(<span class="string">&#x27;A2:D6&#x27;</span>).<span class="title function_">getValues</span>();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> newData = [];</span><br><span class="line">  values.<span class="title function_">forEach</span>(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    newData.<span class="title function_">push</span>(&#123;</span><br><span class="line">      [keys[<span class="number">0</span>]]: data[<span class="number">0</span>],</span><br><span class="line">      [keys[<span class="number">1</span>]]:data[<span class="number">1</span>],</span><br><span class="line">      [keys[<span class="number">2</span>]]:data[<span class="number">2</span>],</span><br><span class="line">      [keys[<span class="number">3</span>]]:data[<span class="number">3</span>],</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">const</span> dataExportFormat = <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(newData);</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">ContentService</span>.<span class="title function_">createTextOutput</span>(dataExportFormat).<span class="title function_">setMimeType</span>(<span class="title class_">ContentService</span>.<span class="property">MimeType</span>.<span class="property">JSON</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子結果就會是我們常見的 JSON 格式了</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;ID&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;名稱&quot;</span><span class="punctuation">:</span> <span class="string">&quot;原子筆&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;分類&quot;</span><span class="punctuation">:</span> <span class="string">&quot;文具&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;數量&quot;</span><span class="punctuation">:</span> <span class="number">10</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>當然寫法還可以更漂亮一點，只是這邊就只是一個示範而已哩。</p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://workspace.google.com/intl/zh-TW/products/apps-script/">Google Apps Script</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#openById(String)">openById(id)</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/apps-script/guides/web?hl=en">doGet</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/Google-Apps-Script/" rel="tag"># Google Apps Script</a>
+              <a href="/tags/Google-%E8%A9%A6%E7%AE%97%E8%A1%A8/" rel="tag"># Google 試算表</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20220207/2089611734/" rel="prev" title="Discord 如何啟用 2FA(Two-factor Authentication) 二階段驗證">
+                  <i class="fa fa-angle-left"></i> Discord 如何啟用 2FA(Two-factor Authentication) 二階段驗證
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20220213/1357199827/" rel="next" title="(1)被迫吃芒果的前端工程師 - 認識 MongoDB 與安裝 MongoDB">
+                  (1)被迫吃芒果的前端工程師 - 認識 MongoDB 與安裝 MongoDB <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

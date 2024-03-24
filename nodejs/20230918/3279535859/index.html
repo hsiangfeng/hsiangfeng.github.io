@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day4 - Node.js 內置模組">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20230918/3279535859/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1690870679477.png?alt=media&token=0bd865e0-ab17-461d-b967-105cee53027c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnode_fs_readfile.png?alt=media&token=571b74d2-2838-4ecd-9df0-79dfc42733ca">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fcallback_hell.jpg?alt=media&token=d48c5e9b-b32b-4891-bb06-f0bc3aed9a14">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fexploding-boom.gif?alt=media&token=542e4b11-291c-43f5-a988-5b004b60df11">
+<meta property="article:published_time" content="2023-09-17T16:00:01.000Z">
+<meta property="article:modified_time" content="2023-09-17T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20230918/3279535859/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20230918/3279535859/","path":"nodejs/20230918/3279535859/","title":"Day4 - Node.js 內置模組"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day4 - Node.js 內置模組 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-js-%E5%85%A7%E7%BD%AE%E6%A8%A1%E7%B5%84"><span class="nav-number">2.</span> <span class="nav-text">Node.js 內置模組</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fs-%E6%A8%A1%E7%B5%84"><span class="nav-number">2.1.</span> <span class="nav-text">fs 模組</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#path-%E6%A8%A1%E7%B5%84"><span class="nav-number">2.2.</span> <span class="nav-text">path 模組</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#os-%E6%A8%A1%E7%B5%84"><span class="nav-number">2.3.</span> <span class="nav-text">os 模組</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crypto-%E6%A8%A1%E7%B5%84"><span class="nav-number">2.4.</span> <span class="nav-text">crypto 模組</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%9C%E6%96%BC-node-%E5%BE%8C%E7%BA%8C%E8%A3%9C%E5%85%85"><span class="nav-number">3.</span> <span class="nav-text">關於 node: 後續補充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="nav-number">4.</span> <span class="nav-text">碎碎念</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">906</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">650</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20230918/3279535859/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day4 - Node.js 內置模組 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day4 - Node.js 內置模組
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-09-18 00:00:01" itemprop="dateCreated datePublished" datetime="2023-09-18T00:00:01+08:00">2023-09-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24" alt="內置模組"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。</p>
+<h2 id="Node-js-內置模組"><a href="#Node-js-內置模組" class="headerlink" title="Node.js 內置模組"></a>Node.js 內置模組</h2><p>首先我們在前面寫了一點小範例（也不算寫，根本是把官方文件範例拿來用）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;node:http&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="property">statusCode</span> = <span class="number">200</span>;</span><br><span class="line">  res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>);</span><br><span class="line">  res.<span class="title function_">end</span>(<span class="string">&#x27;Hello, World!\n&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;); </span><br></pre></td></tr></table></figure>
+
+<p>在前面的範例中，我們並沒有很深刻的去認識它，剛好這一篇我們要來認識一下 Node.js 中的內置模組，所以就順便來解釋一下這個範例。</p>
+<p>首先什麼是內置模組？簡單來說就是 Node.js 中內建的模組，也就是說你不需要額外安裝任何東西，就可以直接使用的模組，而這些模組都是由 Node.js 官方所提供的，因此我們可以直接使用，這就是「內置模組」的意思。</p>
+<p>在上面的範例中，我們就使用到了 Node.js 的內置模組，也就是 <code>http</code> 模組，透過這個模組我們可以很快速的建立一個簡單的伺服器，而這個模組就是 Node.js 官方所提供的，因此我們可以直接使用。</p>
+<p>通常內置模組大多都是這樣寫 <code>require(&#39;node:&lt;模組名稱&gt;&#39;)</code>。</p>
+<p>有個大概簡單觀念之後，我們就來逐行解釋一下前面的範例吧！</p>
+<ul>
+<li>第一行：<code>const http = require(&#39;node:http&#39;);</code><ul>
+<li>使用 <code>require</code> 語法來引入 <code>http</code> 模組，並且將它指派給 <code>http</code> 這個常數，這樣我們就可以透過 <code>http</code> 來使用 <code>http</code> 模組了。</li>
+</ul>
+</li>
+<li>第二行：<code>const hostname = &#39;127.0.0.1&#39;;</code><ul>
+<li>定義了一個 <code>hostname</code> 常數，並且將 <code>&#39;127.0.0.1&#39;</code> 指派給它，後面我們會使用到。</li>
+</ul>
+</li>
+<li>第三行：<code>const port = 3000;</code><ul>
+<li>定義了一個 <code>port</code> 常數，並且將 <code>3000</code> 指派給它，也是後面會使用到。</li>
+</ul>
+</li>
+<li>第五行：<code>const server = http.createServer((req, res) =&gt; &#123; ... &#125;</code><ul>
+<li>我們使用 <code>http</code> 模組中的 <code>createServer</code> 方法，並且將一個函式作為參數傳入，這樣就做好一個簡單的伺服器，但是此時還沒有啟動。</li>
+</ul>
+</li>
+<li>第六行：<code>res.statusCode = 200;</code><ul>
+<li>我們將 <code>res</code> 物件中的 <code>statusCode</code> 屬性指派為 <code>200</code>，這樣就可以讓瀏覽器知道這個請求是成功的。</li>
+</ul>
+</li>
+<li>第七行：<code>res.setHeader(&#39;Content-Type&#39;, &#39;text/plain&#39;);</code><ul>
+<li>用了 <code>res</code> 物件中的 <code>setHeader</code> 方法，將 <code>Content-Type</code> 設定為 <code>text/plain</code>，這樣瀏覽器就會知道我們接下來的回應會是一個純文字。</li>
+</ul>
+</li>
+<li>第八行：<code>res.end(&#39;Hello, World!\n&#39;);</code><ul>
+<li>使用 <code>res</code> 物件中的 <code>end</code> 方法，並且將 <code>Hello, World!\n</code> 作為回應的內容，這樣瀏覽器就會看到 <code>Hello, World!</code> 這個字串。</li>
+</ul>
+</li>
+<li>第十行：<code>server.listen(port, hostname, () =&gt; &#123; ... &#125;</code><ul>
+<li>最後 <code>server</code> 中有一個 <code>listen</code> 方法，我們可以透過這個方法來啟動伺服器，並且指定 <code>port</code> 與 <code>hostname</code>，這樣瀏覽器才能夠連線到伺服器。</li>
+</ul>
+</li>
+</ul>
+<p>透過上面的程式碼，我們就可以建立一個簡單的伺服器，只需要在專案啟動後，就可以在瀏覽器中輸入 <code>http://127.0.0.1:3000/</code> 來看到 <code>Hello, World!</code> 這個字串。</p>
+<p>這邊也額外補充一下 <code>res</code> 代表著回應（Response），而 <code>req</code> 代表著請求（Request），這兩個物件都是由 <code>http</code> 模組所提供的，我們可以透過這兩個物件來操作請求與回應；由於當使用者請求時，我們必須回應給使用者我們即將回傳的格式，因此我們使用 <code>res.setHeader(&#39;Content-Type&#39;, &#39;text/plain&#39;);</code> 來告訴瀏覽器我們即將回傳的格式是 <code>text/plain</code>，這樣瀏覽器就會知道我們接下來的回應會是一個純文字。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1690870679477.png?alt=media&token=0bd865e0-ab17-461d-b967-105cee53027c" alt="偷懶"></p>
+<p>（可惡，我以為把前面範例講完就好了）</p>
+<p>你以為 Node.js 的內置模組只能用來架設一個簡單的伺服器嗎？</p>
+<p>錯！Node.js 的內置模組還有很多很多，這邊我也列出一些內置模組：</p>
+<ul>
+<li><code>http</code>：用於建立 HTTP 伺服器。</li>
+<li><code>https</code>：用於建立 HTTPS 伺服器。</li>
+<li><code>fs</code>：用於操作檔案，例如：讀取檔案、寫入檔案、刪除檔案等等。</li>
+<li><code>path</code>：處理檔案路徑的工具。</li>
+<li><code>os</code>：用於操作作業系統的工具。</li>
+<li><code>crypto</code>：提供加密和解密功能的模組。</li>
+<li><code>zlib</code>：提供壓縮和解壓縮功能的模組。</li>
+<li><code>util</code>：提供一些實用工具的模組。</li>
+<li><code>stream</code>：用於處理 Stream 的模組，可以處理大型檔案或資料的讀取和寫入。</li>
+<li><code>querystring</code>：用於處理 URL 查詢字串的模組。</li>
+</ul>
+<p>那麼由於內置模組並不會每一個都介紹到，因為篇幅實在太多了，因此這邊我只會拉幾個比較常見的來介紹，那麼前面已經有介紹過 <code>http</code> 模組了，所以就不會再額外說明 <code>http</code> 模組囉。</p>
+<p>往下閱讀之前，我想先再一次重複，基本上你只要看到 <code>require(&#39;node:&lt;模組名稱&gt;&#39;)</code>，就代表著它是使用 Node.js 的內置模組，因此你不需要額外安裝，什麼是額外安裝呢？也就是你不用再額外輸入 <code>npm install &lt;模組名稱&gt;</code> 來安裝，因為 Node.js 官方已經幫你準備好了。</p>
+<h3 id="fs-模組"><a href="#fs-模組" class="headerlink" title="fs 模組"></a>fs 模組</h3><p><code>fs</code> 完整名稱是 <code>File system</code> 的縮寫，也就是<strong>檔案系統</strong>的意思，這個模組可以讓我們操作作業系統的檔案，例如：讀取檔案、寫入檔案、刪除檔案等等。</p>
+<p>首先先請你依照以下指令建立一個檔案以及資料夾</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> fs-example</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> fs-example/text.txt</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello, World&quot;</span> &gt; fs-example/text.txt</span><br></pre></td></tr></table></figure>
+
+<p>接下來請你建立一個 index.js 檔案，然後我們就要來認識最基本的 <code>fs</code> 模組了，底下是一個簡單的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">readFile</span>(<span class="string">&#x27;./text.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請不要忘記輸入 <code>npm init -y</code> 來初始化專案，這樣才能夠使用 <code>npm install</code> 來安裝套件以及增加 <code>&quot;start&quot;: &quot;node index.js&quot;</code> 指令唷。</p>
+</blockquote>
+<p>在上面的程式碼中，我們使用了 <code>fs</code> 模組中的 <code>readFile</code> 方法，這個方法可以讀取特定檔案，並且將檔案內容回傳給我們，這邊我們將 <code>text.txt</code> 這個檔案讀取出來，並且將內容回傳給我們，這樣我們就可以在終端機中看到 <code>Hello, World</code> 這個字串</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnode_fs_readfile.png?alt=media&token=571b74d2-2838-4ecd-9df0-79dfc42733ca" alt="readFile"></p>
+<p>有讀取檔案的語法，當然就會有新增、刪除跟寫入的語法啦~</p>
+<p>但是因為 JavaScript 本身在檔案處理這一塊是屬於非同步的，因此我們必須使用 <code>callback</code> 來處理，但是使用 <code>callback</code> 的方式就會發生所謂的「<strong>Callback Hell</strong>」問題發生</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fcallback_hell.jpg?alt=media&token=d48c5e9b-b32b-4891-bb06-f0bc3aed9a14" alt="callback hell"></p>
+<p>那麼 <code>Callback Hell</code> 會導致程式碼過於巢狀，讓程式碼變得難以閱讀，因此 Node.js 在 10.0.0 版本之後，提供了 <code>node:fs/promises</code> 模組可以使用，因此以剛剛的讀取檔案範例來講，我們可以改成這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs/promises&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">readFile</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> fs.<span class="title function_">readFile</span>(<span class="string">&#x27;./text.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">readFile</span>();</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>Callback 的概念就是將函式做為另一個函式的參數傳入並呼叫，也就是當某件事情完成後，我們才會去執行這個函式，這個函式就是 callback，而 Callback Hell 就是 Callback 的巢狀結構，這個巢狀結構會讓程式碼變得難以閱讀。</p>
+</blockquote>
+<p>那麼往下介紹之前，如果你對於 Promise 沒有概念或者不熟悉的話，我會推薦你閱讀我先前寫文章</p>
+<ul>
+<li><a href="https://israynotarray.com/javascript/20211128/2950137358/">JavaScript 中的 Promise 是什麼？以及為什麼你要懂 Promise</a></li>
+</ul>
+<p>如果沒有任何問題的話，這邊我就即將繼續介紹其他檔案操作的方法囉~</p>
+<p>有讀取語法，當然就會有寫入語法，而寫入的語法就是 <code>fs.writeFile</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs/promises&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">updateFile</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt;&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">await</span> fs.<span class="title function_">writeFile</span>(<span class="string">&#x27;./text.txt&#x27;</span>, <span class="string">&#x27;這是更新後的檔案內容。&#x27;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;檔案編輯成功！&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;無法編輯檔案 ：&#x27;</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">updateFile</span>();</span><br></pre></td></tr></table></figure>
+
+<p>這時候你應該會發現一個問題，原本我們在前面是使用 <code>echo &quot;Hello, World&quot; &gt; fs-example/text.txt</code> 這個指令來新增檔案的內容，但是使用 <code>fs.writeFile</code> 這個方法之後，卻沒有新增檔案內容，而是直接覆蓋掉原本的檔案內容，變成了 <code>&#39;這是更新後的檔案內容。&#39;</code>，如果這是你預期的結果那麼就沒問題，但如果不是的話，那麼我們就需要使用 <code>fs.appendFile</code> 這個方法來新增檔案內容才對：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs/promises&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">appendUpdateFile</span>= <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">await</span> fs.<span class="title function_">appendFile</span>(<span class="string">&#x27;./text.txt&#x27;</span>, <span class="string">&#x27;這是新增的內容。&#x27;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;檔案編輯成功！&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;無法編輯檔案 ：&#x27;</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">appendUpdateFile</span>();</span><br></pre></td></tr></table></figure>
+
+<p><code>fs.appendFile</code> 會直接在原本的檔案內容後面新增內容，而不是覆蓋掉原本的檔案內容，這樣就不會發生覆蓋掉原本檔案內容的問題了。</p>
+<blockquote>
+<p><strong>Note</strong><br>你會發現 <code>fs.appendFile</code> 會是在最後一行的字去新增，如果你是希望新增時同時換行的話，可以在字串前後加上 <code>\n</code>，這樣就可以換行了，ex：<code>await fs.appendFile(&#39;./text.txt&#39;, &#39;\n這是新增的內容。\n&#39;);</code>。</p>
+</blockquote>
+<p>接下來就是刪除檔案的語法，刪除檔案的語法就是 <code>fs.unlink</code> 格外簡單許多：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs/promises&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">deleteFile</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">await</span> fs.<span class="title function_">unlink</span>(<span class="string">&#x27;./text.txt&#x27;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;檔案刪除成功！&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;無法刪除檔案 ：&#x27;</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">deleteFile</span>();</span><br></pre></td></tr></table></figure>
+
+<p>基本上我們已經認識了幾個語法</p>
+<ul>
+<li><code>fs.readFile</code>：讀取檔案</li>
+<li><code>fs.writeFile</code>：寫入檔案（我認為應該叫覆蓋檔案比較好）</li>
+<li><code>fs.appendFile</code>：新增檔案內容</li>
+<li><code>fs.unlink</code>：刪除檔案</li>
+</ul>
+<p>當然 <code>fs</code> 底下還有很多功能可以使用，如果一一介紹的話，我看這一篇除了直接爆掉之外，腦袋應該也會爆掉吧？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fexploding-boom.gif?alt=media&token=542e4b11-291c-43f5-a988-5b004b60df11" alt="BOOM"></p>
+<h3 id="path-模組"><a href="#path-模組" class="headerlink" title="path 模組"></a>path 模組</h3><p><code>path</code> 是一個專門處理檔案路徑的模組，很有趣吧？竟然還有一個專門處理檔案路徑的模組，路徑不是就 <code>../</code> or <code>./</code> 嗎？為什麼還需要一個專門處理檔案路徑的模組呢？</p>
+<p>其實原因是出在不同的操作系統上，路徑的表示方式是不同的，例如：在 Windows 上路徑是這樣的 <code>C:\Users\user\Desktop\test.txt</code>，而在 Mac 上路徑是這樣的 <code>/Users/user/Desktop/test.txt</code>，因此我們需要一個專門處理檔案路徑的模組，這樣我們才能夠確保在不同的操作系統上都能夠正確的處理檔案路徑。</p>
+<p>那麼我們就來看看 <code>path</code> 模組的使用方式？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;node:path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> filePath = path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;text.txt&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(filePath);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請記得在專案中建立一個 <code>text.txt</code> 檔案，並且在檔案中輸入任意內容。</p>
+</blockquote>
+<p>有沒有很簡單呢？上面我們使用了 <code>path</code> 模組中的 <code>join</code> 方法，這個方法可以將多個路徑組合起來，並且回傳一個組合後的路徑，這邊我們將 <code>__dirname</code> 與 <code>text.txt</code> 組合起來，這樣就可以得到一個完整的路徑了。</p>
+<p>那麼這邊有趣的事情來了 <code>__dirname</code> 是什麼東西？當你直接輸出 <code>__dirname</code> 你會得到當前檔案的路徑，例如：<code>/Users/user/Desktop/fs-example</code>，所以你應該是想著…</p>
+<p>「<code>__dirname</code> 是哪裡來的？你又沒有宣告這個變數？為什麼他能夠取得當前專案的目錄？」</p>
+<p>在 Node.js 中有一個叫做 <code>global</code> 的物件，這個物件可以讓我們在任何地方都可以使用，而 <code>__dirname</code> 就是 <code>global</code> 物件中的一個屬性，這個屬性可以讓我們取得當前檔案的路徑，因此我們可以透過 <code>__dirname</code> 來取得當前檔案的路徑。</p>
+<blockquote>
+<p><strong>Note</strong><br>Node.js 的全域物件是叫 <code>global</code>，而瀏覽器則是 <code>window</code>，這兩個物件都是可以在任何地方使用的，但是在 Node.js 中，我們不需要使用 <code>global</code> 來取得全域物件，因為 Node.js 預設就會將 <code>global</code> 設定為全域物件，因此我們可以直接使用 <code>__dirname</code> 來取得當前檔案的路徑；你可以將 <code>global</code> 當作是瀏覽器的 <code>window</code> 概念。</p>
+</blockquote>
+<p>那麼只有這樣嗎？不，其實你可以透過 path 取得檔案的檔名或副檔名，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;node:path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> filePath = path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;text.txt&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(path.<span class="title function_">basename</span>(filePath));</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(path.<span class="title function_">extname</span>(filePath));</span><br></pre></td></tr></table></figure>
+
+<p>透過 <code>path.basename</code> 我們可以取得檔案的檔名，透過 <code>path.extname</code> 我們可以取得檔案的副檔名，這樣就可以讓我們更方便的取得檔案的檔名或副檔名了。</p>
+<h3 id="os-模組"><a href="#os-模組" class="headerlink" title="os 模組"></a>os 模組</h3><p><code>os</code> 模組全名是 <code>Operating System</code> 的縮寫，也就是作業系統的意思，這個模組可以讓我們取得作業系統的資訊，例如：作業系統的名稱、作業系統的版本、作業系統的記憶體等等。</p>
+<p>我目前是使用 Mac，因此我們就來看看 <code>os</code> 模組可以取得哪些資訊～</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> os = <span class="built_in">require</span>(<span class="string">&#x27;node:os&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> osName = os.<span class="title function_">platform</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;操作系統名稱：&#x27;</span>, osName);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> osVersion = os.<span class="title function_">release</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;操作系統版本：&#x27;</span>, osVersion);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cpuInfo = os.<span class="title function_">cpus</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;CPU 資訊：&#x27;</span>, cpuInfo);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> networkInterfaces = os.<span class="title function_">networkInterfaces</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;網路介面資訊：&#x27;</span>, networkInterfaces);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> totalMemory = os.<span class="title function_">totalmem</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;總內存量：&#x27;</span>, totalMemory);</span><br></pre></td></tr></table></figure>
+
+<p>基本上你應該輸入完畢後，並執行是可以在終端機看到相關資訊的，而我這邊就不額外提供了，那麼因為 <code>os</code> 模組的相關操作非常多，所以我這邊就不一一介紹了。</p>
+<blockquote>
+<p><strong>Note</strong><br>Mac 的作業系統名稱是 <code>darwin</code>，而 Windows 的作業系統名稱是 <code>win32</code>。</p>
+</blockquote>
+<h3 id="crypto-模組"><a href="#crypto-模組" class="headerlink" title="crypto 模組"></a>crypto 模組</h3><p><code>crypto</code> 主要跟加解密有關，比較常見的場景就是在使用者註冊時，我們會將使用者的密碼進行加密，這樣就可以確保使用者的密碼不會被外洩，而當使用者登入時，我們就會將使用者輸入的密碼進行加密，然後再與資料庫中的密碼進行比對，這樣就可以確保使用者輸入的密碼是正確的。</p>
+<p>而 <code>crypto</code> 也提供相當多的方式，例如：sha256、sha512、md5 等等，這邊我們就來看個簡易的範例吧！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> crypto = <span class="built_in">require</span>(<span class="string">&#x27;node:crypto&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> password = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">hashPassword</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> hash = crypto.<span class="title function_">createHash</span>(<span class="string">&#x27;sha256&#x27;</span>);</span><br><span class="line">  hash.<span class="title function_">update</span>(data);</span><br><span class="line">  <span class="keyword">return</span> hash.<span class="title function_">digest</span>(<span class="string">&#x27;hex&#x27;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hashedPassword = <span class="title function_">hashPassword</span>(password);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(hashedPassword);</span><br></pre></td></tr></table></figure>
+
+<p>簡單來講，我們使用了一個 sha256 進行雜湊，將使用者的密碼變成一串亂碼，這樣子就可以確保使用者的密碼不會被外洩，什麼意思呢？我們在開發系統時總是會需要記錄使用者的帳號及密碼，但為了資安上的考量，我們並不會將使用者的密碼以明碼的方式儲存，而是會將密碼進行雜湊，這樣就可以確保使用者的密碼不會被外洩，因為即使是系統管理員也無法知道使用者的密碼是什麼。</p>
+<blockquote>
+<p><strong>Note</strong><br>明碼的意思就是沒有做任何處理的密碼，例如密碼是 <code>12345678</code> 儲存時也就是 <code>12345678</code>，這樣就是明碼。</p>
+</blockquote>
+<p>但使用 sha256 只是一個基本的方式，通常還會搭配 Salt（加鹽）的方式，只是這就不是這篇的重點了，因此我就不多做介紹了。</p>
+<p>回頭來講 sha256 的部分，當我們使用了 sha256 進行雜湊後，我們該如何在使用者登入時比對呢？基本上只要使用者輸入的密碼進行雜湊，然後再與資料庫中的雜湊後的密碼進行比對就可以囉</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> crypto = <span class="built_in">require</span>(<span class="string">&#x27;node:crypto&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> password = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">hashPassword</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> hash = crypto.<span class="title function_">createHash</span>(<span class="string">&#x27;sha256&#x27;</span>);</span><br><span class="line">  hash.<span class="title function_">update</span>(data);</span><br><span class="line">  <span class="keyword">return</span> hash.<span class="title function_">digest</span>(<span class="string">&#x27;hex&#x27;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hashedPassword = <span class="title function_">hashPassword</span>(password);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 假設這是資料庫中存儲的使用者密碼雜湊值</span></span><br><span class="line"><span class="keyword">const</span> storedHashedPassword = hashedPassword;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用者輸入的密碼</span></span><br><span class="line"><span class="keyword">const</span> userInputPassword = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hashedInputPassword = <span class="title function_">hashPassword</span>(userInputPassword);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 將雜湊後的使用者輸入密碼與資料庫中存儲的密碼雜湊值進行比較</span></span><br><span class="line"><span class="keyword">if</span> (hashedInputPassword === storedHashedPassword) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;密碼正確，驗證成功！&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;密碼錯誤，驗證失敗！&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很簡單吧？但這只是簡單的範例，實際上我們還需要搭配 Salt（加鹽）的方式，這樣才能夠更加確保使用者的密碼不會被外洩唷（很重要）。</p>
+<p>那麼這一篇我想要先來做個結尾了，因為 Node.js 內建模組實在有點多，如果每個都介紹的話，量其實有點大 QQ</p>
+<p>因此這一篇我主要介紹的還是以那幾個比較常見的為主，其餘的部分可以依照自己開發需求來使用哩～</p>
+<p>我們下一篇見囉～</p>
+<h2 id="關於-node-後續補充"><a href="#關於-node-後續補充" class="headerlink" title="關於 node: 後續補充"></a>關於 <code>node:</code> 後續補充</h2><p>剛好有人提問了以下…</p>
+<p>「請問範例中 <code>node:</code> 這個前綴好像有加沒加都可以正常運作？那這樣這有什麼差嗎？」</p>
+<p>這個問題問得很好，確實以我們前面的範例來講：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;node:http&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="property">statusCode</span> = <span class="number">200</span>;</span><br><span class="line">  res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>);</span><br><span class="line">  res.<span class="title function_">end</span>(<span class="string">&#x27;Hello, World!\n&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;); </span><br></pre></td></tr></table></figure>
+
+<p>就算改成了以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="property">statusCode</span> = <span class="number">200</span>;</span><br><span class="line">  res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>);</span><br><span class="line">  res.<span class="title function_">end</span>(<span class="string">&#x27;Hello, World!\n&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;); </span><br></pre></td></tr></table></figure>
+
+<p>這件事情需要先提到一個東西，也就是 Node.js 的 <code>require</code> 緩存機制，基本上模組在引入時都會被緩存起來（放在 <code>require.cache</code> 中），這樣就可以避免重複引入模組，因此當我們在引入模組時，Node.js 會先檢查模組是否已經被緩存，如果有的話就會直接使用緩存的模組，如果沒有的話就會重新載入模組，這樣除了可以大大的提高效能之外，也可以避免重複引入模組，並共用某些狀態。</p>
+<p>而這個 <code>node:</code> 前綴詞是大約在 Node.js 14 左右引入的（吧？），基本上當你使用 <code>node:</code> 前綴詞時，Node.js 將會繞過 <code>require</code> 的快取機制，什麼意思呢？就算 <code>require.cache</code> 中有這個模組，也依然會被忽略掉，直接返回並重新載入模組，這樣就可以確保你使用的是最新的模組，而不是快取的模組。</p>
+<p>因此，使用 <code>node:</code> 就是在跟 Node.js 講說…</p>
+<p>「嘿！你給我直接去找 <code>node:</code> 後面的模組，不要去找快取的模組！」</p>
+<p>這也是為什麼有無使用 <code>node:</code> 前綴詞都可以正常運作的原因哩~</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>最近發生了一點事情，差點鐵人賽文章就沒辦法寫下去了，還好用肝的把它給肝出來了！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" rel="tag"># 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nodejs/20230917/3753839802/" rel="prev" title="Day3 - 第一個 Node.js 專案">
+                  <i class="fa fa-angle-left"></i> Day3 - 第一個 Node.js 專案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20230919/1426601281/" rel="next" title="Day5 - Node.js Modules">
+                  Day5 - Node.js Modules <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
