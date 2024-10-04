@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="首先什麼是 ESM 呢？ESM 全名是「ES6 Modules or JavaScript Modules」，因此這一篇會來介紹一下 ESM。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="什麼是 ESM(ES6 Modules or JavaScript Modules) 呢？">
+<meta property="og:url" content="https://israynotarray.com/javascript/20210424/616364031/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="首先什麼是 ESM 呢？ESM 全名是「ES6 Modules or JavaScript Modules」，因此這一篇會來介紹一下 ESM。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/6r8jupR.png">
+<meta property="og:image" content="https://i.imgur.com/qBty2bo.png">
+<meta property="article:published_time" content="2021-04-24T05:12:38.000Z">
+<meta property="article:modified_time" content="2021-04-24T05:12:38.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="ES Module">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/6r8jupR.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/javascript/20210424/616364031/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/javascript/20210424/616364031/","path":"javascript/20210424/616364031/","title":"什麼是 ESM(ES6 Modules or JavaScript Modules) 呢？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>什麼是 ESM(ES6 Modules or JavaScript Modules) 呢？ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6-Modules-or-JavaScript-Modules"><span class="nav-number">2.</span> <span class="nav-text">ES6 Modules or JavaScript Modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NodeJS"><span class="nav-number">2.1.</span> <span class="nav-text">NodeJS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ESM-%E9%A0%90%E8%A8%AD%E5%9A%B4%E6%A0%BC%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">ESM 預設嚴格模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8%E5%9F%9F%E7%8D%A8%E7%AB%8B"><span class="nav-number">2.3.</span> <span class="nav-text">作用域獨立</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E5%90%8D%E5%8C%AF%E5%87%BA%E8%88%87%E5%8C%AF%E5%85%A5"><span class="nav-number">3.</span> <span class="nav-text">具名匯出與匯入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A0%90%E8%A8%AD%E5%8C%AF%E5%87%BA%E8%88%87%E5%8C%AF%E5%85%A5"><span class="nav-number">4.</span> <span class="nav-text">預設匯出與匯入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Side-Effect-%E6%A8%A1%E7%B5%84"><span class="nav-number">5.</span> <span class="nav-text">Side Effect 模組</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">6.</span> <span class="nav-text">參考文獻</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">920</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">678</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/javascript/20210424/616364031/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="什麼是 ESM(ES6 Modules or JavaScript Modules) 呢？ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="首先什麼是 ESM 呢？ESM 全名是「ES6 Modules or JavaScript Modules」，因此這一篇會來介紹一下 ESM。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          什麼是 ESM(ES6 Modules or JavaScript Modules) 呢？
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-04-24 13:12:38" itemprop="dateCreated datePublished" datetime="2021-04-24T13:12:38+08:00">2021-04-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/javascript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">首先什麼是 ESM 呢？ESM 全名是「ES6 Modules or JavaScript Modules」，因此這一篇會來介紹一下 ESM。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先什麼是 ESM 呢？ESM 全名是「ES6 Modules or JavaScript Modules」，因此這一篇會來介紹一下 ESM。</p>
+<h2 id="ES6-Modules-or-JavaScript-Modules"><a href="#ES6-Modules-or-JavaScript-Modules" class="headerlink" title="ES6 Modules or JavaScript Modules"></a>ES6 Modules or JavaScript Modules</h2><p>原本早期的 JavaScipt 最主要用於網頁上的 DOM 操作，舉凡：特效、互動等，但是在近幾年來講 JavaScript 可以做相當多複雜的事情，例如 SPA、後端環境開發等，那麼因為複雜度不停地提升關係，所以開發者們開始必須考慮如何將複雜的程式模組化。</p>
+<p>那麼為什麼要模組化？這邊舉例一個情境。</p>
+<p>假設今天有一個網頁，然後共有每兩頁都會需要渲染畫面的資料，因此檔案方別為 app1.js 與 app2.js，而內容假使如下：</p>
+<p>（以下是我早期寫的程式碼，醜跟爛請見諒。）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* app1.js */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">updataList</span>(<span class="params">e</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> select = e.<span class="property">target</span>.<span class="property">value</span>;</span><br><span class="line">  listTitle.<span class="property">textContent</span> = select;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; listLen; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (select == data[i].<span class="property">Zone</span>) &#123;</span><br><span class="line">      str += <span class="string">`&lt;div class=&quot;col-md-6 py-2 px-1&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;div class=&quot;card&quot;&gt;</span></span><br><span class="line"><span class="string">          &lt;div class=&quot;card bg-dark text-white text-left&quot;&gt;</span></span><br><span class="line"><span class="string">            &lt;img class=&quot;card-img-top bg-cover&quot; height=&quot;155px&quot; src=&quot;`</span> + data[i].<span class="property">Picture1</span> + <span class="string">`&quot;&gt;</span></span><br><span class="line"><span class="string">            &lt;div class=&quot;card-img-overlay d-flex justify-content-between align-items-end p-0 px-3&quot; style=&quot;background-color: rgba(0, 0, 0, .2)&quot;&gt;</span></span><br><span class="line"><span class="string">             &lt;h5 class=&quot;card-img-title-lg&quot;&gt;`</span> + data[i].<span class="property">Name</span> + <span class="string">`&lt;/h5&gt;&lt;h5 class=&quot;card-img-title-sm&quot;&gt;`</span> + data[i].<span class="property">Zone</span> + <span class="string">`&lt;/h5&gt;</span></span><br><span class="line"><span class="string">           &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;div class=&quot;card-body text-left&quot;&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;far fa-clock fa-clock-time&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Opentime</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-map-marker-alt fa-map-gps&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Add</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">            &lt;div class=&quot;d-flex justify-content-between align-items-end&quot;&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-mobile-alt fa-mobile&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Tel</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-tags text-warning&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Ticketinfo</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">            &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">      &lt;/div&gt;`</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;;</span><br><span class="line">  list.<span class="property">innerHTML</span> = str;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">/* app2.js */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">updataList</span>(<span class="params">e</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> select = e.<span class="property">target</span>.<span class="property">value</span>;</span><br><span class="line">  listTitle.<span class="property">textContent</span> = select;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; listLen; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (select == data[i].<span class="property">Zone</span>) &#123;</span><br><span class="line">      str += <span class="string">`&lt;div class=&quot;col-md-6 py-2 px-1&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;div class=&quot;card&quot;&gt;</span></span><br><span class="line"><span class="string">          &lt;div class=&quot;card bg-dark text-white text-left&quot;&gt;</span></span><br><span class="line"><span class="string">            &lt;img class=&quot;card-img-top bg-cover&quot; height=&quot;155px&quot; src=&quot;`</span> + data[i].<span class="property">Picture1</span> + <span class="string">`&quot;&gt;</span></span><br><span class="line"><span class="string">            &lt;div class=&quot;card-img-overlay d-flex justify-content-between align-items-end p-0 px-3&quot; style=&quot;background-color: rgba(0, 0, 0, .2)&quot;&gt;</span></span><br><span class="line"><span class="string">             &lt;h5 class=&quot;card-img-title-lg&quot;&gt;`</span> + data[i].<span class="property">Name</span> + <span class="string">`&lt;/h5&gt;&lt;h5 class=&quot;card-img-title-sm&quot;&gt;`</span> + data[i].<span class="property">Zone</span> + <span class="string">`&lt;/h5&gt;</span></span><br><span class="line"><span class="string">           &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;div class=&quot;card-body text-left&quot;&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;far fa-clock fa-clock-time&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Opentime</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-map-marker-alt fa-map-gps&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Add</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">            &lt;div class=&quot;d-flex justify-content-between align-items-end&quot;&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-mobile-alt fa-mobile&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Tel</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">              &lt;p class=&quot;card-p-text&quot;&gt;&lt;i class=&quot;fas fa-tags text-warning&quot;&gt;&lt;/i&gt;&amp;nbsp;`</span> + data[i].<span class="property">Ticketinfo</span> + <span class="string">`&lt;/p&gt;</span></span><br><span class="line"><span class="string">            &lt;/div&gt;</span></span><br><span class="line"><span class="string">          &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">      &lt;/div&gt;`</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;;</span><br><span class="line">  list.<span class="property">innerHTML</span> = str;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我們可以發現相同的程式碼我們必須在兩個檔案間重複撰寫兩次，如果有更多頁面的話，則必須寫更多次。</p>
+<p>因此我們就會希望可以將重複性且可以一直利用的程式碼片段抽出來當作模組使用。</p>
+<h3 id="NodeJS"><a href="#NodeJS" class="headerlink" title="NodeJS"></a>NodeJS</h3><p>那麼在 Node.js 則是走所謂的 CommonJS，最早名稱是 ServerJS，為什麼特別提到 CommonJS 呢？原因在於前面所講的開發者為了找出如何將複雜的程式碼模組化而出現的一套標準，主要是使用 <code>module.exports</code> 與 <code>require</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* exports.js */</span></span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="string">&#x27;Hello World&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* main.js */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hello = <span class="built_in">require</span>(<span class="string">&#x27;exports&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(hello); <span class="comment">// Hello World</span></span><br></pre></td></tr></table></figure>
+
+<p>附帶一提 <code>require</code> 語法是同步載入，因此他必須等待 <code>require</code> 執行完畢才會執行後面的程式碼。</p>
+<p>回歸正題，ESM 主要的語法是使用 <code>import</code> 與 <code>export</code>，如果你有使用過 webpack，但這邊的 ESM 介紹並不是講 Webpack 的部分，而是直接在瀏覽器撰寫，而 ESM 主要吸收了 AMD 與 CommonJS 的優點而出現的，因此也被視為 JavaScript 中非常重要的語法。</p>
+<p>那麼想要使用的最主要關鍵在於，你必須將你的 <code>&lt;script&gt;</code> 標籤補上 <code>type=&quot;module&quot;</code> 否則你是無法使用 ESM 的。</p>
+<p>除此之外接下來也會針對 ESM 稍微介紹幾個重點與如何使用。</p>
+<h3 id="ESM-預設嚴格模式"><a href="#ESM-預設嚴格模式" class="headerlink" title="ESM 預設嚴格模式"></a>ESM 預設嚴格模式</h3><p>ESM 後的程式碼會自動變成 <code>&#39;use strict&#39;</code>(嚴格模式)，不論你有沒有使用 <code>&#39;use strict&#39;</code> 必定都會是嚴格模式。</p>
+<p>那麼什麼是嚴格模式呢？由於 JavaScript 是一個相當自由的語言，因此如果對於 JavaScript 沒有一定掌握度，那麼在開發上一定會採許多雷，因此嚴格模式就是要避免我們採到這些奇怪的雷，舉例來講，非常常見的就是打錯字</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person;</span><br><span class="line">persom = &#123;&#125;;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(persom);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/6r8jupR.png" alt="非嚴格模式"></p>
+<p>在沒有使用嚴格模式時，是不會出現任何錯誤且還可以正常運行，當你使用嚴格模式後就會完全不同</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&quot;use strict&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> person ; </span><br><span class="line">persom = &#123;&#125;;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(persom);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/qBty2bo.png" alt="嚴格模式"></p>
+<p>那麼基本上你已經對於嚴格模式有一定認知，接下來你可以嘗試將以下程式碼貼到 Codepen，是可以發現依然會出現一樣的錯誤訊息，這邊我就不重複貼上圖片了。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">var</span> person;</span></span><br><span class="line"><span class="language-javascript">  persom = &#123;&#125;;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(persom);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="作用域獨立"><a href="#作用域獨立" class="headerlink" title="作用域獨立"></a>作用域獨立</h3><p>每一個模組都是獨立的作用域，是無法跨作用域取值，這是什麼意思呢？每一個 <code>script type=&quot;module&quot;</code> 都會自己的一個空間，你是無法取得另一個空間的變數或方法。</p>
+<p>舉例來講，在原本我們這樣寫時是可以跨 script 取值的</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">var</span> person = <span class="string">&#x27;Hello Ray&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(person); <span class="comment">// Hello Ray</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>當你在宣告變數 <code>script</code> 標籤補上 <code>type=&quot;module&quot;</code> 就會完全不同</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">var</span> person = <span class="string">&#x27;Hello Ray&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(person); <span class="comment">// ReferenceError: person is not defined </span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>因此在使用 ESM 的時候，請務必至少知道這兩點問題，否則你可能會一直踩雷。</p>
+<h2 id="具名匯出與匯入"><a href="#具名匯出與匯入" class="headerlink" title="具名匯出與匯入"></a>具名匯出與匯入</h2><p>接下來介紹一下何謂具名匯出，其實概念與具名函式與匿名函式非常雷同，你在模組化匯出時它是會有名字是一樣的，而寫法前面有講到主要是使用 <code>export</code>，而具名匯出並沒有特別限制，你可以匯出物件、變數或是函式等等：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* app.js */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> myName = <span class="string">&#x27;Hello Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="title function_">sayHi</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Ray&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> obj = &#123;</span><br><span class="line">  <span class="attr">myName</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br></pre></td></tr></table></figure>
+
+<p>具名匯出的最大特色在於，你可以一個檔案內有多個模組匯出，而這邊模組匯入則是使用 <code>import</code>，而具名匯出基本上已經有名字了，因此通常會是 <code>import &#123; ... &#125; form &#39;./app.js&#39;</code> 的方式匯入：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">import</span> &#123; arr, obj, sayHi, myName &#125; <span class="keyword">from</span> <span class="string">&#x27;./app.js&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(myName); <span class="comment">// &#x27;Hello Ray&#x27;</span></span></span><br><span class="line"><span class="language-javascript">  <span class="title function_">sayHi</span>(); <span class="comment">// Hello Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(obj.<span class="property">myName</span>); <span class="comment">// Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(arr[<span class="number">0</span>]); <span class="comment">// 0</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你不想要一一匯入的話，你也可以全部匯入，但是通常實務上是不太建議這樣做，因為 debug 很困難，這邊要注意以下 <code>*</code> 代表著是全部匯入，並且 <code>as</code> 賦予到一個新的變數叫做 <code>app</code> 上：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">import</span> * <span class="keyword">as</span> app <span class="keyword">from</span> <span class="string">&#x27;./app.js&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">myName</span>); <span class="comment">// &#x27;Hello Ray&#x27;</span></span></span><br><span class="line"><span class="language-javascript">  app.<span class="title function_">sayHi</span>(); <span class="comment">// Hello Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">obj</span>.<span class="property">myName</span>); <span class="comment">// Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">arr</span>[<span class="number">0</span>]); <span class="comment">// 0</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>當然你也可以使用 <code>as</code> 來重新命名</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">import</span> &#123; obj <span class="keyword">as</span> obj2 &#125; <span class="keyword">from</span> <span class="string">&#x27;./app.js&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(obj2.<span class="property">myName</span>); <span class="comment">// Ray</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="預設匯出與匯入"><a href="#預設匯出與匯入" class="headerlink" title="預設匯出與匯入"></a>預設匯出與匯入</h2><p>基本上你可以把預設匯出想像成匿名函式，因此你在匯入時必須給予一個變數接收，而預設匯出主要常見寫法是一個物件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* app.js */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="title function_">sayHello</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Ray&#x27;</span>);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">myName</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">obj</span>: &#123;</span><br><span class="line">    <span class="attr">myName</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">arr</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>剛剛有提到預設匯出類似匿名函式，因此你在匯入時，必須給予一個名稱接收</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">import</span> app <span class="keyword">from</span> <span class="string">&#x27;./app.js&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">myName</span>); <span class="comment">// &#x27;Ray&#x27;</span></span></span><br><span class="line"><span class="language-javascript">  app.<span class="title function_">sayHello</span>(); <span class="comment">// Hello Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">obj</span>.<span class="property">myName</span>); <span class="comment">// Ray</span></span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">console</span>.<span class="title function_">log</span>(app.<span class="property">arr</span>[<span class="number">0</span>]); <span class="comment">// 0</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Side-Effect-模組"><a href="#Side-Effect-模組" class="headerlink" title="Side Effect 模組"></a>Side Effect 模組</h2><p>接下來你應該會很好奇，那麼早期的函式庫是怎麼做到匯出匯入的？例如 jQuery?</p>
+<p>這個時候就要提到 Side Effect，在原本早期還沒有 ESM 時，基本上就是使用 IIFE (立即執行函式)的技巧來做到：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* jQuery.js */</span></span><br><span class="line">(<span class="keyword">function</span>(<span class="params"><span class="variable language_">global</span></span>)&#123;</span><br><span class="line">  <span class="variable language_">global</span>.<span class="property">$</span> = &#123;</span><br><span class="line">    <span class="title function_">sayHello</span>(<span class="params"></span>) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Ray&#x27;</span>);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">myName</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">    <span class="attr">obj</span>: &#123;</span><br><span class="line">      <span class="attr">myName</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">arr</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)(<span class="variable language_">window</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* app.js */</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>($.myName); <span class="comment">// &#x27;Ray&#x27;</span></span><br><span class="line">$.<span class="title function_">sayHello</span>(); <span class="comment">// Hello Ray</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>($.obj.<span class="property">myName</span>); <span class="comment">// Ray</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>($.arr[<span class="number">0</span>]); <span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
+
+<p>那麼最後這邊可能會有疑慮，學這個幹嘛？基本上如果你可以理解這些基本運作邏輯，那麼未來看到這些程式碼時或者想要自己開發較複雜的系統，就必定會使用到這些技巧唷。</p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Modules">JavaScript modules 模块</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/ES-Module/" rel="tag"># ES Module</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/webpack/20210423/976303083/" rel="prev" title="Webpack 5 走起! - Vue(10) - vue-loader">
+                  <i class="fa fa-angle-left"></i> Webpack 5 走起! - Vue(10) - vue-loader
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/javascript/20210501/1403517775/" rel="next" title="JavaScript 核心觀念(54)- 物件屬性延伸章節：屬性的特徵 - 屬性特徵是什麼？">
+                  JavaScript 核心觀念(54)- 物件屬性延伸章節：屬性的特徵 - 屬性特徵是什麼？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
