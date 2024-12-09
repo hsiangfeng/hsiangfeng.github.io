@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前面介紹了 CORS 跟 Env 可以說是基本的基本，接下來要來介紹一個很特別的東西，叫做 Helmet。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day13 - 替你的 Express 戴上頭盔吧！">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20230927/4133508926/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="前面介紹了 CORS 跟 Env 可以說是基本的基本，接下來要來介紹一個很特別的東西，叫做 Helmet。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_Helmet_408e4fa3-b225-4ee3-b62c-3e0df2a5bba8.png?alt=media&token=dd75a1f6-6d79-4e2e-ba48-509392ebfed7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fx_powered-by.jpg?alt=media&token=6956f796-529d-46c8-bad8-45b1769f0559">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1694781630689.png?alt=media&token=41eb92d9-f095-4c06-9157-141051754a35">
+<meta property="article:published_time" content="2023-09-26T16:00:01.000Z">
+<meta property="article:modified_time" content="2023-09-26T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_Helmet_408e4fa3-b225-4ee3-b62c-3e0df2a5bba8.png?alt=media&token=dd75a1f6-6d79-4e2e-ba48-509392ebfed7">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20230927/4133508926/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20230927/4133508926/","path":"nodejs/20230927/4133508926/","title":"Day13 - 替你的 Express 戴上頭盔吧！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day13 - 替你的 Express 戴上頭盔吧！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helmet-%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">Helmet 是什麼？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helmet-%E5%81%9A%E4%BA%86%E5%93%AA%E4%BA%9B%E4%BA%8B%E6%83%85%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">Helmet 做了哪些事情？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%B1%E8%97%8F-X-Powered-By-%E6%A8%99%E9%A0%AD"><span class="nav-number">3.1.</span> <span class="nav-text">隱藏 X-Powered-By 標頭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%9B%E7%B7%A9%E9%BB%9E%E6%93%8A%E5%8A%AB%E6%8C%81"><span class="nav-number">3.2.</span> <span class="nav-text">減緩點擊劫持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%AB%8B%E6%B1%82%E5%81%BD%E9%80%A0"><span class="nav-number">3.3.</span> <span class="nav-text">跨站請求偽造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%85%B3%E6%9C%AC%E6%94%BB%E6%93%8A"><span class="nav-number">3.4.</span> <span class="nav-text">跨站腳本攻擊</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-Helmet"><span class="nav-number">3.5.</span> <span class="nav-text">其他 Helmet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A9%B2%E5%A6%82%E4%BD%95%E5%9C%A8-Express-%E4%B8%AD%E4%BD%BF%E7%94%A8-Helmet%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">該如何在 Express 中使用 Helmet？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">5.</span> <span class="nav-text">結論</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">921</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">679</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20230927/4133508926/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day13 - 替你的 Express 戴上頭盔吧！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="前面介紹了 CORS 跟 Env 可以說是基本的基本，接下來要來介紹一個很特別的東西，叫做 Helmet。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day13 - 替你的 Express 戴上頭盔吧！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-09-27 00:00:01" itemprop="dateCreated datePublished" datetime="2023-09-27T00:00:01+08:00">2023-09-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">前面介紹了 CORS 跟 Env 可以說是基本的基本，接下來要來介紹一個很特別的東西，叫做 Helmet。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_Helmet_408e4fa3-b225-4ee3-b62c-3e0df2a5bba8.png?alt=media&token=dd75a1f6-6d79-4e2e-ba48-509392ebfed7" alt="替你的 Express 戴上頭盔吧"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面介紹了 CORS 跟 Env 可以說是基本的基本，接下來要來介紹一個很特別的東西，叫做 Helmet。</p>
+<h2 id="Helmet-是什麼？"><a href="#Helmet-是什麼？" class="headerlink" title="Helmet 是什麼？"></a>Helmet 是什麼？</h2><p>開始說明 Helmet 之前，我們要先釐清一件事情，也就是關於「網路安全」的事情。</p>
+<p>網路資訊安全是一個非常大的議題，當然這一篇不可能全部都介紹到，畢竟網路資訊安全包含了個人註冊帳號密碼時的註冊規則等，因此這一篇只會著重於後端的安全性。</p>
+<p>Helmet 其實在官方文件中有特別提到，Helmet 是一個幫助你保護你的 Express 應用程式的中介軟體，它會設定一些 HTTP 標頭，這些標頭可以幫助你的應用程式避免一些已知的網路攻擊。</p>
+<p>簡單來講，Helmet 就是在替你的 Express 戴上頭盔（Helmet），讓你的應用程式可以避免一些已知的網路攻擊，就如同一個人戴上頭盔，可以避免一些已知的傷害。</p>
+<h2 id="Helmet-做了哪些事情？"><a href="#Helmet-做了哪些事情？" class="headerlink" title="Helmet 做了哪些事情？"></a>Helmet 做了哪些事情？</h2><p>預設引入 <code>app.use(helmet());</code> 的狀況下，它會自動幫你在 HTTP 標頭中加入一些東西，而這些東西是可以幫助你的應用程式避免一些已知的網路攻擊。</p>
+<h3 id="隱藏-X-Powered-By-標頭"><a href="#隱藏-X-Powered-By-標頭" class="headerlink" title="隱藏 X-Powered-By 標頭"></a>隱藏 X-Powered-By 標頭</h3><p>在預設的情況下，Express 會在 HTTP 標頭中加入 <code>X-Powered-By: Express</code>，這個標頭會讓攻擊者知道你的應用程式是使用 Express 來開發的，因此攻擊者可以針對 Express 來進行攻擊。</p>
+<blockquote>
+<p><strong>Note</strong><br>實戰開發上會避免讓攻擊者知道你的應用程式是使用什麼來開發的，因為當該應用程式爆出漏洞時，攻擊者就可以針對該漏洞來進行攻擊，因此基本的隱藏是必要的；早期我在接觸 WordPress 時，就有遇到過攻擊者針對 WordPress 的漏洞來進行攻擊，因此這點是非常重要的。</p>
+</blockquote>
+<p>而 Helmet 會幫你隱藏這個標頭，因此攻擊者就無法知道你的應用程式是使用 Express 來開發的。</p>
+<p>不信？你可以試著用前面所練習的 Express 用 Postman 試戳一下，你會看到以下的結果</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fx_powered-by.jpg?alt=media&token=6956f796-529d-46c8-bad8-45b1769f0559" alt="X-Powered-By"></p>
+<h3 id="減緩點擊劫持"><a href="#減緩點擊劫持" class="headerlink" title="減緩點擊劫持"></a>減緩點擊劫持</h3><p>Clickjacking（點擊劫持）是一種攻擊，簡單來講就是誘騙你在網頁上點擊某個元素（通常是按鈕或連結），基本上就是在網頁上做了一個透明的覆蓋層，讓你以為你點擊的是某個元素，但實際上點擊的是另一個元素。</p>
+<p>而 Helmet 會幫你在 HTTP 標頭中加入 <code>X-Frame-Options</code>，這個標頭可以讓你的網頁在被嵌入到其他網頁時，可以避免被點擊劫持。</p>
+<p>如果不好懂的話，我們可以看一下範例程式碼：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 底下是一個惡意 HTML From 結構--&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>惡意網頁<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>點擊這裡贏取大獎！<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">iframe</span></span></span><br><span class="line"><span class="tag">      <span class="attr">src</span>=<span class="string">&quot;駭客的網站&quot;</span></span></span><br><span class="line"><span class="tag">      <span class="attr">style</span>=<span class="string">&quot;opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%;&quot;</span></span></span><br><span class="line"><span class="tag">      <span class="attr">frameborder</span>=<span class="string">&quot;0&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>因此當你點擊「點擊這裡贏取大獎！」時，實際上你點擊的是駭客的網站，而不是你想要的網站。</p>
+<p>而 Helmet 會幫你在 HTTP 標頭中加入 <code>X-Frame-Options</code>，這個標頭可以讓你的網頁在被嵌入到其他網頁時，可以避免被點擊劫持。</p>
+<blockquote>
+<p><strong>Note</strong><br>這個標頭有三種設定方式，分別是 <code>DENY</code>、<code>SAMEORIGIN</code>、<code>ALLOW-FROM</code>，而預設的設定是 <code>SAMEORIGIN</code>，也就是只有同源的網頁才可以嵌入，詳細你可以參考<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options">這裡</a>。</p>
+</blockquote>
+<h3 id="跨站請求偽造"><a href="#跨站請求偽造" class="headerlink" title="跨站請求偽造"></a>跨站請求偽造</h3><p>跨站請求偽造可能比較多人看到，中文若你不熟悉的話，或許 CSRF 會比較熟悉，這是一種攻擊，簡單來講就是攻擊者會在你的網頁中加入一些惡意的東西，當你點擊時，就會觸發攻擊者的惡意程式碼。</p>
+<p>而關於這一點我就不多說明了，畢竟我之前有寫文章說明過了</p>
+<ul>
+<li><a href="https://israynotarray.com/nodejs/20190704/2336420619/">全端勇士之路 Node.js 基礎學習-CSRF 篇</a></li>
+</ul>
+<p>早期防禦的方式是在表單中加入 CSRF Token，但現今主流開發模式是前後端分離，因此就會改用所謂的 Client Double Submit Cookie，而這個方式是在 Cookie 中加入 CSRF Token，然後在 HTTP 標頭中加入 CSRF Token，當後端收到請求時，就會比對 Cookie 中的 CSRF Token 跟 HTTP 標頭中的 CSRF Token 是否相同，如果相同就代表是合法的請求，否則就是非法的請求，實作方式可以參考<a href="https://israynotarray.com/nodejs/20210527/2874571028/">這裡</a>。</p>
+<h3 id="跨站腳本攻擊"><a href="#跨站腳本攻擊" class="headerlink" title="跨站腳本攻擊"></a>跨站腳本攻擊</h3><p>這個其實在一般開發上是滿常遇到的攻擊手法，又稱之為跨網站指令碼攻擊，簡稱 XSS，通常比較常見於 Input 欄位，攻擊者會在 Input 欄位中輸入一些惡意的指令碼，當你點擊送出後，這一段惡意的指令碼就會在某個地方執行，而這個地方可以是你的網頁，也可以是其他網頁。</p>
+<p>例如你的圖片 <code>src</code> 屬性來源是使用者輸入的，而使用者輸入的內容是惡意的指令碼，當你的網頁載入時，這段惡意的指令碼就會被執行，概念就像是使用者在 input 輸入以下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"><span class="title function_">alert</span>(<span class="string">&#x27;哈哈，你被 XSS 攻擊囉!&#x27;</span>);</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著渲染出來的結果就會是</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;#&quot;</span> <span class="attr">onerror</span>=<span class="string">&quot;alert(&#x27;哈哈，你被 XSS 攻擊囉!&#x27;);&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他-Helmet"><a href="#其他-Helmet" class="headerlink" title="其他 Helmet"></a>其他 Helmet</h3><p>當然不只有以上這些，Helmet 還有其他的東西，例如：</p>
+<ul>
+<li>Content-Security-Policy</li>
+<li>Cross-Origin-Opener-Policy</li>
+<li>Cross-Origin-Resource-Policy</li>
+<li>Origin-Agent-Cluster</li>
+<li>Referrer-Policy</li>
+<li>Strict-Transport-Security</li>
+<li>X-Content-Type-Options</li>
+<li>X-DNS-Prefetch-Control</li>
+<li>X-Download-Options</li>
+<li>X-Frame-Options</li>
+<li>X-Permitted-Cross-Domain-Policies</li>
+<li>X-Powered-By</li>
+<li>X-XSS-Protection</li>
+</ul>
+<p>這些都是可以幫助你的應用程式避免一些已知的網路攻擊，當然這些都是可以自行設定的，如果你想要了解更多的話，可以參考<a target="_blank" rel="noopener" href="https://helmetjs.github.io/">官方文件</a>。</p>
+<h2 id="該如何在-Express-中使用-Helmet？"><a href="#該如何在-Express-中使用-Helmet？" class="headerlink" title="該如何在 Express 中使用 Helmet？"></a>該如何在 Express 中使用 Helmet？</h2><p>Helmet 的使用方式非常簡單，只需要在你的專案中安裝 Helmet 套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install helmet</span><br></pre></td></tr></table></figure>
+
+<p>接著在你的程式碼中引用 Helmet：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> helmet = <span class="built_in">require</span>(<span class="string">&#x27;helmet&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過其他程式碼</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">helmet</span>());</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過其他程式碼</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>其引用的方式跟其他的中介軟體一樣，只需要在 <code>app.use()</code> 中加入即可。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你覺得從頭建立 Express 很煩的話，官方其實也有出一個叫做 <a target="_blank" rel="noopener" href="https://expressjs.com/en/starter/generator.html">Express Generator</a> 的東西，可以幫你快速建立一個 Express 專案唷。</p>
+</blockquote>
+<p>基本上預設 Helmet 會幫你加入前面所提到的東西，但如果你想要自行設定的話，也是可以的，例如你想要自行設定 <code>X-Frame-Options</code>，你可以這樣子寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> helmet = <span class="built_in">require</span>(<span class="string">&#x27;helmet&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過其他程式碼</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(</span><br><span class="line">  <span class="title function_">helmet</span>(&#123;</span><br><span class="line">    <span class="attr">frameguard</span>: &#123;</span><br><span class="line">      <span class="attr">xFrameOptions</span>: &#123; <span class="attr">action</span>: <span class="string">&quot;deny&quot;</span> &#125;, <span class="comment">// 不然就是 sameorigin</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過其他程式碼</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如果不想要使用某個功能的話，也是可以的，例如你不想要使用 <code>X-Frame-Options</code> 的話，你可以這樣子寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="title function_">use</span>(</span><br><span class="line">  <span class="title function_">helmet</span>(&#123;</span><br><span class="line">    <span class="attr">xFrameOptions</span>: <span class="literal">false</span>,</span><br><span class="line">  &#125;)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>那假設我只想要引入 <code>X-Powered-By</code> 來刪除 Express（或其他）的標頭，但其他的都不想要引入，你可以這樣子寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="title function_">use</span>(helmet.<span class="title function_">xPoweredBy</span>());</span><br></pre></td></tr></table></figure>
+
+<p>這樣子就只會引入 <code>X-Powered-By</code> 這個功能，其他的都不會引入。</p>
+<blockquote>
+<p><strong>Note</strong><br>其實 Express 官方的 Issues 曾經爭論過要不要把 <code>X-Powered-By</code> 這個功能拿掉，詳情可見 <a target="_blank" rel="noopener" href="https://github.com/expressjs/express/pull/2813">Security improvement: don’t reveal powered-by</a>。</p>
+</blockquote>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>雖然 Helmet 已經盡可能幫你的 Express 戴上頭盔，但也千萬不要認為 Helmet 是一個萬靈藥，畢竟資安事件層出不窮，而且攻擊者也會不斷的找尋漏洞，因此我們還是要多加注意，不要因為 Helmet 的存在，而忽略了資安的重要性唷。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1694781630689.png?alt=media&token=41eb92d9-f095-4c06-9157-141051754a35" alt="中箭"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" rel="tag"># 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nodejs/20230926/1829302614/" rel="prev" title="Day12 - 關於 CORS 與 Env">
+                  <i class="fa fa-angle-left"></i> Day12 - 關於 CORS 與 Env
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20230928/2824059455/" rel="next" title="Day14 - 網頁爬蟲？">
+                  Day14 - 網頁爬蟲？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
