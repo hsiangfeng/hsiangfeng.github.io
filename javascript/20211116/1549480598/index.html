@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在翻一些文獻時剛好翻到關於 Event Queue 的細節說明，所以就寫一篇來紀錄一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="淺談 JavaScript 中的 Event Queue、Event Table、Event Loop 以及 Event Task">
+<meta property="og:url" content="https://israynotarray.com/javascript/20211116/1549480598/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="在翻一些文獻時剛好翻到關於 Event Queue 的細節說明，所以就寫一篇來紀錄一下。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F1637068881310.png?alt=media&token=3dea1de8-212a-43b5-a6fe-28c825f8f1bf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.19.37.png?alt=media&token=e12dc5d2-2585-4600-9ba8-0ca077316c3b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.27.04.png?alt=media&token=057cd541-cfb9-40e6-abff-039ba0635b25">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.33.13.png?alt=media&token=56bf2192-13df-46a6-b9e9-7db21875abe6">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.41.52.png?alt=media&token=c1b8162f-e7e6-479a-9659-65fddc3d2769">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.44.33.png?alt=media&token=bc9a1a6f-673d-42c6-aa0c-f69e8209dffc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2000.03.04.png?alt=media&token=837385a3-51ba-4d13-8e30-6de9a8275752">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2000.04.48.png?alt=media&token=b2819b3f-5e07-4ec7-9239-d166db0ff773">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F1637068881310.png?alt=media&token=3dea1de8-212a-43b5-a6fe-28c825f8f1bf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2001.01.28.png?alt=media&token=49ea5fa8-96c0-4147-8fb5-aed27f20adc3">
+<meta property="article:published_time" content="2021-11-16T12:59:11.000Z">
+<meta property="article:modified_time" content="2021-11-16T12:59:11.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Event Loop">
+<meta property="article:tag" content="Event Queue">
+<meta property="article:tag" content="Event Table">
+<meta property="article:tag" content="Event Task">
+<meta property="article:tag" content="MacroTask">
+<meta property="article:tag" content="MicroTask">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc">
+
+
+<link rel="canonical" href="https://israynotarray.com/javascript/20211116/1549480598/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/javascript/20211116/1549480598/","path":"javascript/20211116/1549480598/","title":"淺談 JavaScript 中的 Event Queue、Event Table、Event Loop 以及 Event Task"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>淺談 JavaScript 中的 Event Queue、Event Table、Event Loop 以及 Event Task | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Queue-%E4%BA%8B%E4%BB%B6%E4%BD%87%E5%88%97"><span class="nav-number">2.</span> <span class="nav-text">Event Queue (事件佇列)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Table-%E4%BA%8B%E4%BB%B6%E8%A1%A8%E6%A0%BC"><span class="nav-number">3.</span> <span class="nav-text">Event Table (事件表格)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Loop-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%92%B0"><span class="nav-number">4.</span> <span class="nav-text">Event Loop (事件循環)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Task-%E4%BA%8B%E4%BB%B6%E4%BB%BB%E5%8B%99"><span class="nav-number">5.</span> <span class="nav-text">Event Task (事件任務)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">6.</span> <span class="nav-text">參考文獻</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">929</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">685</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/javascript/20211116/1549480598/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="淺談 JavaScript 中的 Event Queue、Event Table、Event Loop 以及 Event Task | 是 Ray 不是 Array">
+      <meta itemprop="description" content="在翻一些文獻時剛好翻到關於 Event Queue 的細節說明，所以就寫一篇來紀錄一下。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          淺談 JavaScript 中的 Event Queue、Event Table、Event Loop 以及 Event Task
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-11-16 20:59:11" itemprop="dateCreated datePublished" datetime="2021-11-16T20:59:11+08:00">2021-11-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/javascript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">在翻一些文獻時剛好翻到關於 Event Queue 的細節說明，所以就寫一篇來紀錄一下。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD039 MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在翻一些文獻時剛好翻到關於 Event Queue 的細節說明，所以就寫一篇來紀錄一下。</p>
+<h2 id="Event-Queue-事件佇列"><a href="#Event-Queue-事件佇列" class="headerlink" title="Event Queue (事件佇列)"></a>Event Queue (事件佇列)</h2><p>Event Queue 其實就是我們常在講的事件佇列、事件儲列等等名稱，中文翻譯實在太多了，所以接下來都會以 Event Queue 為主。</p>
+<p>那麼什麼是 Event Queue 呢？</p>
+<p>實際開發時，我們常常會遇到一些非同步的問題，例如：AJAX 操作、<code>setTimeout</code> 呼叫等等，而這些行為就會導致執行順序無法掌握。</p>
+<p>首先先讓我們看一段簡易的程式碼，我們預期下面應該是要依照順序出現 a → b → c</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;b&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;c&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>但實際上出現卻是…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc" alt="Example code"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F1637068881310.png?alt=media&token=3dea1de8-212a-43b5-a6fe-28c825f8f1bf" alt="WT..."></p>
+<p>為什麼會這樣呢？以上面範例來講 <code>setTimeout</code> 與 <code>console.log</code> 非常大的不同在於 <code>setTimeout</code> 並不是 <strong>直接執行</strong>，而是時間到了才執行的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/setTimeout">Web APIs</a>，因此 <code>setTimeout</code> 就會被丟到 Event Queue 中。</p>
+<p>因此我們常見的 AJAX 也會有這種狀況，畢竟 AJAX 取資料的時間是不確定的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;A&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;A&#x27;</span>);</span><br><span class="line">axios.<span class="title function_">get</span>(<span class="string">&#x27;https://randomuser.me/api/&#x27;</span>).<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(res.<span class="property">data</span>.<span class="property">results</span>[<span class="number">0</span>].<span class="property">name</span>.<span class="property">last</span>))</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;B&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;C&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;End&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="event queue" src="https://codepen.io/hsiangfeng/embed/preview/jOLQjVd?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng/pen/jOLQjVd">
+  event queue</a> by Ray (<a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng">@hsiangfeng</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
+</iframe>
+
+<h2 id="Event-Table-事件表格"><a href="#Event-Table-事件表格" class="headerlink" title="Event Table (事件表格)"></a>Event Table (事件表格)</h2><p>那麼 Event Queue 中還有一個東西是 Event Table，而 Event Table 用處在於<strong>紀錄準備丟進 Event Queue 的東西</strong>。</p>
+<p>所以這邊先讓我們看一下即將要講的範例程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;b&#x27;</span>), <span class="number">0</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;c&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>剛剛我們有看到範例結果是如下：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc" alt="Example code"></p>
+<p>那這一段運作是如何呢？讓我們用圖片來拆解吧~</p>
+<p>首先 <code>console.log(&#39;a&#39;);</code>、<code>setTimeout(() =&gt; console.log(&#39;b&#39;), 0);</code> 與 <code>console.log(&#39;c&#39;);</code> 會被放在一個地方，稱之為 Call Stack</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.19.37.png?alt=media&token=e12dc5d2-2585-4600-9ba8-0ca077316c3b" alt="Call Stack"></p>
+<p>那麼接下來 JavaScript 會將 <code>setTimeout(() =&gt; console.log(&#39;b&#39;), 0);</code> 放到 Event Table 註冊這個事件</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.27.04.png?alt=media&token=057cd541-cfb9-40e6-abff-039ba0635b25" alt="Event Table"></p>
+<p>這邊 Event Table 會將 <code>setTimeout</code> 紀錄 0 秒後執行並放在 Event Table 中，當放在 Event Table 的函式時間到了之後，就會將 Event Table 中這個函式放到 Event Queue 等待被丟回 Call Stack</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.33.13.png?alt=media&token=56bf2192-13df-46a6-b9e9-7db21875abe6" alt="Event Queue"></p>
+<p>所以 Event Queue 也就是一個緩衝區，準備回到 Call Stack 的地方。</p>
+<h2 id="Event-Loop-事件循環"><a href="#Event-Loop-事件循環" class="headerlink" title="Event Loop (事件循環)"></a>Event Loop (事件循環)</h2><p>接下來會有一個機制一直監聽 Event Queue 裡面有沒有東西要丟出來到 Call Stack，當若有東西的話它就會丟到 Call Stack</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.41.52.png?alt=media&token=c1b8162f-e7e6-479a-9659-65fddc3d2769" alt="Event Loop"></p>
+<p>當發現裡面若有東西時，它就會將結果丟回到 Call Stack</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2023.44.33.png?alt=media&token=bc9a1a6f-673d-42c6-aa0c-f69e8209dffc" alt="Call Stack"></p>
+<p>所以你才會看到這個結果</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-16%2021.13.54.png?alt=media&token=1204088a-4068-4e3d-aad2-de0f1c31dedc" alt="Example code"></p>
+<h2 id="Event-Task-事件任務"><a href="#Event-Task-事件任務" class="headerlink" title="Event Task (事件任務)"></a>Event Task (事件任務)</h2><p>還有一個東西是 Event Task，而 Event Task 細分兩種，分別是</p>
+<ul>
+<li>MacroTask (宏任務)</li>
+<li>MicroTask (微任务)</li>
+</ul>
+<p>那麼這兩者有什麼差別呢？這邊先讓我們看一段範例程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Promise&#x27;</span>) &#125;);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>) &#125;, <span class="number">0</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;End&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2000.03.04.png?alt=media&token=837385a3-51ba-4d13-8e30-6de9a8275752" alt="Example Code"></p>
+<p>我們可以看到順序是 Start → End → Promise → setTimeout</p>
+<p>但如果程式碼改成以下呢？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>) &#125;, <span class="number">0</span>);</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Promise&#x27;</span>) &#125;);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;End&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2000.04.48.png?alt=media&token=b2819b3f-5e07-4ec7-9239-d166db0ff773" alt="Example Code"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F1637068881310.png?alt=media&token=3dea1de8-212a-43b5-a6fe-28c825f8f1bf" alt="WT...再來一次"></p>
+<p>那麼為什麼會這樣子呢？原因是出在 MicroTask 與 MacroTask 導致，而 MicroTask 與 MacroTask 所代表的意思是<strong>執行順序</strong>，相信剛才前面的程式碼我們有發現不管怎麼調換位子 <code>Promise</code> 總是會優先出現，那麼在執行順序上 MicroTask 會優先被執行，接下來才會執行 MacroTask。</p>
+<p>但是哪些語法是屬於 MacroTask 以及哪些是屬於 MicroTask 呢？基本上你只需要知道 MicroTask 主要是以下語法就好</p>
+<ul>
+<li>Promise</li>
+<li>process.nextTick (Node.js)</li>
+<li>MutaionObserver</li>
+</ul>
+<p>其他則是屬於 MacroTask，因此整體運作過程會像這樣：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FJavaScript%2F%E6%88%AA%E5%9C%96%202021-11-17%2001.01.28.png?alt=media&token=49ea5fa8-96c0-4147-8fb5-aed27f20adc3" alt="MicroTask &amp; MacroTask"></p>
+<p>而這一整個循環也就是 Event Loop 唷~</p>
+<p>最後也補一下 MacroTask 有哪些當作結尾：</p>
+<ul>
+<li>script(JavaScript 整體程式碼)</li>
+<li>setTimeout</li>
+<li>setInterval</li>
+<li>setImmediate</li>
+<li>I&#x2F;O</li>
+<li>UI 互動相關</li>
+</ul>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/setTimeout">window.setTimeout</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-TW/docs/Web/API">Web APIs</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000006811224">JavaScript 事件循环（译文JavaScript Event Loop）</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000039971920">一次搞懂-JS事件循环之宏任务和微任务</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Event-Loop/" rel="tag"># Event Loop</a>
+              <a href="/tags/Event-Queue/" rel="tag"># Event Queue</a>
+              <a href="/tags/Event-Table/" rel="tag"># Event Table</a>
+              <a href="/tags/Event-Task/" rel="tag"># Event Task</a>
+              <a href="/tags/MacroTask/" rel="tag"># MacroTask</a>
+              <a href="/tags/MicroTask/" rel="tag"># MicroTask</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20211114/136128318/" rel="prev" title="JavaScript 核心觀念(72) - ES6 章節：Template Literial - 標籤樣板字面值">
+                  <i class="fa fa-angle-left"></i> JavaScript 核心觀念(72) - ES6 章節：Template Literial - 標籤樣板字面值
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20211117/407591854/" rel="next" title="提高你在社群上的提問技巧">
+                  提高你在社群上的提問技巧 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

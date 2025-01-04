@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="最近朋友私訊問了我一個 Vue 有趣的地方，是關於它嘗試在 Vue 的 Single-File Components 上使用 Higher-Order Function（HOF）結果卻發生一個很有趣的雷點，所以就來寫一篇文章來分析一下這個問題。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="關於在 Vue 的 Single-File Components 上使用 HOF 分析">
+<meta property="og:url" content="https://israynotarray.com/vue/20230711/2687889198/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="最近朋友私訊問了我一個 Vue 有趣的地方，是關於它嘗試在 Vue 的 Single-File Components 上使用 Higher-Order Function（HOF）結果卻發生一個很有趣的雷點，所以就來寫一篇文章來分析一下這個問題。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2023-07-11T15:55:38.000Z">
+<meta property="article:modified_time" content="2023-07-11T15:55:38.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="HOF">
+<meta property="article:tag" content="Higher-Order Function">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://israynotarray.com/vue/20230711/2687889198/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/vue/20230711/2687889198/","path":"vue/20230711/2687889198/","title":"關於在 Vue 的 Single-File Components 上使用 HOF 分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>關於在 Vue 的 Single-File Components 上使用 HOF 分析 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">2.</span> <span class="nav-text">問題程式碼</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E5%95%8F%E9%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">分析問題</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">929</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">685</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/vue/20230711/2687889198/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="關於在 Vue 的 Single-File Components 上使用 HOF 分析 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="最近朋友私訊問了我一個 Vue 有趣的地方，是關於它嘗試在 Vue 的 Single-File Components 上使用 Higher-Order Function（HOF）結果卻發生一個很有趣的雷點，所以就來寫一篇文章來分析一下這個問題。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          關於在 Vue 的 Single-File Components 上使用 HOF 分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-07-11 23:55:38" itemprop="dateCreated datePublished" datetime="2023-07-11T23:55:38+08:00">2023-07-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">Vue</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">最近朋友私訊問了我一個 Vue 有趣的地方，是關於它嘗試在 Vue 的 Single-File Components 上使用 Higher-Order Function（HOF）結果卻發生一個很有趣的雷點，所以就來寫一篇文章來分析一下這個問題。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近朋友私訊問了我一個 Vue 有趣的地方，是關於它嘗試在 Vue 的 Single-File Components 上使用 Higher-Order Function（HOF）結果卻發生一個很有趣的雷點，所以就來寫一篇文章來分析一下這個問題。</p>
+<h2 id="問題程式碼"><a href="#問題程式碼" class="headerlink" title="問題程式碼"></a>問題程式碼</h2><p>首先這邊先提供範例程式碼</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> &#123; ref &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> activeDate = <span class="title function_">ref</span>(<span class="string">&#x27;&#x27;</span>);</span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> <span class="title function_">handleActiveClick</span> = (<span class="params">dateStr</span>) =&gt; <span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-javascript">  activeDate.<span class="property">value</span> = dateStr;</span></span><br><span class="line"><span class="language-javascript">&#125;;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> <span class="title function_">handleActiveClick2</span> = (<span class="params">dateStr</span>) =&gt; &#123;</span></span><br><span class="line"><span class="language-javascript">  activeDate.<span class="property">value</span> = dateStr;</span></span><br><span class="line"><span class="language-javascript">&#125;;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;handleActiveClick(&#x27;click1&#x27;)&quot;</span>&gt;</span>click 1<span class="tag">&lt;/<span class="name">button</span>&gt;</span>｜</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;handleActiveClick(&#x27;click2&#x27;)()&quot;</span>&gt;</span>click 2<span class="tag">&lt;/<span class="name">button</span>&gt;</span>｜</span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;() =&gt; handleActiveClick2(&#x27;click3&#x27;)&quot;</span>&gt;</span>click 3<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>content:&#123;&#123; activeDate &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-id">#app</span> &#123;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">font-family</span>: Avenir, Helvetica, Arial, sans-serif;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">text-align</span>: center;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">color</span>: <span class="number">#2c3e50</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">margin-top</span>: <span class="number">60px</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-tag">a</span>,</span></span><br><span class="line"><span class="language-css"><span class="selector-tag">button</span> &#123;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">color</span>: <span class="number">#4fc08d</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-tag">button</span> &#123;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">background</span>: none;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">border</span>: solid <span class="number">1px</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">border-radius</span>: <span class="number">2em</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">font</span>: inherit;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">padding</span>: <span class="number">0.75em</span> <span class="number">2em</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">cursor</span>: pointer;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果覺得太長也可以看線上版：<a target="_blank" rel="noopener" href="https://play.vuejs.org/#__DEV__eNqlVNtuEzEQ/ZWR+7CJlFsTCmhJI0KpBDwAojzui+udTd16bcv2hlRR/oRf4Zv4BcbepF1RqEB92NV65szZM2dsb9nS2tG6QZazuRdO2gAeQ2MXhZa1NS7AFhxWsIPKmRoygmaFLrQw2gfgIsg1vuUB4TTCelnWf3VIXnFdKlwmyJmS4oYwvZKwF8H14XQBvfTeFho6RKM1V02k2yOJbkfPX0mnv7P+G9983HZLfdIiYG0V5WkFML9sQjAawq3F04K1q4LBaxH/R5EHGnpZSh1n/YIt0iccz8dt4eLnj+9PYp1m/d497/S/eVuXH/q2p591RM/uyBOzXZDnAXXIt9vuqHe7+ThukPm44xstfbhV8fOIW9uOoaL6YcVrqW5zWK5RSzeAd6jWGKTgA1g6ydUAPNd+6NHJiiYDEHAThlzJlc5B0O8xDg1AGGVcDkdTMcOTSQrV3K2kHgZjc3g+sZs43CiFDwq99yXpOJQ+q8TkZXlAdRGXXNysnGl0mYM2GhP9pXElUp03SpZwnPgP0aHjpWx8DlOsUzj2moPUV9RHSBHLy1LqVQ6T0YsTrO+QonE+yrFG7psjObQhk31swIIn3yu5Gl17o+lgJoEFE6a2UqH7ZIOks1CwvJUec1wp8+1DigXXILXfxsUVips/xK/9JsYK9tkhGb/Ggt3lApmKoU2fX3ykYXSStSkbRehHkl+Q/Gqixhb2hkwl2R1cUvs+XS/kz1d/vqFd5g9NRaERuUv4gtGVc/ZI6/dyZ6NZqiM/2e4XwQCnGQ==">Vue SFC Playground</a></p>
+<p>這邊我們透過操作可以發現 <code>click1</code> 按鈕是無效的，但是 <code>click2</code> 跟 <code>click3</code> 點了卻正常運作，而我們可以看到 <code>handleActiveClick</code> 採用的方式是 HOF 的方式，而 <code>handleActiveClick2</code> 則是一般的函式，那麼這個問題到底是什麼呢？</p>
+<p>所以接下來就來準備分析一下這個問題。</p>
+<h2 id="分析問題"><a href="#分析問題" class="headerlink" title="分析問題"></a>分析問題</h2><p>首先這個問題是發生在 Vue 的 Single-File Components 上，但是我們又不可能花時間去看 Vue 的原始碼，所以我們可以先透過簡單的方式來分析一下這個問題。</p>
+<p>首先 <a target="_blank" rel="noopener" href="https://play.vuejs.org/#__DEV__eNqlVNtuEzEQ/ZWR+7CJlFsTCmhJI0KpBDwAojzui+udTd16bcv2hlRR/oRf4Zv4BcbepF1RqEB92NV65szZM2dsb9nS2tG6QZazuRdO2gAeQ2MXhZa1NS7AFhxWsIPKmRoygmaFLrQw2gfgIsg1vuUB4TTCelnWf3VIXnFdKlwmyJmS4oYwvZKwF8H14XQBvfTeFho6RKM1V02k2yOJbkfPX0mnv7P+G9983HZLfdIiYG0V5WkFML9sQjAawq3F04K1q4LBaxH/R5EHGnpZSh1n/YIt0iccz8dt4eLnj+9PYp1m/d497/S/eVuXH/q2p591RM/uyBOzXZDnAXXIt9vuqHe7+ThukPm44xstfbhV8fOIW9uOoaL6YcVrqW5zWK5RSzeAd6jWGKTgA1g6ydUAPNd+6NHJiiYDEHAThlzJlc5B0O8xDg1AGGVcDkdTMcOTSQrV3K2kHgZjc3g+sZs43CiFDwq99yXpOJQ+q8TkZXlAdRGXXNysnGl0mYM2GhP9pXElUp03SpZwnPgP0aHjpWx8DlOsUzj2moPUV9RHSBHLy1LqVQ6T0YsTrO+QonE+yrFG7psjObQhk31swIIn3yu5Gl17o+lgJoEFE6a2UqH7ZIOks1CwvJUec1wp8+1DigXXILXfxsUVips/xK/9JsYK9tkhGb/Ggt3lApmKoU2fX3ykYXSStSkbRehHkl+Q/Gqixhb2hkwl2R1cUvs+XS/kz1d/vqFd5g9NRaERuUv4gtGVc/ZI6/dyZ6NZqiM/2e4XwQCnGQ==">Vue SFC Playground</a> 上方可以看編譯後的結果，你可以點一下「<code>JS</code>」來看一下編譯後的結果，這邊我們可以看到編譯後結果如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Analyzed bindings: &#123;</span></span><br><span class="line"><span class="comment">  &quot;ref&quot;: &quot;setup-const&quot;,</span></span><br><span class="line"><span class="comment">  &quot;activeDate&quot;: &quot;setup-ref&quot;,</span></span><br><span class="line"><span class="comment">  &quot;handleActiveClick&quot;: &quot;setup-const&quot;,</span></span><br><span class="line"><span class="comment">  &quot;handleActiveClick2&quot;: &quot;setup-const&quot;</span></span><br><span class="line"><span class="comment">&#125; */</span></span><br><span class="line"><span class="keyword">import</span> &#123; ref &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> __sfc__ = &#123;</span><br><span class="line">  <span class="attr">__name</span>: <span class="string">&#x27;App&#x27;</span>,</span><br><span class="line">  <span class="title function_">setup</span>(<span class="params">__props, &#123; expose: __expose &#125;</span>) &#123;</span><br><span class="line">  <span class="title function_">__expose</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> activeDate = <span class="title function_">ref</span>(<span class="string">&#x27;&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleActiveClick</span> = (<span class="params">dateStr</span>) =&gt; <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = dateStr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleActiveClick2</span> = (<span class="params">dateStr</span>) =&gt; &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = dateStr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> __returned__ = &#123; activeDate, handleActiveClick, handleActiveClick2, ref &#125;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(__returned__, <span class="string">&#x27;__isScriptSetup&#x27;</span>, &#123; <span class="attr">enumerable</span>: <span class="literal">false</span>, <span class="attr">value</span>: <span class="literal">true</span> &#125;)</span><br><span class="line"><span class="keyword">return</span> __returned__</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">import</span> &#123; createElementVNode <span class="keyword">as</span> _createElementVNode, toDisplayString <span class="keyword">as</span> _toDisplayString, createTextVNode <span class="keyword">as</span> _createTextVNode, <span class="title class_">Fragment</span> <span class="keyword">as</span> _Fragment, openBlock <span class="keyword">as</span> _openBlock, createElementBlock <span class="keyword">as</span> _createElementBlock &#125; <span class="keyword">from</span> <span class="string">&quot;vue&quot;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">render</span>(<span class="params">_ctx, _cache, $props, $setup, $data, $options</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> (<span class="title function_">_openBlock</span>(), <span class="title function_">_createElementBlock</span>(_Fragment, <span class="literal">null</span>, [</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">0</span>] || (_cache[<span class="number">0</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click1&#x27;</span>)))</span><br><span class="line">    &#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">1</span>] || (_cache[<span class="number">1</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click2&#x27;</span>)()))</span><br><span class="line">    &#125;, <span class="string">&quot;click 2&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">2</span>] || (_cache[<span class="number">2</span>] = <span class="function">() =&gt;</span> $setup.<span class="title function_">handleActiveClick2</span>(<span class="string">&#x27;click3&#x27;</span>))</span><br><span class="line">    &#125;, <span class="string">&quot;click 3&quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;p&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;content:&quot;</span> + <span class="title function_">_toDisplayString</span>($setup.<span class="property">activeDate</span>), <span class="number">1</span> <span class="comment">/* TEXT */</span>)</span><br><span class="line">  ], <span class="number">64</span> <span class="comment">/* STABLE_FRAGMENT */</span>))</span><br><span class="line">&#125;</span><br><span class="line">__sfc__.<span class="property">render</span> = render</span><br><span class="line">__sfc__.<span class="property">__file</span> = <span class="string">&quot;src/App.vue&quot;</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> __sfc__</span><br></pre></td></tr></table></figure>
+
+<p>那麼很複雜對吧？不用擔心，我們只需要看到底下這幾段地方就好</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">handleActiveClick</span> = (<span class="params">dateStr</span>) =&gt; <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = dateStr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">render</span>(<span class="params">_ctx, _cache, $props, $setup, $data, $options</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> (<span class="title function_">_openBlock</span>(), <span class="title function_">_createElementBlock</span>(_Fragment, <span class="literal">null</span>, [</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">0</span>] || (_cache[<span class="number">0</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click1&#x27;</span>)))</span><br><span class="line">    &#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">1</span>] || (_cache[<span class="number">1</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click2&#x27;</span>)()))</span><br><span class="line">    &#125;, <span class="string">&quot;click 2&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">2</span>] || (_cache[<span class="number">2</span>] = <span class="function">() =&gt;</span> $setup.<span class="title function_">handleActiveClick2</span>(<span class="string">&#x27;click3&#x27;</span>))</span><br><span class="line">    &#125;, <span class="string">&quot;click 3&quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;p&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;content:&quot;</span> + <span class="title function_">_toDisplayString</span>($setup.<span class="property">activeDate</span>), <span class="number">1</span> <span class="comment">/* TEXT */</span>)</span><br><span class="line">  ], <span class="number">64</span> <span class="comment">/* STABLE_FRAGMENT */</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...略過</span></span><br></pre></td></tr></table></figure>
+
+<p>首先直接看 <code>render</code> 的部分，可以看到會回傳兩個東西，分別是 <code>_openBlock</code> 跟 <code>_createElementBlock</code>，這邊只需要注意 <code>_createElementBlock</code> 的部分，<code>_createElementBlock</code> 的參數分別有三個，第一個是 <code>Fragment</code>，第二個是 <code>null</code>，第三個是一個陣列，而我們只需要注意第三個參數，也就是陣列的部分</p>
+<p>那麼我們這邊是 <code>&lt;button type=&quot;button&quot; @click=&quot;handleActiveClick(&#39;click1&#39;)&quot;&gt;click 1&lt;/button&gt;</code> 無法正常運作，因此就可以看這一段</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: _cache[<span class="number">0</span>] || (_cache[<span class="number">0</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click1&#x27;</span>)))</span><br><span class="line">&#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line"><span class="comment">// ... 略過</span></span><br></pre></td></tr></table></figure>
+
+<p><code>_createElementVNode</code> 基本上就是新增一個虛擬 DOM 元素的函式，這邊我們不用太深入，只需要專注於 <code>onClick</code> 這個屬性就好，這邊可以看到 <code>onClick</code> 的值是 <code>_cache[0] || (_cache[0] = $event =&gt; ($setup.handleActiveClick(&#39;click1&#39;)))</code>。</p>
+<p>這邊可能稍微有一點複雜，首先這邊有一個 <code>||</code> 運算子，在 JavaScript 中當前者是 True 的時候就會回傳前者，若沒有就回傳後者，所以如果 <code>_cache[0]</code> 有值的時候就回傳 <code>_cache[0]</code>，若沒有值就回傳 <code>(_cache[0] = $event =&gt; ($setup.handleActiveClick(&#39;click1&#39;)))</code>，但是這邊有一個重點也就是裡面有一個 <code>()</code> 函示呼叫的運算子，因此會優先執行 <code>(_cache[0] = $event =&gt; ($setup.handleActiveClick(&#39;click1&#39;)))</code> 這一段程式碼，因此 <code>(_cache[0] = $event =&gt; ($setup.handleActiveClick(&#39;click1&#39;)))</code> 會先變成以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_cache[<span class="number">0</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click1&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>接著因為裡面還有一個 <code>()</code> 函示呼叫的運算子，因此會先執行 <code>$setup.handleActiveClick(&#39;click1&#39;)</code>，但是這邊要注意前面我們的 <code>handleActiveClick</code> 是這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">handleActiveClick</span> = (<span class="params">dateStr</span>) =&gt; <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = dateStr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>因此套用過來時，完整版會變成以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_cache[<span class="number">0</span>] = $event =&gt; <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = <span class="string">&#x27;click1&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以完整版就變成了這樣</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: _cache[<span class="number">0</span>] = $event =&gt; <span class="function">() =&gt;</span> (activeDate.<span class="property">value</span> = <span class="string">&#x27;click1&#x27;</span>)</span><br><span class="line">&#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line"><span class="comment">// ... 略過</span></span><br></pre></td></tr></table></figure>
+
+<p>那麼這也是為什麼當我們點擊第一個按鈕時會沒有任何反應的原因，因為其實回傳賦予給 <code>onClick</code> 的只是一個單純沒任何行為的函式，如果這樣不好讀的話，你可以看看以下是否比較好理解</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: _cache[<span class="number">0</span>] = $event =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      activeDate.<span class="property">value</span> = <span class="string">&#x27;click1&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line"><span class="comment">// ... 略過</span></span><br></pre></td></tr></table></figure>
+
+<p>我們都知道這是一個類似閉包（Closure）的寫法，因此通常我們在寫閉包時，都會需要將函式回傳並儲存到一個變數內，如以下範例</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">count</span>(<span class="params"></span>) &#123;</span><br><span class="line"> <span class="keyword">var</span> icash = <span class="number">1000</span>;</span><br><span class="line"> <span class="keyword">return</span>  <span class="function">(<span class="params">price</span>) =&gt;</span> &#123;</span><br><span class="line">  icash = icash - price;</span><br><span class="line">  <span class="keyword">return</span> icash;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> item = <span class="title function_">count</span>();</span><br><span class="line"><span class="title function_">item</span>(<span class="number">100</span>);</span><br><span class="line"><span class="title function_">item</span>(<span class="number">200</span>);</span><br></pre></td></tr></table></figure>
+
+<p>而這也就是為什麼第一個按鈕會失效的原因了，因為我們只是將函式回傳給 <code>onClick</code>，但是並沒有執行。</p>
+<p>那為什麼第二個按鈕可以正常呢？因為我們在第二個按鈕的 <code>onClick</code> 是這樣寫的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: _cache[<span class="number">1</span>] || (_cache[<span class="number">1</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click2&#x27;</span>)()))</span><br><span class="line">&#125;, <span class="string">&quot;click 2&quot;</span>),</span><br><span class="line"><span class="comment">// ... 略過</span></span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到呼叫了 <code>handleActiveClick</code> 並且執行了函式，因此第二個按鈕回傳的就是以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: _cache[<span class="number">1</span>] = $event =&gt; activeDate.<span class="property">value</span> = <span class="string">&#x27;click2&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;, <span class="string">&quot;click 2&quot;</span>),</span><br><span class="line"><span class="comment">// ... 略過</span></span><br></pre></td></tr></table></figure>
+
+<p>第三個呢？為什麼正常運作呢？因為我們只是單純的傳入一個函式，因此不會有閉包的問題，因此第三個按鈕的 <code>onClick</code> 會是以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ... 略過</span></span><br><span class="line"><span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">  <span class="attr">onClick</span>: <span class="function">() =&gt;</span> $setup.<span class="title function_">handleActiveClick2</span>(<span class="string">&#x27;click3&#x27;</span>)</span><br><span class="line">&#125;, <span class="string">&quot;click 3&quot;</span>),</span><br></pre></td></tr></table></figure>
+
+<p>最後這邊也分享一下四種 <code>@click</code> 寫法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;handleActiveClick(&#x27;click1&#x27;)&quot;</span>&gt;click <span class="number">1</span>&lt;/button&gt;｜</span><br><span class="line">&lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;handleActiveClick(&#x27;click2&#x27;)()&quot;</span>&gt;click <span class="number">2</span>&lt;/button&gt;｜</span><br><span class="line">&lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;() =&gt; handleActiveClick2(&#x27;click3&#x27;)&quot;</span>&gt;click <span class="number">3</span>&lt;/button&gt;｜</span><br><span class="line">&lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;handleActiveClick2(&#x27;click4&#x27;)&quot;</span>&gt;click <span class="number">4</span>&lt;/button&gt;</span><br></pre></td></tr></table></figure>
+
+<p>而他們編譯出來會是以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">render</span>(<span class="params">_ctx, _cache, $props, $setup, $data, $options</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> (<span class="title function_">_openBlock</span>(), <span class="title function_">_createElementBlock</span>(_Fragment, <span class="literal">null</span>, [</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">0</span>] || (_cache[<span class="number">0</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click1&#x27;</span>)))</span><br><span class="line">    &#125;, <span class="string">&quot;click 1&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">1</span>] || (_cache[<span class="number">1</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick</span>(<span class="string">&#x27;click2&#x27;</span>)()))</span><br><span class="line">    &#125;, <span class="string">&quot;click 2&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">2</span>] || (_cache[<span class="number">2</span>] = <span class="function">() =&gt;</span> $setup.<span class="title function_">handleActiveClick2</span>(<span class="string">&#x27;click3&#x27;</span>))</span><br><span class="line">    &#125;, <span class="string">&quot;click 3&quot;</span>),</span><br><span class="line">    <span class="title function_">_createTextVNode</span>(<span class="string">&quot;｜ &quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;button&quot;</span>, &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;button&quot;</span>,</span><br><span class="line">      <span class="attr">onClick</span>: _cache[<span class="number">3</span>] || (_cache[<span class="number">3</span>] = $event =&gt; ($setup.<span class="title function_">handleActiveClick2</span>(<span class="string">&#x27;click4&#x27;</span>)))</span><br><span class="line">    &#125;, <span class="string">&quot;click 4&quot;</span>),</span><br><span class="line">    <span class="title function_">_createElementVNode</span>(<span class="string">&quot;p&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;content:&quot;</span> + <span class="title function_">_toDisplayString</span>($setup.<span class="property">activeDate</span>), <span class="number">1</span> <span class="comment">/* TEXT */</span>)</span><br><span class="line">  ], <span class="number">64</span> <span class="comment">/* STABLE_FRAGMENT */</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>透過以上分析，你應該就大概知道為什麼第一個按鈕會失效了吧~</p>
+<p>那麼這邊應該也會有人好奇 React 的部分，這邊我就額外補上 React 編譯後的程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">handleActiveDateClick</span> = dateStr =&gt; <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  activeDate.<span class="property">value</span> = dateStr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> example = <span class="comment">/*#__PURE__*/</span><span class="title class_">React</span>.<span class="title function_">createElement</span>(<span class="string">&quot;h1&quot;</span>, &#123;</span><br><span class="line">    <span class="attr">onClick</span>: <span class="string">&quot;handleActiveDateClick2(&#x27;08-12&#x27;)&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">&quot;Hello React&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以大概知道 Vue 跟 React 實作上是有一定差異的。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+              <a href="/tags/HOF/" rel="tag"># HOF</a>
+              <a href="/tags/Higher-Order-Function/" rel="tag"># Higher-Order Function</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20230701/2021952545/" rel="prev" title="關於我成為了 2023 Node.js 軟體工程師企業專題班教練這件事">
+                  <i class="fa fa-angle-left"></i> 關於我成為了 2023 Node.js 軟體工程師企業專題班教練這件事
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20230722/1626712457/" rel="next" title="Node.js 應用篇 - 使用 Nodemailer 來發送 Email">
+                  Node.js 應用篇 - 使用 Nodemailer 來發送 Email <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
