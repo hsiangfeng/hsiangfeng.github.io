@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這一篇測試文章其實我想寫非常久了，只是一直沒有時間去寫，所以趁著有空來補這一篇測試的文章。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="別再用 1+1&#x3D;2 學測試了！這次就讓我們從 Vitest 開始學單元測試吧！">
+<meta property="og:url" content="https://israynotarray.com/vitest/20230420/4055762937/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="這一篇測試文章其實我想寫非常久了，只是一直沒有時間去寫，所以趁著有空來補這一篇測試的文章。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/gfxk9ih.png">
+<meta property="og:image" content="https://i.imgur.com/NPwMgl3.png">
+<meta property="og:image" content="https://i.imgur.com/B0m86HL.png">
+<meta property="og:image" content="https://i.imgur.com/XXhQCGU.png">
+<meta property="og:image" content="https://i.imgur.com/zuwVmb9.png">
+<meta property="og:image" content="https://i.imgur.com/ngWadUR.png">
+<meta property="og:image" content="https://i.imgur.com/2ZlOO13.png">
+<meta property="og:image" content="https://i.imgur.com/rcuvTYM.png">
+<meta property="og:image" content="https://i.imgur.com/qhnx8jz.png">
+<meta property="og:image" content="https://i.ibb.co/bJCbCf2/202203292020.gif">
+<meta property="article:published_time" content="2023-04-20T08:45:00.000Z">
+<meta property="article:modified_time" content="2023-04-20T08:45:00.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="jest">
+<meta property="article:tag" content="vitest">
+<meta property="article:tag" content="testing">
+<meta property="article:tag" content="unit testing">
+<meta property="article:tag" content="vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/gfxk9ih.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/vitest/20230420/4055762937/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/vitest/20230420/4055762937/","path":"vitest/20230420/4055762937/","title":"別再用 1+1=2 學測試了！這次就讓我們從 Vitest 開始學單元測試吧！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>別再用 1+1=2 學測試了！這次就讓我們從 Vitest 開始學單元測試吧！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A6%81%E5%AF%AB%E6%B8%AC%E8%A9%A6%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">為什麼要寫測試？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vitest-%E7%92%B0%E5%A2%83%E6%BA%96%E5%82%99"><span class="nav-number">3.</span> <span class="nav-text">Vitest 環境準備</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vitest-%E5%9F%BA%E7%A4%8E%E8%88%87%E6%B8%AC%E8%A9%A6%E8%AA%9E%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">Vitest 基礎與測試語法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#describe-%E6%8F%8F%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">describe (描述)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#test-%E6%B8%AC%E8%A9%A6"><span class="nav-number">4.2.</span> <span class="nav-text">test (測試)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expect-%E9%A0%90%E6%9C%9F"><span class="nav-number">4.3.</span> <span class="nav-text">expect (預期)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F"><span class="nav-number">4.4.</span> <span class="nav-text">生命週期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6%E6%AA%94%E6%A1%88"><span class="nav-number">4.5.</span> <span class="nav-text">測試檔案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%96%8B%E5%A7%8B%E6%92%B0%E5%AF%AB%E6%B8%AC%E8%A9%A6"><span class="nav-number">5.</span> <span class="nav-text">開始撰寫測試</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A9%97%E8%AD%89-App-vue"><span class="nav-number">5.1.</span> <span class="nav-text">驗證 App.vue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%A0%E7%AB%AF-API-%E6%B8%AC%E8%A9%A6"><span class="nav-number">5.2.</span> <span class="nav-text">遠端 API 測試</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6%E5%87%BD%E5%BC%8F"><span class="nav-number">5.3.</span> <span class="nav-text">測試函式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%83%E4%BB%B6%E6%B8%AC%E8%A9%A6"><span class="nav-number">5.4.</span> <span class="nav-text">元件測試</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mocking"><span class="nav-number">5.5.</span> <span class="nav-text">Mocking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">6.</span> <span class="nav-text">結論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vitest-%E6%8E%A8%E8%96%A6%E5%A5%97%E4%BB%B6"><span class="nav-number">7.</span> <span class="nav-text">Vitest 推薦套件</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">933</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">686</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/vitest/20230420/4055762937/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="別再用 1+1=2 學測試了！這次就讓我們從 Vitest 開始學單元測試吧！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="這一篇測試文章其實我想寫非常久了，只是一直沒有時間去寫，所以趁著有空來補這一篇測試的文章。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          別再用 1+1=2 學測試了！這次就讓我們從 Vitest 開始學單元測試吧！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-04-20 16:45:00" itemprop="dateCreated datePublished" datetime="2023-04-20T16:45:00+08:00">2023-04-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/vitest/" itemprop="url" rel="index"><span itemprop="name">vitest</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">這一篇測試文章其實我想寫非常久了，只是一直沒有時間去寫，所以趁著有空來補這一篇測試的文章。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://i.imgur.com/gfxk9ih.png" alt="測試"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇測試文章其實我想寫非常久了，只是一直沒有時間去寫，所以趁著有空來補這一篇測試的文章。</p>
+<h2 id="為什麼要寫測試？"><a href="#為什麼要寫測試？" class="headerlink" title="為什麼要寫測試？"></a>為什麼要寫測試？</h2><p>開頭不免要提一下「為什麼要寫測試？」這件事情，首先你可以思考一下自己在實際開發的專案中，有沒有遇過一種狀況，也就是「改了 A 功能，但不知道為什麼 B 功能」卻跟著壞掉，又或者是功能越來越複雜的狀況下，又該如何測試這些功能？</p>
+<p>所以寫測試這件事情就格外的重要了，因為測試可以幫助我們確保程式碼的穩定性及可靠性，什麼意思呢？代表著當我們修改了某個功能後，我們可以透過測試來確保功能的運作，而不是透過人工一個一個測試。</p>
+<p>這時候你或許會想說「人工測試有錯嗎？」，當然不是，只是當一個專案越來越龐大後人工驗證就會顯得非常困難，總不可能每次新增或者修改一個功能後，就叫一個人來把整個專案都測試一輪吧？</p>
+<p>所以測試就會格外的重要，那麼測試這邊也提一下，基本上以前端來講大多區分為兩種測試，一種是單元測試(Unit Testing)，另一種是端對端測試(E2E Testing)，而這一篇會以單元測試為主哩。</p>
+<h2 id="Vitest-環境準備"><a href="#Vitest-環境準備" class="headerlink" title="Vitest 環境準備"></a>Vitest 環境準備</h2><p>那麼這一篇我將會使用 Vitest + Vue3 作為測試範例，因此一開始我們要先來建立一個開發環境，請你在終端機輸入以下指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm create vue@3</span><br></pre></td></tr></table></figure>
+
+<p>而選項基本上如下圖，當然你可以依照自己需求來調整</p>
+<p><img src="https://i.imgur.com/NPwMgl3.png" alt="create vue"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">✔ Project name(專案名稱): example-vue3-vitest</span><br><span class="line">✔ Add TypeScript?(加入 TypeScript？) -&gt; No</span><br><span class="line">✔ Add JSX Support?(加入 JSX？) -&gt; No</span><br><span class="line">✔ Add Vue Router <span class="keyword">for</span> Single Page Application development?(加入 Vue-router 用於 SPA 開發？) -&gt; No</span><br><span class="line">✔ Add Pinia <span class="keyword">for</span> state management?(加入 Pinia 作為狀態管理？) -&gt; No</span><br><span class="line">✔ Add Vitest <span class="keyword">for</span> Unit Testing?(加入 Vitest 進行單元測試？) -&gt; Yes</span><br><span class="line">✔ Add an End-to-End Testing Solution?(加入端對端進行測試？) -&gt; No</span><br><span class="line">✔ Add ESLint <span class="keyword">for</span> code quality?(加入 ESLint 管理程式碼風格？) -&gt; No</span><br></pre></td></tr></table></figure>
+
+<p>如果你懶得自己建立的話，這邊我也提供一個<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-vue3-vitest">範例專案</a>給你，你可以直接 clone 下來</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:hsiangfeng/example-vue3-vitest.git</span><br></pre></td></tr></table></figure>
+
+<p>(這個專案完全是初始狀態，所以你也可以自己嘗試建立看看。)</p>
+<h2 id="Vitest-基礎與測試語法"><a href="#Vitest-基礎與測試語法" class="headerlink" title="Vitest 基礎與測試語法"></a>Vitest 基礎與測試語法</h2><p>開始撰寫測試之前，你必須先學會一些東西，也就是關於 Vitest 的基礎與測試語法，否則我相信你應該會無從下手。</p>
+<p>那麼在開始說明之前，想先跟觀看這一篇文章的讀者補充一件事情 Vitest 本身是基於 Jest 封裝整合而成的，因此未來你在查詢任何語法時，你也可以直接去查詢 Jest 的語法，因為兩者都是相同的。</p>
+<blockquote>
+<p><strong>Note</strong><br>Jest 是一款 JavaScript 測試框架，它可以讓你撰寫測試程式碼，在業界上也是非常常見的測試框架。</p>
+</blockquote>
+<h3 id="describe-描述"><a href="#describe-描述" class="headerlink" title="describe (描述)"></a><code>describe</code> (描述)</h3><p>首先第一個是 <code>describe</code>，<code>describe</code> 是在描述這一個測試的名稱，主要是方便讓你可以辨識這個測試在做什麼事情</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;測試名稱&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 測試內容</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>而 <code>describe</code> 本身是一個群組概念，因此裡面會寫很多的測試，當然你也可以在 <code>describe</code> 裡面再套一個 <code>describe</code>，這樣就可以讓你的測試更加的清楚。</p>
+<h3 id="test-測試"><a href="#test-測試" class="headerlink" title="test (測試)"></a><code>test</code> (測試)</h3><p>接著就是 <code>test</code>，<code>test</code> 這個語法就是我們單元測試的主角&#x2F;核心，我們預期要寫的內容都是會寫在這邊</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;測試名稱&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 測試內容</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>雖然 <code>test</code> 跟 <code>describe</code> 看起來好像都是一樣的，但是 <code>describe</code> 只用來描述該測試的名稱，而真正的測試行為是在 <code>test</code> 裡面寫的。</p>
+<p>這邊也額外提一下 <code>test</code> 有另一種更短的寫法，也就是 <code>it</code>，這兩者的本質是相同的，只是 <code>it</code> 是 <code>test</code> 的別名而已。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">it</span>(<span class="string">&#x27;測試名稱&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 測試內容</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="expect-預期"><a href="#expect-預期" class="headerlink" title="expect (預期)"></a><code>expect</code> (預期)</h3><p>假設我們撰寫了測試，那我們該怎麼知道測試的結果是正確的呢？這邊我們就會使用到 <code>expect</code> 語法，舉例來講，我們預期 <code>1 + 1</code> 的結果是 <code>2</code>，那麼我們就可以這樣寫（不是說好不要用 1+1&#x3D;2 嗎？）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">expect</span>(<span class="number">1</span> + <span class="number">1</span>).<span class="title function_">toBe</span>(<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p>如果以程式的角度來講，當我們執行了 <code>expect(1 + 1)</code> 之後，它會回傳一個 <code>expect</code> 物件，而這個物件上面有很多方法，例如 <code>toBe</code>、<code>toEqual</code>、<code>toBeGreaterThan</code>、<code>toBeLessThan</code> 等等，這些方法都是用來判斷預期的結果是否正確，而 <code>toBe</code> 就是用來判斷是否等於我們要的答案。</p>
+<p>例如…</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> name = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">expect</span>(name).<span class="title function_">toBe</span>(<span class="string">&#x27;Ray&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如同前面所言 <code>expect</code> 執行後會回傳很多種方法，所以這邊就不額外介紹了，如果好奇的話你可以查 <a target="_blank" rel="noopener" href="https://jestjs.io/docs/expect">Jest</a> 官方文件或者 <a target="_blank" rel="noopener" href="https://cn.vitest.dev/api/#expect">Vitest</a> 官方文件。</p>
+<h3 id="生命週期"><a href="#生命週期" class="headerlink" title="生命週期"></a>生命週期</h3><p>意想不到吧？測試竟然也有自己的生命週期，這些生命週期在實戰上是很常使用的，而常見的生命週期有以下幾種</p>
+<ul>
+<li><code>beforeAll</code>：在所有測試開始之前執行</li>
+<li><code>beforeEach</code>：在每個測試開始之前執行</li>
+<li><code>afterAll</code>：在所有測試結束之後執行</li>
+<li><code>afterEach</code>：在每個測試結束之後執行</li>
+</ul>
+<p>但是這邊要注意一件事情，測試的生命週期放置位置會影響到它的執行順序，例如…</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; beforeEach &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">beforeEach</span>(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;beforeEach&#x27;</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>跟</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; beforeEach &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;測試&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">beforeEach</span>(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;beforeEach&#x27;</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>這兩個運作時機是不同的，前者為整份檔案的測試生命週期，而後者為 <code>describe</code> 的測試生命週期，因此前者會在所有測試開始之前執行，而後者則是在每個 <code>describe</code> 測試開始之前執行。</p>
+<p>當然這邊可能會有點難懂是什麼意思，所以先知道這件事情就好，後面我們開始撰寫一些小範例的時候你會更清楚其差異。</p>
+<h3 id="測試檔案"><a href="#測試檔案" class="headerlink" title="測試檔案"></a>測試檔案</h3><p>最後一個觀念很重要，也就是如何建立測試檔案，在建立測試檔案的時候是有一定的規範，通常來講我們會在根目錄底下建立一個 <code>__tests__</code> 的資料夾</p>
+<p><img src="https://i.imgur.com/B0m86HL.png" alt="__tests__"></p>
+<p>未來我們所撰寫的測試檔案一率都是放在 <code>__tests__</code> 底下，而測試的檔案名稱也有一定的規範</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;檔案名稱&#125;.<span class="built_in">test</span>.&#123;副檔名&#125;</span><br><span class="line">&#123;檔案名稱&#125;.spec.&#123;副檔名&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上差不多就是你在開始撰寫測試之前需要知道的必備觀念，接下來我們就要來撰寫一些小範例來融會貫通這些觀念囉。</p>
+<h2 id="開始撰寫測試"><a href="#開始撰寫測試" class="headerlink" title="開始撰寫測試"></a>開始撰寫測試</h2><p>在開始撰寫測試之前，我們先建立一個測試檔案在 <code>__tests__</code> 底下，檔名為 <code>first.test.js</code>，並且在裡面加入以下內容</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; test, describe, expect &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;測試&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">test</span>(<span class="string">&#x27;1 + 1 = 2&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">expect</span>(<span class="number">1</span> + <span class="number">1</span>).<span class="title function_">toBe</span>(<span class="number">2</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>接著打開終端機輸入 <code>npm run test:unit</code>，你會發現終端機會印出以下內容</p>
+<p><img src="https://i.imgur.com/XXhQCGU.png" alt="test:unit"></p>
+<p>你會看到畫面寫著 <code>Test Files  2 passed (2)</code>、<code>Tests  2 passed (2)</code>，這是因為 Vite 的預設範本下有寫一個測試檔案在 <code>src/components</code>，所以才會變成兩個，如果你覺得會干擾你學習的話，你可以先把 <code>src/components</code> 底下的檔案刪掉（我這邊也會刪除，避免過多資訊干擾）</p>
+<p><img src="https://i.imgur.com/zuwVmb9.png" alt="test:unit"></p>
+<p>那麼到這邊為止，只是先測試我們的測試是否正常運作，接下來才是真正的開始撰寫測試。</p>
+<h3 id="驗證-App-vue"><a href="#驗證-App-vue" class="headerlink" title="驗證 App.vue"></a>驗證 App.vue</h3><p>首先一開始我們先針對 App.vue 撰寫一下內容</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>IsRayNotArray<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著建立一個 <code>App.test.js</code> 檔案在 <code>__tests__</code> 底下（之後不會再說要建立在哪個資料夾下囉～），那我們要測什麼呢？</p>
+<p>在撰寫測試的時候我們必須搭配特定的情境來撰寫，例如我們要測試 <code>App.vue</code> 的標題是否為 「IsRayNotArray」，所以我們就要先建立一個 <code>App.vue</code> 的測試檔案，並且在裡面撰寫以下內容</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; test, describe, expect &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;@vue/test-utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;../src/App.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;App.vue&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> wrapper = <span class="title function_">mount</span>(<span class="title class_">App</span>);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">test</span>(<span class="string">&#x27;標題是否為 IsRayNotArray 正確&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> text = wrapper.<span class="title function_">text</span>();</span><br><span class="line">    <span class="title function_">expect</span>(text).<span class="title function_">toBe</span>(<span class="string">&#x27;IsRayNotArray&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>接著打開終端機輸入 <code>npm run test:unit</code>，你會發現終端機會印出以下內容</p>
+<p><img src="https://i.imgur.com/ngWadUR.png" alt="test:unit"></p>
+<p>恭喜你測試通過了，那麼讓我們回頭看一下前面沒提到的東西</p>
+<ul>
+<li><code>import &#123; mount &#125; from &#39;@vue/test-utils&#39;;</code></li>
+<li><code>const wrapper = mount(App);</code></li>
+</ul>
+<p>這兩個東西是什麼呢？首先 <code>@vue/test-utils</code> 是 <a target="_blank" rel="noopener" href="https://test-utils.vuejs.org/api/">Vue 官方</a>提供的測試工具，主要是讓你可以測試 Vue 的元件，而 <code>mount</code> 你可以把它想像成實例化，就是把你的元件真的建立起來，這樣子你才有辦法測試它。</p>
+<p>接著當你建立起這元件之後，它底下會有一個物件這個物件有非常多的方法，常用的方法有以下</p>
+<ul>
+<li><code>wrapper.text()</code>：取得元件內的文字</li>
+<li><code>wrapper.html()</code>：取得元件內的 HTML</li>
+<li><code>wrapper.find()</code>：找到元件內的某個元素</li>
+<li><code>wrapper.findAll()</code>：找到元件內的所有元素</li>
+<li><code>wrapper.vm</code>：取得元件內的資料(例如：<code>data</code>)</li>
+</ul>
+<p>但由於方法非常的多，所以我不會一一介紹，如果你想要了解更多的話，可以參考 <a target="_blank" rel="noopener" href="https://test-utils.vuejs.org/api/#wrapper-methods">Vue 官方文件</a>。</p>
+<p>那麼假設我們已經有切版了，內容可能如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">class</span>=<span class="string">&quot;text-base&quot;</span>&gt;</span>IsRayNotArray<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">li</span>&gt;</span>產品 1<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">li</span>&gt;</span>產品 2<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">li</span>&gt;</span>產品 3<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>那我們該如何正確選取到 <code>IsRayNotArray</code> 這個文字元素呢？因為我們假設的情境是我們 App.vue 的畫面上必定會有「IsRayNotArray」這個文字，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; test, describe, expect &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;@vue/test-utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;../src/App.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;App.vue&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> wrapper = <span class="title function_">mount</span>(<span class="title class_">App</span>);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">test</span>(<span class="string">&#x27;標題是否為 IsRayNotArray 正確&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> text = wrapper.<span class="title function_">find</span>(<span class="string">&#x27;h1.text-base&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">    <span class="title function_">expect</span>(text).<span class="title function_">toBe</span>(<span class="string">&#x27;IsRayNotArray&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這樣子我們就可以正確的選取到「IsRayNotArray」這個文字囉。</p>
+<h3 id="遠端-API-測試"><a href="#遠端-API-測試" class="headerlink" title="遠端 API 測試"></a>遠端 API 測試</h3><p>接下來這邊我們要來安裝 <code>axios</code> 來練習，所以請你在終端機輸入以下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install axios</span><br></pre></td></tr></table></figure>
+
+<p>接著將 App.vue 改成以下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> &#123; ref, onMounted &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> products = <span class="title function_">ref</span>([]); </span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="title function_">get</span>(<span class="string">&#x27;https://fakestoreapi.com/products&#x27;</span>);</span></span><br><span class="line"><span class="language-javascript">  products.<span class="property">value</span> = response.<span class="property">data</span>;</span></span><br><span class="line"><span class="language-javascript">&#125;;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="title function_">onMounted</span>(getData);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">class</span>=<span class="string">&quot;text-base&quot;</span>&gt;</span>IsRayNotArray<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">&quot;item in products&quot;</span>&gt;</span>&#123;&#123; item.title &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>假設這些是你的產品，那麼我們該如何測試這些產品是否正確的顯示出來呢？這邊就稍微難一點了，因為我們要來介紹一個叫做 <code>mock</code> 的東西，<code>mock</code> 的意思就是模擬，我們可以模擬一個假的 API 來測試我們的元件是否正確的顯示出來。</p>
+<p>接下來打開 App.test.js，我們將會使用到一個新的語法，也就是 <code>vi</code>，<code>vi</code> 是由 Vitest 提供的 API，它底下有非常多的方法，但這邊我們主要需要使用的是 <code>spyOn</code>，<code>spyOn</code> 的意思就是偵測，我們可以偵測一個方法是否被呼叫，或是偵測一個方法是否被正確的執行，其中 <code>spyOn</code> 也可以設置回傳值，這樣子我們就可以模擬一個假的 API 來測試我們的元件是否正確的顯示出來。</p>
+<p>那麼該如何撰寫呢？首先我們前面範例中是使用 <code>https://fakestoreapi.com/products</code> 作為 API，所以我們就直接從 API 所提供的資料中取得一些資料，以便我們去模擬 API 回傳的資料。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">&#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;price&quot;</span><span class="punctuation">:</span> <span class="number">109.95</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;category&quot;</span><span class="punctuation">:</span> <span class="string">&quot;men&#x27;s clothing&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;rating&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;rate&quot;</span><span class="punctuation">:</span> <span class="number">3.9</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">120</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">&#123;</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Mens Casual Premium Slim Fit T-Shirts &quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;price&quot;</span><span class="punctuation">:</span> <span class="number">22.3</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight &amp; soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;category&quot;</span><span class="punctuation">:</span> <span class="string">&quot;men&#x27;s clothing&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;rating&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;rate&quot;</span><span class="punctuation">:</span> <span class="number">4.1</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">259</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">&#123;</span></span><br><span class="line"></span><br><span class="line">      <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">3</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Mens Cotton Jacket&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;price&quot;</span><span class="punctuation">:</span> <span class="number">55.99</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;category&quot;</span><span class="punctuation">:</span> <span class="string">&quot;men&#x27;s clothing&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;image&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;rating&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;rate&quot;</span><span class="punctuation">:</span> <span class="number">4.7</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">500</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>接著就準備要來寫 App.test.js 了，首先我們要先引入 <code>vi</code>，接著我們要先偵測 <code>axios.get</code> 這個方法是否被呼叫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; test, describe, expect, vi &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;@vue/test-utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">App</span> <span class="keyword">from</span> <span class="string">&#x27;../src/App.vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;App.vue&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> getProducts = vi.<span class="title function_">spyOn</span>(axios, <span class="string">&#x27;get&#x27;</span>);</span><br><span class="line">  getProducts.<span class="title function_">mockReturnValue</span>(&#123; <span class="attr">data</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;id&quot;</span>: <span class="number">1</span>,</span><br><span class="line">      <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops&quot;</span>,</span><br><span class="line">      <span class="string">&quot;price&quot;</span>: <span class="number">109.95</span>,</span><br><span class="line">      <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday&quot;</span>,</span><br><span class="line">      <span class="string">&quot;category&quot;</span>: <span class="string">&quot;men&#x27;s clothing&quot;</span>,</span><br><span class="line">      <span class="string">&quot;image&quot;</span>: <span class="string">&quot;https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg&quot;</span>,</span><br><span class="line">      <span class="string">&quot;rating&quot;</span>: &#123;</span><br><span class="line">          <span class="string">&quot;rate&quot;</span>: <span class="number">3.9</span>,</span><br><span class="line">          <span class="string">&quot;count&quot;</span>: <span class="number">120</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ...略過</span></span><br><span class="line">  ]&#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> wrapper = <span class="title function_">mount</span>(<span class="title class_">App</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...略過</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>請注意，使用 <code>spyOn</code> 時有一個重點，<code>spyOn</code> 的行為必須在 <code>mount</code> 之前，否則 <code>spyOn</code> 會失效，這件事情很重要。</p>
+<p>接著我們這邊測試要寫什麼呢？首先我們範例程式碼預設在 DOM 完成後必定會呼叫 <code>axios.get</code> 這個方法，所以我們就可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;App.vue&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> getProducts = vi.<span class="title function_">spyOn</span>(axios, <span class="string">&#x27;get&#x27;</span>);</span><br><span class="line">  <span class="comment">// ...略過</span></span><br><span class="line"></span><br><span class="line">  <span class="title function_">test</span>(<span class="string">&#x27;products 方法有被呼叫一次&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">expect</span>(getProducts).<span class="title function_">toHaveBeenCalledTimes</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>toHaveBeenCalledTimes(1)</code> 的意思是指 <code>getProducts</code> 有沒有被呼叫一次，如果有就會成功，沒有就會失敗，用這種方式我們可以知道 <code>axios.get</code> 這個方法有沒有被呼叫。</p>
+<p><img src="https://i.imgur.com/2ZlOO13.png" alt="toHaveBeenCalledTimes"></p>
+<p>接下來呢？接下來我們的程式碼中有寫 <code>const products = ref([]);</code>，所以依照程式碼來講，我們應該要測試 <code>products</code> 這個變數有沒有被賦值，所以我們就可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;products 目前已經有資料，而且資料長度為 3&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">expect</span>(wrapper.<span class="property">vm</span>.<span class="property">products</span>.<span class="property">length</span>).<span class="title function_">toBe</span>(<span class="number">3</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>最後當然是要比較 <code>products</code> 裡面的資料是否正確，所以我們就可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;products 裡面的資料是否正確&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">expect</span>(wrapper.<span class="property">vm</span>.<span class="property">products</span>[<span class="number">0</span>].<span class="property">title</span>).<span class="title function_">toBe</span>(<span class="string">&quot;Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops&quot;</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>那麼這邊我們先總結一下遠端 API 測試的部分</p>
+<ul>
+<li><code>spyOn</code> 的行為必須在 <code>mount</code> 之前，否則 <code>spyOn</code> 會失效</li>
+<li>寫測試時，不會真的去呼叫遠端 API，而是會直接回傳我們預先定義好的資料</li>
+<li><code>axios.get</code> 這個方法有沒有被呼叫，可以使用 <code>toHaveBeenCalledTimes(1)</code> 來判斷</li>
+</ul>
+<h3 id="測試函式"><a href="#測試函式" class="headerlink" title="測試函式"></a>測試函式</h3><p>接下來你可能會想說「人家總是說單元測試就是要測試一個函式，那這樣子該怎麼測試？」</p>
+<p>首先函式要被可以測試之前，我們必須先釐清一件事情，也就是「函式是什麼？」，函式是一個可以被呼叫的程式碼，而且函式可以接收參數，也可以回傳值，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這個函式可以接收兩個參數，然後回傳兩個參數的和，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;add 函式可以正常運作並回傳 3&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">expect</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>)).<span class="title function_">toBe</span>(<span class="number">3</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這是一個眾所皆知的答案，也是我們在看網路上單元測試的文章最常見的範例，因此函式必須要有輸入和輸出，才能夠被測試，也就是常常人家說的「純函式」，如果你對於純函式不太了解，可以參考這篇文章 <a href="https://israynotarray.com/other/20211219/3830068067/">簡單趣談 Functional Programming in JavaScript</a>，我就不多做介紹了。</p>
+<p>而這也是為什麼人家會說當你寫測試的時候，你的程式必須要可以被測試，也就是說你的程式必須要是純函式，這樣才能夠被測試。</p>
+<blockquote>
+<p><strong>Note</strong><br><code>spyOn</code> 在使用的時候要多加注意，它第一個參數必須是一個物件，而第二個參數必須是一個字串，而且字串必須是物件的方法，否則會失敗。<br>如下：</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cart = &#123;</span><br><span class="line">  <span class="attr">getApples</span>: <span class="function">() =&gt;</span> <span class="number">13</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> spy = vi.<span class="title function_">spyOn</span>(cart, <span class="string">&#x27;getApples&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="元件測試"><a href="#元件測試" class="headerlink" title="元件測試"></a>元件測試</h3><p>以一名 Vue 開發者來講，拆分元件是一個很重要的事情，那麼寫測試的時候，我們要怎麼測試元件呢？</p>
+<p>首先先來建立一個元件叫做 <code>Products.vue</code>，這個元件的功能是顯示一個商品的資訊，所以它內容應該長這樣</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> props = <span class="title function_">defineProps</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="attr">products</span>: &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">type</span>: <span class="title class_">Array</span>,</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">required</span>: <span class="literal">true</span></span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">&quot;item in products&quot;</span>&gt;</span>&#123;&#123; item.title &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;scss&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>而 App.vue 的內容調整成以下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> &#123; ref, onMounted &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> <span class="title class_">Products</span> <span class="keyword">from</span> <span class="string">&#x27;./components/Products.vue&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> products = <span class="title function_">ref</span>([]); </span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="title function_">get</span>(<span class="string">&#x27;https://fakestoreapi.com/products&#x27;</span>);</span></span><br><span class="line"><span class="language-javascript">  products.<span class="property">value</span> = response.<span class="property">data</span>;</span></span><br><span class="line"><span class="language-javascript">&#125;;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="title function_">onMounted</span>(getData);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">class</span>=<span class="string">&quot;text-base&quot;</span>&gt;</span>IsRayNotArray<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Products</span> <span class="attr">:products</span>=<span class="string">&quot;products&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>目前來講，你如果依照上面範例操作到現在，理論上來講 <code>npm run test:unit</code> 應該是可以通過的，但是我們可以針對 App.test.js 再增加一個測試，也就是測試 <code>Products</code> 元件是否正確，但這邊就必須修改一下 <code>mount</code> 的方式，因為我們要測試的是 <code>Products</code> 元件，所以我們必須要把 <code>Products</code> 元件 mount 進來，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Products</span> <span class="keyword">from</span> <span class="string">&#x27;../src/components/Products.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//...略過</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> wrapper = <span class="title function_">mount</span>(<span class="title class_">App</span>, &#123;</span><br><span class="line">  <span class="attr">global</span>: &#123;</span><br><span class="line">    <span class="attr">components</span>: &#123;</span><br><span class="line">      <span class="title class_">Products</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//...略過</span></span><br></pre></td></tr></table></figure>
+
+<p>接著就可以測試 <code>Products</code> 元件是否存在於畫面上</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;Products 元件是否存在於畫面上&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">expect</span>(wrapper.<span class="title function_">findComponent</span>(<span class="title class_">Products</span>).<span class="title function_">exists</span>()).<span class="title function_">toBe</span>(<span class="literal">true</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>接下來就是要來測試 Products 元件，讓我們在 <code>__tests__</code> 資料夾下面建立一個 <code>/components</code> 資料夾，然後在裡面建立一個 <code>Products.test.js</code>，這個檔案的內容如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; test, describe, expect, vi &#125; <span class="keyword">from</span> <span class="string">&#x27;vitest&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;@vue/test-utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">Products</span> <span class="keyword">from</span> <span class="string">&#x27;@/components/Products.vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;Products.vue&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> wrapper = <span class="title function_">mount</span>(<span class="title class_">Products</span>,&#123;</span><br><span class="line">    <span class="attr">props</span>: &#123;</span><br><span class="line">      <span class="attr">products</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">&quot;id&quot;</span>: <span class="number">1</span>,</span><br><span class="line">          <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops&quot;</span>,</span><br><span class="line">          <span class="string">&quot;price&quot;</span>: <span class="number">109.95</span>,</span><br><span class="line">          <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday&quot;</span>,</span><br><span class="line">          <span class="string">&quot;category&quot;</span>: <span class="string">&quot;men&#x27;s clothing&quot;</span>,</span><br><span class="line">          <span class="string">&quot;image&quot;</span>: <span class="string">&quot;https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg&quot;</span>,</span><br><span class="line">          <span class="string">&quot;rating&quot;</span>: &#123;</span><br><span class="line">              <span class="string">&quot;rate&quot;</span>: <span class="number">3.9</span>,</span><br><span class="line">              <span class="string">&quot;count&quot;</span>: <span class="number">120</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;id&quot;</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Mens Casual Premium Slim Fit T-Shirts &quot;</span>,</span><br><span class="line">            <span class="string">&quot;price&quot;</span>: <span class="number">22.3</span>,</span><br><span class="line">            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight &amp; soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.&quot;</span>,</span><br><span class="line">            <span class="string">&quot;category&quot;</span>: <span class="string">&quot;men&#x27;s clothing&quot;</span>,</span><br><span class="line">            <span class="string">&quot;image&quot;</span>: <span class="string">&quot;https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg&quot;</span>,</span><br><span class="line">            <span class="string">&quot;rating&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;rate&quot;</span>: <span class="number">4.1</span>,</span><br><span class="line">                <span class="string">&quot;count&quot;</span>: <span class="number">259</span></span><br><span class="line">            &#125;</span><br><span class="line">      </span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">      </span><br><span class="line">            <span class="string">&quot;id&quot;</span>: <span class="number">3</span>,</span><br><span class="line">            <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Mens Cotton Jacket&quot;</span>,</span><br><span class="line">            <span class="string">&quot;price&quot;</span>: <span class="number">55.99</span>,</span><br><span class="line">            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.&quot;</span>,</span><br><span class="line">            <span class="string">&quot;category&quot;</span>: <span class="string">&quot;men&#x27;s clothing&quot;</span>,</span><br><span class="line">            <span class="string">&quot;image&quot;</span>: <span class="string">&quot;https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg&quot;</span>,</span><br><span class="line">            <span class="string">&quot;rating&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;rate&quot;</span>: <span class="number">4.7</span>,</span><br><span class="line">                <span class="string">&quot;count&quot;</span>: <span class="number">500</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到與以往不同的地方在於 <code>mount</code> 時就先傳入了 <code>props</code>，接著就一樣可以來寫測試，例如在畫面上必定依據 <code>props</code> 傳入的資料來顯示商品資訊，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;Products 元件是否正確顯示商品資訊&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> items = wrapper.<span class="title function_">findAll</span>(<span class="string">&#x27;li&#x27;</span>);</span><br><span class="line">  <span class="title function_">expect</span>(items.<span class="property">length</span>).<span class="title function_">toBe</span>(<span class="number">3</span>);</span><br><span class="line">  <span class="title function_">expect</span>(items[<span class="number">0</span>].<span class="title function_">text</span>()).<span class="title function_">toBe</span>(<span class="string">&#x27;Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops&#x27;</span>);</span><br><span class="line">  <span class="title function_">expect</span>(items[<span class="number">1</span>].<span class="title function_">text</span>()).<span class="title function_">toBe</span>(<span class="string">&#x27;Mens Casual Premium Slim Fit T-Shirts &#x27;</span>);</span><br><span class="line">  <span class="title function_">expect</span>(items[<span class="number">2</span>].<span class="title function_">text</span>()).<span class="title function_">toBe</span>(<span class="string">&#x27;Mens Cotton Jacket&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這樣子我們就可以正確驗證商品資訊是有呈現在畫面上的。</p>
+<h3 id="Mocking"><a href="#Mocking" class="headerlink" title="Mocking"></a>Mocking</h3><p>Mock 在寫測試的時候也會很常使用到，那麼假設 Products.vue 有一個按鈕當你按下按鈕後會跳出警告視窗</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> &#123; onMounted &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> props = <span class="title function_">defineProps</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="attr">products</span>: &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">type</span>: <span class="title class_">Array</span>,</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">required</span>: <span class="literal">true</span></span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;);</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> <span class="title function_">showAlert</span> = (<span class="params">str</span>) =&gt; &#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="variable language_">window</span>.<span class="title function_">alert</span>(str);</span></span><br><span class="line"><span class="language-javascript">&#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">&quot;item in products&quot;</span>&gt;</span>&#123;&#123; item.title &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-alert&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;showAlert(&#x27;哈囉&#x27;)&quot;</span>&gt;</span>點我<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;scss&quot;</span> <span class="attr">scoped</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著我們打開 Product.test.js 檔案，我們要針對 <code>showAlert</code> 這個方法來做測試，所以我們可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;按鈕點擊呼叫 alert&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> mockAlert = vi.<span class="title function_">fn</span>();</span><br><span class="line">  <span class="variable language_">window</span>.<span class="property">alert</span> = mockAlert;</span><br><span class="line">  <span class="keyword">const</span> button = wrapper.<span class="title function_">find</span>(<span class="string">&#x27;.btn-alert&#x27;</span>);</span><br><span class="line">  button.<span class="title function_">trigger</span>(<span class="string">&#x27;click&#x27;</span>);</span><br><span class="line">  <span class="title function_">expect</span>(mockAlert).<span class="title function_">toBeCalledWith</span>(<span class="string">&#x27;哈囉&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>那麼為什麼要特別宣告一個 <code>vi.fn()</code> 去換掉 <code>window.alert</code> 呢？因為我們並沒有打算真的跳出警告視窗，我們只是想要驗證 <code>showAlert</code> 這個方法有沒有被呼叫，然後傳入的參數是否正確，所以我們就可以這樣寫。</p>
+<p>但你可能會想說，如果我不寫 <code>vi.fn();</code> 會發生什麼事情呢？基本上很簡單，你會沒辦法驗證，因此不管怎樣你還是會需要 <code>vi.fn()</code>，當然這時候你可能會想說，那可以用 <code>spyOn</code> 嗎？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">test</span>(<span class="string">&#x27;按鈕點擊呼叫 alert&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> alertSpy = vi.<span class="title function_">spyOn</span>(<span class="variable language_">window</span>, <span class="string">&#x27;alert&#x27;</span>);</span><br><span class="line">  <span class="keyword">const</span> button = wrapper.<span class="title function_">find</span>(<span class="string">&#x27;.btn-alert&#x27;</span>);</span><br><span class="line">  button.<span class="title function_">trigger</span>(<span class="string">&#x27;click&#x27;</span>);</span><br><span class="line">  <span class="title function_">expect</span>(alertSpy).<span class="title function_">toBeCalledWith</span>(<span class="string">&#x27;哈囉&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>雖然測試會通過，但是會出現「<code>Error: Not implemented: window.alert</code>」這一段錯誤，所以正確的用法還是 <code>vi.fn()</code> 唷。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>這一篇寫的有一點長，主要是因為單元測試看似很簡單，但實際上需要注意的細節非常多，滿多細節都要注意跟翻官方文件，所以我也很難保證說這一篇就是絕對正確，只是如果可以讓你比較容易入門撰寫測試的話那當然是最好。</p>
+<p>其中每一位學習單元測試的人都會有一些困擾，就是不知道該怎麼寫，滿多人都會說先寫測試再寫程式碼，可是以前端來講我認為這有一點困難，因為前端畫面上來講，滿多都需要先有畫面才會有程式碼，所以我認為是有一點困難。</p>
+<p>另外就是測試不知道該怎麼寫，基本上測試在撰寫的時候就是基於你的程式碼去做撰寫，所以如果要簡單一點的理解就是，把它想像成是一個使用者，然後你要測試的是使用者的行為。</p>
+<p>這邊舉例 TodoList 來講好了，一個 TodoList 裡面必定會有以下功能</p>
+<ul>
+<li>新增 todo</li>
+<li>刪除 todo</li>
+<li>編輯 todo</li>
+</ul>
+<p>那麼你在撰寫測試的時候，就會是去寫 <code>test(&#39;新增 todo&#39;)</code>、<code>test(&#39;刪除 todo&#39;)</code>、<code>test(&#39;編輯 todo&#39;)</code>，接著嘗試針對該函式做呼叫，然後再來 <code>expect</code> 你的結果是否正確，這樣子你就完成了一個測試，因此通常撰寫測試時也會搭配情境來撰寫，這樣子你就可以更清楚的知道你要測試的是什麼。</p>
+<p>剛好這邊我也有寫一個 TodoList 的單元測試，你可以試著<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/Vue-TodoList/blob/main/src/__tests__/App.spec.ts">參考</a>看看。</p>
+<p>而這一篇的 <a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-vue3-vitest">範例測試檔案</a> 也都放在這邊囉~</p>
+<p>最後相信你應該會想說，那我該如何知道我自己的程式碼都有測試到？其實 Vitest 本身也有整合 c8(測試覆蓋率)，它會顯示你的測試覆蓋率，並且產生一個 html 檔案，你可以直接在瀏覽器上開啟，然後就可以看到你的測試覆蓋率了。</p>
+<p><img src="https://i.imgur.com/rcuvTYM.png" alt="測試覆蓋率"></p>
+<p><img src="https://i.imgur.com/qhnx8jz.png" alt="測試覆蓋率"></p>
+<p>我想到這邊應該有解決你各種疑問了，希望這一篇可以幫助到想學測試的你哩 :D</p>
+<h2 id="Vitest-推薦套件"><a href="#Vitest-推薦套件" class="headerlink" title="Vitest 推薦套件"></a>Vitest 推薦套件</h2><p>最後我也來推薦一個不錯的 VSCode <a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ZixuanChen.vitest-explorer">Vitest 套件</a></p>
+<p>有時候我們並不想要每次測試都打開終端機輸入 <code>npm run test:unit</code>，這時候我們可以使用這個套件，它可以讓你在 VSCode 上直接執行測試，而且速度非常快，假設有出現錯誤的話，它也會直接顯示在 VSCode 上，非常方便，真的非常推薦你安裝使用</p>
+<p><img src="https://i.ibb.co/bJCbCf2/202203292020.gif" alt="VSCode 套件"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/jest/" rel="tag"># jest</a>
+              <a href="/tags/vitest/" rel="tag"># vitest</a>
+              <a href="/tags/testing/" rel="tag"># testing</a>
+              <a href="/tags/unit-testing/" rel="tag"># unit testing</a>
+              <a href="/tags/vue/" rel="tag"># vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/vue/20230419/135728563/" rel="prev" title="解決 Vue 專案上開發出現 Virtual script not found 的錯誤">
+                  <i class="fa fa-angle-left"></i> 解決 Vue 專案上開發出現 Virtual script not found 的錯誤
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20230425/1940966356/" rel="next" title="Express 部署到 Vercel">
+                  Express 部署到 Vercel <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

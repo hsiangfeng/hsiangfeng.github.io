@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Monorepo 是什麼呢？而這個專案架構又與普通的專案架構有什麼不同呢？剛好最近有相關專案的需求，所以就寫這一篇記錄一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Monorepo？來聊聊另一種專案管理架構吧！使用 Vite+ pnpm 建立 Vue3 Monorepo">
+<meta property="og:url" content="https://israynotarray.com/other/20240413/3177435894/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="Monorepo 是什麼呢？而這個專案架構又與普通的專案架構有什麼不同呢？剛好最近有相關專案的需求，所以就寫這一篇記錄一下。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-13%2023.50.43.png?alt=media&token=427bf66c-dd2e-42e6-9326-92ca93b2fcc0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2Fim-leaving-leaving.gif?alt=media&token=36e0e691-3481-4017-9e53-79ba852c77ff">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F202404140133.jpg?alt=media&token=84dd1195-1da9-4bf0-bad0-21dbb8382828">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMonolith%20Repository.png?alt=media&token=a60df513-573d-4a94-ae97-926445c09922">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMulti%20Repository.png?alt=media&token=74918249-b9aa-4e4f-96f0-0d5902009d7f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMono%20Repository.png?alt=media&token=b439e524-066e-4f62-8e7d-9b9b1a70db2c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMono%20Repository.png?alt=media&token=b439e524-066e-4f62-8e7d-9b9b1a70db2c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2013.38.35.png?alt=media&token=8e65162b-39f8-40b8-bd59-e872bfd8eaef">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2013.40.05.png?alt=media&token=641e2746-ee03-4800-afde-724f05e8517b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2016.24.35.png?alt=media&token=7a08a6fc-d9a5-4a4d-911e-69b6d7c97593">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2017.39.43.png?alt=media&token=ec6e0180-d03c-4d90-9dcb-fffc15d42a3a">
+<meta property="article:published_time" content="2024-04-13T13:51:10.000Z">
+<meta property="article:modified_time" content="2024-04-13T13:51:10.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Vite">
+<meta property="article:tag" content="pnpm">
+<meta property="article:tag" content="Vue3">
+<meta property="article:tag" content="Monorepo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-13%2023.50.43.png?alt=media&token=427bf66c-dd2e-42e6-9326-92ca93b2fcc0">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20240413/3177435894/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20240413/3177435894/","path":"other/20240413/3177435894/","title":"Monorepo？來聊聊另一種專案管理架構吧！使用 Vite+ pnpm 建立 Vue3 Monorepo"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Monorepo？來聊聊另一種專案管理架構吧！使用 Vite+ pnpm 建立 Vue3 Monorepo | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Monorepo%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什麼是 Monorepo？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monolith-Repository%EF%BC%88%E5%96%AE%E9%AB%94%E5%84%B2%E5%AD%98%E5%BA%AB%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">Monolith Repository（單體儲存庫）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multi-Repository%EF%BC%88%E5%A4%9A%E5%80%8B%E5%84%B2%E5%AD%98%E5%BA%AB%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">Multi Repository（多個儲存庫）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mono-Repository%EF%BC%88%E5%96%AE%E4%B8%80%E5%84%B2%E5%AD%98%E5%BA%AB%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">Mono Repository（單一儲存庫）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8-Vite-%E5%AF%A6%E4%BD%9C%E4%B8%80%E5%80%8B-Monorepo"><span class="nav-number">3.</span> <span class="nav-text">用 Vite 實作一個 Monorepo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%85%AC%E7%94%A8%E4%BE%9D%E8%B3%B4%E5%A5%97%E4%BB%B6"><span class="nav-number">3.1.</span> <span class="nav-text">建立公用依賴套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%85%AC%E7%94%A8%E7%9A%84-Vue-Component"><span class="nav-number">3.2.</span> <span class="nav-text">建立公用的 Vue Component</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">933</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">686</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20240413/3177435894/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Monorepo？來聊聊另一種專案管理架構吧！使用 Vite+ pnpm 建立 Vue3 Monorepo | 是 Ray 不是 Array">
+      <meta itemprop="description" content="Monorepo 是什麼呢？而這個專案架構又與普通的專案架構有什麼不同呢？剛好最近有相關專案的需求，所以就寫這一篇記錄一下。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Monorepo？來聊聊另一種專案管理架構吧！使用 Vite+ pnpm 建立 Vue3 Monorepo
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-04-13 21:51:10" itemprop="dateCreated datePublished" datetime="2024-04-13T21:51:10+08:00">2024-04-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">Monorepo 是什麼呢？而這個專案架構又與普通的專案架構有什麼不同呢？剛好最近有相關專案的需求，所以就寫這一篇記錄一下。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Monorepo 是什麼呢？而這個專案架構又與普通的專案架構有什麼不同呢？剛好最近有相關專案的需求，所以就寫這一篇記錄一下。</p>
+<h2 id="什麼是-Monorepo？"><a href="#什麼是-Monorepo？" class="headerlink" title="什麼是 Monorepo？"></a>什麼是 Monorepo？</h2><p>Monorepo 是什麼東西呢？首先這是多個單字的組合，分別是 Mono 與 Repo，Mono 代表單一的意思，而 Repo 則是 Repository 的縮寫，也就是說 Monorepo 代表的是單一的 Repository。</p>
+<p>感覺滿難懂的吧？沒關係，讓我們先講講其他的專案架構，接著我們再來 Monorepo 吧！</p>
+<h3 id="Monolith-Repository（單體儲存庫）"><a href="#Monolith-Repository（單體儲存庫）" class="headerlink" title="Monolith Repository（單體儲存庫）"></a>Monolith Repository（單體儲存庫）</h3><p>通常我們在開發專案的時候，都會歷經以下幾個步驟：</p>
+<ul>
+<li>建立專案</li>
+<li>初始化版本控制（<code>git init</code>）</li>
+<li>開發功能</li>
+<li>提交變更到遠端儲存庫（GitHub、GitLab、Bitbucket 等）</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-13%2023.50.43.png?alt=media&token=427bf66c-dd2e-42e6-9326-92ca93b2fcc0" alt="Repository"></p>
+<p>而這個專案就會獨立一個 Git Repository，也是我們最基本的專案架構，那麼這種架構又稱之為 Monolith Repository（後面僅稱 Monolith），也就是單一專案的 Repository。</p>
+<p>那麼 Monolith 的專案架構可能長這樣：</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> Repository</span><br><span class="line"><span class="bullet">  -</span> .git</span><br><span class="line"><span class="bullet">  -</span> README.md</span><br><span class="line"><span class="bullet">  -</span> package.json</span><br><span class="line"><span class="bullet">  -</span> src</span><br><span class="line"><span class="bullet">    -</span> components</span><br><span class="line"><span class="bullet">      -</span> Button</span><br><span class="line"><span class="bullet">      -</span> Input</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">    -</span> pages</span><br><span class="line"><span class="bullet">      -</span> index</span><br><span class="line"><span class="bullet">      -</span> shopping</span><br><span class="line"><span class="bullet">      -</span> admin</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">  -</span> public</span><br><span class="line"><span class="bullet">  -</span> ...其他檔案</span><br></pre></td></tr></table></figure>
+
+<p>透過上面架構我們可以看到會 Monolith 會是一個 Git 管理一整個專案。</p>
+<p>雖然 Monolith 的架構非常方便也簡單，在做一些 MVP 專案是相當不錯的首選，可是也會有一些問題存在，當專案開始越來越大時，這個專案就會變得越來越難維護，為什麼呢？舉例來講，我們這個專案裡面可能有包含了以下幾個功能模組：</p>
+<ul>
+<li>前台首頁</li>
+<li>前台購物頁面</li>
+<li>後台管理<br>…等等功能</li>
+</ul>
+<p>開發以及部署的速度會隨著專案越來越龐大而變得越來越慢，就連一個小改動你都需要跑完一整個專案的編譯、測試、部署等等流程，而且只要一個地方出錯，這個專案就會跟你說一聲「掰掰」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2Fim-leaving-leaving.gif?alt=media&token=36e0e691-3481-4017-9e53-79ba852c77ff" alt="掰掰"></p>
+<p>那麼為了解決這問題，我們就延伸出了另一個專案架構，也就是 Multi Repository。</p>
+<h3 id="Multi-Repository（多個儲存庫）"><a href="#Multi-Repository（多個儲存庫）" class="headerlink" title="Multi Repository（多個儲存庫）"></a>Multi Repository（多個儲存庫）</h3><p>Multi Repository（後面簡稱 Multi）是什麼呢？簡單來講就是將原本的 Monolith 拆分成多個 Repository，也就是將原本的專案拆分成多個專案，每個專案都有自己的 Repository，這樣就可以讓每個專案獨立開發、獨立部署，這樣就可以解決 Monolith 的問題。</p>
+<p>那麼這個專案架構就會從原本的 Monolith 變成以下的架構：</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> A Repository</span><br><span class="line"><span class="bullet">  -</span> .git</span><br><span class="line"><span class="bullet">  -</span> README.md</span><br><span class="line"><span class="bullet">  -</span> package.json</span><br><span class="line"><span class="bullet">  -</span> src</span><br><span class="line"><span class="bullet">    -</span> components</span><br><span class="line"><span class="bullet">      -</span> Button</span><br><span class="line"><span class="bullet">      -</span> Input</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">    -</span> pages</span><br><span class="line"><span class="bullet">      -</span> index</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">  -</span> public</span><br><span class="line"><span class="bullet">  -</span> ...其他檔案</span><br><span class="line"><span class="bullet">-</span> B Repository</span><br><span class="line"><span class="bullet">  -</span> .git</span><br><span class="line"><span class="bullet">  -</span> README.md</span><br><span class="line"><span class="bullet">  -</span> package.json</span><br><span class="line"><span class="bullet">  -</span> src</span><br><span class="line"><span class="bullet">    -</span> components</span><br><span class="line"><span class="bullet">      -</span> Button</span><br><span class="line"><span class="bullet">      -</span> Input</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">    -</span> pages</span><br><span class="line"><span class="bullet">      -</span> shopping</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">  -</span> public</span><br><span class="line"><span class="bullet">  -</span> ...其他檔案</span><br><span class="line"><span class="bullet">-</span> C Repository</span><br><span class="line"><span class="bullet">  -</span> .git</span><br><span class="line"><span class="bullet">  -</span> README.md</span><br><span class="line"><span class="bullet">  -</span> package.json</span><br><span class="line"><span class="bullet">  -</span> src</span><br><span class="line"><span class="bullet">    -</span> components</span><br><span class="line"><span class="bullet">      -</span> Button</span><br><span class="line"><span class="bullet">      -</span> Input</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">    -</span> pages</span><br><span class="line"><span class="bullet">      -</span> admin</span><br><span class="line"><span class="bullet">      -</span> ...</span><br><span class="line"><span class="bullet">  -</span> public</span><br><span class="line"><span class="bullet">  -</span> ...其他檔案</span><br></pre></td></tr></table></figure>
+
+<p>看起來這種專案架構是相當不錯的，讓我們解決了牽一髮而動全身的問題，而這個專案架構也會將功能模組各自拆分成一個專案，這樣就可以讓每個專案獨立開發、獨立部署，這樣就可以解決 Monolith 的問題。</p>
+<p>但卻也有一些問題發生，我們在上面的例子中，我們可以看到 Button、Input 這兩個功能模組都是重複的，這樣就會造成重複開發的問題，而且當這兩個功能模組有一個地方出錯時，我們就需要到每個專案去修改，這樣就會造成維護上的困難，當然不只有這個問題存在，像是專案的 CI&#x2F;CD、套件的版本等等也就會變得更加難以維護 QAQ…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F202404140133.jpg?alt=media&token=84dd1195-1da9-4bf0-bad0-21dbb8382828" alt="崩潰"></p>
+<h3 id="Mono-Repository（單一儲存庫）"><a href="#Mono-Repository（單一儲存庫）" class="headerlink" title="Mono Repository（單一儲存庫）"></a>Mono Repository（單一儲存庫）</h3><p>那麼為了解決這個問題，所以又延伸出了另一個專案架構，也就是我們這一篇要說的重點 Monorepo 架構。</p>
+<p>這時候應該有點混亂了，所以我決定畫圖來讓大家更加了解彼此的架構差異，首先是 Monolith：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMonolith%20Repository.png?alt=media&token=a60df513-573d-4a94-ae97-926445c09922" alt="Monolith Repository"></p>
+<p>我們可以看到 Monolith 的專案架構是一個專案一個 Repository，裡面通常會包含了許多功能模組，這樣就會造成牽一髮而動全身的問題。</p>
+<p>接下來是 Multi：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMulti%20Repository.png?alt=media&token=74918249-b9aa-4e4f-96f0-0d5902009d7f" alt="Multi Repository"></p>
+<p>我們可以看到 Multi 的專案架構是將原本的 Monolith 拆分成多個 Repository，這樣就可以讓每個專案獨立開發、獨立部署，這樣就可以解決 Monolith 的問題。</p>
+<p>最後是 Mono Repository（後面簡稱 Monorepo）：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMono%20Repository.png?alt=media&token=b439e524-066e-4f62-8e7d-9b9b1a70db2c" alt="Mono Repository"></p>
+<p>透過圖像我們可以看到原本 Multi 都是獨立的 Git 管理，但是在 Monorepo 中，我們可以看到所有的專案都是在同一個 Repository 中並且由一個 Git 管理，這樣就可以解決 Multi 的問題，讓我們可以將所有的專案都放在同一個 Repository 中，讓所有的專案共享相同的資源。</p>
+<p>雖然 Monorepo 的架構解決了 Multi 的問題，但也有一些缺點，例如…</p>
+<ul>
+<li>專案肥大後 <code>git clone</code> 時會花費較多時間</li>
+<li>共用的東西必須要規劃好，否則容易互相影響</li>
+<li>由於 Monorepo 中的專案都是共用的，所以無法區分專案的權限</li>
+<li>Git 儲存庫的大小會變得非常大</li>
+</ul>
+<p>我們可以發現不論是哪一種專案架構，都有屬於他的優缺點，所以在選擇專案架構時，可以評估一下自己的專案需求，再來選擇適合的專案架構。</p>
+<h2 id="用-Vite-實作一個-Monorepo"><a href="#用-Vite-實作一個-Monorepo" class="headerlink" title="用 Vite 實作一個 Monorepo"></a>用 Vite 實作一個 Monorepo</h2><p>接下來我將會介紹如何使用 Vite + pnpm 建立一個 Vue3 的 Monorepo，首先請你先依照以下步驟準備好環境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> monorepo-example-pnpm-vue3</span><br><span class="line"><span class="built_in">cd</span> monorepo-example-pnpm-vue3</span><br><span class="line">pnpm init</span><br></pre></td></tr></table></figure>
+
+<p>接下來我們要做一點特別的設定，在 pnpm 的 <a target="_blank" rel="noopener" href="https://pnpm.io/zh/workspaces">工作空間（Workspace）</a> 官方文件有說到一件事情，如果我們要建立 Monorepo 的話會需要在根目錄建立一個「pnpm-workspace.yaml」檔案，所以請你在這個專案底下建立一個「pnpm-workspace.yaml」檔案。</p>
+<blockquote>
+<p><strong>Note</strong><br>pnpm-workspace.yaml 這個檔案主要是用來告訴 pnpm 這個專案是一個 Monorepo 專案，並且在你執行 <code>pnpm install</code> 時會自動安裝所有專案的相依套件</p>
+</blockquote>
+<p>內容要寫什麼呢？這邊先讓我們回頭看一下 Monorepo 的圖：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2FMono%20Repository.png?alt=media&token=b439e524-066e-4f62-8e7d-9b9b1a70db2c" alt="Mono Repository"></p>
+<p>我們可以看到一個 Git 底下會管理很多個專案，所以通常 Monorepo 的專案會長這樣：</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> Git</span><br><span class="line"><span class="bullet">  -</span> pnpm-workspace.yaml</span><br><span class="line"><span class="bullet">  -</span> package.json</span><br><span class="line"><span class="bullet">  -</span> apps</span><br><span class="line"><span class="bullet">  -</span> packages</span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到有一個 apps 資料夾，這個就是我們將會放置所有專案的地方，所以我們要在根目錄建立一個「apps」資料夾</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> apps</span><br></pre></td></tr></table></figure>
+
+<p>接著在「pnpm-workspace.yaml」檔案中寫入以下內容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">packages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">apps/*</span></span><br></pre></td></tr></table></figure>
+
+<p>到這邊為止，已經將 Monorepo 的基本環境準備好了，接下來就是建立一個 Vue3 的專案，請你移動到「apps」資料夾中，並且建立一個 Vue3 的專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> apps</span><br><span class="line">pnpm create vue@latest</span><br></pre></td></tr></table></figure>
+
+<p>這邊我就示範建立一個「shopping」的專案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2013.38.35.png?alt=media&token=8e65162b-39f8-40b8-bd59-e872bfd8eaef" alt="Vue Create"></p>
+<p>建立完成後，你專案應該會長這樣：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2013.40.05.png?alt=media&token=641e2746-ee03-4800-afde-724f05e8517b" alt="專案當前結構"></p>
+<p>接下來要請你打開 apps&#x2F;shopping 的專案，並且找到 package.json 將 <code>name</code> 屬性改成 <code>@apps/shopping</code>，這樣才能讓 pnpm 知道這個專案是屬於 Monorepo 底下的專案。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;@apps/shopping&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.1.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;private&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;dev&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vite&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vite build&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;serve&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vite preview&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;dependencies&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;vue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^3.2.29&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;devDependencies&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;@vitejs/plugin-vue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^1.9.2&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vite&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^2.7.13&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br><code>@app/專案名稱</code> 這個是 Monorepo 的命名規則，專案名稱在 Monorepo 中是不能重複的，所以通常 Monorepo 底下的命名為「<code>@</code>」＋「<code>apps</code>」＋「<code>/</code>」＋「<code>專案名稱</code>」，例如…我要建立一個 shopping 的專案，那麼專案名稱就會是「<code>@apps/shopping</code>」。</p>
+</blockquote>
+<p>接下來請你回到最外層找到 package.json，並增加一個啟動指令在 scripts 中：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;monorepo-example-pnpm-vue3&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1.0.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;main&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;shopping&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pnpm --filter @apps/shopping&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;keywords&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;license&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ISC&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>pnpm --filter @apps/shopping</code> 這一段的指令意思是告訴 pnpm 這個專案是要執行 <code>@apps/shopping</code> 這個專案，這樣就可以讓我們在根目錄執行 <code>pnpm shopping</code> 時，就會啟動 <code>@apps/shopping</code> 這個專案。</p>
+<p>接下來我們該如何啟動專案呢？只需要在根目錄執行以下指令即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm shopping dev</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br><code>pnpm shopping dev</code> 這個指令的意思是告訴 pnpm 這個專案是要執行 <code>@apps/shopping</code> 這個專案，並且執行 <code>dev</code> 這個指令，<code>dev</code> 指令則是 <code>@apps/shopping</code> 專案中的 <code>scripts</code> 中的 <code>dev</code> 指令。</p>
+</blockquote>
+<h3 id="建立公用依賴套件"><a href="#建立公用依賴套件" class="headerlink" title="建立公用依賴套件"></a>建立公用依賴套件</h3><p>接下來由於我們底下環境都是 Vue 相關的：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;@apps/shopping&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ...略過其他</span></span><br><span class="line">  <span class="attr">&quot;dependencies&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;pinia&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^2.1.7&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^3.4.21&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vue-router&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^4.3.0&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;devDependencies&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;@rushstack/eslint-patch&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^1.8.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;@vitejs/plugin-vue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^5.0.4&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;@vue/eslint-config-prettier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^9.0.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;@vue/test-utils&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^2.4.5&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;eslint&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^8.57.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;eslint-plugin-vue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^9.23.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;jsdom&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^24.0.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^3.2.5&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vite&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^5.2.8&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vite-plugin-vue-devtools&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^7.0.25&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vitest&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^1.4.0&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>所以我們就可以把 <code>dependencies</code> 跟 <code>devDependencies</code> 移動外層 package.json，作為一個共用，接下來只要將相關的指令加入到 <code>scripts</code> 即可，所以調整後會變成以下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;monorepo-example-pnpm-vue3&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1.0.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;main&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dev:shopping&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pnpm run -C apps/shopping dev&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;build:shopping&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pnpm run -C apps/shopping build&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dev:order&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pnpm run -C apps/order dev&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;build:order&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pnpm run -C apps/order build&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ...略過其他</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>由於我們將 <code>dependencies</code> 跟 <code>devDependencies</code> 移動到根目錄，所以才把 <code>--filter</code> 改成了 <code>-C</code>，這樣才能讓 pnpm 知道這個專案是要執行哪個專案。</p>
+</blockquote>
+<p>接下來輸入指令時，只需要輸入相對應的指令即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm dev:shopping</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2016.24.35.png?alt=media&token=7a08a6fc-d9a5-4a4d-911e-69b6d7c97593" alt="專案啟動"></p>
+<p>那麼如果我們想要新增一個公用的套件，只需要在根目錄下安裝即可，例如…<code>vue-loading-overlay</code> 套件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm add vue-loading-overlay -w</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>在 Monorepo 中安裝套件時，需要加上 <code>-w</code> 參數，這樣才能讓 pnpm 知道這個套件是要安裝在所有專案中，如果是安裝 devDependencies 則需要加上 <code>-D</code> 參數，如：<code>pnpm add eslint -w -D</code>。</p>
+</blockquote>
+<h3 id="建立公用的-Vue-Component"><a href="#建立公用的-Vue-Component" class="headerlink" title="建立公用的 Vue Component"></a>建立公用的 Vue Component</h3><p>假設今天我們有一個共用的 Button 元件，那我們在 Monorepo 該如何處理呢？首先請你在根目錄輸入以下指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> packages</span><br><span class="line"><span class="built_in">cd</span> packages</span><br></pre></td></tr></table></figure>
+
+<p>接著輸入以下指令一個新的 Vue3 專案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm create vue@latest</span><br></pre></td></tr></table></figure>
+
+<p>接著把專案精簡成以下：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fmonorepo%2F%E6%88%AA%E5%9C%96%202024-04-15%2017.39.43.png?alt=media&token=ec6e0180-d03c-4d90-9dcb-fffc15d42a3a" alt="專案精簡"></p>
+<p>因為我們是要共用元件，並不需要 vite.config.js、public 以及 App.vue 這類檔案，接著打開 ui-lib 將 package.json 改成以下即可：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;@packages/ui-lib&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.0.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;private&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;module&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;main&quot;</span><span class="punctuation">:</span> <span class="string">&quot;src/main.js&quot;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br><code>main</code> 屬性非常重要，請務必指向到你的 main.js 檔案，這樣才能讓其他專案引入這個套件。</p>
+</blockquote>
+<p>接下來該如何在 Shopping 使用呢？只需要輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> apps/shopping</span><br><span class="line">pnpm add @packages/ui-lib</span><br></pre></td></tr></table></figure>
+
+<p>接著在 Shopping 的專案中使用這個元件即可：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> <span class="title class_">Button</span> <span class="keyword">from</span> <span class="string">&#x27;@packages/ui-lib&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">Button</span> <span class="attr">label</span>=<span class="string">&quot;哈囉，我在 Shopping&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以在 Shopping 中使用 ui-lib 的 Button 元件了～</p>
+<p>那麼以上就差不多是一個簡單的 Monorepo 環境，最後我也提供這個範例的 GitHub 連結給你參考。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/monorepo-example-pnpm-vue3">GitHub</a></li>
+</ul>
+<blockquote>
+<p><strong>Note</strong><br><code>git clone</code> 專案之後，只需要在根目錄輸入 <code>pnpm install</code> 即可安裝所有專案的相依套件。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Vite/" rel="tag"># Vite</a>
+              <a href="/tags/pnpm/" rel="tag"># pnpm</a>
+              <a href="/tags/Vue3/" rel="tag"># Vue3</a>
+              <a href="/tags/Monorepo/" rel="tag"># Monorepo</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/windows/20240324/4257487202/" rel="prev" title="你知道嗎？Windows 的關機並不是真的關機">
+                  <i class="fa fa-angle-left"></i> 你知道嗎？Windows 的關機並不是真的關機
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20240422/247586401/" rel="next" title="解決 GitHub Pages 無法驗證 Discord .well-known 網域問題">
+                  解決 GitHub Pages 無法驗證 Discord .well-known 網域問題 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
