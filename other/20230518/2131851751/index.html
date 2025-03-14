@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="作爲一名工程師，偶爾下班寫寫一些 Side Project 是滿正常不過的事情，而這些東西通常會放在免費的平台上，但是許多平台都有一個共通的問題，就是如果沒有人使用的話，它就會進入休眠狀態，這時候如果有人想要使用的話，就會需要等待一段時間，所以這一篇就會來介紹 UptimeRobot 以及 cron-job.org 這兩個服務。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！">
+<meta property="og:url" content="https://israynotarray.com/other/20230518/2131851751/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="作爲一名工程師，偶爾下班寫寫一些 Side Project 是滿正常不過的事情，而這些東西通常會放在免費的平台上，但是許多平台都有一個共通的問題，就是如果沒有人使用的話，它就會進入休眠狀態，這時候如果有人想要使用的話，就會需要等待一段時間，所以這一篇就會來介紹 UptimeRobot 以及 cron-job.org 這兩個服務。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2FRay_computer_power_off_0fe6e796-bc75-49a1-b96c-9c6fc1c1abee.png?alt=media&token=e1685b00-78a4-4383-b9cb-b0bcd449c825">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.34.03.png?alt=media&token=f7ae731f-9cd6-4b46-a8e5-402c11dfe674">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.38.07.png?alt=media&token=3861ec99-0e4a-4c81-9087-206b60f00833">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.39.42.png?alt=media&token=5db4811e-e6bd-4a6d-a4de-45f871738a3d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.46.49.png?alt=media&token=2e97e1d7-ef12-4246-b331-f80863ef7b9b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.51.30.png?alt=media&token=9b136e28-77ec-4923-bf9b-f0fc95055e2a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.56.18.png?alt=media&token=852277b8-8932-4c4b-a96f-3c4b8e387360">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.57.23.png?alt=media&token=7cf528e1-7079-4158-8000-88865bf7643e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2011.02.40.png?alt=media&token=9c698bbb-f550-4aa6-8727-699b8580dae8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2011.05.25.png?alt=media&token=15427161-e398-49f6-9e8e-e4e8feaee643">
+<meta property="article:published_time" content="2023-05-18T01:25:53.000Z">
+<meta property="article:modified_time" content="2023-05-18T01:25:53.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Render">
+<meta property="article:tag" content="UptimeRobot">
+<meta property="article:tag" content="cron-job.org">
+<meta property="article:tag" content="休眠">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2FRay_computer_power_off_0fe6e796-bc75-49a1-b96c-9c6fc1c1abee.png?alt=media&token=e1685b00-78a4-4383-b9cb-b0bcd449c825">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20230518/2131851751/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20230518/2131851751/","path":"other/20230518/2131851751/","title":"Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%8D%E8%B2%BB%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.</span> <span class="nav-text">免費平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解決方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UptimeRobot"><span class="nav-number">4.</span> <span class="nav-text">UptimeRobot</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cron-job-org"><span class="nav-number">5.</span> <span class="nav-text">cron-job.org</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">6.</span> <span class="nav-text">結論</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">935</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">688</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20230518/2131851751/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="作爲一名工程師，偶爾下班寫寫一些 Side Project 是滿正常不過的事情，而這些東西通常會放在免費的平台上，但是許多平台都有一個共通的問題，就是如果沒有人使用的話，它就會進入休眠狀態，這時候如果有人想要使用的話，就會需要等待一段時間，所以這一篇就會來介紹 UptimeRobot 以及 cron-job.org 這兩個服務。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-05-18 09:25:53" itemprop="dateCreated datePublished" datetime="2023-05-18T09:25:53+08:00">2023-05-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">作爲一名工程師，偶爾下班寫寫一些 Side Project 是滿正常不過的事情，而這些東西通常會放在免費的平台上，但是許多平台都有一個共通的問題，就是如果沒有人使用的話，它就會進入休眠狀態，這時候如果有人想要使用的話，就會需要等待一段時間，所以這一篇就會來介紹 UptimeRobot 以及 cron-job.org 這兩個服務。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2FRay_computer_power_off_0fe6e796-bc75-49a1-b96c-9c6fc1c1abee.png?alt=media&token=e1685b00-78a4-4383-b9cb-b0bcd449c825" alt="Demo"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>作爲一名工程師，偶爾下班寫寫一些 Side Project 是滿正常不過的事情，而這些東西通常會放在免費的平台上，但是許多平台都有一個共通的問題，就是如果沒有人使用的話，它就會進入休眠狀態，這時候如果有人想要使用的話，就會需要等待一段時間，所以這一篇就會來介紹 UptimeRobot 以及 cron-job.org 這兩個服務。</p>
+<h2 id="免費平台"><a href="#免費平台" class="headerlink" title="免費平台"></a>免費平台</h2><p>如同前面所提，我們在實作一些小專案或小玩具時，都會將這些玩具放到一些免費平台。</p>
+<p>但是這些免費平台總是會有一些限制，以 <a target="_blank" rel="noopener" href="https://render.com/">Render.com</a> 來講，官方文件就有提到這句話</p>
+<blockquote>
+<p>Web Services on the free instance type are automatically spun down after 15 minutes of inactivity. When a new request for a free service comes in, Render spins it up again so it can process the request.</p>
+</blockquote>
+<p>Google 翻譯：</p>
+<blockquote>
+<p>免費實例類型上的 Web 服務在閒置 15 分鐘後會自動停止運行。 當一個新的免費服務請求進來時，Render 會再次啟動它，以便它可以處理該請求。</p>
+</blockquote>
+<p>更詳細你可以看這邊 <a target="_blank" rel="noopener" href="https://render.com/docs/free">Free Web Services</a>。</p>
+<p>這邊你可能會想說…</p>
+<p>「那不要用 <a target="_blank" rel="noopener" href="https://render.com/">Render.com</a> 就好啦？改用 fly.io 或是 Vercel 等等之類就好啦？」</p>
+<p>沒錯，這確實是比較乾脆的事情，如果你非常在意即時的反應以及沒有延遲的請求的話，改到別的平台確實是一件比較好的事情，但是我個人認為 <a target="_blank" rel="noopener" href="https://render.com/">Render.com</a> 的介面比 fly.io 或是 Vercel 來的簡單且非常接近原本的 Heroku(附註：Heroku 在 2022&#x2F;11&#x2F;28 停止免費專案)。</p>
+<h2 id="解決方案"><a href="#解決方案" class="headerlink" title="解決方案"></a>解決方案</h2><p>那麼前面提了那麼多，接下來當然還是著重於如果我們使用的平台有休眠限制的話該怎麼辦這件事上，因為其實只要你的伺服器有使用的話，它就不會進入休眠狀態，所以我們只要讓它一直有使用就好了。</p>
+<p>那麼該怎麼做到這件事情呢？其實有一些免費服務可以幫我們做到這些事情，底下我列出我知道的服務</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://uptimerobot.com/">UptimeRobot</a></li>
+<li><a target="_blank" rel="noopener" href="https://cron-job.org/">cron-job.org</a></li>
+<li><a target="_blank" rel="noopener" href="https://cronhub.io/">cronhub</a></li>
+</ul>
+<p>這一篇會以 <a target="_blank" rel="noopener" href="https://uptimerobot.com/">UptimeRobot</a> 為主，因為我個人一直都是使用 UptimeRobot 為主，所以就以這個為主哩~</p>
+<blockquote>
+<p><strong>Note</strong><br>cronhub 僅提供七天免費，後續都是要付費的，所以我就不介紹了。</p>
+</blockquote>
+<h2 id="UptimeRobot"><a href="#UptimeRobot" class="headerlink" title="UptimeRobot"></a>UptimeRobot</h2><p>首先請先到 <a target="_blank" rel="noopener" href="https://uptimerobot.com/">UptimeRobot</a> 註冊一個帳號，註冊完畢後，你會看到這樣的畫面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.34.03.png?alt=media&token=f7ae731f-9cd6-4b46-a8e5-402c11dfe674" alt="UptimeRobot"></p>
+<p>接下來我們點選左邊的 <code>+ Add New Monitor</code></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.38.07.png?alt=media&token=3861ec99-0e4a-4c81-9087-206b60f00833" alt="Add New Monitor"></p>
+<p>接著點一下 Monitor Type 選擇 <code>HTTP(s)</code></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.39.42.png?alt=media&token=5db4811e-e6bd-4a6d-a4de-45f871738a3d" alt="Monitor Type"></p>
+<p>接下來你需要關注這幾個欄位</p>
+<ul>
+<li>Monitor Type：這個是監控的方式，我們選擇 HTTP(s)</li>
+<li>Friendly Name：這個是你的服務名稱，可以隨便取</li>
+<li>URL (or IP)：這個是你的服務網址，如果你是使用 <a target="_blank" rel="noopener" href="https://render.com/">Render.com</a> 的話，你可以在你的專案頁面找到你的網址，填上你的 <code>https://你的專案名稱.onrender.com/</code> 網址就好</li>
+<li>Monitoring Interval：這個是監控的間隔時間，如果你是使用免費版的話，你只能選擇 5 分鐘以上，所以我們就選擇 5 分鐘</li>
+<li>Monitor Timeout：這個是監控的逾時時間，如果你的服務在 5 分鐘內沒有回應的話，就會被判定為掛掉，預設這邊保持 30 秒就好</li>
+</ul>
+<p>其他部分你可以保持預設，接著點選 <code>Create Monitor</code> 就可以（如果你沒有打勾 Alert Contacts To Notify 的話，你會看到一個警告，你可以忽略它），接著你就可以在畫面上看到剛剛新增的監控</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.46.49.png?alt=media&token=2e97e1d7-ef12-4246-b331-f80863ef7b9b" alt="Monitor"></p>
+<p>這樣子每五分鐘 UptimeRobot 就會去呼叫你的服務，你的服務就不會進入休眠狀態了。</p>
+<blockquote>
+<p><strong>Note</strong><br><a target="_blank" rel="noopener" href="https://render.com/">Render.com</a> 服務依照官方文件是在 15 min 沒有任何請求時才會進入睡眠，因此設置為每 5 分鐘請求一次 HTTP(s) 服務是滿足夠的。</p>
+</blockquote>
+<p>那麼你也可以透過這個 Monitor 看到你的服務狀況，如果是 100% 代表監控這段時間完全沒掉線，如果是 99.9% 代表這段時間有 0.1% 的時間掉線<br><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.51.30.png?alt=media&token=9b136e28-77ec-4923-bf9b-f0fc95055e2a" alt="Monitor"></p>
+<p>這個服務很適合拿來監控你的服務，如果你的服務掛掉了，你就會收到一封信件，告訴你你的服務掛掉了，這樣子你就可以馬上去修復你的服務~</p>
+<h2 id="cron-job-org"><a href="#cron-job-org" class="headerlink" title="cron-job.org"></a>cron-job.org</h2><p>cron-job.org 跟 UptimeRobot 比較不太一樣，它比較偏向於排程，他可以幫你定時去呼叫你的服務，讓你的服務不會進入休眠狀態。</p>
+<p>使用方式也非常簡單，這邊就假設你已經註冊好了，所以你應該會看到這個畫面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.56.18.png?alt=media&token=852277b8-8932-4c4b-a96f-3c4b8e387360" alt="cron-job.org"></p>
+<p>接著點一下 Create Cronjob</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2010.57.23.png?alt=media&token=7cf528e1-7079-4158-8000-88865bf7643e" alt="Create Cronjob"></p>
+<p>然後你只需要填寫以下</p>
+<ul>
+<li>Title：這個排程的名稱</li>
+<li>Url：你的服務網址，你的 <code>https://你的專案名稱.onrender.com/</code> 網址就好</li>
+<li>Execution schedule：排程的時間，這邊我們選擇每 5 分鐘一次</li>
+</ul>
+<p>其他部分你可以保持預設，接著點選 <code>Create</code> 就可以，所以你應該預設會是這樣</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2011.02.40.png?alt=media&token=9c698bbb-f550-4aa6-8727-699b8580dae8" alt="Create Cronjob"></p>
+<p>接著新增後你畫面上就會有你剛剛新增的排程</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2FUptimeRobot%2F%E6%88%AA%E5%9C%96%202023-05-18%2011.05.25.png?alt=media&token=15427161-e398-49f6-9e8e-e4e8feaee643" alt="Cronjob"></p>
+<p>接下來就會依照你的排程去呼叫你的服務，這樣你的服務也不會進入睡眠囉</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>基本上 UptimeRobot 或 cron-job.org 都可以做到一樣的需求，可是 UptimeRobot 功能上會比較豐富，所以我個人是比較常用 UptimeRobot 就是了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Render/" rel="tag"># Render</a>
+              <a href="/tags/UptimeRobot/" rel="tag"># UptimeRobot</a>
+              <a href="/tags/cron-job-org/" rel="tag"># cron-job.org</a>
+              <a href="/tags/%E4%BC%91%E7%9C%A0/" rel="tag"># 休眠</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/information-security/20230516/18406287/" rel="prev" title="Token 放 localStorage？sessionStorage？還是 Cookie？">
+                  <i class="fa fa-angle-left"></i> Token 放 localStorage？sessionStorage？還是 Cookie？
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20230520/2118016719/" rel="next" title="或許你該懂一下 CI/CD？用 CD 部署到 Render.com">
+                  或許你該懂一下 CI/CD？用 CD 部署到 Render.com <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="通常我們在開發後端時，時常開發完畢之後必須撰寫 API 文件，因此這一邊就來介紹一下，如何自動生成 API 文件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 Swagger 自動生成 API 文件">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20201229/1974873838/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="通常我們在開發後端時，時常開發完畢之後必須撰寫 API 文件，因此這一邊就來介紹一下，如何自動生成 API 文件。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2Fswagger_ui.png?alt=media&token=ccffb2c4-9bd4-48d7-bdae-23c5a44c0a55">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2020.41.23.png?alt=media&token=0b60b6a1-887d-4833-82b5-5d6d2d2c048f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2020.59.22.png?alt=media&token=e0d83245-8da7-4b59-97ef-2ac2e3e2a431">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2021.05.32.png?alt=media&token=51d7ef49-3620-451a-acc8-132c4a972217">
+<meta property="article:published_time" content="2020-12-29T12:24:14.000Z">
+<meta property="article:modified_time" content="2020-12-29T12:24:14.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Express">
+<meta property="article:tag" content="Swagger">
+<meta property="article:tag" content="Swagger UI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2Fswagger_ui.png?alt=media&token=ccffb2c4-9bd4-48d7-bdae-23c5a44c0a55">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20201229/1974873838/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20201229/1974873838/","path":"nodejs/20201229/1974873838/","title":"使用 Swagger 自動生成 API 文件"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>使用 Swagger 自動生成 API 文件 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%96%8B%E7%99%BC%E7%92%B0%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">開發環境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8B%95%E7%94%A2%E7%94%9F-API-%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">自動產生 API 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#swagger-autogen"><span class="nav-number">4.</span> <span class="nav-text">swagger-autogen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#swagger-ui-express"><span class="nav-number">5.</span> <span class="nav-text">swagger-ui-express</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#swagger-autogen-%E8%A8%BB%E8%A7%A3%E6%92%B0%E5%AF%AB"><span class="nav-number">6.</span> <span class="nav-text">swagger-autogen 註解撰寫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">7.</span> <span class="nav-text">參考文獻</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">935</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">688</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20201229/1974873838/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="使用 Swagger 自動生成 API 文件 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="通常我們在開發後端時，時常開發完畢之後必須撰寫 API 文件，因此這一邊就來介紹一下，如何自動生成 API 文件。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 Swagger 自動生成 API 文件
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-12-29 20:24:14" itemprop="dateCreated datePublished" datetime="2020-12-29T20:24:14+08:00">2020-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">通常我們在開發後端時，時常開發完畢之後必須撰寫 API 文件，因此這一邊就來介紹一下，如何自動生成 API 文件。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>通常我們在開發後端時，時常開發完畢之後必須撰寫 API 文件，因此這一邊就來介紹一下，如何自動生成 API 文件。</p>
+<h2 id="開發環境"><a href="#開發環境" class="headerlink" title="開發環境"></a>開發環境</h2><ul>
+<li>Node.js 14</li>
+<li>Express</li>
+<li>MacOS Big Sur</li>
+</ul>
+<p>雖然這邊列上了開發環境，但實際上後面還是會提供範例程式碼。</p>
+<h2 id="自動產生-API-文件"><a href="#自動產生-API-文件" class="headerlink" title="自動產生 API 文件"></a>自動產生 API 文件</h2><p>這邊我們將會使用 Swagger，而 Swagger 是什麼呢？這邊擷取 wiki 部分說明</p>
+<blockquote>
+<p>Swagger 與一組開源軟件工具一起使用，以設計，構建，記錄和使用RESTful Web服務。Swagger包括自動文檔，代碼生成和測試用例生成。</p>
+</blockquote>
+<p>簡單來講就是方便後端 API 介接時有一個更直覺的 GUI 介面，透過 <a target="_blank" rel="noopener" href="https://swagger.io/tools/swagger-ui/">Swagger UI</a> 你可以生成一個網頁，讓你可以直接在網頁上測試 API 以及了解狀況。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2Fswagger_ui.png?alt=media&token=ccffb2c4-9bd4-48d7-bdae-23c5a44c0a55" alt="Swagger UI"></p>
+<p>講那麼多廢話，那麼該如何實際應用在自己專案中呢？這邊我將會使用 Express 作為範本。</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">express --pug --css sass // 建立之後記得進入該目錄輸入 npm install</span><br></pre></td></tr></table></figure>
+
+<p>(在此我是使用「Express 應用程式產生器」建立，若沒有安裝的話則可以試著安裝 <code>npm install express-generator -g</code>。)</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2020.41.23.png?alt=media&token=0b60b6a1-887d-4833-82b5-5d6d2d2c048f" alt="Express"></p>
+<p>接下來我們要替專案安裝兩個重點套件</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install --save swagger-autogen swagger-ui-express</span><br></pre></td></tr></table></figure>
+
+<h2 id="swagger-autogen"><a href="#swagger-autogen" class="headerlink" title="swagger-autogen"></a>swagger-autogen</h2><p>swagger-ui-express 簡單來講就是讓 Express 支援 swagger 的 UI 介面呈現而已，這邊的自動化產生 API 的重點套件在於 swagger-autogen。</p>
+<p>swagger-autogen 是什麼呢？簡單來講，你只需要在 API 的 router 撰寫註解，那麼在執行 swagger-autogen 時，它就會自動依照註解內容生成 API 文件，是不是超貼心呢？</p>
+<p>因此接下來我們要建立一個檔案叫做「swagger.js」，內容則是以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> swaggerAutogen = <span class="built_in">require</span>(<span class="string">&#x27;swagger-autogen&#x27;</span>)();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = <span class="string">&#x27;./swagger_output.json&#x27;</span>; <span class="comment">// 輸出的文件名稱</span></span><br><span class="line"><span class="keyword">const</span> endpointsFiles = [<span class="string">&#x27;./app.js&#x27;</span>]; <span class="comment">// 要指向的 API，通常使用 Express 直接指向到 app.js 就可以</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">swaggerAutogen</span>(outputFile, endpointsFiles); <span class="comment">// swaggerAutogen 的方法</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來讓我們修改一下 router，通常預設會生成兩個 router</p>
+<ul>
+<li>「router&#x2F;index.js」</li>
+<li>「router&#x2F;users.js」</li>
+</ul>
+<p>然後內容多增加一些 router，這邊會有兩種寫法</p>
+<p>第一種寫法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">router.<span class="title function_">get</span>(<span class="string">&#x27;/&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res, next</span>) &#123;</span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&#x27;respond with a resource&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">router.<span class="title function_">post</span>(<span class="string">&#x27;/post&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res, next</span>) &#123;</span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&#x27;respond with a resource&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">router.<span class="title function_">put</span>(<span class="string">&#x27;/put&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res, next</span>) &#123;</span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&#x27;respond with a resource&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">router.<span class="title function_">delete</span>(<span class="string">&#x27;/delete&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res, next</span>) &#123;</span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&#x27;respond with a resource&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>第二種寫法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">router.<span class="title function_">get</span>(<span class="string">&#x27;/&#x27;</span>, <span class="keyword">function</span> (<span class="params">req, res, next</span>) &#123;</span><br><span class="line">    res.<span class="title function_">render</span>(<span class="string">&#x27;index&#x27;</span>, &#123; <span class="attr">title</span>: <span class="string">&#x27;Express&#x27;</span> &#125;);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">post</span>(<span class="string">&#x27;/post&#x27;</span>, <span class="keyword">function</span> (<span class="params">req, res, next</span>) &#123;</span><br><span class="line">    res.<span class="title function_">render</span>(<span class="string">&#x27;index&#x27;</span>, &#123; <span class="attr">title</span>: <span class="string">&#x27;Express&#x27;</span> &#125;);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">put</span>(<span class="string">&#x27;/put&#x27;</span>, <span class="keyword">function</span> (<span class="params">req, res, next</span>) &#123;</span><br><span class="line">    res.<span class="title function_">render</span>(<span class="string">&#x27;index&#x27;</span>, &#123; <span class="attr">title</span>: <span class="string">&#x27;Express&#x27;</span> &#125;);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">delete</span>(<span class="string">&#x27;/delete&#x27;</span>, <span class="keyword">function</span> (<span class="params">req, res, next</span>) &#123;</span><br><span class="line">    res.<span class="title function_">render</span>(<span class="string">&#x27;index&#x27;</span>, &#123; <span class="attr">title</span>: <span class="string">&#x27;Express&#x27;</span> &#125;);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>接下來修改 package.json 增加一行指令</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;swagger-autogen&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node ./swagger.js&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br></pre></td></tr></table></figure>
+
+<p>因此我們就可以輸入 <code>npm run swagger-autogen</code>，這邊當你輸入之後就會出現以下訊息</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2020.59.22.png?alt=media&token=e0d83245-8da7-4b59-97ef-2ac2e3e2a431" alt="swagger"></p>
+<p>當看到 swagger-autogen 顯示 「<code>Swagger-autogen:  Success ✔</code>」，就會發現專案生成了一個 JSON 檔案叫做「swagger_output.json」，這邊可以不用太過理會。</p>
+<h2 id="swagger-ui-express"><a href="#swagger-ui-express" class="headerlink" title="swagger-ui-express"></a>swagger-ui-express</h2><p>最後我們來修改一下 app.js，畢竟我們都安裝了 swagger-ui-express，也就代表我們希望在 Express 上運行 Swagger UI，這邊只需要加入以下程式碼即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> swaggerUi = <span class="built_in">require</span>(<span class="string">&#x27;swagger-ui-express&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> swaggerFile = <span class="built_in">require</span>(<span class="string">&#x27;./swagger_output.json&#x27;</span>) <span class="comment">// 剛剛輸出的 JSON</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="string">&#x27;/api-doc&#x27;</span>, swaggerUi.<span class="property">serve</span>, swaggerUi.<span class="title function_">setup</span>(swaggerFile))</span><br></pre></td></tr></table></figure>
+
+<p>接下來輸入 <code>npm start</code> 並進入特定「<a target="_blank" rel="noopener" href="http://localhost:3000/api-doc/">http://localhost:3000/api-doc/</a>」就可以看到自動生成的 API 文件囉</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F%E6%88%AA%E5%9C%96%202020-12-29%2021.05.32.png?alt=media&token=51d7ef49-3620-451a-acc8-132c4a972217" alt="Swagger UI"></p>
+<h2 id="swagger-autogen-註解撰寫"><a href="#swagger-autogen-註解撰寫" class="headerlink" title="swagger-autogen 註解撰寫"></a>swagger-autogen 註解撰寫</h2><p>在上面圖中可以看到我的 API 有依照 API 去區分區塊，而這部分是如何做到的呢？其實在 swagger-autogen 是有提供範例程式碼的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> swaggerAutogen = <span class="built_in">require</span>(<span class="string">&#x27;swagger-autogen&#x27;</span>)()</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> doc = &#123;</span><br><span class="line">    <span class="attr">info</span>: &#123;</span><br><span class="line">        <span class="string">&quot;version&quot;</span>: <span class="string">&quot;&quot;</span>,                <span class="comment">// by default: &quot;1.0.0&quot;</span></span><br><span class="line">        <span class="string">&quot;title&quot;</span>: <span class="string">&quot;&quot;</span>,                  <span class="comment">// by default: &quot;REST API&quot;</span></span><br><span class="line">        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;&quot;</span>             <span class="comment">// by default: &quot;&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">host</span>: <span class="string">&quot;&quot;</span>,                         <span class="comment">// by default: &quot;localhost:3000&quot;</span></span><br><span class="line">    <span class="attr">basePath</span>: <span class="string">&quot;&quot;</span>,                     <span class="comment">// by default: &quot;/&quot;</span></span><br><span class="line">    <span class="attr">schemes</span>: [],                      <span class="comment">// by default: [&#x27;http&#x27;]</span></span><br><span class="line">    <span class="attr">consumes</span>: [],                     <span class="comment">// by default: [&#x27;application/json&#x27;]</span></span><br><span class="line">    <span class="attr">produces</span>: [],                     <span class="comment">// by default: [&#x27;application/json&#x27;]</span></span><br><span class="line">    <span class="attr">tags</span>: [                           <span class="comment">// by default: empty Array</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>,               <span class="comment">// Tag name</span></span><br><span class="line">            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;&quot;</span>         <span class="comment">// Tag description</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// &#123; ... &#125;</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">securityDefinitions</span>: &#123; &#125;,         <span class="comment">// by default: empty object</span></span><br><span class="line">    <span class="attr">definitions</span>: &#123; &#125;                  <span class="comment">// by default: empty object</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = <span class="string">&#x27;./path/swagger-output.json&#x27;</span></span><br><span class="line"><span class="keyword">const</span> endpointsFiles = [<span class="string">&#x27;./path/endpointsUser.js&#x27;</span>, <span class="string">&#x27;./path/endpointsBook.js&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="title function_">swaggerAutogen</span>(outputFile, endpointsFiles, doc)</span><br></pre></td></tr></table></figure>
+
+<p>因此在我們的 swagger.js 就可以這樣調整</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> swaggerAutogen = <span class="built_in">require</span>(<span class="string">&#x27;swagger-autogen&#x27;</span>)();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> doc = &#123;</span><br><span class="line">  <span class="attr">tags</span>: [ <span class="comment">// by default: empty Array</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;Index&quot;</span>,</span><br><span class="line">      <span class="attr">description</span>: <span class="string">&quot;首頁 router&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;Users&quot;</span>,</span><br><span class="line">      <span class="attr">description</span>: <span class="string">&quot;使用者 router&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = <span class="string">&#x27;./swagger-output.json&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> endpointsFiles = [<span class="string">&#x27;./app.js&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="title function_">swaggerAutogen</span>(outputFile, endpointsFiles, doc);</span><br></pre></td></tr></table></figure>
+
+<p>接下來回到每一個 router 的相關 JS，依照官方範例可以這樣寫，基本上寫法有兩種形式，一個是使用單行註解與多行註解</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">app.<span class="title function_">get</span>(<span class="string">&#x27;/users/:id&#x27;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">// #swagger.tags = [&#x27;Index&#x27;]</span></span><br><span class="line">  ...</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/users&#x27;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">/* </span></span><br><span class="line"><span class="comment">    #swagger.tags = [&#x27;Users&#x27;]</span></span><br><span class="line"><span class="comment">  &#125; */</span></span><br><span class="line">  users.<span class="title function_">addUser</span>(req.<span class="property">body</span>)</span><br><span class="line">  ...</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>只需要在每一個 router 裡面撰寫註解，這樣 swagger-autogen 就會依照註解自己去生成並分類，甚至是生成註解說明等等。</p>
+<p>這邊就不再次展示，而官方的文件本身就寫得滿清楚該如何撰寫註解，因此這邊就不一一介紹了。</p>
+<p>比較特別的是 swagger-autogen 也可以針對單一 <code>function</code> 去做撰寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myFunction</span>(<span class="params">param</span>) &#123;</span><br><span class="line">    <span class="comment">// #swagger.start</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">        #swagger.path = &#x27;/forcedEndpoint/&#123;id&#125;&#x27;</span></span><br><span class="line"><span class="comment">        #swagger.method = &#x27;put&#x27;</span></span><br><span class="line"><span class="comment">        #swagger.description = &#x27;Forced endpoint.&#x27;</span></span><br><span class="line"><span class="comment">        #swagger.produces = [&quot;application/json&quot;]</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">/*  #swagger.parameters[&#x27;id&#x27;] = &#123;</span></span><br><span class="line"><span class="comment">            in: &#x27;path&#x27;,</span></span><br><span class="line"><span class="comment">            description: &#x27;User ID.&#x27; &#125; */</span></span><br><span class="line">    <span class="keyword">const</span> dataId = users.<span class="title function_">getUser</span>(req.<span class="property">params</span>.<span class="property">id</span>)</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">/*  #swagger.parameters[&#x27;obj&#x27;] = &#123;</span></span><br><span class="line"><span class="comment">            in: &#x27;query&#x27;,</span></span><br><span class="line"><span class="comment">            description: &#x27;User data.&#x27;,</span></span><br><span class="line"><span class="comment">            type: &#x27;object&#x27;,</span></span><br><span class="line"><span class="comment">            schema: &#123; $ref: &quot;#/definitions/AddUser&quot; &#125;</span></span><br><span class="line"><span class="comment">    &#125; */</span></span><br><span class="line">    <span class="keyword">const</span> dataObj = users.<span class="title function_">getUser</span>(req.<span class="property">query</span>.<span class="property">obj</span>)</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (...)</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">status</span>(<span class="number">200</span>).<span class="title function_">send</span>(<span class="literal">true</span>)    <span class="comment">// #swagger.responses[200]</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> res.<span class="title function_">status</span>(<span class="number">404</span>).<span class="title function_">send</span>(<span class="literal">false</span>)       <span class="comment">// #swagger.responses[404]</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// #swagger.end</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>當然官方也有提供<a target="_blank" rel="noopener" href="https://github.com/davibaltar/example-swagger-autogen-with-router">撰寫範例</a>可供參考。</p>
+<p>如果你想看我寫的範本，這邊也提供給您參考~</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/expressSwagger">expressSwagger</a></p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://swagger.io/tools/swagger-ui/">Swagger UI</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/davibaltar/swagger-autogen">swagger-autogen</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Swagger_(software)">Swagger (software)</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Express/" rel="tag"># Express</a>
+              <a href="/tags/Swagger/" rel="tag"># Swagger</a>
+              <a href="/tags/Swagger-UI/" rel="tag"># Swagger UI</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20201227/2207483464/" rel="prev" title="JavaScript 核心觀念(40)-函式以及 This 的運作-最常見的 this：物件的方法調用">
+                  <i class="fa fa-angle-left"></i> JavaScript 核心觀念(40)-函式以及 This 的運作-最常見的 this：物件的方法調用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20210102/1186303391/" rel="next" title="美化自己的 GitHub 首頁">
+                  美化自己的 GitHub 首頁 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
