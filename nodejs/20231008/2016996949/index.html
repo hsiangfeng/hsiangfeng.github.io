@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前一面我們對於伺服器有基本概念後，接下來當然是要實際部署專案到伺服器上囉～">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day24-部署到 Zeabur">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20231008/2016996949/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="前一面我們對於伺服器有基本概念後，接下來當然是要實際部署專案到伺服器上囉～">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2014.22.48.png?alt=media&token=e0774dd6-b588-4508-bb2b-9df8ac7018cc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2014.56.20.png?alt=media&token=e9a9830f-1949-471b-8ced-d2a191f48dd3">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2015.00.25.png?alt=media&token=692321b3-259c-4b3e-be83-df62520ae366">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2015.01.11.png?alt=media&token=ecc6a9ad-473d-4dee-bd74-aabdf3cb2ace">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnew%20Project.png?alt=media&token=a140b760-e2d3-4b5b-9c7a-0cd2fa93737e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_service_dash.jpg?alt=media&token=b60b9b13-433f-44fe-a2ce-b083c7560bd2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fzeabur_deploy_git.png?alt=media&token=286abbd6-2563-4141-aaa0-538d3ecf765c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fzeabur_deploy_git2.jpg?alt=media&token=3346f320-5607-4690-8bbc-ed0ec14a4d55">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.15.07.png?alt=media&token=401378c2-f3d9-4aa9-9935-23a0d593748f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.31.52.png?alt=media&token=b8b28f2d-dc6f-4ad9-af19-ec413d6bbe99">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_log.jpg?alt=media&token=d5e45635-e981-4422-88a5-ca39b29b3500">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.39.27.png?alt=media&token=26b8fe85-e792-431f-b711-713f16526aa0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_env.jpg?alt=media&token=0f70596a-2f3e-4821-9173-1ba8c2a29790">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.31.52.png?alt=media&token=b8b28f2d-dc6f-4ad9-af19-ec413d6bbe99">
+<meta property="article:published_time" content="2023-10-07T16:00:01.000Z">
+<meta property="article:modified_time" content="2023-10-07T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2014.22.48.png?alt=media&token=e0774dd6-b588-4508-bb2b-9df8ac7018cc">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20231008/2016996949/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20231008/2016996949/","path":"nodejs/20231008/2016996949/","title":"Day24-部署到 Zeabur"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day24-部署到 Zeabur | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zeabur"><span class="nav-number">2.</span> <span class="nav-text">Zeabur</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2"><span class="nav-number">3.</span> <span class="nav-text">部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%9C%E6%96%BC%E8%87%AA%E5%8B%95%E8%A8%BB%E5%86%8A%E6%8C%87%E4%BB%A4"><span class="nav-number">3.1.</span> <span class="nav-text">關於自動註冊指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%9C%8D%E5%8B%99"><span class="nav-number">4.</span> <span class="nav-text">其他服務</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">935</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">688</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20231008/2016996949/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day24-部署到 Zeabur | 是 Ray 不是 Array">
+      <meta itemprop="description" content="前一面我們對於伺服器有基本概念後，接下來當然是要實際部署專案到伺服器上囉～">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day24-部署到 Zeabur
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-10-08 00:00:01" itemprop="dateCreated datePublished" datetime="2023-10-08T00:00:01+08:00">2023-10-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">前一面我們對於伺服器有基本概念後，接下來當然是要實際部署專案到伺服器上囉～</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2014.22.48.png?alt=media&token=e0774dd6-b588-4508-bb2b-9df8ac7018cc" alt="Zeabur"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前一面我們對於伺服器有基本概念後，接下來當然是要實際部署專案到伺服器上囉～</p>
+<h2 id="Zeabur"><a href="#Zeabur" class="headerlink" title="Zeabur"></a>Zeabur</h2><p>Zeabur 是一個 PaaS 平台，何謂 PaaS 呢？Platform as a service 中文又稱平台即服務。</p>
+<p>有點模糊吧？那我舉個例子來講好了，假設你今天要蓋一個房子好了，那你需要什麼呢？當然是地基、水泥、磚頭、木頭等等，更不用說你還需要去設計房子的樣子，這些都是你需要做的事情。</p>
+<p>而 PaaS 概念就跟請一個專業的建築公司來蓋一樣，因為這間建築公司本身就有提供相對應得服務，例如：設計、施工、材料等等，你只需要跟他們說你要蓋什麼樣的房子，他們就會幫你蓋好，這就是 PaaS 的概念。</p>
+<p>所以以這個概念來講，你代表著<strong>開發者</strong>，而建築公司則代表著<strong>PaaS 平台</strong>，而房子則代表著<strong>專案</strong>，你只需要專注於專案的開發，而不需要去擔心伺服器的問題，這就是 PaaS 的好處。</p>
+<p>常見的 PaaS 平台非常多，例如…先前轉成收費的 Heroku 就是一個 PaaS 平台，因此我們不用過度的去擔心伺服器的問題，只需要註冊帳號、建立專案、部屬專案就好了，非常的方便呢！</p>
+<p>而 PaaS 平台核心理念在於抽象化你原有在伺服器上複雜管理工作，讓你可以更專注於專案上的開發，因此對於新手、小白等開發者，其實是非常的方便的。</p>
+<blockquote>
+<p><strong>Note</strong><br>當然，也有所謂的 Iass（Infrastructure as a Service）與 SaaS（Software as a Service），但這兩個東西就不是我們這邊要講的了，有興趣的話可以自行去查詢看看。</p>
+</blockquote>
+<p>那麼為什麼我會選擇 Zeabur 呢？因為 Zeabur 是台灣的 PaaS 平台，當然要支持一下本土的平台，而且 Zeabur 也有提供免費的方案（每個月 5 美金），更不用說非常的方便，所以我們就來使用 Zeabur 來部屬我們的專案吧！</p>
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>接下來我會全程一步一步帶著你將前一篇的專案部屬到 Zeabur 上，當然你也可以自己先試試看，如果有問題的話再回來看看這篇文章。</p>
+<p>首先底下我提供相對應的指令以及預期要部署的程式碼，確保你我之間的程式碼是一致的，這樣才能夠順利的部屬。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> example-discord-bot-crawler</span><br><span class="line"><span class="built_in">cd</span> example-discord-bot-crawler</span><br><span class="line">npm init -y</span><br><span class="line"><span class="built_in">touch</span> index.js</span><br><span class="line"><span class="built_in">touch</span> register.js</span><br><span class="line"><span class="built_in">touch</span> crawler.js</span><br><span class="line"><span class="built_in">touch</span> postCron.js</span><br><span class="line"><span class="built_in">touch</span> .<span class="built_in">env</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i discord.js cheerio dotenv cron</span><br></pre></td></tr></table></figure>
+
+<p>.env：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .env</span></span><br><span class="line"># .<span class="property">env</span></span><br><span class="line"><span class="variable constant_">DISCORD_TOKEN</span>=</span><br><span class="line"><span class="variable constant_">DISCORD_CLIENT_ID</span>=</span><br><span class="line"><span class="variable constant_">DISCORD_CHANNEL_ID</span>=</span><br></pre></td></tr></table></figure>
+
+<p>index.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;dotenv&#x27;</span>).<span class="title function_">config</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> crawler = <span class="built_in">require</span>(<span class="string">&#x27;./crawler&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> postCron = <span class="built_in">require</span>(<span class="string">&#x27;./postCron&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> &#123;</span><br><span class="line">  <span class="title class_">Client</span>,</span><br><span class="line">  <span class="title class_">GatewayIntentBits</span>,</span><br><span class="line">  <span class="title class_">Partials</span>,</span><br><span class="line">  <span class="title class_">Events</span>,</span><br><span class="line">&#125; = <span class="built_in">require</span>(<span class="string">&#x27;discord.js&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = <span class="keyword">new</span> <span class="title class_">Client</span>(&#123;</span><br><span class="line">  <span class="attr">intents</span>: [</span><br><span class="line">    <span class="title class_">GatewayIntentBits</span>.<span class="property">Guilds</span>,</span><br><span class="line">    <span class="title class_">GatewayIntentBits</span>.<span class="property">GuildMessages</span>,</span><br><span class="line">    <span class="title class_">GatewayIntentBits</span>.<span class="property">MessageContent</span>,</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">partials</span>: [</span><br><span class="line">    <span class="title class_">Partials</span>.<span class="property">Channel</span>,</span><br><span class="line">  ],</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">once</span>(<span class="title class_">Events</span>.<span class="property">ClientReady</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Ready!&#x27;</span>);</span><br><span class="line">  <span class="title function_">postCron</span>(client).<span class="title function_">start</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="title class_">Events</span>.<span class="property">InteractionCreate</span>, <span class="keyword">async</span> (interaction) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (interaction.<span class="property">commandName</span> === <span class="string">&#x27;blog&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> <span class="title function_">crawler</span>();</span><br><span class="line">    <span class="keyword">const</span> randomIndex = <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Math</span>.<span class="title function_">random</span>() * data.<span class="property">length</span>);</span><br><span class="line">    <span class="keyword">const</span> randomData = data[randomIndex];</span><br><span class="line">    <span class="keyword">await</span> interaction.<span class="title function_">reply</span>(<span class="string">`隨機推薦一篇 Ray 的文章：[<span class="subst">$&#123;randomData.title&#125;</span>](<span class="subst">$&#123;randomData.url&#125;</span>)`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">login</span>(process.<span class="property">env</span>.<span class="property">DISCORD_TOKEN</span>);</span><br></pre></td></tr></table></figure>
+
+<p>postCron.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// postCron.js</span></span><br><span class="line"><span class="keyword">const</span> cron = <span class="built_in">require</span>(<span class="string">&#x27;cron&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> crawler = <span class="built_in">require</span>(<span class="string">&#x27;./crawler&#x27;</span>); <span class="comment">// 引入爬蟲程式碼</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">postCron</span> = (<span class="params">client</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> job = <span class="keyword">new</span> cron.<span class="title class_">CronJob</span>(<span class="string">&#x27;* * * * *&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// 呼叫爬蟲程式碼，並取得資料</span></span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> <span class="title function_">crawler</span>();</span><br><span class="line">    <span class="comment">// 依據資料長度隨機產生一個索引值</span></span><br><span class="line">    <span class="keyword">const</span> randomIndex = <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Math</span>.<span class="title function_">random</span>() * data.<span class="property">length</span>);</span><br><span class="line">    <span class="comment">// 依照隨機產生的索引值取得資料</span></span><br><span class="line">    <span class="keyword">const</span> randomData = data[randomIndex];</span><br><span class="line">    <span class="comment">// 取得頻道</span></span><br><span class="line">    <span class="keyword">const</span> channel = client.<span class="property">channels</span>.<span class="property">cache</span>.<span class="title function_">get</span>(process.<span class="property">env</span>.<span class="property">DISCORD_CHANNEL_ID</span>);</span><br><span class="line">    <span class="comment">// // 發送訊息</span></span><br><span class="line">    <span class="keyword">await</span> channel.<span class="title function_">send</span>(<span class="string">`每日晚間九點隨機推薦 Ray 的一篇文章：[<span class="subst">$&#123;randomData.title&#125;</span>](<span class="subst">$&#123;randomData.url&#125;</span>)`</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> job;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = postCron;</span><br></pre></td></tr></table></figure>
+
+<p>crawler.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// crawler.js</span></span><br><span class="line"><span class="keyword">const</span> cheerio = <span class="built_in">require</span>(<span class="string">&#x27;cheerio&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params">url</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(url);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">crawler</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> target = <span class="string">&#x27;https://israynotarray.com/&#x27;</span>; <span class="comment">// 目標網址</span></span><br><span class="line">  <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(target);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> $ = cheerio.<span class="title function_">load</span>(html);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> postTitleLink = $(<span class="string">&#x27;.post-title-link&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> data = [];</span><br><span class="line"></span><br><span class="line">  postTitleLink.<span class="title function_">each</span>(<span class="function">(<span class="params">index, element</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> title = $(element).<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">const</span> url = $(element).<span class="title function_">attr</span>(<span class="string">&#x27;href&#x27;</span>);</span><br><span class="line">    data.<span class="title function_">push</span>(&#123;</span><br><span class="line">      title,</span><br><span class="line">      <span class="attr">url</span>: <span class="string">`<span class="subst">$&#123;target&#125;</span><span class="subst">$&#123;url&#125;</span>`</span>, <span class="comment">// 補上網域</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = crawler;</span><br></pre></td></tr></table></figure>
+
+<p>register.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// register.js</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;dotenv&#x27;</span>).<span class="title function_">config</span>(); <span class="comment">// 引入 dotenv</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> &#123;</span><br><span class="line">  <span class="variable constant_">REST</span>,</span><br><span class="line">  <span class="title class_">Routes</span></span><br><span class="line">&#125; = <span class="built_in">require</span>(<span class="string">&#x27;discord.js&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> list = [</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;blog&#x27;</span>,</span><br><span class="line">    <span class="attr">description</span>: <span class="string">&#x27;取得首頁第一頁隨機文章&#x27;</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> rest = <span class="keyword">new</span> <span class="title function_">REST</span>(&#123; <span class="attr">version</span>: <span class="string">&#x27;10&#x27;</span> &#125;).<span class="title function_">setToken</span>(process.<span class="property">env</span>.<span class="property">DISCORD_TOKEN</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">registerCommands</span> = <span class="keyword">async</span> (<span class="params">commands</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Started refreshing application (/) commands.&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">await</span> rest.<span class="title function_">put</span>(<span class="title class_">Routes</span>.<span class="title function_">applicationCommands</span>(process.<span class="property">env</span>.<span class="property">DISCORD_CLIENT_ID</span>), &#123; <span class="attr">body</span>: commands &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Successfully reloaded application (/) commands.&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">registerCommands</span>(list)</span><br></pre></td></tr></table></figure>
+
+<p>最後有一件事情很重要，你必須要修改一下 package.json，增加 “start” 的指令，因為 Zeabur 會依照這個指令來啟動專案，所以你必須要增加這個指令。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example-discord-crawler&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ... 略過其他程式碼</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node index.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ... 略過其他程式碼</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來請你將此專案部署到 GitHub Repositories 上，因為 Zeabur 會需要你的 GitHub Repositories 來部屬專案，所以請先將專案部署到 GitHub Repositories 上，這個部署過程我就不額外說明了，除此之外 Zeabur 也是使用 GitHub 註冊並登入的，所以 GitHub 你是必須要有的。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你是第一次使用 GitHub 的話，你可以參考我這一篇「<a href="https://israynotarray.com/git/20210709/1381487661/">使用 SSH 連接&#x2F;上傳到你的 GitHub(Ed25519)</a>」來設定，並挑戰嘗試將專案部署到 GitHub Repositories 上</p>
+</blockquote>
+<p>這邊也提醒一下，請不要將 <code>.env</code> 上傳到 GitHub Repositories 上，因為裡面包含了你的 Discord Token，如果上傳到 GitHub Repositories 上，那麼你的 Discord Token 就會被公開，這樣的話你的 Discord Bot 就會被其他人操控，所以請務必記得將 <code>.env</code> 加入到 <code>.gitignore</code> 中。</p>
+<p>接下來我們就來到 Zeabur 這個平台，由於 Zeabur 是使用 GitHub 註冊並登入的</p>
+<p><a target="_blank" rel="noopener" href="https://dash.zeabur.com/login">https://dash.zeabur.com/login</a></p>
+<p>所以你可以直接使用 GitHub 登入</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2014.56.20.png?alt=media&token=e9a9830f-1949-471b-8ced-d2a191f48dd3" alt="GitHub 登入"></p>
+<p>登入成功後，你會直接進入到 Zeabur 的控制台，接下來你可以點擊畫面上的「建立專案」按鈕來建立專案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2015.00.25.png?alt=media&token=692321b3-259c-4b3e-be83-df62520ae366" alt="建立專案"></p>
+<p>接下來你會需要選擇專案的地區，這邊我們就選「Taiwan」（題外話：Zeabur 主機位於 GCP 台灣機房）</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2015.01.11.png?alt=media&token=ecc6a9ad-473d-4dee-bd74-aabdf3cb2ace" alt="Taiwan"></p>
+<p>接著你就可以看到剛剛建立的專案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnew%20Project.png?alt=media&token=a140b760-e2d3-4b5b-9c7a-0cd2fa93737e" alt="New Project"></p>
+<p>點一下它就可以看到這個專案的資訊，先讓我用一張圖介紹說明一下：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_service_dash.jpg?alt=media&token=b60b9b13-433f-44fe-a2ce-b083c7560bd2" alt="專案介紹"></p>
+<p>專案設定方面我就不特別介紹了，讓你自行點進去摸索就好。</p>
+<p>那麼我們就先來部署自己的服務（專案），點一下建立服務，你會看到 Git、Marketplace 這兩個選項，這邊我們選 Git，因為我們要部署 GitHub 上的專案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fzeabur_deploy_git.png?alt=media&token=286abbd6-2563-4141-aaa0-538d3ecf765c" alt="Git Deploy"></p>
+<p>接著選擇你要部署的專案就可以了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fzeabur_deploy_git2.jpg?alt=media&token=3346f320-5607-4690-8bbc-ed0ec14a4d55" alt="專案"></p>
+<p>整個部署過程大概需要 1~2 分鐘</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.15.07.png?alt=media&token=401378c2-f3d9-4aa9-9935-23a0d593748f" alt="部署"></p>
+<p>你可以點擊「Log」來查看部署的過程</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.31.52.png?alt=media&token=b8b28f2d-dc6f-4ad9-af19-ec413d6bbe99" alt="Log"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_log.jpg?alt=media&token=d5e45635-e981-4422-88a5-ca39b29b3500" alt="Log"></p>
+<p>不意外，你應該會發現 Log 出現錯誤</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.39.27.png?alt=media&token=26b8fe85-e792-431f-b711-713f16526aa0" alt="Error"></p>
+<p>因為我們並沒有填寫 Env 的關係，回到專案主控台下方有一個環境變數，點一下編輯環境變數，你就可以無痛把 .env 的內容直接貼上囉！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2FZeabur_env.jpg?alt=media&token=0f70596a-2f3e-4821-9173-1ba8c2a29790" alt="Env"></p>
+<p>儲存後，按一下專案的 ReDeploy 就可以恢復正常哩~</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F%E6%88%AA%E5%9C%96%202023-09-08%2016.31.52.png?alt=media&token=b8b28f2d-dc6f-4ad9-af19-ec413d6bbe99" alt="ReDeploy"></p>
+<p>接著你回到 Discord 上面，應該就會看到你的 Discord Bot 已經上線了，而且你也可以嘗試輸入 <code>/blog</code> 來測試看看，應該就會看到你的 Discord Bot 回覆你一篇文章囉！</p>
+<h3 id="關於自動註冊指令"><a href="#關於自動註冊指令" class="headerlink" title="關於自動註冊指令"></a>關於自動註冊指令</h3><p>最後也補充一個點一下，也就是關於註冊指令的部分，我們前面有新增一個檔案叫做 <code>register.js</code>，這個檔案的用途就是用來註冊指令的，那麼為了確保指令是最新的，我們可以透過 npm scripts 的指令來註冊指令，這樣就不用每次都要手動註冊指令囉～</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example-discord-crawler&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ... 略過其他程式碼</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;postinstall&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node register.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node index.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;register&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node register.js&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="comment">// ... 略過其他程式碼</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他服務"><a href="#其他服務" class="headerlink" title="其他服務"></a>其他服務</h2><p>當然還有很多服務可以使用，例如我先前介紹過的…</p>
+<ul>
+<li><a href="https://israynotarray.com/other/20221213/3036227586/">關於從 Heroku 跳到 Render 這件事情</a></li>
+<li><a href="https://israynotarray.com/other/20221216/786812101/">將你的 Node.js 部署到 fly.io 吧！</a></li>
+</ul>
+<p>之前也有寫過 Zeabur 的文章</p>
+<ul>
+<li><a href="https://israynotarray.com/other/20230401/3544735243/">除了 Render 與 Fly 之外，你還可以考慮 Zeabur 服務</a></li>
+</ul>
+<p>這幾個我試用下來，我個人是滿推薦使用 Zeabur 的，雖然只能建立一個專案，但一個專案內是可以部署相當多的服務的，更不用說又有免費的五美金額度可以使用，更不用說官方文件其實非常齊全且相關人員都會第一時間盡可能協助解決問題，所以基本上是非常推薦的。</p>
+<p>—– 底下是業配開始線 —–</p>
+<p>那麼如果你覺得試用下來相當不錯的話，你可以再付費時填寫我的兌換碼：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">israynotarray</span><br></pre></td></tr></table></figure>
+
+<p>你可以免費獲得一個月的開發者方案唷！</p>
+<p>而 Zeabur 的計費方式你可以參考他們官方文件：</p>
+<p><a target="_blank" rel="noopener" href="https://zeabur.com/zh-TW/pricing">收費方式</a></p>
+<p>—– 以上業配結束線 —–</p>
+<p>那麼這一篇也差不多了，我們下一篇見哩～</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" rel="tag"># 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nodejs/20231007/3219221834/" rel="prev" title="Day23 - 關於伺服器">
+                  <i class="fa fa-angle-left"></i> Day23 - 關於伺服器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20231009/609773828/" rel="next" title="Day25-Google Extension">
+                  Day25-Google Extension <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

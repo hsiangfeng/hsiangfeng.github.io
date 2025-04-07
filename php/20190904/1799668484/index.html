@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前一篇我們已經學習了基礎的資料庫操作，但是資料庫底下還有一個東西叫做資料表，而資料表就是存放資料的地方，你可以把它想像成表格或是筆記本概念，所以這一篇就要來學習資料表的基礎 SQL 指令操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day3-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料表篇">
+<meta property="og:url" content="https://israynotarray.com/php/20190904/1799668484/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="前一篇我們已經學習了基礎的資料庫操作，但是資料庫底下還有一個東西叫做資料表，而資料表就是存放資料的地方，你可以把它想像成表格或是筆記本概念，所以這一篇就要來學習資料表的基礎 SQL 指令操作。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/erNMyPr.png">
+<meta property="og:image" content="https://i.imgur.com/cOM2FlW.png">
+<meta property="og:image" content="https://i.imgur.com/ABIJq4u.png">
+<meta property="og:image" content="https://i.imgur.com/YALm6HV.png">
+<meta property="og:image" content="https://i.imgur.com/ZMzMvsX.png">
+<meta property="og:image" content="https://i.imgur.com/0k3qdyb.png">
+<meta property="og:image" content="https://i.imgur.com/IbzyzLr.png">
+<meta property="og:image" content="https://i.imgur.com/BKZ1Fh0.png">
+<meta property="article:published_time" content="2019-09-04T01:02:58.000Z">
+<meta property="article:modified_time" content="2019-09-04T01:02:58.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="第 11 屆 iT邦幫忙鐵人賽">
+<meta property="article:tag" content="ThinkPHP 5.1">
+<meta property="article:tag" content="從基礎學習 ThinkPHP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/erNMyPr.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/php/20190904/1799668484/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/php/20190904/1799668484/","path":"php/20190904/1799668484/","title":"Day3-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料表篇"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day3-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料表篇 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%9E%8B%E6%85%8B"><span class="nav-number">2.</span> <span class="nav-text">資料型態</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E8%B3%87%E6%96%99%E8%A1%A8"><span class="nav-number">3.</span> <span class="nav-text">建立資料表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%A9%A2%E8%B3%87%E6%96%99%E8%A1%A8%E6%AC%84%E4%BD%8D%E8%B3%87%E8%A8%8A"><span class="nav-number">4.</span> <span class="nav-text">查詢資料表欄位資訊</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%B3%87%E6%96%99%E8%A1%A8%E6%AC%84%E4%BD%8D"><span class="nav-number">5.</span> <span class="nav-text">更新資料表欄位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E8%B3%87%E6%96%99%E8%A1%A8%E6%AC%84%E4%BD%8D"><span class="nav-number">6.</span> <span class="nav-text">刪除資料表欄位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E8%B3%87%E6%96%99%E6%AC%84%E4%BD%8D"><span class="nav-number">7.</span> <span class="nav-text">新增資料欄位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E8%B3%87%E6%96%99%E8%A1%A8"><span class="nav-number">8.</span> <span class="nav-text">刪除資料表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E7%A9%BA%E8%B3%87%E6%96%99%E8%A1%A8"><span class="nav-number">9.</span> <span class="nav-text">清空資料表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E5%B0%BE"><span class="nav-number">10.</span> <span class="nav-text">結尾</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">935</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">688</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/php/20190904/1799668484/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day3-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料表篇 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="前一篇我們已經學習了基礎的資料庫操作，但是資料庫底下還有一個東西叫做資料表，而資料表就是存放資料的地方，你可以把它想像成表格或是筆記本概念，所以這一篇就要來學習資料表的基礎 SQL 指令操作。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day3-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料表篇
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2019-09-04 09:02:58" itemprop="dateCreated datePublished" datetime="2019-09-04T09:02:58+08:00">2019-09-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/php/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">前一篇我們已經學習了基礎的資料庫操作，但是資料庫底下還有一個東西叫做資料表，而資料表就是存放資料的地方，你可以把它想像成表格或是筆記本概念，所以這一篇就要來學習資料表的基礎 SQL 指令操作。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前一篇我們已經學習了基礎的資料庫操作，但是資料庫底下還有一個東西叫做資料表，而資料表就是存放資料的地方，你可以把它想像成表格或是筆記本概念，所以這一篇就要來學習資料表的基礎 SQL 指令操作。</p>
+<h2 id="資料型態"><a href="#資料型態" class="headerlink" title="資料型態"></a>資料型態</h2><p>學習資料表相關語法之前，我們必須先來認識一下常見的資料表的資料欄位型態有哪些，一般來講我個人常用的資料欄位型態有以下(以下僅列我常用的資料型態)：</p>
+<ul>
+<li><code>VARCHAR</code><ul>
+<li>另一個常見的是 <code>CHAR</code>，但 <code>CHAR</code> 是屬於固定長度的字串，如果字串長度會變動的話建議使用 <code>VARCHAR</code>。</li>
+</ul>
+</li>
+<li><code>TEXT</code><ul>
+<li>最常見用於留言板上，但是除了 <code>TEXT</code> 還有另外兩個資料型態 <code>MEDIUMTEXT</code>、<code>LOGNTEXT</code>，而我個人常用 <code>TEXT</code>。</li>
+</ul>
+</li>
+<li><code>INT</code><ul>
+<li>正整數，就是沒有小數點的意思</li>
+<li>另一個是 <code>SMALLINT</code>，比較適合用於小數值的欄位，但是基本上我比較常用 <code>INT</code> (偷懶)。</li>
+</ul>
+</li>
+<li><code>FLOAT</code><ul>
+<li>浮點數，例如：3.14759….</li>
+<li>還有另一個是 <code>DOUBLE</code> 與 <code>FLOAT</code> 類同，但 <code>DOUBLE</code> 所消耗的空間是 <code>FLOAT</code> 兩倍，因為精密度較高，但是一般來講使用 <code>FLOAT</code> 就夠了。</li>
+</ul>
+</li>
+<li><code>CHAR</code><ul>
+<li>上面已經介紹過哩。</li>
+</ul>
+</li>
+<li><code>TIMESTAMP</code><ul>
+<li>時間戳，以 <code>YYYY-MM-DD HH:MM:SS</code> 格式作為時間戳記。</li>
+<li>如果你沒特別去指定時間，它會自動依照目前的時間做紀錄。</li>
+</ul>
+</li>
+</ul>
+<p>以上只是僅列我使用過 &amp; 常用的資料型態，如果你想更了解的資料型態的各種說明，我會建議可以看這一位前輩寫的文章會有更詳細的說明 → <a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10203456?sc=iThelpR">常用的資料型態</a>。</p>
+<h2 id="建立資料表"><a href="#建立資料表" class="headerlink" title="建立資料表"></a>建立資料表</h2><p>首先我們在前一篇已經建立一個資料庫叫做 <code>it_think_sql</code>，前面情景我們是使用銀行來做比喻，那這邊也是一樣。</p>
+<p>一般來講銀行裡面都會有一個一個的小型保險櫃，如果你沒有做規劃的話，那就只是一個鐵盒而已，所以為了替將來要儲存進來的資料做好規劃，那麼我們就要新增一張資料表來保存資料，所以假設我們今天要建立一個班上同學的身高體重紀錄表，那就會使用以下的語法來建立資料表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> hw_table (</span><br><span class="line">  id <span class="type">int</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> auto_increment,</span><br><span class="line">  name <span class="type">varchar</span>(<span class="number">5</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">default</span> <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">  weight <span class="type">int</span>(<span class="number">5</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">default</span> <span class="number">0</span>,</span><br><span class="line">  height <span class="type">float</span>(<span class="number">5</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">default</span> <span class="number">0</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">) AUTO_INCREMENT<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>看到一些陌生的東西時，莫帕莫驚慌，因為我會介紹，首先讓我們認識一下上面幾個英文單字 ↓</p>
+<ul>
+<li><code>NOT NULL</code> - 意旨此欄位不得為空。</li>
+<li><code>auto_increment</code> - 自動填入。</li>
+<li><code>default</code> - 預設值，後面就是預設的資料 or 值。</li>
+<li><code>PRIMARY KEY</code> - 設置索引值，也就是 <code>Key</code>。</li>
+<li><code>AUTO_INCREMENT</code> - 自動遞增，並於數字 <code>1</code> 開始，所以 <code>id</code> 欄位將會自己從 <code>1</code> 開始計算。</li>
+</ul>
+<p>※ 指令說明:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>  <span class="string">&#x27;資料表名稱&#x27;</span> (</span><br><span class="line">  欄位名稱<span class="number">1</span> 資料類型 欄位設定選項</span><br><span class="line">  欄位名稱<span class="number">2</span> 資料類型 欄位設定選項</span><br><span class="line">  ...</span><br><span class="line">  索引 欄位</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>但是這邊要注意一件事情，在你執行上面 SQL 指令時，請務必確認自己正在 <code>it_think_sql</code> 底下，否則資料表極有可能建立在別的地方 or 無法建立唷!</p>
+<p><img src="https://i.imgur.com/erNMyPr.png" alt="SQL 執行位置"></p>
+<p>當執行成功後就可以看到 <code>it_think_sql</code> 裡面多了一張資料表 ↓</p>
+<p><img src="https://i.imgur.com/cOM2FlW.png" alt="新增成功"></p>
+<h2 id="查詢資料表欄位資訊"><a href="#查詢資料表欄位資訊" class="headerlink" title="查詢資料表欄位資訊"></a>查詢資料表欄位資訊</h2><p>資料表也有與資料庫查詢清單類似的語法，最主要是用於查詢特定資料表欄位的資訊，讓我們來試著查詢剛剛新增的 <code>hw_table</code> 資料表欄位資訊看看：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DESCRIBE</span> hw_table;</span><br></pre></td></tr></table></figure>
+
+<p>※ 指令說明: <code>DESCRIBE [資料表名稱];</code></p>
+<p><img src="https://i.imgur.com/ABIJq4u.png" alt="查詢資料表欄位資訊"></p>
+<h2 id="更新資料表欄位"><a href="#更新資料表欄位" class="headerlink" title="更新資料表欄位"></a>更新資料表欄位</h2><p>有建立資料表以及查詢資料表欄位，那麼就一定會有更新資料欄位的方式，假設我們要將資料欄位中的 <code>weight</code> 欄位改成 <code>float</code> 的資料型態，那麼語法就會像下面這樣撰寫：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> hw_table CHANGE <span class="keyword">COLUMN</span> weight weight <span class="type">float</span>;</span><br></pre></td></tr></table></figure>
+
+<p>※ 指令說明: <code>ALTER TABLE [資料表名稱] CHANGE COLUMN [要修改的欄位名稱] [新的欄位名稱] [新的欄位型態];</code></p>
+<p>接下來我們可以試著使用剛剛所學到的 <code>DESCRIBE [資料表名稱];</code> 語法來看看資料欄位有沒有成功被修改 ↓</p>
+<p><img src="https://i.imgur.com/YALm6HV.png" alt="修改結果"></p>
+<p>同理，如果我們要更改名稱 <code>weight</code> → <code>itweight</code> 並且資料型態變成 <code>int</code>，那麼只需要依照上面的語法來做變化即可達到需求：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> hw_table CHANGE <span class="keyword">COLUMN</span> weight itweight <span class="type">int</span>;</span><br></pre></td></tr></table></figure>
+
+<p>當然結果就會像我們預期的一樣 ↓</p>
+<p><img src="https://i.imgur.com/ZMzMvsX.png" alt="修改成功"></p>
+<h2 id="刪除資料表欄位"><a href="#刪除資料表欄位" class="headerlink" title="刪除資料表欄位"></a>刪除資料表欄位</h2><p>最後就是刪除資料欄位，假設我們要把剛剛修改的 <code>itweight</code> 資料欄位刪除，那就會使用到刪除資料欄位語法，但是你會發現刪除語法與更新語法非常的相似，所以在使用時，請務必小心輸入(打錯字就 GG 了)：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> hw_table <span class="keyword">DROP</span> <span class="keyword">COLUMN</span> itweight;</span><br></pre></td></tr></table></figure>
+
+<p>※ 指令說明: <code>ALTER TABLE [資料表名稱] DROP COLUMN [欄位名稱];</code></p>
+<p>那我就直接使用 <code>DESCRIBE hw_table;</code> 來看執行後的結果，一般來講在 phpMyAdmin 執行該語法時，是會跳出提示訊息的唷 ↓</p>
+<p><img src="https://i.imgur.com/0k3qdyb.png" alt="提示訊息(圖中指令小寫請忽略)"></p>
+<p>原因我在前面有講過，刪除語法本身是一個非常危險的動作，所以它才會跟你確認　「你真的要刪除這個欄位嗎？」 ↓</p>
+<p><img src="https://i.imgur.com/IbzyzLr.png" alt="刪除成功(圖中指令小寫請忽略)"></p>
+<h2 id="新增資料欄位"><a href="#新增資料欄位" class="headerlink" title="新增資料欄位"></a>新增資料欄位</h2><p>你會發現我將新增資料欄位語法放在後面，主要是為了展示建立資料表後，可以很順利地更新資料欄位 → 查詢欄位以及刪除資料欄位，那麼接下來就是介紹新增資料欄位的語法，你會發現新增資料欄位的語法與更新資料欄位語法也是非常相像，所以我這邊就不多說廢話直接上程式碼!讓我們把剛剛刪除的 <code>weight</code> 給復原吧~</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> hw_table <span class="keyword">ADD</span> <span class="keyword">COLUMN</span> weight <span class="type">int</span>;</span><br></pre></td></tr></table></figure>
+
+<p>※ 指令說明: <code>ALTER TABLE [資料表名稱] ADD COLUMN [欄位名稱] [資料型態];</code></p>
+<p>那麼我們這樣就成功將剛剛被刪除的資料欄位新增回來囉~</p>
+<p><img src="https://i.imgur.com/BKZ1Fh0.png" alt="新增成功"></p>
+<h2 id="刪除資料表"><a href="#刪除資料表" class="headerlink" title="刪除資料表"></a>刪除資料表</h2><p>老生常談這個語法很危險，所以請務必小心使用，那我這邊就不做示範，避免影響後面的章節操作，直接提供語法說明就可以囉~</p>
+<p>※ 指令說明: <code>DROP TABLE [資料表名稱];</code></p>
+<h2 id="清空資料表"><a href="#清空資料表" class="headerlink" title="清空資料表"></a>清空資料表</h2><p>這個語法類似刪除，但是它主要是清空資料表內的所有資料，那麼由於我們目前資料表內並沒有塞入任何資料，所以就算執行了也不會有任何問題，只是執行該語法之後，它會保留資料表的資料結構以及欄位，簡單來講就是只有裡面的資料會消失而已：</p>
+<p>※ 指令說明: <code>TRUNCATE TABLE [資料表名稱];</code></p>
+<h2 id="結尾"><a href="#結尾" class="headerlink" title="結尾"></a>結尾</h2><p>最後讓我們整理一下本篇所講到的 SQL 指令</p>
+<table>
+<thead>
+<tr>
+<th>操作功能</th>
+<th>SQL 語法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>建立資料表</td>
+<td>CREATE TABLE ‘資料表名稱’ (   欄位名稱1 資料類型 欄位設定選項   欄位名稱2 資料類型 欄位設定選項   …   索引 欄位 )</td>
+</tr>
+<tr>
+<td>查詢資料表欄位資訊</td>
+<td>DESCRIBE [資料表名稱];</td>
+</tr>
+<tr>
+<td>更新資料表欄位</td>
+<td>ALTER TABLE [資料表名稱] CHANGE COLUMN [要修改的欄位名稱] [新的欄位名稱] [新的欄位型態];</td>
+</tr>
+<tr>
+<td>刪除資料表欄位</td>
+<td>ALTER TABLE [資料表名稱] DROP COLUMN [欄位名稱];</td>
+</tr>
+<tr>
+<td>新增資料表欄位</td>
+<td>ALTER TABLE [資料表名稱] ADD COLUMN [欄位名稱] [資料型態];</td>
+</tr>
+<tr>
+<td>刪除資料表</td>
+<td>DROP TABLE [資料表名稱];</td>
+</tr>
+<tr>
+<td>清空資料表</td>
+<td>TRUNCATE TABLE [資料表名稱];</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E7%AC%AC-11-%E5%B1%86-iT%E9%82%A6%E5%B9%AB%E5%BF%99%E9%90%B5%E4%BA%BA%E8%B3%BD/" rel="tag"># 第 11 屆 iT邦幫忙鐵人賽</a>
+              <a href="/tags/ThinkPHP-5-1/" rel="tag"># ThinkPHP 5.1</a>
+              <a href="/tags/%E5%BE%9E%E5%9F%BA%E7%A4%8E%E5%AD%B8%E7%BF%92-ThinkPHP/" rel="tag"># 從基礎學習 ThinkPHP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/php/20190903/2318537651/" rel="prev" title="Day2-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料庫篇">
+                  <i class="fa fa-angle-left"></i> Day2-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料庫篇
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/php/20190905/1275666548/" rel="next" title="Day4-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料篇(1)">
+                  Day4-從基礎學習 ThinkPHP-基礎 MySQL 學習-資料篇(1) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

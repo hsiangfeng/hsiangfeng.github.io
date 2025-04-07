@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="接下來這一篇也是針對爬蟲來介紹，但是會去撈一些比較複雜的資料。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day16 - 續談爬蟲（上）">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20230930/4076915411/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="接下來這一篇也是針對爬蟲來介紹，但是會去撈一些比較複雜的資料。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_crawler_cute_girl_9bd5121b-9085-42b2-9184-67317d3ed46c.png?alt=media&token=fbeda46e-412e-40e1-b7ec-cca9cc5ed28f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1694785933103.png?alt=media&token=77f20302-ff63-49f1-8ab5-980fc5b63eca">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1693281628898.png?alt=media&token=c16288f0-1b6c-477c-9e93-3f7113c62dfb">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F2022_iThome_202308291204.jpg?alt=media&token=6398e661-5a04-49dc-80b3-70b7e0e051f6">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F2022_iThome_202308291206.jpg?alt=media&token=95845729-a3e3-49e7-816b-0b4474b15344">
+<meta property="article:published_time" content="2023-09-29T16:00:01.000Z">
+<meta property="article:modified_time" content="2023-09-29T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_crawler_cute_girl_9bd5121b-9085-42b2-9184-67317d3ed46c.png?alt=media&token=fbeda46e-412e-40e1-b7ec-cca9cc5ed28f">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20230930/4076915411/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20230930/4076915411/","path":"nodejs/20230930/4076915411/","title":"Day16 - 續談爬蟲（上）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day16 - 續談爬蟲（上） | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%88%E6%98%AF%E7%88%AC%E8%9F%B2"><span class="nav-number">2.</span> <span class="nav-text">又是爬蟲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%88%AC%E8%9F%B2%E5%89%8D%E7%9A%84%E6%BA%96%E5%82%99"><span class="nav-number">3.</span> <span class="nav-text">爬蟲前的準備</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%88%AC%E8%9F%B2%E9%96%8B%E5%A7%8B"><span class="nav-number">4.</span> <span class="nav-text">爬蟲開始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E5%88%86%E9%A0%81%E7%9A%84%E8%B3%87%E6%96%99%E8%A9%B2%E6%80%8E%E9%BA%BC%E8%BE%A6%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">有分頁的資料該怎麼辦？</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">935</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">688</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20230930/4076915411/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day16 - 續談爬蟲（上） | 是 Ray 不是 Array">
+      <meta itemprop="description" content="接下來這一篇也是針對爬蟲來介紹，但是會去撈一些比較複雜的資料。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day16 - 續談爬蟲（上）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-09-30 00:00:01" itemprop="dateCreated datePublished" datetime="2023-09-30T00:00:01+08:00">2023-09-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">接下來這一篇也是針對爬蟲來介紹，但是會去撈一些比較複雜的資料。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_crawler_cute_girl_9bd5121b-9085-42b2-9184-67317d3ed46c.png?alt=media&token=fbeda46e-412e-40e1-b7ec-cca9cc5ed28f" alt="續談爬蟲"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來這一篇也是針對爬蟲來介紹，但是會去撈一些比較複雜的資料。</p>
+<h2 id="又是爬蟲"><a href="#又是爬蟲" class="headerlink" title="又是爬蟲"></a>又是爬蟲</h2><p>前一篇我們針對我的部落格去做示範，底下是前一篇的示範程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> cheerio = <span class="built_in">require</span>(<span class="string">&#x27;cheerio&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params">url</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(url);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">crawler</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(<span class="string">&#x27;https://israynotarray.com/&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> $ = cheerio.<span class="title function_">load</span>(html);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> postTitleLink = $(<span class="string">&#x27;.post-title-link&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> data = [];</span><br><span class="line"></span><br><span class="line">  postTitleLink.<span class="title function_">each</span>(<span class="function">(<span class="params">index, element</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> title = $(element).<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">const</span> url = $(element).<span class="title function_">attr</span>(<span class="string">&#x27;href&#x27;</span>);</span><br><span class="line">    data.<span class="title function_">push</span>(&#123;</span><br><span class="line">      title,</span><br><span class="line">      url,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  fs.<span class="title function_">writeFileSync</span>(<span class="string">&#x27;./data.json&#x27;</span>, <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">crawler</span>();</span><br></pre></td></tr></table></figure>
+
+<p>算是初步簡單的爬蟲，但是如果我們今天想要爬點不一樣的資料呢？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1694785933103.png?alt=media&token=77f20302-ff63-49f1-8ab5-980fc5b63eca" alt="不一樣的資料"></p>
+<p>前面有提到，爬蟲的原理就是去取得 HTML 資料後，再透過解析 HTML 的方式去取得我們想要的資料，最後再儲存成我們想要的格式，而這份資料就可以有很大的用途，例如說我們可以透過這份資料去做資料分析、資料視覺化等等。</p>
+<p>其中，我認為滿適合做為示範的就是…</p>
+<p>「<strong>IT 邦幫忙的鐵人賽文章</strong>」</p>
+<p>疑？為什麼是鐵人賽文章呢？其實鐵人賽一直都沒有提供閱讀排行的功能，而這次我們就可以來試著實作看看。</p>
+<h2 id="爬蟲前的準備"><a href="#爬蟲前的準備" class="headerlink" title="爬蟲前的準備"></a>爬蟲前的準備</h2><p>在準備開始爬蟲之前，我們要先擬定一下我們的需求</p>
+<ul>
+<li>參賽者名稱</li>
+<li>參賽類別</li>
+<li>文章標題</li>
+<li>文章網址</li>
+<li>瀏覽人數</li>
+<li>Like 人數</li>
+<li>留言人數</li>
+</ul>
+<p>我們大概要這五個資料，然後資料來源呢？當然就是<a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/2022ironman/signup/list">2022 鐵人賽參賽者列表</a>啦！</p>
+<blockquote>
+<p><strong>Note</strong><br>為什麼是 2022 鐵人賽？因為 2023 鐵人賽還沒結束，所以這邊就以 2022 鐵人賽為例，但整體觀念是一樣的。</p>
+</blockquote>
+<p>接下來沒問題後就是來建立專案囉！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> example-ithelp-crawler</span><br><span class="line"><span class="built_in">cd</span> example-ithelp-crawler</span><br><span class="line">npm init -y</span><br><span class="line">npm i cheerio</span><br><span class="line"><span class="built_in">touch</span> index.js</span><br></pre></td></tr></table></figure>
+
+<p>(別忘了替 package.json 加上啟動指令。)</p>
+<p>接下來當然就是要開始…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1693281628898.png?alt=media&token=c16288f0-1b6c-477c-9e93-3f7113c62dfb" alt="插嘴"></p>
+<p>你別急，還記得前一篇我提過的四個東西嗎？</p>
+<ul>
+<li>分析來源</li>
+<li>取得資料</li>
+<li>解析資料</li>
+<li>儲存資料</li>
+</ul>
+<p>第一步驟當然是要先分析來源，不然你怎麼知道要抓什麼呢？所以這邊請你先用瀏覽器打開 <a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/2022ironman/signup/list">2022 鐵人賽參賽者列表</a> 頁面，接著我們可以看到滿滿的參賽者資訊這個頁面我們可以取得以下資訊</p>
+<ul>
+<li>參賽者名稱</li>
+<li>參賽類別</li>
+<li>文章標題</li>
+<li>文章網址</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F2022_iThome_202308291204.jpg?alt=media&token=6398e661-5a04-49dc-80b3-70b7e0e051f6" alt="資訊"></p>
+<p>接下來的資訊呢？我們可以點文章網址進入，就可以看到文章的資訊，這邊我們可以取得以下資訊</p>
+<ul>
+<li>瀏覽人數</li>
+<li>Like 人數</li>
+<li>留言人數</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F2022_iThome_202308291206.jpg?alt=media&token=95845729-a3e3-49e7-816b-0b4474b15344" alt="資訊"></p>
+<p>所以我們可以確定，我們的資料都可以從這幾個頁面取得，接下來就是要開始撰寫程式碼囉！</p>
+<h2 id="爬蟲開始"><a href="#爬蟲開始" class="headerlink" title="爬蟲開始"></a>爬蟲開始</h2><p>一開始很簡單，我們要先取得參賽者列表，這邊程式碼如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> cheerio = <span class="built_in">require</span>(<span class="string">&#x27;cheerio&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params">url</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(url);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">crawler</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(<span class="string">&#x27;https://ithelp.ithome.com.tw/2022ironman/signup/list&#x27;</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(html);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">crawler</span>();</span><br></pre></td></tr></table></figure>
+
+<p>基本上執行後，你會得到以下結果：</p>
+<p>（由於內容較多，我只截取重點部分）</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 略過其他程式碼 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;list-card&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 略過其他程式碼 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;list-card&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;row&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-md-2&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/users/20119486/ironman&quot;</span> <span class="attr">class</span>=<span class="string">&quot;contestants-list__person&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;user-avatar contestants-list__avatar&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;https://member.ithome.com.tw/avatars/140252?s=ithelp&quot;</span> <span class="attr">class</span>=<span class="string">&quot;w-100&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;contestants-list__name&quot;</span>&gt;</span>Ray<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-md-10&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;d-sm-flex flex-sm-row justify-content-between mb-3&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;tag&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/static/2022ironman/img/topic/web.png&quot;</span> <span class="attr">class</span>=<span class="string">&quot;tag-img&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">span</span>&gt;</span>Modern Web<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;contestants-list__date date&quot;</span>&gt;</span>報名日期：2022/08/07 13:34:48<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/users/20119486/ironman/5111&quot;</span> <span class="attr">class</span>=<span class="string">&quot;contestants-list__title title&quot;</span>&gt;</span>終究都要學</span><br><span class="line">        React 何不現在學呢？<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">&quot;contestants-list__desc content&quot;</span>&gt;</span>反正身為一名前端工程師掌握 1 ~</span><br><span class="line">        2個框架也是很正常的事情以及身為一名工程師肝硬化、少年禿頭都是很正常的事情，那麼遲早都要成為禿頭肝鐵人不如趁現在來學個 React 讓自己禿的更光以及肝極致的硬化吧。</span><br><span class="line"></span><br><span class="line">        除此之外因為我本身是 Vue 開發者，因此其實我是抱著想多學一個框架的心態寫這一篇，所以可能會出現一些 Vue 跟 React 兩者語法上的差異比較，主要也是希望讓 Vue</span><br><span class="line">        開發者可以更好上手，接著就不廢話了，就讓我們準備開始學吧！<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;team-dashboard__box d-flex align-items-center justify-content-between team-progress--success&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;team-dashboard__progress flex-grow-1&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;progress&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;progress-bar&quot;</span> <span class="attr">role</span>=<span class="string">&quot;progressbar&quot;</span> <span class="attr">aria-valuenow</span>=<span class="string">&quot;100&quot;</span> <span class="attr">aria-valuemin</span>=<span class="string">&quot;0&quot;</span> <span class="attr">aria-valuemax</span>=<span class="string">&quot;100&quot;</span></span></span><br><span class="line"><span class="tag">              <span class="attr">style</span>=<span class="string">&quot;width: 100%;&quot;</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;progress-num&quot;</span> <span class="attr">data-toggle</span>=<span class="string">&quot;tooltip&quot;</span> <span class="attr">data-placement</span>=<span class="string">&quot;top&quot;</span> <span class="attr">title</span>=<span class="string">&quot;&quot;</span> <span class="attr">data-original-title</span>=<span class="string">&quot;100%&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">aria-describedby</span>=<span class="string">&quot;tooltip779036&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">label</span> <span class="attr">class</span>=<span class="string">&quot;note team-dashboard__day&quot;</span>&gt;</span></span><br><span class="line">          DAY 30</span><br><span class="line">        <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;list-card&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 略過其他程式碼 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;list-card&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 略過其他程式碼 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 略過其他程式碼 --&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>基本上你會發現參賽資料結構都是放在 <code>.list-card</code> 底下，因此我們可以透過 <code>.list-card</code> 來取得參賽者資料，這樣目標就滿明確的，因此這邊我直接貼上程式碼給你看最終呈現結果如何，但這邊我們還不會使用 <code>fs</code> 儲存檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">const</span> cheerio = <span class="built_in">require</span>(<span class="string">&#x27;cheerio&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params">url</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(url);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">crawler</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(<span class="string">&#x27;https://ithelp.ithome.com.tw/2022ironman/signup/list&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> $ = cheerio.<span class="title function_">load</span>(html);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> listCard = $(<span class="string">&#x27;.list-card&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> data = [];</span><br><span class="line"></span><br><span class="line">  listCard.<span class="title function_">each</span>(<span class="function">(<span class="params">index, element</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> name = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__name&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">const</span> category = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.tag span&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">const</span> title = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__title&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">const</span> url = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__title&#x27;</span>).<span class="title function_">attr</span>(<span class="string">&#x27;href&#x27;</span>);</span><br><span class="line">    data.<span class="title function_">push</span>(&#123;</span><br><span class="line">      name,</span><br><span class="line">      category,</span><br><span class="line">      title,</span><br><span class="line">      url,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">crawler</span>();</span><br></pre></td></tr></table></figure>
+
+<p>當你執行後，你應該就可以取得「第一頁」參賽者的資料。</p>
+<h2 id="有分頁的資料該怎麼辦？"><a href="#有分頁的資料該怎麼辦？" class="headerlink" title="有分頁的資料該怎麼辦？"></a>有分頁的資料該怎麼辦？</h2><p>另一個問題發生了，鐵人賽頁面上的網址是有分頁的，因此我們要怎麼處理呢？</p>
+<p>透過我們剛剛請求回來的 HTML 中，有以下這個片段</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">nav</span> <span class="attr">class</span>=<span class="string">&quot;pagination-container&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;pagination justify-content-center&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">&quot;pagination-newer disabled&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">svg</span> <span class="attr">class</span>=<span class="string">&quot;svg-inline--fa fa-caret-left fa-w-6&quot;</span> <span class="attr">aria-hidden</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">focusable</span>=<span class="string">&quot;false&quot;</span> <span class="attr">data-prefix</span>=<span class="string">&quot;fas&quot;</span> <span class="attr">data-icon</span>=<span class="string">&quot;caret-left&quot;</span> <span class="attr">role</span>=<span class="string">&quot;img&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2000/svg&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">viewBox</span>=<span class="string">&quot;0 0 192 512&quot;</span> <span class="attr">data-fa-i2svg</span>=<span class="string">&quot;&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">path</span> <span class="attr">fill</span>=<span class="string">&quot;currentColor&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">d</span>=<span class="string">&quot;M192 127.338v257.324c0 17.818-21.543 26.741-34.142 14.142L29.196 270.142c-7.81-7.81-7.81-20.474 0-28.284l128.662-128.662c12.599-12.6 34.142-3.676 34.142 14.142z&quot;</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">path</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">svg</span>&gt;</span><span class="comment">&lt;!-- &lt;i class=&quot;fas fa-caret-left&quot;&gt;&lt;/i&gt; Font Awesome fontawesome.com --&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;pagination-inner&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">&quot;active&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>1<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=2&quot;</span>&gt;</span>2<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=3&quot;</span>&gt;</span>3<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=4&quot;</span>&gt;</span>4<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=5&quot;</span>&gt;</span>5<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=6&quot;</span>&gt;</span>6<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=7&quot;</span>&gt;</span>7<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=8&quot;</span>&gt;</span>8<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;pagination-inner&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">&quot;pagination-active&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span>&gt;</span>...<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;pagination-inner&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=55&quot;</span>&gt;</span>55<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=56&quot;</span>&gt;</span>56<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">&quot;pagination-older&quot;</span> <span class="attr">href</span>=<span class="string">&quot;https://ithelp.ithome.com.tw/2022ironman/signup/list?page=2&quot;</span> <span class="attr">rel</span>=<span class="string">&quot;next&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">svg</span> <span class="attr">class</span>=<span class="string">&quot;svg-inline--fa fa-caret-right fa-w-6&quot;</span> <span class="attr">aria-hidden</span>=<span class="string">&quot;true&quot;</span> <span class="attr">focusable</span>=<span class="string">&quot;false&quot;</span> <span class="attr">data-prefix</span>=<span class="string">&quot;fas&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">data-icon</span>=<span class="string">&quot;caret-right&quot;</span> <span class="attr">role</span>=<span class="string">&quot;img&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="attr">viewBox</span>=<span class="string">&quot;0 0 192 512&quot;</span> <span class="attr">data-fa-i2svg</span>=<span class="string">&quot;&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">path</span> <span class="attr">fill</span>=<span class="string">&quot;currentColor&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">d</span>=<span class="string">&quot;M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">path</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">svg</span>&gt;</span><span class="comment">&lt;!-- &lt;i class=&quot;fas fa-caret-right&quot;&gt;&lt;/i&gt; Font Awesome fontawesome.com --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>這我們可以看到最後一頁是 <code>56</code>，我們就可以透過這個數字來決定我們要撈幾頁，並且透過 <code>for</code> 迴圈來撈取每一頁的資料，這邊就讓我們來看程式碼吧？</p>
+<p>雖然可能會有點複雜，但我會每一行都補上註解的，讓你比較好理解</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cheerio = <span class="built_in">require</span>(<span class="string">&#x27;cheerio&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getData</span> = <span class="keyword">async</span> (<span class="params">url</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(url);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">text</span>();</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">crawler</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 先初次取得第一頁的資料</span></span><br><span class="line">  <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(<span class="string">&#x27;https://ithelp.ithome.com.tw/2022ironman/signup/list&#x27;</span>);</span><br><span class="line">  <span class="comment">// 用 cheerio 解析 html 資料</span></span><br><span class="line">  <span class="keyword">const</span> $ = cheerio.<span class="title function_">load</span>(html); </span><br><span class="line">  <span class="comment">// 取得最後一頁的頁碼</span></span><br><span class="line">  <span class="keyword">const</span> paginationInner = $(<span class="string">&#x27;span.pagination-inner &gt; a&#x27;</span>).<span class="title function_">last</span>();</span><br><span class="line">  <span class="comment">// 取得文字，並將頁碼文字轉成數字</span></span><br><span class="line">  <span class="keyword">const</span> lastPage = <span class="title class_">Number</span>(paginationInner.<span class="title function_">text</span>());</span><br><span class="line">  <span class="comment">// 建立一個空陣列來存放資料</span></span><br><span class="line">  <span class="keyword">const</span> data = [];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 用 for 迴圈來爬取每一頁的資料</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">1</span>; i &lt;= lastPage; i++) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`正在爬取第 <span class="subst">$&#123;i&#125;</span> 頁`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 爬取每一頁的資料</span></span><br><span class="line">    <span class="keyword">const</span> html = <span class="keyword">await</span> <span class="title function_">getData</span>(<span class="string">`https://ithelp.ithome.com.tw/2022ironman/signup/list?page=<span class="subst">$&#123;i&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用 cheerio 解析 html 資料</span></span><br><span class="line">    <span class="keyword">const</span> $ = cheerio.<span class="title function_">load</span>(html);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 參賽者卡片</span></span><br><span class="line">    <span class="keyword">const</span> listCard = $(<span class="string">&#x27;.list-card&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用 each 來爬取每一個參賽者的資料</span></span><br><span class="line">    listCard.<span class="title function_">each</span>(<span class="function">(<span class="params">index, element</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 取得參賽者的名字、分類、標題、網址</span></span><br><span class="line">      <span class="keyword">const</span> name = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__name&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">      <span class="keyword">const</span> category = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.tag span&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">      <span class="keyword">const</span> title = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__title&#x27;</span>).<span class="title function_">text</span>();</span><br><span class="line">      <span class="keyword">const</span> url = $(element).<span class="title function_">find</span>(<span class="string">&#x27;.contestants-list__title&#x27;</span>).<span class="title function_">attr</span>(<span class="string">&#x27;href&#x27;</span>);</span><br><span class="line">      data.<span class="title function_">push</span>(&#123;</span><br><span class="line">        name,</span><br><span class="line">        category,</span><br><span class="line">        title,</span><br><span class="line">        url,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 避免過度請求增加伺服器負擔</span></span><br><span class="line">    <span class="keyword">await</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">resolve</span>();</span><br><span class="line">      &#125;, <span class="number">5000</span>); <span class="comment">// 5 秒跑一次</span></span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 將資料寫入 data.json</span></span><br><span class="line">  fs.<span class="title function_">writeFileSync</span>(<span class="string">&#x27;./data.json&#x27;</span>, <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">crawler</span>();</span><br></pre></td></tr></table></figure>
+
+<p>基本上你執行這一段程式碼後，你就可以撈出全部參賽者的資料了～</p>
+<blockquote>
+<p><strong>Note</strong><br>你可以發現我有寫一個「避免過度請求增加伺服器負擔」的程式碼，主要是為了避免過度請求，造成伺服器負擔過重，因此我們可以透過 <code>setTimeout</code> 來設定每 5 秒跑一次，這樣就可以避免過度請求了。</p>
+</blockquote>
+<p>我發現這一篇好像拉得有點長了，所以我打算這一篇就先到這些就好，我們下一篇再來說明該如何取得文章的瀏覽人數、Like 人數、留言人數吧！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" rel="tag"># 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nodejs/20230929/3878806252/" rel="prev" title="Day15 - 第一個爬蟲">
+                  <i class="fa fa-angle-left"></i> Day15 - 第一個爬蟲
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20231001/2119244773/" rel="next" title="Day17 - 續談爬蟲（下）">
+                  Day17 - 續談爬蟲（下） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
