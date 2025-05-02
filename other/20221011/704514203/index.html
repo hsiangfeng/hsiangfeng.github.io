@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="就算不讀 Clean Code，你也可以把程式碼寫好">
+<meta property="og:url" content="https://israynotarray.com/other/20221011/704514203/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/m3h6azU.png">
+<meta property="og:image" content="https://i.imgur.com/CkTwb0B.png">
+<meta property="og:image" content="https://i.imgur.com/2nKfyHv.png">
+<meta property="article:published_time" content="2022-10-11T02:26:32.000Z">
+<meta property="article:modified_time" content="2022-10-11T02:26:32.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="Clean Code">
+<meta property="article:tag" content="Code Review">
+<meta property="article:tag" content="Code Style">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/m3h6azU.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20221011/704514203/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20221011/704514203/","path":"other/20221011/704514203/","title":"就算不讀 Clean Code，你也可以把程式碼寫好"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>就算不讀 Clean Code，你也可以把程式碼寫好 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A6%81%E5%AF%AB%E9%80%99%E7%AF%87%E6%96%87%E7%AB%A0%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">為什麼要寫這篇文章？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E6%84%8F%E7%BE%A9%E7%9A%84%E5%87%BD%E5%BC%8F%E8%88%87%E8%AE%8A%E6%95%B8%E5%91%BD%E5%90%8D"><span class="nav-number">3.</span> <span class="nav-text">有意義的函式與變數命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E6%9B%96%E6%98%A7%E7%9A%84%E5%91%BD%E5%90%8D"><span class="nav-number">4.</span> <span class="nav-text">避免曖昧的命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E6%BC%A2%E8%AA%9E%E6%8B%BC%E9%9F%B3"><span class="nav-number">5.</span> <span class="nav-text">避免漢語拼音</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%9B%E5%B0%91%E4%BD%BF%E7%94%A8-var"><span class="nav-number">6.</span> <span class="nav-text">減少使用 var</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AB%8B%E4%B8%8D%E8%A6%81-var-%E8%B7%9F-let-%E5%90%8C%E6%99%82%E4%BD%BF%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">請不要 var 跟 let 同時使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%96%84%E5%8A%A0%E5%88%A9%E7%94%A8-ES6-%E7%9A%84%E8%A7%A3%E6%A7%8B%E8%B3%A6%E5%80%BC"><span class="nav-number">8.</span> <span class="nav-text">善加利用 ES6 的解構賦值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84%E5%A4%A7%E6%8B%AC%E8%99%9F"><span class="nav-number">9.</span> <span class="nav-text">被忽略的大括號</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E4%BA%82%E5%AF%AB%E8%A8%BB%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">不要亂寫註解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E9%9B%9E%E5%A9%86%E6%8A%8A%E7%A8%8B%E5%BC%8F%E7%A2%BC%E6%94%B9%E6%88%90%E4%B8%80%E8%A1%8C"><span class="nav-number">11.</span> <span class="nav-text">不要雞婆把程式碼改成一行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E6%BF%AB%E7%94%A8%E4%B8%89%E5%85%83%E9%81%8B%E7%AE%97%E5%AD%90"><span class="nav-number">12.</span> <span class="nav-text">不要濫用三元運算子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%87%E5%9C%B0%E9%96%8B%E8%8A%B1%E7%9A%84-console-log"><span class="nav-number">13.</span> <span class="nav-text">片地開花的 console.log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%9B%E8%A1%8C%E8%A6%81%E9%81%A9%E7%95%B6%EF%BC%8C%E4%B9%9F%E4%B8%8D%E8%A6%81%E9%81%8E%E5%BA%A6%E6%8F%9B%E8%A1%8C"><span class="nav-number">14.</span> <span class="nav-text">換行要適當，也不要過度換行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%BD%E7%94%A8%E8%BF%B4%E5%9C%88%E5%B0%B1%E8%BF%B4%E5%9C%88%E5%AF%AB"><span class="nav-number">15.</span> <span class="nav-text">能用迴圈就迴圈寫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Composition-API-%E4%B8%8D%E8%A6%81%E8%88%87-Options-API-%E6%B7%B7%E7%94%A8"><span class="nav-number">16.</span> <span class="nav-text">Composition API 不要與 Options API 混用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">17.</span> <span class="nav-text">結語</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">939</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">703</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20221011/704514203/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="就算不讀 Clean Code，你也可以把程式碼寫好 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          就算不讀 Clean Code，你也可以把程式碼寫好
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-10-11 10:26:32" itemprop="dateCreated datePublished" datetime="2022-10-11T10:26:32+08:00">2022-10-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。</p>
+<h2 id="為什麼要寫這篇文章？"><a href="#為什麼要寫這篇文章？" class="headerlink" title="為什麼要寫這篇文章？"></a>為什麼要寫這篇文章？</h2><p>這一篇並不會像 Clean Code 那樣教你怎麼寫、怎麼命名，而是主要分享自己的當助教期間所看到的各種 Code 寫法，然後說明為什麼這樣寫不好，當然這一篇也會盡可能避免說明到一些太過複雜的概念，主軸比較偏向於「你還可以怎麼寫會更好」。</p>
+<p>當然每個人都有自己的 Code Style，所以分享這一篇並不代表你就一定要依照我的作法去做，而是讓你知道「為什麼我會這樣子建議」以及「為什麼不要這樣寫」。</p>
+<p>當然由於我是 Vue 開發者，所以你可能會看到一些關於 Vue 的建議。</p>
+<p>如果沒有什麼太大問題的話，就準備好好認識自己的程式碼是不是我舉例的其中一種吧！</p>
+<p>照慣例，一樣要補個迷因圖：</p>
+<p><img src="https://i.imgur.com/m3h6azU.png" alt="求你了"></p>
+<h2 id="有意義的函式與變數命名"><a href="#有意義的函式與變數命名" class="headerlink" title="有意義的函式與變數命名"></a>有意義的函式與變數命名</h2><p>一開始我們先來看一個我最常見的奇怪狀況：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">xxxx</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有注意到問題嗎？函式名稱就真的叫做 <code>xxxx</code>，或許你並不會這樣寫甚至許多人也不會這樣寫，但是我在當助教的時候確實看到過這種毫無意義的命名，更不用說變數這樣子命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bbbb = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">const</span> bbbbArray = [];</span><br></pre></td></tr></table></figure>
+
+<p>我絕對不會說上面還是我業界的朋友提供給我的，甚至是下方這種也很常見：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> aaaa = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這種奇怪且毫無意義的命名都是非常常見的。</p>
+<p>那麼該怎麼命名會比較好呢？其實就是看裡面的程式碼(邏輯)是在做什麼為主，由於前面內容都是寫「<code>do something</code>」很難看出該怎麼命名，因此這邊我補上一下內容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">xxxx</span>(<span class="params"></span>) &#123;</span><br><span class="line">  axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">      data = res.<span class="property">data</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上面範例來說是一個與遠端進行溝通的 AJAX 函式，雖然我們可以透過閱讀內容略知一二，但以目前函式名稱來講，我們無法知道這函式是在做什麼，而必須閱讀完整程式碼才能知道用途。</p>
+<p>因此為了避免這種狀況我們可以透過有意義的命名來讓其他人知道這個函式是在做什麼，舉例來講可以改成這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;</span><br><span class="line">  axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">      data = res.<span class="property">data</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那麼這樣子當你看到該函式名稱時，就可以知道這個函式是在做「<strong>取得產品</strong>」的事情，因此有意義的命名是非常重要的，若你保持著「<code>xxxx</code>」則會讓開發者還要花時間去閱讀函式內做什麼，這樣子並不是一個好習慣。</p>
+<p>除了函式命名為什麼要有意義之外，變數命名也是一樣的，例如前面的範例雖然資料是放在 <code>data</code> 中：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;</span><br><span class="line">  axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">      data = res.<span class="property">data</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>雖然看是沒有什麼問題，但是你依然無法知道 <code>data</code> 是放什麼資料且是什麼資料，因此我們可以這樣命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> products = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;</span><br><span class="line">  axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">      products = res.<span class="property">data</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>明確有意義的命名可以讓開發者知道你的變數是預計準備放什麼資料的，而不是讓開發者去通靈猜你到底要放什麼或者執行看看才知道。</p>
+<p>變數跟函式命名上基本上原則很簡單，寧可長、好閱讀也不要短而難理解。</p>
+<h2 id="避免曖昧的命名"><a href="#避免曖昧的命名" class="headerlink" title="避免曖昧的命名"></a>避免曖昧的命名</h2><p>除了上面提到的「有意義的命名」之外，還有一個問題是「曖昧的命名」，這個曖昧的命明我比較常在 Vue 的最終作業中看到：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> @<span class="attr">click.prevent</span>=<span class="string">&quot;click(&#x27;點我&#x27;)&quot;</span>&gt;</span>這是一個超連結<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到 <code>click</code> 與 Vue 的 <code>click</code> 事件非常曖昧，這種命名不但很曖昧之外也會讓開發者第一眼誤以為你是在使用 Vue 的 <code>click</code> 事件，因此非常的容易讓人混淆。</p>
+<p>如果你還真不知道該命名什麼，那麼還不如命名為 <code>handleClick</code>，這樣子就可以讓開發者知道這是一個處理點擊事件的函式：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> @<span class="attr">click.prevent</span>=<span class="string">&quot;handleClick(&#x27;點我&#x27;)&quot;</span>&gt;</span>這是一個超連結<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>請盡可能避免使用曖昧的命名，你應該不會想要讓開發者看著你的程式碼一直罵 F**K。</p>
+<p>題外話，我也曾經看過一種很神奇的寫法，然後問我為什麼每次打開網頁都會壞掉，因為它這樣子寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">click</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Click&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">click</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子寫的話，每次呼叫 <code>click</code> 函式時，就會無限的呼叫 <code>click</code> 函式，因此網頁就會爆掉，所以在命名上會建議多花個幾秒去思考一下，這樣子才不會出現這種問題。</p>
+<h2 id="避免漢語拼音"><a href="#避免漢語拼音" class="headerlink" title="避免漢語拼音"></a>避免漢語拼音</h2><p>我曾經看過一位同學的函式跟變數命名都是使用漢語拼音方式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">sanminTitle</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;三民區&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">llingyaTitle</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;苓雅區&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">bigTreeTitle</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;大樹區&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這種命名方式不太建議的原因是因為，如果你要將專案交給國外開發者時，國外開發者大概會一臉問號，除此之外大部分的開發者還是會比較傾向使用英文的方式來命名，因此這邊還是會建議使用英文作為命名。</p>
+<p>（如果你英文不好，可以請 Google 翻譯幫你翻譯。）</p>
+<h2 id="減少使用-var"><a href="#減少使用-var" class="headerlink" title="減少使用 var"></a>減少使用 <code>var</code></h2><p>在 JavaScript 中，我們可以使用 <code>var</code>、<code>let</code> 與 <code>const</code> 來宣告變數，但是實戰開發上我們會盡可能使用 ES6 <code>let</code> 與 <code>const</code> 來宣告一個變數，其原因主要是出在 <code>var</code> 的作用域是函式(Function)，而 <code>let</code> 與 <code>const</code> 的作用域是區塊(Block)</p>
+<p>舉例來講，如果我們使用 <code>var</code> 來宣告一個變數，然後幾百行之後在裡面又重新宣告一次同名的變數，這時候你會發現你的變數值會被覆蓋掉，因為 <code>var</code> 作用域是函式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(a); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<p>而如果我們使用 <code>let</code> 或 <code>const</code> 來宣告變數，則不會有這樣的問題，因為只要有 <code>&#123;&#125;</code> 都是 <code>let</code> 或 <code>const</code> 的限制作用域：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"><span class="comment">// 這邊是一些程式碼</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(a); <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<p>因此我們在實戰開發上，盡可能使用 <code>let</code> 與 <code>const</code> 來宣告變數，避免出現作用域的問題。</p>
+<p>儘管現今已經大力提倡使用 ES6 的 <code>let</code> 與 <code>const</code>，但還是有人會使用 <code>var</code> 來宣告變數，所以這邊才特別提出來，而這也是我批改作業時常見的錯誤。</p>
+<h2 id="請不要-var-跟-let-同時使用"><a href="#請不要-var-跟-let-同時使用" class="headerlink" title="請不要 var 跟 let 同時使用"></a>請不要 <code>var</code> 跟 <code>let</code> 同時使用</h2><p>這是一個很有趣的事情，如同前面所講的 JavaScript 同時具備 <code>var</code>、<code>let</code> 與 <code>const</code> 三種變數宣告方式，但是我們會盡可能避免使用 <code>var</code> 與 <code>let</code> 同時使用，這樣將會導致開發者很容易混淆變數作用域，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(a); <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<p>當然我也有看過另一種寫法，也就是 <code>let</code> 宣告在 Global Scope，然後在 <code>if</code> 裡面使用 <code>var</code> 宣告變數，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>雖然以目前的瀏覽器已經有阻擋這樣的寫法(印象以前可以通過。)，但如果你嘗試貼入到瀏覽器 Console 內可能會看到以下錯誤（不同瀏覽器可能會有不同的錯誤訊息）：</p>
+<p>Chrome：<code>Uncaught SyntaxError: Identifier &#39;a&#39; has already been declared</code><br>Firefox：<code>Uncaught SyntaxError: redeclaration of let a</code></p>
+<p>因此為了避免這樣的問題，我們還是會盡可能避免使用 <code>var</code> 與 <code>let</code> 同時使用，這也是為了避免你被同事請出去喝咖啡。</p>
+<h2 id="善加利用-ES6-的解構賦值"><a href="#善加利用-ES6-的解構賦值" class="headerlink" title="善加利用 ES6 的解構賦值"></a>善加利用 ES6 的解構賦值</h2><p>這邊先來看一個簡單的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">  <span class="attr">address</span>: <span class="string">&#x27;Taipei&#x27;</span>,</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&#x27;example@gmail.com&#x27;</span>,</span><br><span class="line">  <span class="attr">phone</span>: <span class="string">&#x27;0912345678&#x27;</span>,</span><br><span class="line">  <span class="attr">isDeveloper</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isEnabled</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">category</span>: <span class="string">&#x27;developer&#x27;</span>,</span><br><span class="line">  <span class="attr">isMale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isFemale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">loginType</span>: <span class="string">&#x27;google&#x27;</span>,</span><br><span class="line">  <span class="attr">avatar</span>: <span class="string">&#x27;https://example.com/avatar.png&#x27;</span>,</span><br><span class="line">  <span class="attr">createdAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">  <span class="attr">updatedAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> newUser = &#123;</span><br><span class="line">  <span class="attr">name</span>: user.<span class="property">name</span>,</span><br><span class="line">  <span class="attr">age</span>: user.<span class="property">age</span>,</span><br><span class="line">  <span class="attr">address</span>: user.<span class="property">address</span>,</span><br><span class="line">  <span class="attr">email</span>: user.<span class="property">email</span>,</span><br><span class="line">  <span class="attr">phone</span>: user.<span class="property">phone</span>,</span><br><span class="line">  <span class="attr">isDeveloper</span>: user.<span class="property">isDeveloper</span>,</span><br><span class="line">  <span class="attr">isEnabled</span>: user.<span class="property">isEnabled</span>,</span><br><span class="line">  <span class="attr">category</span>: user.<span class="property">category</span>,</span><br><span class="line">  <span class="attr">isMale</span>: user.<span class="property">isMale</span>,</span><br><span class="line">  <span class="attr">isFemale</span>: user.<span class="property">isFemale</span>,</span><br><span class="line">  <span class="attr">loginType</span>: user.<span class="property">loginType</span>,</span><br><span class="line">  <span class="attr">avatar</span>: user.<span class="property">avatar</span>,</span><br><span class="line">  <span class="attr">createdAt</span>: user.<span class="property">createdAt</span>,</span><br><span class="line">  <span class="attr">updatedAt</span>: user.<span class="property">updatedAt</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到基本上我們只是將 <code>user</code> 物件的屬性值，一一複製到 <code>newUser</code> 物件裡面而已，我們可以看到 <code>newUser</code> 的寫法非常冗長，而且如果 <code>user</code> 物件的屬性值有變動，那麼我們也必須要同步修改 <code>newUser</code> 物件的屬性值，這樣的寫法非常不好維護，因此我們可以利用 ES6 的解構賦值來簡化這個寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">  <span class="attr">address</span>: <span class="string">&#x27;Taipei&#x27;</span>,</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&#x27;example@gmail.com&#x27;</span>,</span><br><span class="line">  <span class="attr">phone</span>: <span class="string">&#x27;0912345678&#x27;</span>,</span><br><span class="line">  <span class="attr">isDeveloper</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isEnabled</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">category</span>: <span class="string">&#x27;developer&#x27;</span>,</span><br><span class="line">  <span class="attr">isMale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isFemale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">loginType</span>: <span class="string">&#x27;google&#x27;</span>,</span><br><span class="line">  <span class="attr">avatar</span>: <span class="string">&#x27;https://example.com/avatar.png&#x27;</span>,</span><br><span class="line">  <span class="attr">createdAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">  <span class="attr">updatedAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> newUser = &#123;</span><br><span class="line">  ...user,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>善加利用 ES6 解構賦值的方式，可以讓我們的程式碼更簡潔，也更容易維護。</p>
+<p>但如果今天是只有部分屬性值需要複製，例如我們只想要複製 <code>name</code>、<code>age</code>、<code>address</code>、<code>email</code>、<code>phone</code> 這五個屬性值，那麼我們可以這樣寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">  <span class="attr">address</span>: <span class="string">&#x27;Taipei&#x27;</span>,</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&#x27;example@gmail.com&#x27;</span>,</span><br><span class="line">  <span class="attr">phone</span>: <span class="string">&#x27;0912345678&#x27;</span>,</span><br><span class="line">  <span class="attr">isDeveloper</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isEnabled</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">category</span>: <span class="string">&#x27;developer&#x27;</span>,</span><br><span class="line">  <span class="attr">isMale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isFemale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">loginType</span>: <span class="string">&#x27;google&#x27;</span>,</span><br><span class="line">  <span class="attr">avatar</span>: <span class="string">&#x27;https://example.com/avatar.png&#x27;</span>,</span><br><span class="line">  <span class="attr">createdAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">  <span class="attr">updatedAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> data = [<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;address&#x27;</span>, <span class="string">&#x27;email&#x27;</span>, <span class="string">&#x27;phone&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> newUser = &#123;</span><br><span class="line">  ...data.<span class="title function_">reduce</span>(<span class="function">(<span class="params">acc, key</span>) =&gt;</span> &#123;</span><br><span class="line">    acc[key] = user[key];</span><br><span class="line">    <span class="keyword">return</span> acc;</span><br><span class="line">  &#125;, &#123;&#125;),</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子我們就只需要專心在 <code>data</code> 新增我們想要的屬性值，而不需要去修改 <code>newUser</code> 物件的屬性值。</p>
+<p>當然使用 <code>reduce</code> 這種做法是比較進階一點的，所以這邊你也可以改用 <code>forEach</code> 來寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">  <span class="attr">address</span>: <span class="string">&#x27;Taipei&#x27;</span>,</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&#x27;example@gmail.com&#x27;</span>,</span><br><span class="line">  <span class="attr">phone</span>: <span class="string">&#x27;0912345678&#x27;</span>,</span><br><span class="line">  <span class="attr">isDeveloper</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isEnabled</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">category</span>: <span class="string">&#x27;developer&#x27;</span>,</span><br><span class="line">  <span class="attr">isMale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">isFemale</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">loginType</span>: <span class="string">&#x27;google&#x27;</span>,</span><br><span class="line">  <span class="attr">avatar</span>: <span class="string">&#x27;https://example.com/avatar.png&#x27;</span>,</span><br><span class="line">  <span class="attr">createdAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">  <span class="attr">updatedAt</span>: <span class="string">&#x27;2019-01-01 00:00:00&#x27;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> data = [<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;address&#x27;</span>, <span class="string">&#x27;email&#x27;</span>, <span class="string">&#x27;phone&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// forEach</span></span><br><span class="line"><span class="keyword">const</span> newUser = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">data.<span class="title function_">forEach</span>(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">  newUser[key] = user[key];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>另一種我常見的奇怪寫法就是 <code>import</code>，下方是一個 Font Awesome icon 的引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; faUser &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; faUserSecret &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; faUserTie &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; faUserCircle &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; faUserAstronaut &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; faUserNinja &#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>相同的引入來源，但我們寫了六次，這樣的寫法非常不好維護，因此我們可以這樣寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;</span><br><span class="line">  faUser,</span><br><span class="line">  faUserSecret,</span><br><span class="line">  faUserTie,</span><br><span class="line">  faUserCircle,</span><br><span class="line">  faUserAstronaut,</span><br><span class="line">  faUserNinja,</span><br><span class="line">&#125; <span class="keyword">from</span> <span class="string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子我們就可以一次引入多個 icon，而不需要一個一個引入。</p>
+<h2 id="被忽略的大括號"><a href="#被忽略的大括號" class="headerlink" title="被忽略的大括號"></a>被忽略的大括號</h2><p>在 JavaScript 中，很常可以看到許多開發者忽略 <code>if</code> 語句的大括號，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>) <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello World&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>這種寫法本身並沒有錯誤，這是因為 JavaScript 引擎會自動幫我們加上大括號，當只有一行時還沒有什麼，但當你有多個判斷時就會顯得稍微有點混亂，尤其是搭配用 <code>else if</code> 時，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (myName === <span class="string">&#x27;Ray&#x27;</span>) <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Ray&#x27;</span>);</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (myName === <span class="string">&#x27;John&#x27;</span>) <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello John&#x27;</span>);</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (myName === <span class="string">&#x27;Mary&#x27;</span>) <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Mary&#x27;</span>);</span><br><span class="line"><span class="keyword">else</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello World&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>應該稍微可以感覺到混亂了，對於一位新手工程師來講，這一段必須先花個幾秒的時間去理解，因此如果有多個判斷時，會建議你還是加上大括號，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (myName === <span class="string">&#x27;Ray&#x27;</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Ray&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (myName === <span class="string">&#x27;John&#x27;</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello John&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (myName === <span class="string">&#x27;Mary&#x27;</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello Mary&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello World&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>儘管程式碼感覺較多，但是在表達上也比較清楚。</p>
+<p>（除此之外，你不是在寫 Python，不要這麼簡寫）</p>
+<p>當然，提到這件事情並不代表你就不要這樣做，只是因為許多人會過度的去省略大括號，因此實際開發來講，最佳實踐上依然很常見一行解決的狀況。</p>
+<h2 id="不要亂寫註解"><a href="#不要亂寫註解" class="headerlink" title="不要亂寫註解"></a>不要亂寫註解</h2><p>適當的註解是可以幫助開發者釐清當初的想法，但是如果你的註解太多，那麼你的程式碼就會變得很難閱讀，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 宣告一個變數叫做 products 並賦予一個空陣列</span></span><br><span class="line"><span class="keyword">const</span> products = [];</span><br><span class="line"><span class="comment">// 宣告一個函式叫做 getProducts</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// 使用 axios 來取得產品資料，來源是 https://example.com/products</span></span><br><span class="line">  axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">    <span class="comment">// 資料取得成功時走這裡</span></span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 取得資料後，將資料放入 products 陣列中</span></span><br><span class="line">      products = response.<span class="property">data</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到註解的數量已經快要比程式碼還要多了，過多的註解並不會幫助開發者理解程式碼，反而會讓程式碼變得複雜，因為程式碼本身就是一個註解，如果你的程式碼寫得不好，那麼你的註解也就沒有意義，與其花一大推時間在寫註解，不如花時間在寫程式碼上，思考如何讓程式碼更好閱讀，除非你這一塊的邏輯真的非常複雜。</p>
+<p>除了上面這個例子之外，我也曾在 Vue 的專案中看到這樣的註解：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createApp &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">createApp</span>(&#123;</span><br><span class="line">  <span class="title function_">data</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">products</span>: [],</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">methods</span>: &#123;</span><br><span class="line">    <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;</span><br><span class="line">      axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>)</span><br><span class="line">        .<span class="title function_">then</span>(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">products</span> = response.<span class="property">data</span>;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// mounted</span></span><br><span class="line">  <span class="title function_">created</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="title function_">getProducts</span>();</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;).<span class="title function_">mount</span>(<span class="string">&#x27;#app&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>看到那一個 <code>mounted</code> 的註解了嗎？依照程式碼來看我們可以看到 <code>getProducts</code> 是在 <code>created</code> 階段被呼叫，但 <code>created</code> 上方卻有一個 <code>mounted</code>，此時的我會認為這個註解是不是寫錯了，還是有什麼特別意義，那麼為了確認這一條註解意義我可能要去問原本的開發者，如果他還在職那就沒什麼，但如果他離職呢？那麼這個註解就會變得毫無意義，因此我們應該要避免這樣的註解。</p>
+<p>還有另一種註解，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// import getProducts from &#x27;./getProducts&#x27;; // 記得註解</span></span><br></pre></td></tr></table></figure>
+
+<p>其實當我看到這一段的時候我完全很茫然的狀態，因為這一段程式碼不是已經註解了嗎？為什麼還要特別寫一個記得註解？因此註解也是要適當的使用，盡可能避免過多、無意義的註解。</p>
+<p>除此之外也會建議你盡可能地移除已經沒有作用的註解程式碼，只要確保該程式碼已經毫無價值且意義，那麼就會建議移除，確保程式碼的乾淨。</p>
+<h2 id="不要雞婆把程式碼改成一行"><a href="#不要雞婆把程式碼改成一行" class="headerlink" title="不要雞婆把程式碼改成一行"></a>不要雞婆把程式碼改成一行</h2><p>我之前有看過一段程式碼是直接各種壓縮到一行，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> products = [];</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProducts</span>(<span class="params"></span>) &#123;axios.<span class="title function_">get</span>(<span class="string">&#x27;/products&#x27;</span>).<span class="title function_">then</span>(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;products = response.<span class="property">data</span>;&#125;);&#125;</span><br><span class="line"><span class="title function_">getProducts</span>();</span><br></pre></td></tr></table></figure>
+
+<p>拜託不要為了追求程式碼的行數然後各種壓縮成一行，這樣子可讀性是非常差的，壓縮這件事情我們可以透過 <code>Gulp</code>、<code>Webpack</code> 等工具來幫助我們，如果這樣子做，只會讓人家想請你喝咖啡泡茶聊天而已。</p>
+<h2 id="不要濫用三元運算子"><a href="#不要濫用三元運算子" class="headerlink" title="不要濫用三元運算子"></a>不要濫用三元運算子</h2><p>三元運算子是一個非常好用的技巧，但是如果你過度濫用的話，其實反而會大幅降低可讀性，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> products = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> myName === <span class="string">&#x27;Ray&#x27;</span> ? <span class="literal">true</span> : <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> status = (products.<span class="property">length</span> &gt; <span class="number">0</span>) || <span class="title function_">fn</span>()  ? <span class="string">&#x27;success&#x27;</span> : <span class="string">&#x27;error&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>因此在實際上來講，三元運算子還是會傾向於簡單的判斷，如果判斷較複雜的話，還是會建議使用 <code>if</code> 來去判斷較好。</p>
+<h2 id="片地開花的-console-log"><a href="#片地開花的-console-log" class="headerlink" title="片地開花的 console.log"></a>片地開花的 <code>console.log</code></h2><p><code>console.log</code> 是我們在開發時，最常拿來 debug 的技巧，但是也請記得當一個專案完成時，盡可能的移除 <code>console.log</code>，許多狀況跟一些規範都會提到 <code>console.log</code> 是開發階段時所使用的語法，因此在正式上線時應移除 <code>console.log</code>，這也是為了避免一些敏感資訊不小心曝露出來。</p>
+<p>當然除了避免敏感資訊之外，過多的 <code>console.log</code> 遺留在專案上也會讓人覺得你是不是不太會寫程式，因此也請記得在專案完成時，盡可能的移除 <code>console.log</code>。</p>
+<h2 id="換行要適當，也不要過度換行"><a href="#換行要適當，也不要過度換行" class="headerlink" title="換行要適當，也不要過度換行"></a>換行要適當，也不要過度換行</h2><p>我之前看過一份作業是這樣子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(myName);</span><br></pre></td></tr></table></figure>
+
+<p>一個變數跟 <code>console.log</code> 距離超級無敵遠，整份作業只有少少一百多行，打開來卻高達五百多行，其餘都是空白的換行，這樣子其實在閱讀上非常困擾，你會滾輪滾到爆。</p>
+<p>再不然就是完全不換行，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(myName);</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sayHello</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hello&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">sayHello</span>();</span><br></pre></td></tr></table></figure>
+
+<p>適當的換行可以讓程式碼更好閱讀，但是過度的換行也不好，因此請記得適當的換行而不要過度換行。</p>
+<h2 id="能用迴圈就迴圈寫"><a href="#能用迴圈就迴圈寫" class="headerlink" title="能用迴圈就迴圈寫"></a>能用迴圈就迴圈寫</h2><p>這邊提醒一下，接下來後面稍微會比較偏向框架方面的東西哩。</p>
+<p>實戰開發時，往往會有許多地方是重複性的，曾經就有看過一位同學在寫程式碼時，每一個 <code>option</code> 都是自己手寫，就這樣子寫了 20 個 <code>option</code>，例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&quot;1&quot;</span>&gt;</span>1<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&quot;2&quot;</span>&gt;</span>2<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&quot;3&quot;</span>&gt;</span>3<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&quot;4&quot;</span>&gt;</span>4<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&quot;5&quot;</span>&gt;</span>5<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/CkTwb0B.png" alt="耐心十足"></p>
+<p>如果你是使用框架開發的話，請善加利用框架提供的迴圈功能，以 Vue 來講就是 <code>v-for</code>，例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">option</span> <span class="attr">v-for</span>=<span class="string">&quot;i in 20&quot;</span> <span class="attr">:value</span>=<span class="string">&quot;i&quot;</span>&gt;</span>&#123;&#123; i &#125;&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>若是 React 則是：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;select&gt;</span><br><span class="line">  &#123;[...<span class="title class_">Array</span>(<span class="number">20</span>).<span class="title function_">keys</span>()].<span class="title function_">map</span>(<span class="function">(<span class="params">i</span>) =&gt;</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">&#123;i</span> + <span class="attr">1</span>&#125;&gt;</span>&#123;i + 1&#125;<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span></span><br><span class="line">  ))&#125;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<p>不管怎麼樣都遠比你手動打 20 個 <code>option</code> 好。</p>
+<h2 id="Composition-API-不要與-Options-API-混用"><a href="#Composition-API-不要與-Options-API-混用" class="headerlink" title="Composition API 不要與 Options API 混用"></a>Composition API 不要與 Options API 混用</h2><p>這個算是我最常在 Vue3 最終作業上遇到的狀況，有些同學會在同一個頁面中混用 Composition API 與 Options API，而這種我稱之為 ComOption API(誤）：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="language-javascript">  data () &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">  &#125;,</span></span><br><span class="line"><span class="language-javascript">  mounted () &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="comment">// ...</span></span></span><br><span class="line"><span class="language-javascript">  &#125;,</span></span><br><span class="line"><span class="language-javascript">  <span class="title function_">setup</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="comment">// ...</span></span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>不要懷疑，這我很常看見有人這樣寫，雖然程式碼可以正常運作，但是強烈的建議不要混用。</p>
+<p>那麼為什麼不建議混用呢？</p>
+<p>首先這兩者本身生命週期本身就不同了，以 Option API 來講我們實戰開發上常用的是 <code>created</code> 與 <code>mounted</code> 這兩個生命週期，而 Composition API 則是 <code>onMounted</code>，因此光生命週期就有滿明顯的差異，更不用說是 Composition API 與 Option API 兩者的撰寫風格更是不同，你可以試想一下你接手的專案有兩種寫法你會有何感想。</p>
+<p>這邊也附上 Kuro 準備好的 <a target="_blank" rel="noopener" href="https://book.vue.tw/CH1/1-7-lifecycle.html">Vue 生命週期</a> 對照表：</p>
+<p><img src="https://i.imgur.com/2nKfyHv.png" alt="Vue 生命週期"></p>
+<p>React 的話則是 class component 與 function component，這兩者本身也是不同的撰寫風格，因此也是不建議混用。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>以上差不多就是我當助教這段時間看到的一些狀況，希望這些狀況跟舉例可以幫助到你的程式碼寫得更好，也希望可以避免你被同事約出去喝咖啡。</p>
+<p>當然以上都只是一個參考而已，並不代表你就一定要這樣子寫，因為實際專案來講還是要看團隊的 Code Style，其中裡面的不要忽略大括號就非常看情境，只是許多人會過度的去省略。</p>
+<p>除此之外其實上面有許多建議搭配 Lint 就可以解決，只是在使用 Lint 之前你可以先養好一定的開發習慣，這樣子打開 Lint 時就比較不會覺得害怕與可怕。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+              <a href="/tags/React/" rel="tag"># React</a>
+              <a href="/tags/Clean-Code/" rel="tag"># Clean Code</a>
+              <a href="/tags/Code-Review/" rel="tag"># Code Review</a>
+              <a href="/tags/Code-Style/" rel="tag"># Code Style</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/react/20221011/3592716318/" rel="prev" title="終究都要學 React 何不現在學呢？ - React Router - Hook - (27)">
+                  <i class="fa fa-angle-left"></i> 終究都要學 React 何不現在學呢？ - React Router - Hook - (27)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/react/20221012/622986263/" rel="next" title="終究都要學 React 何不現在學呢？ - React Router - Lazy Loading - (28)">
+                  終究都要學 React 何不現在學呢？ - React Router - Lazy Loading - (28) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

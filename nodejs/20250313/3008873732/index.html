@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這一篇將會介紹如何使用六角學院所提供的後端程式碼啟動 API 伺服器，並透過 Postman 來測試 API 的各種功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="六角專題班學習組電商 API 之完整教學">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20250313/3008873732/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="這一篇將會介紹如何使用六角學院所提供的後端程式碼啟動 API 伺服器，並透過 Postman 來測試 API 的各種功能。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.34.31.png?alt=media&token=e4b53259-8a28-4062-a4c8-db33056e052d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212232237.jpg?alt=media&token=46e28e0c-f00d-40c4-a747-c7d56bd182fd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.44.13.png?alt=media&token=8f380d4c-20ab-4f82-972b-923d5d29f96c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.48.20.png?alt=media&token=d8e5f50d-0a39-411a-8987-e97f121b07b4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.19.png?alt=media&token=6d613fff-ebd2-4fd4-9f5e-74bb0180b8e5">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.55.png?alt=media&token=5f3f97a1-6cbe-44d0-856a-599c1c562da5">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.50.39.png?alt=media&token=b2e18403-c7ea-4a9a-a6b3-00796973187f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314103353.png?alt=media&token=37e287ee-48e2-41aa-b318-fbb4386c1e5c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314103901.png?alt=media&token=bccbb2db-e119-41f6-84db-211c0e0bc9b7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104232.png?alt=media&token=a6217106-ad93-441a-96cd-ec3cc89bd0b6">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104509.png?alt=media&token=dce119d0-e031-4c77-a7fb-7c1cc317bf12">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104718.png?alt=media&token=baf38e9e-4d9d-4f17-82ea-ea6f52aab1de">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110135.png?alt=media&token=000d8fc8-8238-4926-9212-2217f7fec6a4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110245.png?alt=media&token=56d87cc1-0b48-4234-8e7a-01535927dda4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110411.png?alt=media&token=f450cba2-701c-466a-b044-a1b52790a7c5">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110528.png?alt=media&token=a7dbd3c0-066e-423d-b053-780700ca2024">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110715.png?alt=media&token=6e2d9326-0868-4727-818a-b33170a592b8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110806.png?alt=media&token=baf13fea-56d2-4632-86e3-f8b9465579ad">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314111011.png?alt=media&token=d3d5f578-4c0c-48d8-828c-331aac6346b8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314111103.png?alt=media&token=d7105c0a-1649-43d6-8e75-767b5934384a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314140204.png?alt=media&token=a9ff963a-028e-4a4f-b3da-31c095eb752a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.29.37.png?alt=media&token=1a9b6822-90c2-41ad-8601-47df2e5e6dbf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313100141.png?alt=media&token=d90a9829-f57b-4524-8f84-f16be26d18a0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313105350.png?alt=media&token=2e309c4e-7b00-43ce-8384-d60ccfeb7817">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313110137.gif?alt=media&token=26de2292-5165-43a2-b18e-453c7eae50c0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313144849%402x.png?alt=media&token=c33feb61-c4ab-4ca3-9e4b-b9c8377ae17f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313145429%402x.png?alt=media&token=bba247cb-25bc-4bf9-bc7a-8162d926bca7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313145924.png?alt=media&token=4141c962-f7db-49ae-9009-a23f83e2b9bc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150419.png?alt=media&token=b2967139-06a9-463a-8fff-2ec6b8af2b9c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150754.png?alt=media&token=2ea40960-7e71-47be-bbbe-b3a01bc00d9b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150419.png?alt=media&token=b2967139-06a9-463a-8fff-2ec6b8af2b9c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313153333.png?alt=media&token=f8069358-fec4-4594-b9eb-1da7f8b43b13">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313224141.png?alt=media&token=0d722b43-dace-43f2-a562-b1a64b06d3ec">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313225123.gif?alt=media&token=8488ebd0-747a-4484-9f8e-80355c39e0cb">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313225747.png?alt=media&token=2ffea29f-8d02-4e17-80d6-0274925f737e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314140038.png?alt=media&token=a9ac3b86-59da-424e-a402-9af6d11023fd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314001620.png?alt=media&token=d3045ae3-97d6-4992-b82b-f7c5eefa9063">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314001911.png?alt=media&token=a6de1cba-fac8-4196-8b30-1a5dffa8b360">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314002238.png?alt=media&token=e8d5d816-1a13-473e-a7ba-144e44ba826e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314002551.png?alt=media&token=7b39735c-f799-40e0-b272-27836db48943">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313230651.png?alt=media&token=0d3141d3-9488-4641-9010-215aca0f0fb2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313231622.png?alt=media&token=804e806a-fdbe-462e-b50b-6ab952ebecb1">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313232440.png?alt=media&token=15c9f529-f373-41d9-95bb-5a443ecdcc65">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314004616.png?alt=media&token=4921d741-05e5-4412-ab02-67effa987afa">
+<meta property="article:published_time" content="2025-03-13T01:13:26.000Z">
+<meta property="article:modified_time" content="2025-03-13T01:13:26.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Nodejs">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.34.31.png?alt=media&token=e4b53259-8a28-4062-a4c8-db33056e052d">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20250313/3008873732/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20250313/3008873732/","path":"nodejs/20250313/3008873732/","title":"六角專題班學習組電商 API 之完整教學"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>六角專題班學習組電商 API 之完整教學 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99"><span class="nav-number">2.</span> <span class="nav-text">事前準備</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Firebase-%E5%B0%88%E6%A1%88%E8%A8%AD%E5%AE%9A"><span class="nav-number">3.</span> <span class="nav-text">Firebase 專案設定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Firebase-%E5%B0%88%E6%A1%88"><span class="nav-number">3.1.</span> <span class="nav-text">建立 Firebase 專案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Firebase-Storage"><span class="nav-number">3.2.</span> <span class="nav-text">設定 Firebase Storage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%96%E5%BE%97-Firebase-Admin-SDK"><span class="nav-number">3.3.</span> <span class="nav-text">取得 Firebase Admin SDK</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%BB%E5%95%86%E5%B0%88%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">電商專案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E5%B0%88%E6%A1%88%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8"><span class="nav-number">4.1.</span> <span class="nav-text">設定專案環境變數</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D%E5%B0%88%E6%A1%88%E5%A5%97%E4%BB%B6"><span class="nav-number">4.2.</span> <span class="nav-text">安裝專案套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%8C%96%EF%BC%88Docker%EF%BC%89%E7%92%B0%E5%A2%83"><span class="nav-number">4.3.</span> <span class="nav-text">容器化（Docker）環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6-API"><span class="nav-number">4.4.</span> <span class="nav-text">測試 API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A9%B2%E5%A6%82%E4%BD%95%E9%96%8B%E7%99%BC%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">該如何開發？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E9%96%8B%E7%99%BC%E5%89%8D%E6%BA%96%E5%82%99"><span class="nav-number">5.1.</span> <span class="nav-text">本地開發前準備</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%96%8B%E7%99%BC%E6%B5%81%E7%A8%8B"><span class="nav-number">5.2.</span> <span class="nav-text">開發流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%96%8B%E7%99%BC%E7%AF%84%E4%BE%8B%EF%BC%88%E4%BD%BF%E7%94%A8%E8%80%85%E8%A8%BB%E5%86%8A%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">開發範例（使用者註冊）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%8F%E9%81%8E-GitHub-Actions-%E8%87%AA%E5%8B%95%E5%8C%96%E6%B8%AC%E8%A9%A6"><span class="nav-number">6.</span> <span class="nav-text">透過 GitHub Actions 自動化測試</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B3%E8%AB%8B-GitHub-Token"><span class="nav-number">6.1.</span> <span class="nav-text">申請 GitHub Token</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-GitHub-Repository-Secret"><span class="nav-number">6.2.</span> <span class="nav-text">設定 GitHub Repository Secret</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">939</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">703</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20250313/3008873732/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="六角專題班學習組電商 API 之完整教學 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="這一篇將會介紹如何使用六角學院所提供的後端程式碼啟動 API 伺服器，並透過 Postman 來測試 API 的各種功能。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          六角專題班學習組電商 API 之完整教學
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-03-13 09:13:26" itemprop="dateCreated datePublished" datetime="2025-03-13T09:13:26+08:00">2025-03-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">這一篇將會介紹如何使用六角學院所提供的後端程式碼啟動 API 伺服器，並透過 Postman 來測試 API 的各種功能。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇將會介紹如何使用六角學院所提供的後端程式碼啟動 API 伺服器，並透過 Postman 來測試 API 的各種功能。</p>
+<h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><p>準備開始往下之前，請你先準備好以下的環境：</p>
+<ul>
+<li>安裝 Node.js v20 以上<ul>
+<li><a target="_blank" rel="noopener" href="https://nodejs.org/zh-tw">Node.js 官方網站</a></li>
+<li>額外推薦：<a href="https://israynotarray.com/nodejs/20200124/3404456418/">Mac OS X 安裝 nvm</a>、<a href="https://israynotarray.com/nodejs/20200107/3738078915/">Windows 10 安裝並使用 nvm 切換 NodeJS 版本</a></li>
+</ul>
+</li>
+<li>安裝 Postman<ul>
+<li><a target="_blank" rel="noopener" href="https://www.postman.com/">Postman 官方網站</a></li>
+<li>額外推薦：<a href="https://israynotarray.com/other/20211207/427026/">跟著我一起快速入門 Postman 吧！</a></li>
+</ul>
+</li>
+<li>安裝 Git<ul>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/">Git 官方網站</a></li>
+</ul>
+</li>
+<li>註冊一個 GitHub 帳號<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/">GitHub 官方網站</a></li>
+</ul>
+</li>
+<li>安裝你的 IDE 編輯器 Visual Studio Code<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">Visual Studio Code 官方網站</a></li>
+</ul>
+</li>
+<li>Chrome 瀏覽器<ul>
+<li><a target="_blank" rel="noopener" href="https://www.google.com/intl/zh-TW/chrome/">Chrome 官方網站</a></li>
+</ul>
+</li>
+</ul>
+<p>以上環境都準備好後，我們就可以開始進入下一步囉！</p>
+<blockquote>
+<p><strong>Note</strong><br>這一篇不會特別介紹該如何安裝這些軟體，如果你對這些軟體不熟悉，建議你可以先自行查詢相關資料哩。</p>
+</blockquote>
+<h2 id="Firebase-專案設定"><a href="#Firebase-專案設定" class="headerlink" title="Firebase 專案設定"></a>Firebase 專案設定</h2><p>由於六角學院所提供的專案會使用 Firebase Storage 來儲存圖片，所以你需要先設定好 Firebase 專案。</p>
+<blockquote>
+<p><strong>Note</strong><br>Firebase 新的規定部分功能是需要綁定信用卡才能使用，但是不用擔心，Google 本身會提供一定程度的免費額度使用。<br>除此之外，Firebase 的畫面可能會隨著使用者帳號差異有一點點不一樣，但這一篇會盡可能描述從零開始唷～</p>
+</blockquote>
+<h3 id="建立-Firebase-專案"><a href="#建立-Firebase-專案" class="headerlink" title="建立 Firebase 專案"></a>建立 Firebase 專案</h3><p>首先開啟 <a target="_blank" rel="noopener" href="https://firebase.google.com/">Firebase</a>，並且點選右上角的「<strong>轉到控制台</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.34.31.png?alt=media&token=e4b53259-8a28-4062-a4c8-db33056e052d" alt="轉到控制台"></p>
+<p>接著點「<strong>新增專案</strong>」or 「<strong>建立專案</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212232237.jpg?alt=media&token=46e28e0c-f00d-40c4-a747-c7d56bd182fd" alt="新增專案"></p>
+<p>當你點了「<strong>建立專案</strong>」後，就會跳出一個滿版的視窗，這邊就是你要輸入專案名稱的地方，基本上你可以隨便取，但是我這邊就取「<strong>Firebase-Express</strong>」，接著按下「<strong>繼續</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.44.13.png?alt=media&token=8f380d4c-20ab-4f82-972b-923d5d29f96c" alt="專案名稱"></p>
+<p>第二步驟是 Firebase 問你要不要開啟 Google Analytics(分析) 之類，但這邊我們都不需要，所以就「<strong>關閉</strong>」並按下「<strong>建立專案</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.48.20.png?alt=media&token=d8e5f50d-0a39-411a-8987-e97f121b07b4" alt="Google Analytics(分析)"></p>
+<p>建立過程會稍微等一下，你去上個廁所就好了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.19.png?alt=media&token=6d613fff-ebd2-4fd4-9f5e-74bb0180b8e5" alt="建立中"></p>
+<p>準備好後，就按一下「<strong>繼續</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.55.png?alt=media&token=5f3f97a1-6cbe-44d0-856a-599c1c562da5" alt="新專案已準備就緒"></p>
+<p>這時候你應該會直接進入到你的專案控制台，到這邊為止你的 Firebase 專案就準備完成了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.50.39.png?alt=media&token=b2e18403-c7ea-4a9a-a6b3-00796973187f" alt="完成"></p>
+<h3 id="設定-Firebase-Storage"><a href="#設定-Firebase-Storage" class="headerlink" title="設定 Firebase Storage"></a>設定 Firebase Storage</h3><blockquote>
+<p><strong>Note</strong><br>這個步驟很重要，如果沒有先設定的話，你將無法取得 Storage Bucket 的 URL，這對我們後面的程式碼會有影響。</p>
+</blockquote>
+<p>接下來你必須設置 Firebase Storage 的儲存區域，所以請你點一下左側功能列表找到「<strong>Storage</strong>」，並點擊「<strong>升級專案</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314103353.png?alt=media&token=37e287ee-48e2-41aa-b318-fbb4386c1e5c" alt="升級專案"></p>
+<p>接著 Firebase 會跳出要求你升級帳號，因為 Firebase 為了避免資源被濫用，所以未來開始一率使用 Firebase Storage 服務的人，都要綁定信用卡，但這邊不用擔心，我們先繼續往下，點擊「<strong>建立 Cloud Billing 帳戶</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314103901.png?alt=media&token=bccbb2db-e119-41f6-84db-211c0e0bc9b7" alt="繼續"></p>
+<p>這時候畫面會跳出 Google Cloud 視窗，點一下「<strong>確認</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104232.png?alt=media&token=a6217106-ad93-441a-96cd-ec3cc89bd0b6" alt="確認"></p>
+<p>接著需要填寫一些稅務資訊，填寫完畢後，最下方要綁定一個信用卡，而這邊我是綁定一張自己沒有在使用的信用卡，沒問題後，就按下「<strong>確認購買</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104509.png?alt=media&token=dce119d0-e031-4c77-a7fb-7c1cc317bf12" alt="確認購買"></p>
+<blockquote>
+<p><strong>Note</strong><br>如果你是新的使用者 Google 會提供 300 美金讓你可以免費使用。</p>
+</blockquote>
+<p>這時候會跑一下「<strong>正在設定帳單</strong>」，就稍微等待一下….</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314104718.png?alt=media&token=baf38e9e-4d9d-4f17-82ea-ea6f52aab1de" alt="正在設定帳單"></p>
+<p>理論上設定完就可以回到 Firebase 上。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你的帳戶有問題，如：跨區、卡號有問題，Google 會要求你再次驗證一次唷。</p>
+</blockquote>
+<p>接著你可能會跳出一個預算設定，這邊我們先按下「<strong>略過</strong>」，後面如果你有需要可以再自己去設定</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110135.png?alt=media&token=000d8fc8-8238-4926-9212-2217f7fec6a4" alt="略過"></p>
+<p>接著我們要把 Firebase 與我們在 Google Cloud 綁定的信用卡與我們的 Firebase 專案連結，這邊我們可以直接點一下「<strong>連結 Cloud Billing 帳戶</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110245.png?alt=media&token=56d87cc1-0b48-4234-8e7a-01535927dda4" alt="連結 Cloud Billing 帳戶"></p>
+<p>當你看到以下畫面時，就代表你設定完成囉！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110411.png?alt=media&token=f450cba2-701c-466a-b044-a1b52790a7c5" alt="設定完成"></p>
+<p>如果你想知道目前用量，你可以點上方齒輪 &#x3D;&gt; 「<strong>用量與帳單</strong>」查看哩</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110528.png?alt=media&token=a7dbd3c0-066e-423d-b053-780700ca2024" alt="用量與帳單"></p>
+<p>接下來我們回到 Firebase Storage 的部分，你應該已經會看到以下畫面，這時候你可以點一下「<strong>開始使用</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110715.png?alt=media&token=6e2d9326-0868-4727-818a-b33170a592b8" alt="開始使用"></p>
+<p>接著會需要選取 Storage 的地區，通常預設是 <code>US-CENTRAL1</code>，而這邊我們沒有必要去調整，所以你可以直接按下「<strong>繼續</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314110806.png?alt=media&token=baf13fea-56d2-4632-86e3-f8b9465579ad" alt="Storage 地區"></p>
+<p>接著會需要設定安全性規則，這邊也不用動</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314111011.png?alt=media&token=d3d5f578-4c0c-48d8-828c-331aac6346b8" alt="安全性規則"></p>
+<p>當你看到這個畫面，就代表你的 Storage 已經設定完成了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314111103.png?alt=media&token=d7105c0a-1649-43d6-8e75-767b5934384a" alt="設定完成"></p>
+<blockquote>
+<p><strong>Note</strong><br>為什麼不直接使用 Google Cloud 就好呢？因為 Firebase 本身就是基於 Google Cloud 的服務，而 Firebase 有額外提供許多方便的功能，如：Authentication、Firestore、Realtime Database、Storage、Hosting 等等，在整體 UI 介面上也比較親民，所以我們這邊就使用 Firebase 來進行操作。</p>
+</blockquote>
+<h3 id="取得-Firebase-Admin-SDK"><a href="#取得-Firebase-Admin-SDK" class="headerlink" title="取得 Firebase Admin SDK"></a>取得 Firebase Admin SDK</h3><p>接著由於我們需要上傳圖片，因此會使用到 Firebase Admin SDK，所以接著就來取得這個 SDK 吧！</p>
+<p>首先點一下上方「<strong>齒輪</strong>」 &#x3D;&gt; 「<strong>專案設定</strong>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314140204.png?alt=media&token=a9ff963a-028e-4a4f-b3da-31c095eb752a" alt="專案設定"></p>
+<p>接著再點一下「<strong>服務帳號</strong>」，你就可以看到 Firebase Admin SDK 的頁面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.29.37.png?alt=media&token=1a9b6822-90c2-41ad-8601-47df2e5e6dbf" alt="Firebase Admin SDK"></p>
+<p>最後你只要按一下「<strong>產生新的私密金鑰</strong>」(你可以依照你的程式語言生成範例程式碼)，就可以取得你的 Firebase Admin SDK 金鑰，接著請把這份 JSON 檔案保存好，後面我們會使用。</p>
+<blockquote>
+<p><strong>Danger</strong><br>請不要隨意將金鑰提供給別人<br>請不要將這個金鑰放到你的 GitHub 上（如果你真這樣幹，請你把這個儲存庫刪除並重新生成一個新的金鑰吧。）</p>
+</blockquote>
+<p>到目前為止，我們已經準備好了 Firebase 的事前準備，接下來我們就準備往下進行囉！</p>
+<h2 id="電商專案"><a href="#電商專案" class="headerlink" title="電商專案"></a>電商專案</h2><p>首先我們要先來準備下載一下六角學院所提供的專案，這邊我們會使用到 Git 來進行下載。</p>
+<p>請你點擊這個連結「<a target="_blank" rel="noopener" href="https://github.com/hexschool/nodejs-study-example">六角專題班學習組電商 API</a>」，接著找到「<strong>Download ZIP</strong>」取得專案壓縮檔案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313100141.png?alt=media&token=d90a9829-f57b-4524-8f84-f16be26d18a0" alt="Download ZIP"></p>
+<p>解壓縮後，請你使用 Visual Studio Code 開啟這個專案，你會看到以下這個檔案架構圖</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">NODEJS-STUDY-EXAMPLE/</span><br><span class="line">├── .github/                  # GitHub Actions 設定檔</span><br><span class="line">├── bin/                      # 伺服器啟動設定檔</span><br><span class="line">├── config/                   # 專案設定檔（如：環境變數、資料庫連線等）</span><br><span class="line">├── controllers/              # 路由控制器，處理業務邏輯</span><br><span class="line">├── db/                       # 資料庫設定，連線設定</span><br><span class="line">├── entities/                 # 資料庫實體模型</span><br><span class="line">├── middlewares/              # 中介層，處理請求的中間件</span><br><span class="line">├── routes/                   # 路由設定</span><br><span class="line">├── test/                     # 單元測試</span><br><span class="line">├── utils/                    # 共用工具函式</span><br><span class="line">├── .dockerignore             # Docker 忽略設定</span><br><span class="line">├── .env.example              # 環境變數範例檔案</span><br><span class="line">├── .eslintrc.json            # ESLint 設定檔</span><br><span class="line">├── .gitignore                # Git 忽略設定</span><br><span class="line">├── .nvmrc                    # Node.js 版本管理檔案</span><br><span class="line">├── app.js                    # 專案進入點</span><br><span class="line">├── docker-compose.yml        # Docker Compose 設定檔</span><br><span class="line">├── Dockerfile                # Docker 設定檔</span><br><span class="line">├── jest.config.js            # Jest 測試框架設定檔</span><br><span class="line">├── package-lock.json         # npm 鎖定檔</span><br><span class="line">├── package.json              # 專案資訊與依賴設定</span><br><span class="line">└── README.md                 # 專案說明文件</span><br></pre></td></tr></table></figure>
+
+<p>了解基本架構後，我們也要了解一下這個專案所提供的指令，在這個專案中，有幫我們準備好一些指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="string">&quot;docker compose --env-file .env up -d --build&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;restart&quot;</span><span class="punctuation">:</span> <span class="string">&quot;docker compose --env-file .env up --force-recreate --build -d&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;stop&quot;</span><span class="punctuation">:</span> <span class="string">&quot;docker compose --env-file .env stop&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;clean&quot;</span><span class="punctuation">:</span> <span class="string">&quot;docker compose --env-file .env down -v&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dev&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node ./bin/www.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;test:unit&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node --experimental-vm-modules node_modules/.bin/jest --config ./jest.config.js --coverage --roots ./test/unit&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;test:integration&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node --experimental-vm-modules node_modules/.bin/jest --testSequencer=./test/sequencer -i --config ./jest.config.js --coverage --roots ./test/integration&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;init:schema&quot;</span><span class="punctuation">:</span> <span class="string">&quot;typeorm schema:sync -d ./db/data-source.js&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊我們來看一下這些指令的用途：</p>
+<ul>
+<li><code>start</code>：啟動並建立 Docker 環境</li>
+<li><code>restart</code>：重新啟動 Docker 環境</li>
+<li><code>stop</code>：停止 Docker 環境</li>
+<li><code>clean</code>：清除 Docker 環境</li>
+<li><code>dev</code>：啟動開發模式</li>
+<li><code>test:unit</code>：執行 Jest 單元測試</li>
+<li><code>test:integration</code>：執行 Jest 整合測試</li>
+<li><code>init:schema</code>：初始化資料庫</li>
+</ul>
+<p>而這邊實際上我們常用的指令僅有 <code>start</code>、<code>restart</code>、<code>stop</code>、<code>clean</code>、<code>test:integration</code>，其他指令你可以先不用理會。</p>
+<h3 id="設定專案環境變數"><a href="#設定專案環境變數" class="headerlink" title="設定專案環境變數"></a>設定專案環境變數</h3><p>接下來我們要將 <code>.env.example</code> 複製一份並命名為 <code>.env</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> .env.example .<span class="built_in">env</span></span><br></pre></td></tr></table></figure>
+
+<p>接著打開 <code>.env</code> 檔案，你會看到以下這些環境變數：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># PostgreSQL 設定</span><br><span class="line">POSTGRES_USER=testHexschool</span><br><span class="line">POSTGRES_PASSWORD=pgStartkit4test</span><br><span class="line">POSTGRES_DB=test</span><br><span class="line"></span><br><span class="line"># 資料庫連接設定</span><br><span class="line"></span><br><span class="line">## Docker 環境請使用 postgres</span><br><span class="line">DB_HOST=postgres</span><br><span class="line">## 本地開發環境請改成 localhost</span><br><span class="line"># DB_HOST=localhost</span><br><span class="line"></span><br><span class="line">DB_PORT=5432</span><br><span class="line">DB_USERNAME=testHexschool</span><br><span class="line">DB_PASSWORD=pgStartkit4test</span><br><span class="line">DB_DATABASE=test</span><br><span class="line">DB_SYNCHRONIZE=true</span><br><span class="line">DB_ENABLE_SSL=false</span><br><span class="line"></span><br><span class="line"># 伺服器設定</span><br><span class="line">PORT=8080</span><br><span class="line"></span><br><span class="line"># LOG 設定</span><br><span class="line">LOG_LEVEL=debug</span><br><span class="line"></span><br><span class="line"># JWT 設定</span><br><span class="line">JWT_EXPIRES_DAY=30d</span><br><span class="line">JWT_SECRET=hexschool666</span><br><span class="line"></span><br><span class="line"># Firebase Storage 設定</span><br><span class="line">FIREBASE_SERVICE_ACCOUNT=</span><br><span class="line">FIREBASE_STORAGE_BUCKET=</span><br></pre></td></tr></table></figure>
+
+<p>這邊要請你將 Firebase Admin SDK 的金鑰內容複製到 <code>FIREBASE_SERVICE_ACCOUNT</code> 中，此時你畫面會長這樣：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># Firebase Storage 設定</span><br><span class="line">FIREBASE_SERVICE_ACCOUNT=&#123;</span><br><span class="line">  &quot;type&quot;: &quot;service_account&quot;,</span><br><span class="line">  &quot;project_id&quot;: &quot;firebase-express&quot;,</span><br><span class="line">  &quot;private</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line">FIREBASE_STORAGE_BUCKET=</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313105350.png?alt=media&token=2e309c4e-7b00-43ce-8384-d60ccfeb7817" alt="Firebase Admin SDK"></p>
+<p>接下來有一個很重要的行為要做，也就是將 <code>FIREBASE_SERVICE_ACCOUNT</code> 改成一行，這樣才能正確讀取到金鑰，將整段選取起來，並按下 <code>command + shift + p</code>（Windows：<code>ctrl + shift + p</code>）輸入 <code>Join Lines</code>，這樣就會變成一行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FIREBASE_SERVICE_ACCOUNT=&#123;&quot;type&quot;:&quot;service_account&quot;,&quot;project_id&quot;:&quot;firebase-express&quot;,&quot;private_key_id&quot;:&quot;...&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313110137.gif?alt=media&token=26de2292-5165-43a2-b18e-453c7eae50c0" alt="Git Join Lines"></p>
+<blockquote>
+<p><strong>Note</strong><br>請務必把整個 JSON 選取起來後再進行 Join Lines，不然會導致 JSON 格式錯誤唷！</p>
+</blockquote>
+<p>接著我們要去取得 Firebase Storage Bucket，請你回到 Firebase 控制台，並點選左側功能列表的「<strong>Storage</strong>」，進入到 Storage 頁面後，請你找到「<code>gs://....</code>」這一段就是你的 Storage Bucket 名稱，請將這個名稱複製到 <code>FIREBASE_STORAGE_BUCKET</code> 中</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313144849%402x.png?alt=media&token=c33feb61-c4ab-4ca3-9e4b-b9c8377ae17f" alt="Firebase Storage Bucket"></p>
+<p>到這邊為止，我們才終於把 Environment Variables 設定完成了，接下來我們就可以開始來準備還原專案囉！</p>
+<h3 id="安裝專案套件"><a href="#安裝專案套件" class="headerlink" title="安裝專案套件"></a>安裝專案套件</h3><p>接下來我們要安裝專案所需的套件，在輸入指令之前，請先確認以下事項：</p>
+<ul>
+<li>Node.js 版本是 v20 以上</li>
+<li>Docker 已經安裝完成並且運作正常</li>
+</ul>
+<p>請在終端機輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker -v</span><br><span class="line">node -v <span class="comment"># 確認 Node.js 版本</span></span><br><span class="line">npm ci</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請不要使用 <code>npm install</code>，因為這個指令會將 <code>package-lock.json</code> 的版本更新，這樣會導致專案的套件版本不一致，所以為了避免這個問題，請使用 <code>npm ci</code> 來安裝套件。<br>如果你不知道 <code>npm ci</code> 與 <code>npm install</code> 的差異，請參考這篇文章：<a href="https://israynotarray.com/nodejs/20211027/1827968017/">npm ci 與 npm install 差異</a></p>
+</blockquote>
+<h3 id="容器化（Docker）環境"><a href="#容器化（Docker）環境" class="headerlink" title="容器化（Docker）環境"></a>容器化（Docker）環境</h3><p>接下來我們要使用 Docker 來建立我們的環境，請在終端機輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>運作過程中會稍微等一下</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313145429%402x.png?alt=media&token=bba247cb-25bc-4bf9-bc7a-8162d926bca7" alt="docker compose"></p>
+<p>執行完畢後，你會看到以下這個畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313145924.png?alt=media&token=4141c962-f7db-49ae-9009-a23f83e2b9bc" alt="docker compose"></p>
+<p>這就代表 <code>npm start</code> 已經把 Docker 環境準備好了，接著請你打開 Docker Desktop，確認畫面是否像這樣兩個綠點：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150419.png?alt=media&token=b2967139-06a9-463a-8fff-2ec6b8af2b9c" alt="Docker Desktop"></p>
+<p>如果你發現沒有正常顯示兩個綠點，那就代表可能沒有正常運作，最基本排除錯誤方式就是輸入 <code>npm run restart</code> 來重新建立 Docker 環境。</p>
+<h3 id="測試-API"><a href="#測試-API" class="headerlink" title="測試 API"></a>測試 API</h3><p>由於 Docker 是將我們當前整個後端程式碼封裝成一個環境，所以我們可以直接使用 Postman 來測試 API，而當初我們針對後端設定的 Port 是 <code>8080</code>，所以我們可以直接在 Postman 輸入 <code>http://localhost:8080/healthcheck</code> 來測試 API 是否正常運作，如果你看到以下這個畫面，就代表你的 API 已經正常運作了！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150754.png?alt=media&token=2ea40960-7e71-47be-bbbe-b3a01bc00d9b" alt="ok"></p>
+<p>到這邊為止，我們已經完成了整個專案的 Docker 建立囉！</p>
+<h2 id="該如何開發？"><a href="#該如何開發？" class="headerlink" title="該如何開發？"></a>該如何開發？</h2><p>前面我們只是學習該如何把專案給建立起來並且開始 Run 起來，接下來我將會介紹該如何用這個專案來開發。</p>
+<h3 id="本地開發前準備"><a href="#本地開發前準備" class="headerlink" title="本地開發前準備"></a>本地開發前準備</h3><p>在前面我們所設定的 Env 環境是用來建立 Docker 環境的，並不是拿來開發用的，所以如果你準備開始開發的話，那你就要先將 Env 底下屬性做調整：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 資料庫連接設定</span><br><span class="line"></span><br><span class="line">## Docker 環境請使用 postgres</span><br><span class="line"># DB_HOST=postgres # 將這一行註解起來</span><br><span class="line">## 本地開發環境請改成 localhost</span><br><span class="line">DB_HOST=localhost # 取消註解</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"># 伺服器設定</span><br><span class="line">PORT=5500 # 這個 Port 從 8080 改成 5500</span><br></pre></td></tr></table></figure>
+
+<p>我們這邊主要修改的是…</p>
+<ul>
+<li><code>DB_HOST</code>：將 <code>postgres</code> 註解起來，並將 <code>localhost</code> 取消註解</li>
+<li><code>PORT</code>：將 <code>8080</code> 改成 <code>5500</code></li>
+</ul>
+<p>會這樣做是因為，我們要從 Docker 環境切換到本地開發環境，所以我們要將 <code>DB_HOST</code> 改成 <code>localhost</code>，而 <code>PORT</code> 是因為我們要避免與 Docker 環境的 Port 衝突，所以我們將 Port 改成 <code>5500</code>。</p>
+<p>接下來你還要注意一件事情，請務必確認你的 Docker PostgreSQL 有正常運作，也就是正常來講，你會看到以下這個畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313150419.png?alt=media&token=b2967139-06a9-463a-8fff-2ec6b8af2b9c" alt="Docker Desktop"></p>
+<p>兩個點都應該是要綠色的，如果沒有你是無法啟動專案的唷！</p>
+<p>為了確保你可以正常開發，所以我這邊提供 Todo 給你自我檢查：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 有跑過 <code>npm ci</code> 安裝套件</li>
+<li><input checked="" disabled="" type="checkbox"> 有將 <code>.env.example</code> 複製一份並命名為 <code>.env</code></li>
+<li><input checked="" disabled="" type="checkbox"> 有將 Firebase Admin SDK 的金鑰複製到 <code>FIREBASE_SERVICE_ACCOUNT</code> 中</li>
+<li><input checked="" disabled="" type="checkbox"> 有將 Firebase Storage Bucket 名稱複製到 <code>FIREBASE_STORAGE_BUCKET</code> 中</li>
+<li><input checked="" disabled="" type="checkbox"> 有確認 Docker Desktop 是否有兩個綠點</li>
+<li><input checked="" disabled="" type="checkbox"> 有確認 Postman 是否可以正常測試 API</li>
+<li><input checked="" disabled="" type="checkbox"> 有將 <code>DB_HOST</code> 改成 <code>localhost</code>，並將 <code>PORT</code> 改成 <code>5500</code></li>
+<li><input checked="" disabled="" type="checkbox"> 有確認 Docker PostgreSQL 是否正常運作</li>
+</ul>
+<p>如果以上都檢查完畢了，那麼你就可以試著輸入以下指令來啟動專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+
+<p>專案啟動成功後，你會看到以下這個畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313153333.png?alt=media&token=f8069358-fec4-4594-b9eb-1da7f8b43b13" alt="npm run dev"></p>
+<p>如果有看到的話，恭喜你，你已經可以開始本地開發囉～</p>
+<blockquote>
+<p><strong>Note</strong><br>中斷執行的終端機，請按下 <code>ctrl + c</code> 即可退出。</p>
+</blockquote>
+<h3 id="開發流程"><a href="#開發流程" class="headerlink" title="開發流程"></a>開發流程</h3><p>本專案有加入測試檔案，測試檔案目的是確保你寫出來的程式碼有符合預期結果，該怎麼做呢？</p>
+<p>首先請你打開 「<a target="_blank" rel="noopener" href="https://github.com/hexschool/nodejs-study-example/tree/answer">六角專題班學習組電商 API</a>」，接著切換到 <code>answer</code> 分支，這個分支就是已經寫好的答案，你可以將 <code>answer</code> 分支下載到你的本地端，這樣你就可以參考答案來開發。</p>
+<p>那麼我們的開發流程會是如何呢？這邊提供流程給予參考：</p>
+<ol>
+<li>參考課程提供的 DB 規劃表以及 API 文件來開發功能</li>
+<li>開發完畢後，將位於 <code>answer</code> 分支的測試檔案複製到 <code>main</code> 分支</li>
+<li>輸入 <code>npm run test:integration</code> 來執行整合測試</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong><br>測試檔案是基於課程提供的 API 文件來撰寫，所以你可以參考 API 文件來撰寫程式碼。</p>
+</blockquote>
+<p>這時候就會看到測試結果，如果有通過的話，那就代表你的程式碼是正確的，如果沒有通過，那就代表你的程式碼有問題，請你再次檢查程式碼。</p>
+<p>接下來，就讓我來快速的示範一次整個開發流程唷！</p>
+<h3 id="開發範例（使用者註冊）"><a href="#開發範例（使用者註冊）" class="headerlink" title="開發範例（使用者註冊）"></a>開發範例（使用者註冊）</h3><p>首先一開始我們會先開發使用者註冊的功能，因此當你打開 <code>routes/users.js</code> 檔案後，你會看到以下這段程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> usersController = <span class="built_in">require</span>(<span class="string">&#x27;../controllers/users&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> router = express.<span class="title class_">Router</span>()</span><br><span class="line"><span class="comment">// const config = require(&#x27;../config/index&#x27;)</span></span><br><span class="line"><span class="comment">// const &#123; dataSource &#125; = require(&#x27;../db/data-source&#x27;)</span></span><br><span class="line"><span class="comment">// const logger = require(&#x27;../utils/logger&#x27;)(&#x27;Users&#x27;)</span></span><br><span class="line"><span class="comment">// const auth = require(&#x27;../middlewares/auth&#x27;)(&#123;</span></span><br><span class="line"><span class="comment">//   secret: config.get(&#x27;secret&#x27;).jwtSecret,</span></span><br><span class="line"><span class="comment">//   userRepository: dataSource.getRepository(&#x27;users&#x27;),</span></span><br><span class="line"><span class="comment">//   logger</span></span><br><span class="line"><span class="comment">// &#125;)</span></span><br><span class="line"></span><br><span class="line">router.<span class="title function_">post</span>(<span class="string">&#x27;/signup&#x27;</span>, usersController.<span class="property">postSignup</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = router</span><br></pre></td></tr></table></figure>
+
+<p>這邊是幫各位大家準備好的起手式，讓你知道基本的寫法是這樣，而註解那一段可以暫時不理會，那部分是針對 Middleware 的開發，接著我們點擊右鍵「移至定義」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313224141.png?alt=media&token=0d722b43-dace-43f2-a562-b1a64b06d3ec" alt="移至定義"></p>
+<p>接著 VSCode 就會幫你打開位於 <code>controllers/users.js</code> 檔案，這邊你會看到以下這段程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UsersController</span> &#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">async</span> postSignup (req, res, next) &#123;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">UsersController</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊就是讓你開始寫使用者註冊的功能。</p>
+<p>那麼這邊就讓我偷懶一下打開 answer 分支的 <code>controllers/users.js</code> 檔案，把 <code>postSignup</code> 的解答貼上來：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bcrypt = <span class="built_in">require</span>(<span class="string">&#x27;bcrypt&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">&#x27;../config/index&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> &#123; dataSource &#125; = <span class="built_in">require</span>(<span class="string">&#x27;../db/data-source&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> logger = <span class="built_in">require</span>(<span class="string">&#x27;../utils/logger&#x27;</span>)(<span class="string">&#x27;UsersController&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> generateJWT = <span class="built_in">require</span>(<span class="string">&#x27;../utils/generateJWT&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> passwordPattern = <span class="regexp">/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).&#123;8,32&#125;/</span></span><br><span class="line"><span class="keyword">const</span> emailPattern = <span class="regexp">/^[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\.[A-Za-z]&#123;2,&#125;$/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">isUndefined</span> (value) &#123;</span><br><span class="line">  <span class="keyword">return</span> value === <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">isNotValidSting</span> (value) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">typeof</span> value !== <span class="string">&#x27;string&#x27;</span> || value.<span class="title function_">trim</span>().<span class="property">length</span> === <span class="number">0</span> || value === <span class="string">&#x27;&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UsersController</span> &#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">async</span> postSignup (req, res, next) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; name, email, password &#125; = req.<span class="property">body</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="title function_">isUndefined</span>(name) || <span class="title function_">isNotValidSting</span>(name) || name.<span class="title function_">trim</span>().<span class="property">length</span> &gt; <span class="number">10</span> || name.<span class="title function_">trim</span>().<span class="property">length</span> &lt; <span class="number">2</span> ||</span><br><span class="line">        <span class="title function_">isUndefined</span>(email) || <span class="title function_">isNotValidSting</span>(email) || !emailPattern.<span class="title function_">test</span>(email) ||</span><br><span class="line">        <span class="title function_">isUndefined</span>(password) || <span class="title function_">isNotValidSting</span>(password)) &#123;</span><br><span class="line">        logger.<span class="title function_">warn</span>(<span class="string">&#x27;欄位未填寫正確&#x27;</span>)</span><br><span class="line">        res.<span class="title function_">status</span>(<span class="number">400</span>).<span class="title function_">json</span>(&#123;</span><br><span class="line">          <span class="attr">message</span>: <span class="string">&#x27;欄位未填寫正確&#x27;</span></span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (!passwordPattern.<span class="title function_">test</span>(password)) &#123;</span><br><span class="line">        logger.<span class="title function_">warn</span>(<span class="string">&#x27;建立使用者錯誤: 密碼不符合規則，需要包含英文數字大小寫，最短8個字，最長32個字&#x27;</span>)</span><br><span class="line">        res.<span class="title function_">status</span>(<span class="number">400</span>).<span class="title function_">json</span>(&#123;</span><br><span class="line">          <span class="attr">message</span>: <span class="string">&#x27;密碼不符合規則，需要包含英文數字大小寫，最短8個字，最長32個字&#x27;</span></span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> userRepository = dataSource.<span class="title function_">getRepository</span>(<span class="string">&#x27;users&#x27;</span>)</span><br><span class="line">      <span class="keyword">const</span> existingUser = <span class="keyword">await</span> userRepository.<span class="title function_">findOne</span>(&#123;</span><br><span class="line">        <span class="attr">where</span>: &#123; email &#125;</span><br><span class="line">      &#125;)</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (existingUser) &#123;</span><br><span class="line">        logger.<span class="title function_">warn</span>(<span class="string">&#x27;註冊失敗，Email 已被使用&#x27;</span>)</span><br><span class="line">        res.<span class="title function_">status</span>(<span class="number">409</span>).<span class="title function_">json</span>(&#123;</span><br><span class="line">          <span class="attr">message</span>: <span class="string">&#x27;註冊失敗，Email 已被使用&#x27;</span></span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> salt = <span class="keyword">await</span> bcrypt.<span class="title function_">genSalt</span>(<span class="number">10</span>)</span><br><span class="line">      <span class="keyword">const</span> hashPassword = <span class="keyword">await</span> bcrypt.<span class="title function_">hash</span>(password, salt)</span><br><span class="line">      <span class="keyword">const</span> newUser = userRepository.<span class="title function_">create</span>(&#123;</span><br><span class="line">        name,</span><br><span class="line">        email,</span><br><span class="line">        <span class="attr">role</span>: <span class="string">&#x27;USER&#x27;</span>,</span><br><span class="line">        <span class="attr">password</span>: hashPassword</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="keyword">const</span> savedUser = <span class="keyword">await</span> userRepository.<span class="title function_">save</span>(newUser)</span><br><span class="line">      logger.<span class="title function_">info</span>(<span class="string">&#x27;新建立的使用者ID:&#x27;</span>, savedUser.<span class="property">id</span>)</span><br><span class="line">      res.<span class="title function_">status</span>(<span class="number">201</span>).<span class="title function_">json</span>(&#123;</span><br><span class="line">        <span class="attr">message</span>: <span class="string">&#x27;註冊成功&#x27;</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">      logger.<span class="title function_">error</span>(<span class="string">&#x27;建立使用者錯誤:&#x27;</span>, error)</span><br><span class="line">      <span class="title function_">next</span>(error)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">UsersController</span></span><br></pre></td></tr></table></figure>
+
+<p>貼上來後，我們再把 answer 分支的 <code>test/integration/0-users</code> 資料夾複製到你的專案內</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313225123.gif?alt=media&token=8488ebd0-747a-4484-9f8e-80355c39e0cb" alt="複製資料夾"></p>
+<p>這邊要注意，複製資料夾時，會包含其他的測試檔案，所以要麻煩你將 0-postSignup.test.js 之外的檔案刪除，這樣才能正確執行測試，畢竟你還沒有寫完其他的功能。</p>
+<p>接下來你就可以嘗試輸入以下指令來執行測試：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run <span class="built_in">test</span>:integration</span><br></pre></td></tr></table></figure>
+
+<p>如果你看到以下這個畫面，那就代表你的程式碼是正確的，並且通過測試了！（而底下這張圖也是六角的教練們要看的結果圖）</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313225747.png?alt=media&token=2ffea29f-8d02-4e17-80d6-0274925f737e" alt="測試結果"></p>
+<blockquote>
+<p><strong>Note</strong><br>你寫出來的程式碼必須要與我們提供的答案一樣，才能通過測試，如果不一樣，那就代表你的程式碼有問題，請再次檢查程式碼唷！</p>
+</blockquote>
+<p>所以每當我們開發完畢一個功能，你就可以把測試解答複製到你的專案內，並且執行測試哩～</p>
+<h2 id="透過-GitHub-Actions-自動化測試"><a href="#透過-GitHub-Actions-自動化測試" class="headerlink" title="透過 GitHub Actions 自動化測試"></a>透過 GitHub Actions 自動化測試</h2><p>除了透過本地端來執行測試外，我們也可以透過 GitHub Actions 來自動化測試，這樣就可以讓我們的程式碼在每次 Push 到 GitHub 上時，都能自動執行測試，這樣就能確保我們的程式碼是正確的。</p>
+<h3 id="申請-GitHub-Token"><a href="#申請-GitHub-Token" class="headerlink" title="申請 GitHub Token"></a>申請 GitHub Token</h3><p>首先我們要先申請 GitHub Token，這個 Token 是用來讓 GitHub Actions 可以正常運作，請你進入到 GitHub 的 Settings 頁面（點自己頭像）</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314140038.png?alt=media&token=a9ac3b86-59da-424e-a402-9af6d11023fd" alt="Setting"></p>
+<p>並點選左側功能列表的「Developer settings」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314001620.png?alt=media&token=d3045ae3-97d6-4992-b82b-f7c5eefa9063" alt="Developer settings"></p>
+<p>接著點選左側功能列表的「Personal access tokens」，進入到「Tokens」頁面，接著點選「Generate new token（classic）」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314001911.png?alt=media&token=a6de1cba-fac8-4196-8b30-1a5dffa8b360" alt="Generate new token"></p>
+<p>接著你會看到以下這個畫面，請你填寫以下欄位：</p>
+<ul>
+<li><code>Note</code>：填寫 Token 名稱</li>
+<li><code>Expiration</code>：選擇 Token 有效期限</li>
+<li><code>Select scopes</code>：勾選 <code>repo</code>、<code>workflow</code>，將這兩個權限勾選起來</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314002238.png?alt=media&token=e8d5d816-1a13-473e-a7ba-144e44ba826e" alt="Generate token"></p>
+<p>其他欄位都不用理會，接著點選「Generate token」，接著你會看到以下這個畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314002551.png?alt=media&token=7b39735c-f799-40e0-b272-27836db48943" alt="Token generated"></p>
+<p>請你將這個 Token 複製起來，這個 Token 只會出現一次，所以請務必複製起來，並且妥善保管，後面我們會用到這個 Token。</p>
+<h3 id="設定-GitHub-Repository-Secret"><a href="#設定-GitHub-Repository-Secret" class="headerlink" title="設定 GitHub Repository Secret"></a>設定 GitHub Repository Secret</h3><p>所以請你打開 GitHub 並建立一個新的儲存庫</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313230651.png?alt=media&token=0d3141d3-9488-4641-9010-215aca0f0fb2" alt="建立儲存庫"></p>
+<p>接著我們要來替這個 GitHub 儲存庫設置 Secrets and variables，請你進入儲存庫的 Settings 頁面，並點選左側功能列表的「Secrets and variables」，接著點選「Actions」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313231622.png?alt=media&token=804e806a-fdbe-462e-b50b-6ab952ebecb1" alt="Secrets and variables"></p>
+<p>接著點選「New repository secret」，進入到新增 Secrets 頁面，這邊我們要新增以下這些 Secrets：</p>
+<ul>
+<li><code>FIREBASE_SERVICE_ACCOUNT</code>：Firebase Admin SDK 金鑰</li>
+<li><code>FIREBASE_STORAGE_BUCKET</code>：Firebase Storage Bucket 名稱</li>
+<li><code>DEPLOY_GITHUB_TOKEN</code>：GitHub Token</li>
+</ul>
+<p>也就是我們前面 <code>.env</code> 設定的環境變數，這邊我們要把這些環境變數設定到 GitHub 上</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250313232440.png?alt=media&token=15c9f529-f373-41d9-95bb-5a443ecdcc65" alt="Secrets"></p>
+<blockquote>
+<p><strong>Note</strong><br>由於我們測試有使用到 Firebase Admin SDK 金鑰，所以才會需要特別設定這一塊，而其他方面則不需要，因為預設 <code>.env.example</code> 已經設定好了，當我們執行 GitHub Actions 時，會自動跑 <code>cp .env.example .env</code> 這個指令，所以不需要特別設定。</p>
+</blockquote>
+<p>設定完這些後，你就可以把程式碼 Push 到這個儲存庫囉！理論上，你只要每次 <code>push</code> 到該儲存庫，GitHub Actions 就會自動執行測試囉</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2025-nodejs-study-example%2F20250314004616.png?alt=media&token=4921d741-05e5-4412-ab02-67effa987afa" alt="GitHub Actions"></p>
+<p>那麼以上就是完整的流程囉！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Nodejs/" rel="tag"># Nodejs</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250225/3903283315/" rel="prev" title="買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API">
+                  <i class="fa fa-angle-left"></i> 買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/vscode/20250424/4258825567/" rel="next" title="VSCode 找不到 Git，安裝它或使用 "git.path" 設置">
+                  VSCode 找不到 Git，安裝它或使用 "git.path" 設置 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

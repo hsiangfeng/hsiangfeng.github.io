@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="生成式 AI 已經不再是工程師領域才會使用的名詞，它正在滲透到我們的日常生活中，只要你有在使用 ChatGPT、Grok、Midjourney 等這類工具的話，這些技術名詞就會有機會出現在你的世界中，如果你是一名工程師，那麼我更推薦你應該要理解這些名詞，因為未來的開發上，工程師肯定會更依賴這些技術來開發出更好的產品。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙">
+<meta property="og:url" content="https://israynotarray.com/ai/20250425/3215958971/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="生成式 AI 已經不再是工程師領域才會使用的名詞，它正在滲透到我們的日常生活中，只要你有在使用 ChatGPT、Grok、Midjourney 等這類工具的話，這些技術名詞就會有機會出現在你的世界中，如果你是一名工程師，那麼我更推薦你應該要理解這些名詞，因為未來的開發上，工程師肯定會更依賴這些技術來開發出更好的產品。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fllm%26rag%26prompt%2F202504250800.png?alt=media&token=82b0cc91-18dc-4fbc-80ce-087c369ad279">
+<meta property="article:published_time" content="2025-04-25T07:25:50.000Z">
+<meta property="article:modified_time" content="2025-04-25T07:25:50.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="GenAI">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="Prompt">
+<meta property="article:tag" content="fine-tuning">
+<meta property="article:tag" content="function calling">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="MCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fllm%26rag%26prompt%2F202504250800.png?alt=media&token=82b0cc91-18dc-4fbc-80ce-087c369ad279">
+
+
+<link rel="canonical" href="https://israynotarray.com/ai/20250425/3215958971/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/ai/20250425/3215958971/","path":"ai/20250425/3215958971/","title":"你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%99%E4%BA%9B%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">這些是什麼？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NLP"><span class="nav-number">2.1.</span> <span class="nav-text">NLP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LLMs"><span class="nav-number">2.2.</span> <span class="nav-text">LLMs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GenAI"><span class="nav-number">2.3.</span> <span class="nav-text">GenAI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAG"><span class="nav-number">2.4.</span> <span class="nav-text">RAG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prompt"><span class="nav-number">2.5.</span> <span class="nav-text">Prompt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fine-Tuning"><span class="nav-number">2.6.</span> <span class="nav-text">Fine Tuning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Function-Calling"><span class="nav-number">2.7.</span> <span class="nav-text">Function Calling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AI-Agent"><span class="nav-number">2.8.</span> <span class="nav-text">AI Agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MCP"><span class="nav-number">2.9.</span> <span class="nav-text">MCP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">3.</span> <span class="nav-text">總結</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">939</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">703</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/ai/20250425/3215958971/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="生成式 AI 已經不再是工程師領域才會使用的名詞，它正在滲透到我們的日常生活中，只要你有在使用 ChatGPT、Grok、Midjourney 等這類工具的話，這些技術名詞就會有機會出現在你的世界中，如果你是一名工程師，那麼我更推薦你應該要理解這些名詞，因為未來的開發上，工程師肯定會更依賴這些技術來開發出更好的產品。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-04-25 15:25:50" itemprop="dateCreated datePublished" datetime="2025-04-25T15:25:50+08:00">2025-04-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ai/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">生成式 AI 已經不再是工程師領域才會使用的名詞，它正在滲透到我們的日常生活中，只要你有在使用 ChatGPT、Grok、Midjourney 等這類工具的話，這些技術名詞就會有機會出現在你的世界中，如果你是一名工程師，那麼我更推薦你應該要理解這些名詞，因為未來的開發上，工程師肯定會更依賴這些技術來開發出更好的產品。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fllm%26rag%26prompt%2F202504250800.png?alt=media&token=82b0cc91-18dc-4fbc-80ce-087c369ad279" alt="你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>生成式 AI 已經不再是工程師領域才會使用的名詞，它正在滲透到我們的日常生活中，只要你有在使用 ChatGPT、Grok、Midjourney 等這類工具的話，這些技術名詞就會有機會出現在你的世界中，如果你是一名工程師，那麼我更推薦你應該要理解這些名詞，因為未來的開發上，工程師肯定會更依賴這些技術來開發出更好的產品。</p>
+<h2 id="這些是什麼？"><a href="#這些是什麼？" class="headerlink" title="這些是什麼？"></a>這些是什麼？</h2><ul>
+<li>NLP</li>
+<li>LLMs</li>
+<li>GenAI</li>
+<li>RAG</li>
+<li>Prompt</li>
+<li>Fine Tuning</li>
+<li>Function Calling</li>
+<li>MCP</li>
+<li>AI Agent</li>
+</ul>
+<p>上面所提到的名詞，都是生成式 AI 領域中常見的詞彙，這些詞彙簡單來講就是為了讓我們好去形容與理解它們，但這些畢竟是技術名詞，對於一般人來說，可能會有些難以理解，這篇文章就會針對這些名詞做一個簡單的介紹，讓你能夠更了解這些名詞的意思。</p>
+<h3 id="NLP"><a href="#NLP" class="headerlink" title="NLP"></a>NLP</h3><p>NLP（Natural Language Processing，自然語言處理）是一種讓電腦能理解人類語言的技術。</p>
+<p>所以我們簡單理解起來 NLP 就是…</p>
+<p>『讓電腦可以理解人類語言的能力』</p>
+<p>為什麼要特別這樣做呢？其實人類的語言是非常的複雜，舉例來講：</p>
+<p>「我去方便一下！」</p>
+<p>「我吃一下方便麵～」</p>
+<p>「方便打擾你一下嗎？」</p>
+<p>這三句話我們可以看到「<strong>方便</strong>」這兩個字在不同的情境下就有不同的意思，就連我們自己人類都會搞混了，更何況是原本只能處理程式邏輯、毫無語言理解能力的電腦呢？</p>
+<p>所以 NLP 核心精髓就是先讓電腦可以學會「理解」人類的語言，在轉換成電腦可以理解的語言，這樣才能讓電腦可以更好的理解我們的需求，進而做出我們想要的事情。</p>
+<p>因此 NLP 是生成式 AI 的基礎，沒有 NLP 就不會有 LLMs、RAG 等等的技術。</p>
+<p>實際上來講，你也已經有使用過 NLP 的記述了，例如…</p>
+<ul>
+<li>Google Translate（Google 翻譯）</li>
+<li>Siri</li>
+<li>客服機器人</li>
+</ul>
+<p>這些都是基於 NLP 的應用，能夠幫助我們更有效地與技術互動。</p>
+<h3 id="LLMs"><a href="#LLMs" class="headerlink" title="LLMs"></a>LLMs</h3><p>相較於 NLP，LLMs 可以說是更上一層樓的技術，LLMs 是 Large Language Models 的縮寫，中文譯為大型語言模型，讓電腦理解語言的進階技術</p>
+<p>那麼 LLMs 和 NLP 有什麼不同呢？</p>
+<p>簡單來講，後者（NLP）是提供了電腦一個基本理解人類語言的能力，但是前者（LLMs）就不同了，因為我們提供了相當大量的文獻、資料讓電腦去學習，這使得電腦再回覆上可以更精準的滿足我們的需求。</p>
+<p>如果以比較生活面來講，NLP 我們在學校就像是學習 ㄅ、ㄆ、ㄇ、ㄈ or A、B、C、D，這些都是語言的基本能力，然後懂的一些基本的單字、詞彙，例如前面所提到的「<strong>方便</strong>」這個字。</p>
+<p>而 LLMs 則是像我們在學習文法、語意一般，可以更精準的理解我們所要表達的意思，並且能夠更好的回覆我們的問題，而不會陷入「方便」有三種意思，這個人累到底在指什麼？</p>
+<p>所以 LLMs 是透過大量的資料訓練，學習語言的結構和語境，進而提升其理解和生成文本的能力。</p>
+<h3 id="GenAI"><a href="#GenAI" class="headerlink" title="GenAI"></a>GenAI</h3><p>GenAI 其實也是縮寫，完整寫法是 Generative AI，中文譯為生成式 AI，這個名詞應該會比較廣泛也比較常聽到，畢竟身為這個世代的人們肯定有聽過 ChatGPT 這個單字，而 GenAI 就是在指這些大型語言模型（LLMs）所產生的內容。</p>
+<p>所以 GenAI 是什麼呢？簡單來講它是基於 LLMs 的技術再加上其他的技術，讓電腦可以生成出我們想要的內容，例如文字、圖片、音樂等等。</p>
+<p>如果你有使用 ChatGPT 的話，你應該有注意到所謂的「<strong>生成式</strong>」其實是指，它不是像傳統聊天機器人一樣從固定回應中選擇一個回答，而是「從零生成一段全新內容」。</p>
+<p>畢竟以目前的 AI 技術來講，比較偏向我們引導 AI 去「產生」出我們想要的內容，而不是讓 AI 自主產生內容，如果能夠做到自主產生的話，就代表 AI 已經有了自己的意識了，這樣的話我們就不需要再去引導它了。</p>
+<p><del>也代表人類應該要開始擔心了</del></p>
+<h3 id="RAG"><a href="#RAG" class="headerlink" title="RAG"></a>RAG</h3><p>RAG 是 Retrieval-augmented generation 的縮寫，中文是檢索增強生成，雖然 LLMs 已經非常的強大了，但 LLMs 仍然有一些限制，最明顯的就是資料的限制</p>
+<p>什麼意思呢？前面有提到 LLMs 是透過大量的資料所訓練出來的，但是我們的資料每分每秒都在不斷增加與更新，那這種狀況下 LLMs 就會有一個問題存在，也就是</p>
+<p>「資料過時。」</p>
+<p>就跟我們在學校上課時，學校總是有一套教材讓你學習，但這些教材往往都跟不上時代不符合業界所需，變成你必須要額外自行學習、Google 搜尋資料，這樣才有辦法跟上時代的腳步。</p>
+<p>哎？等一下，上面那一段描述其實我就已經講到了 RAG 的概念了，也就是「額外自行學習、Google 搜尋資料」這個概念，RAG 就是讓 LLMs 可以透過檢索資料來增強生成的能力，這樣就可以讓 LLMs 在生成內容時，可以套用最新的資料，讓生成的內容更符合當前的需求。</p>
+<p>RAG 的概念其實是非常簡單的，還沒有 RAG 之前，流程會像這樣：</p>
+<ul>
+<li>LLMs 是 2023 年的資料</li>
+<li>你詢問 LLMs 一個問題是關於 2025 年的資料</li>
+<li>LLMs 回覆的內容是 2023 年的資料，或者跟你說「我不知道」</li>
+</ul>
+<p>但如果套用了 RAG 的話，流程就會變成這樣：</p>
+<ul>
+<li>LLMs 是 2023 年的資料</li>
+<li>你詢問 LLMs 一個問題是關於 2025 年的資料</li>
+<li>LLMs 會去檢索最新的資料（例如 Google 搜尋）</li>
+<li>LLMs 將檢索到的資料與 2023 年的資料結合</li>
+<li>LLMs 回覆的內容是 2025 年的資料</li>
+</ul>
+<p>所以其實 RAG 就是一個資料搜尋的概念，它讓 LLMs 更進一步的強化本生的生成能力，進而解決資料過時的問題。</p>
+<p>畢竟每次訓練一個新的 LLMs 都是需要花費大量的時間與金錢的，所以 RAG 可以有效地減少這些成本，讓開發者能夠更專注於創造與應用 AI 技術。</p>
+<h3 id="Prompt"><a href="#Prompt" class="headerlink" title="Prompt"></a>Prompt</h3><p>Prompt 是一個非常重要的概念，這個中文意思是提示詞的意思，有些人會稱之為「詠唱」、「咒語」等等，這些其實都在講同一件事情，但這個 Prompt 卻也非常的重要，因為它是讓 LLMs 理解我們需求的關鍵。</p>
+<p>那 Prompt 如果要用比較生活化來舉例的話，你可以想像成你爸媽要交代事情給你時，會跟你說清楚你要幹嘛，例如今天你爸媽要請你去超市買菜</p>
+<p>「你幫我去超市買菜。」</p>
+<p>這時候你肯定會想說：「買什麼菜？要去哪裡買？要幾點去買？」等等的問題，然後你就很難達到對方期望的需求。</p>
+<p>如果今天你爸媽是跟你說</p>
+<p>「你下午三點時，幫我去愛國超市買一把青江菜。」</p>
+<p>這樣的話，你就會知道要去哪裡買、要幾點去買、要買什麼菜，這樣就能夠更好的滿足對方的需求了。</p>
+<p>而這個概念就是 Prompt 的概念，你如果可以把 Prompt 寫得越清楚、越詳細，那麼 LLMs 就能夠更好的理解你的需求，進而產生出你想要的內容。</p>
+<p>這也是為什麼近期會出現 Prompt Engineer 這個職業，因為 Prompt 寫得好壞會直接影響到 LLMs 的生成內容，所以 Prompt Engineer 就是專門負責寫 Prompt 的人，讓 LLMs 可以更好的理解我們的需求。</p>
+<p>除此之外，也因應這需求而誕生新的攻擊手法，稱之為「Prompt Injection」，這個攻擊手法是透過在 Prompt 中注入惡意的內容，讓 LLMs 產生出我們不想讓使用者看到的內容，這樣的攻擊可能會導致錯誤的資訊或不當的回應出現，因此為了防範 Prompt Injection，開發者通常會限制模型能存取的指令範圍，或對使用者輸入進行過濾處理。</p>
+<p>如果你對 Prompt Injection 有興趣的話，且想嘗試練習的話，你可以參考這篇文章：<a href="https://israynotarray.com/ai/20240229/2784844101/">有趣的小遊戲 - Gandalf Adventures 之 prompt injection 攻略</a>。</p>
+<h3 id="Fine-Tuning"><a href="#Fine-Tuning" class="headerlink" title="Fine Tuning"></a>Fine Tuning</h3><p>Fine-tuning 中文叫做微調，就是針對已經訓練好的 LLMs 在更近一步的訓練，這樣可以讓 LLMs 更符合我們的需求，這個概念其實就像是我們在學校上課一樣，老師會針對我們的程度來調整課程內容，讓我們能夠更好的理解與學習。</p>
+<p>所以 Fine-tuning 基本上就是針對 LLMs 進行再訓練的過程，如果用比較生活面來舉例來講的話，你可以想像成有一位大學生他畢業了，但是他修了科系是電機、資管、外語這三大系，但是你期望他可以專精於電機系，所以你特別再送他去上電機系的課程，這樣他就能夠更好的理解電機系的內容了。</p>
+<p>這樣做可以讓原本已經懂三門科系的學生，對於電機系的內容更精通，這樣就能夠更好的滿足我們的需求了。</p>
+<p>只是這邊要注意使用 Fine-tuning 的話，基本上成本會貴上 5~6 成以上唷。</p>
+<p>Fine-tuning 適合中大型企業或開發者，當你想要打造一個「具備企業內部語言與風格」的模型時，例如：一個專門回覆保險條款的客服模型。</p>
+<p>相比之下，小型應用可以考慮用「RAG + Prompt 設計」的方式來達成類似效果，成本更低。</p>
+<h3 id="Function-Calling"><a href="#Function-Calling" class="headerlink" title="Function Calling"></a>Function Calling</h3><p>簡單來講 Function Calling 就是讓 LLMs 可以直接調用函式的能力，這樣就可以讓 LLMs 在生成內容時，可以直接調用函式來獲取資料，這樣就可以更快速的滿足我們的需求。</p>
+<p>運作概念其實就是將我們的自然語言送給 LLMs，接著 LLMs 分析完畢後，認為你是在問「天氣」的問題，那它就會去呼叫相應的函式來獲取最新的天氣資訊。</p>
+<p>這樣我們就可以直接呼叫特定的函式來獲取並回傳資料，而不是透過 LLMs 的內部邏輯來推斷，而只是把 LLMs 充當一個中介角色，幫助我們分析使用者的需求。</p>
+<p>Function Calling 並不是讓 LLMs「學會寫程式」，而是讓模型可以根據你輸入的語句，自動挑選一個 API 函式來調用，並將參數以 JSON 格式傳回，供後端執行邏輯或查詢資料庫。</p>
+<h3 id="AI-Agent"><a href="#AI-Agent" class="headerlink" title="AI Agent"></a>AI Agent</h3><p>AI Agent 是一個非常有趣的概念，中文叫做 AI 代理人，什麼意思呢？</p>
+<p>前面我們不是介紹了 GenAI 嗎？但是 GenAI 只是單純依照我們所提出的需求去生成我們要的內容，但它並沒有辦法直接幫我們做某些事情，變成 GenAI 生出結果後，我們還是要手動做一些事情。</p>
+<p>舉例來講，我們今天問了 ChatGPT 一個關於 Excel 公式的問題，雖然 ChatGPT 可以幫我們生成出公式，但我們還是要手動去 Excel 中輸入這個公式，這樣才會有辦法運行。</p>
+<p>但如果今天是 AI Agent 的話，它就會在我們問完問題後，自動地幫我們在 Excel 中輸入這個公式，並執行它，這樣就能夠更快速地得到結果了。</p>
+<p>不好懂嗎？更簡單來講就是你會看到你的電腦自己在運行一些程式，感覺就像有人遠端控制你的電腦一樣，這個概念就是 AI Agent 的概念。</p>
+<p>AI Agent 背後通常結合了 LLMs、工具調用（Function Calling）、記憶體（Memory）與目標導向（Goal Planning）等模組，才能完成「理解任務 → 拆解步驟 → 自動執行」的整個流程。</p>
+<h3 id="MCP"><a href="#MCP" class="headerlink" title="MCP"></a>MCP</h3><p>MCP 是 Model Context Protocol 的縮寫，中文可譯為「模型上下文協定」，是由 Anthropic 所提出的一項開放標準。</p>
+<p>它的目的是讓 LLM 在執行期間，不再只依賴輸入的 Prompt，而是可以<strong>動態地查詢外部資料、呼叫工具、甚至與應用程式互動</strong>。</p>
+<p>這個協定定義了一套通用的格式與規則，讓 LLM 可以透過一致的方式，去請求外部的資料或執行任務。</p>
+<p>舉例來說，如果你正在開發一個 AI 助手，它透過 MCP 就能：</p>
+<ul>
+<li>查詢 Notion 中某份文件的內容</li>
+<li>呼叫某個 CRM API 來取得客戶資訊</li>
+<li>啟動一段自動化流程來幫你整理表格</li>
+</ul>
+<p>MCP 不代表一個特定平台，而是一種溝通協定，讓 AI 模型與各種工具能像插 USB 裝置一樣，<strong>接上就能用</strong>。這讓 AI 應用不再是「問與答」的模型，而是真正能與環境互動的系統。</p>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>最後這邊也提供一下表格讓大家可以快速回顧前面所提到的名詞與定義：</p>
+<table>
+<thead>
+<tr>
+<th>名詞</th>
+<th>中文解釋</th>
+<th>重點說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NLP</td>
+<td>自然語言處理</td>
+<td>讓電腦理解人類語言，例如 Siri、翻譯器等。</td>
+</tr>
+<tr>
+<td>LLMs</td>
+<td>大型語言模型</td>
+<td>在大量資料上訓練，能更深入理解語言和回應。</td>
+</tr>
+<tr>
+<td>GenAI</td>
+<td>生成式 AI</td>
+<td>根據指令，從零「生成」文字、圖片、音樂等內容。</td>
+</tr>
+<tr>
+<td>RAG</td>
+<td>檢索增強生成</td>
+<td>模型在回答前，會先去搜尋最新資料，避免知識過時。</td>
+</tr>
+<tr>
+<td>Prompt</td>
+<td>提示詞</td>
+<td>告訴 AI 你想要什麼，越清楚越能得到好答案。</td>
+</tr>
+<tr>
+<td>Fine-tuning</td>
+<td>微調</td>
+<td>針對特定領域再訓練模型，提升專業度，但成本高。</td>
+</tr>
+<tr>
+<td>Function Calling</td>
+<td>函式調用</td>
+<td>讓模型能直接呼叫 API 或功能，快速拿到最新資料。</td>
+</tr>
+<tr>
+<td>AI Agent</td>
+<td>AI 代理人</td>
+<td>自動理解任務、拆解步驟，並操作工具完成事情。</td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>模型上下文協定</td>
+<td>定義一套格式，讓 LLM 動態取資料、用工具、啟動流程。</td>
+</tr>
+</tbody></table>
+<p>這一篇算是快速且簡單的介紹一些 AI 概念與名詞，而不是深入了解背後的運作原理以及該如何撰寫。</p>
+<p>希望這一篇有讓你對於這些技術名詞有更近一步的認識哩～</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/RAG/" rel="tag"># RAG</a>
+              <a href="/tags/GenAI/" rel="tag"># GenAI</a>
+              <a href="/tags/NLP/" rel="tag"># NLP</a>
+              <a href="/tags/Prompt/" rel="tag"># Prompt</a>
+              <a href="/tags/fine-tuning/" rel="tag"># fine-tuning</a>
+              <a href="/tags/function-calling/" rel="tag"># function calling</a>
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/MCP/" rel="tag"># MCP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20250424/3992645625/" rel="prev" title="前端工程師應該要懂的瀏覽器渲染機制">
+                  <i class="fa fa-angle-left"></i> 前端工程師應該要懂的瀏覽器渲染機制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/ai/20250502/2743392124/" rel="next" title="架設自己的 AI 語言模型實驗室不求人之 LM Studio">
+                  架設自己的 AI 語言模型實驗室不求人之 LM Studio <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
