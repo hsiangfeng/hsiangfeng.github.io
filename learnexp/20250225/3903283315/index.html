@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="接下來，就讓我們從一個簡單的彩券案例開始，一步步揭開 API、REST、以及 RESTful API 的神祕面紗。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250225/3903283315/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="接下來，就讓我們從一個簡單的彩券案例開始，一步步揭開 API、REST、以及 RESTful API 的神祕面紗。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Frest-restful-api%2F202502271045.jpg?alt=media&token=57d2748b-deae-43b0-89e0-544d26bb60ab">
+<meta property="article:published_time" content="2025-02-25T03:15:47.000Z">
+<meta property="article:modified_time" content="2025-02-25T03:15:47.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="RESTful">
+<meta property="article:tag" content="REST">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Frest-restful-api%2F202502271045.jpg?alt=media&token=57d2748b-deae-43b0-89e0-544d26bb60ab">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250225/3903283315/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250225/3903283315/","path":"learnexp/20250225/3903283315/","title":"買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#APIs"><span class="nav-number">2.</span> <span class="nav-text">APIs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E5%AF%A6-APIs-%E6%98%AF%E4%B8%80%E7%A8%AE%E3%80%8C%E4%BA%A4%E6%98%93%E3%80%8D%E8%A1%8C%E7%82%BA"><span class="nav-number">2.1.</span> <span class="nav-text">其實 APIs 是一種「交易」行為</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#APIs-%E7%9A%84%E7%A8%AE%E9%A1%9E"><span class="nav-number">2.2.</span> <span class="nav-text">APIs 的種類</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RESTful"><span class="nav-number">3.</span> <span class="nav-text">RESTful</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#REST-%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">REST 是什麼？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Uniform-Interface%EF%BC%88%E7%B5%B1%E4%B8%80%E4%BB%8B%E9%9D%A2%EF%BC%89"><span class="nav-number">3.1.1.</span> <span class="nav-text">Uniform Interface（統一介面）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Stateless%EF%BC%88%E7%84%A1%E7%8B%80%E6%85%8B%EF%BC%89"><span class="nav-number">3.1.2.</span> <span class="nav-text">Stateless（無狀態）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Client-Server%EF%BC%88%E5%AE%A2%E6%88%B6%E7%AB%AF-%E4%BC%BA%E6%9C%8D%E5%99%A8%EF%BC%89"><span class="nav-number">3.1.3.</span> <span class="nav-text">Client-Server（客戶端-伺服器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Layered-System%EF%BC%88%E5%88%86%E5%B1%A4%E7%B3%BB%E7%B5%B1%EF%BC%89"><span class="nav-number">3.1.4.</span> <span class="nav-text">Layered System（分層系統）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cacheable%EF%BC%88%E5%8F%AF%E5%BF%AB%E5%8F%96%EF%BC%89"><span class="nav-number">3.1.5.</span> <span class="nav-text">Cacheable（可快取）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Code-on-Demand%EF%BC%88%E5%8F%AF%E7%A8%8B%E5%BC%8F%E7%A2%BC%E5%8C%96%EF%BC%89"><span class="nav-number">3.1.6.</span> <span class="nav-text">Code on Demand（可程式碼化）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RESTful-APIs-x3D-RESTful-APIs"><span class="nav-number">4.</span> <span class="nav-text">RESTful + APIs &#x3D; RESTful APIs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">5.</span> <span class="nav-text">結語</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">940</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">705</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250225/3903283315/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API | 是 Ray 不是 Array">
+      <meta itemprop="description" content="接下來，就讓我們從一個簡單的彩券案例開始，一步步揭開 API、REST、以及 RESTful API 的神祕面紗。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-02-25 11:15:47" itemprop="dateCreated datePublished" datetime="2025-02-25T11:15:47+08:00">2025-02-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">接下來，就讓我們從一個簡單的彩券案例開始，一步步揭開 API、REST、以及 RESTful API 的神祕面紗。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Frest-restful-api%2F202502271045.jpg?alt=media&token=57d2748b-deae-43b0-89e0-544d26bb60ab" alt="買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來，就讓我們從一個簡單的彩券案例開始，一步步揭開 API、REST、以及 RESTful API 的神祕面紗。</p>
+<h2 id="APIs"><a href="#APIs" class="headerlink" title="APIs"></a>APIs</h2><p>很多時候我們會常常聽到人家說：</p>
+<p>「這個有 APIs 可以用嗎？」</p>
+<p>「這個有提供 APIs 嗎？」</p>
+<p>「你會接 APIs 嗎？」。</p>
+<p>身為一名工程師，相信你一定聽過不少次 APIs 這個單字，那麼究竟什麼是 APIs 呢？</p>
+<p>APIs 全名是 Application Programming Interface 中文翻譯為應用程式介面，大多文獻、參考來源都會說它是一個應用程式與應用程式之間的橋樑、接口，我認為這樣的定義與說明對於一個新手來講是相對難懂的，所以我想請你把這些介紹與說明拋到腦後。</p>
+<p>「拋到腦後的話，那你該怎麼解釋？」</p>
+<p>我知道你會這樣講，所以別擔心，我將會用現實生活中的例子來解釋 APIs，讓你更容易理解。</p>
+<h3 id="其實-APIs-是一種「交易」行為"><a href="#其實-APIs-是一種「交易」行為" class="headerlink" title="其實 APIs 是一種「交易」行為"></a>其實 APIs 是一種「交易」行為</h3><p>請你試著在腦海中模擬出一個畫面…</p>
+<p>你今天要去彩券行買彩券，當你走進去後，你會跟彩券行老闆說：「老闆，我要 100 塊大樂透！」，接著你就會把 100 塊給老闆，老闆確定有收到 100 塊後，就會在彩券機上輸入你的 100 塊訂單，接著彩券機就會印出一張大樂透，裡面有兩組號碼，然後老闆就會把這張大樂透給你。</p>
+<blockquote>
+<p><strong>Note</strong><br>通常彩卷一組號碼（6 個號碼）是 50 元，而這邊舉例買了兩組號碼，所以是 100 元。</p>
+</blockquote>
+<p>這個過程中，我們就已經解釋了整個 APIs 的概念跟行為，什麼意思呢？讓我們將 APIs 與買彩券的行為做一個對應，這樣你就會更容易理解了。</p>
+<p>首先我們先了解一下這個對應表：</p>
+<ul>
+<li>你：使用者（User）</li>
+<li>老闆：伺服器（Server）</li>
+<li>100 塊：請求（Request），通常會附帶驗證資料</li>
+<li>彩券機：銀行將寫好的 APIs 封裝在裡面，讓伺服器可以直接呼叫對應的功能，當然也會包含一些驗證資料、參數等</li>
+<li>大樂透：回傳（Response）的資料（Data）</li>
+</ul>
+<p>接著我們將這個對應表套用到我們的例子中：</p>
+<ul>
+<li>你今天要去彩券行買彩券，當你走進去：使用者打開瀏覽器，輸入網址進入到特定網站</li>
+<li>跟彩券行老闆說：「老闆，我要 100 塊大樂透！」，把 100 塊給老闆：向網站發請一個請求，並附帶驗證資料</li>
+<li>老闆確定有收到 100 塊：伺服器驗證你的請求是否合法以及是否有權限</li>
+<li>就會在彩券機上輸入你的 100 塊訂單：伺服器去呼叫 APIs，APIs 是一個已經封裝好的函式或程式，通常會有多個 APIs 可以使用</li>
+<li>彩券機就會印出一張大樂透：APIs 回傳資料給伺服器</li>
+<li>老闆就會把這張大樂透給你：伺服器將資料回傳給使用者</li>
+</ul>
+<p>當然這個舉例可能沒有很標準，但至少我認為你已經有一定的概念了。</p>
+<p>而這邊 APIs 真正的重點在於「就會在彩券機上輸入你的 100 塊訂單」這件事情上，我們都知道販售彩卷的單位是銀行，但我們不可能買一張彩卷都跑去銀行買，所以我們會去彩券行買，而彩卷機就是幫助我們跟銀行溝通的橋樑，這就是 APIs 的概念。</p>
+<p>所以這邊簡單結論一下…</p>
+<p>「APIs 其實是 A 應用程式（老闆）與 B 應用程式（銀行）之間的橋樑（彩券機），讓 A 應用程式可以透過 APIs 來跟 B 應用程式溝通，這樣就可以達到資料交換的目的。」</p>
+<p>那…如果套用到 Web 前後端開發呢？</p>
+<ul>
+<li>使用者可見的網頁介面（前端）：A 應用程式</li>
+<li>伺服器：作為執行與處理的中心，負責處理後端程式的邏輯</li>
+<li>APIs：由後端程式提供的接口，讓前端程式可以透過 APIs 來跟後端程式溝通</li>
+</ul>
+<p>所以使用者在操作畫面時，其實會跟伺服器說：「嘿！我現在正在請求 <code>/api/v1/user</code> 的資料，你可以幫我把資料回傳給我嗎？」，而伺服器就會去呼叫 <code>/api/v1/user</code> 這個 APIs，然後將資料回傳給使用者，而這個 <code>/api/v1/user</code> 則是會去呼叫一個封裝好的函式或程式，這就是 APIs 的概念。</p>
+<h3 id="APIs-的種類"><a href="#APIs-的種類" class="headerlink" title="APIs 的種類"></a>APIs 的種類</h3><p>APIs 的種類基本上不外乎是以下這幾種最常見：</p>
+<ul>
+<li>開放式 APIs（Open APIs）：提供給開發者使用，讓開發者可以串接這些 APIs 來開發自己的應用程式</li>
+<li>內部 APIs（Internal APIs）：公司內部使用的 APIs，不對外開放</li>
+<li>第三方 APIs（Third-party APIs）：由第三方提供的 APIs，讓開發者可以串接這些 APIs 來開發自己的應用程式</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong><br>第三方意旨非官方提供的 APIs，通常是由第三方公司或者個人提供的 APIs。</p>
+</blockquote>
+<p>以 OpenAI 來講，大多人都是使用 ChatGPT 的 WebUI 來跟 AI 對話，但是如果你想要串接 ChatGPT 的 APIs 來開發自己的應用程式，那你就可以使用 OpenAI 提供的 APIs 來串接，而這個 APIs 就隸屬於開放式 APIs。</p>
+<p>那麼開放式 APIs 與第三方 APIs 有什麼差別呢？其實差別不大，只是開放式 APIs 比較著重於開放性，舉例來講開放式 APIs 的資料來源可能是由政府開放資料平台提供，但是你如果直接去串接 APIs，可能會有一些資料邏輯上的問題要處理，這時候你就可以使用第三方 APIs 來解決這個問題，因為第三方 APIs 已經幫你處理好了這些問題。</p>
+<p>所以這邊簡單結論一下：</p>
+<ul>
+<li>開放式 APIs：強調的是公開性與生態系建立，通常由原始服務提供。</li>
+<li>第三方 APIs：指由非官方或其他公司基於原始 APIs 再做封裝或增強處理，目的是讓資料整合更便利。</li>
+<li>內部 APIs：Just for company.，僅著重於公司內部使用，不對外開放</li>
+</ul>
+<p>這邊也額外補充說明一下，如果可以直接使用開放式 APIs，那是最好的，因為第三方 APIs 是由第三方提供，其穩定度以及資料安全性都是一個問題，所以如果可以直接使用開放式 APIs，那是最好的。</p>
+<h2 id="RESTful"><a href="#RESTful" class="headerlink" title="RESTful"></a>RESTful</h2><p>首先，這邊我要直接先講結論…</p>
+<p>「RESTful APIs 是一種設計 APIs 的風格，而不是一種技術或標準，僅僅只是一個約定俗成的方式。」</p>
+<p>前面我們已經知道什麼是 APIs，但 RESTful…又是什麼鬼東西呢？如果你去 Google 應該會得到一個「表現層狀態轉換」的翻譯文字，但這樣的翻譯對於一個新手來講是非常難懂的，就算是我也是。</p>
+<p>所以在解釋 RESTful 之前，我們要先知道什麼是 REST。</p>
+<h3 id="REST-是什麼？"><a href="#REST-是什麼？" class="headerlink" title="REST 是什麼？"></a>REST 是什麼？</h3><p>REST 是 <strong>RE</strong>presentational <strong>S</strong>tate <strong>T</strong>ransfer 的縮寫，中文翻譯確實是「表現層狀態轉換」，目的是為了方便管理分散的資源所提出來的一套設計模式，而這套設計模式是由 Roy Fielding 在 2000 年博士論文中提出來的。</p>
+<p>只要你設計出來的 APIs 符合 REST 的設計風格，那這個 APIs 就可以稱為 RESTful APIs。</p>
+<p>那麼想要符合 REST 的設計風格，你需要遵守以下這幾個原則：</p>
+<h4 id="Uniform-Interface（統一介面）"><a href="#Uniform-Interface（統一介面）" class="headerlink" title="Uniform Interface（統一介面）"></a>Uniform Interface（統一介面）</h4><p>要達成統一介面這件事情，其實是有一些事情要注意，通常必須要達成四項約束：</p>
+<ul>
+<li>資源識別：每一個資料請求都要有一個獨特的 Url 來識別資源（如：<code>/api/v1/user</code>），就跟前端在取得特定元素時會使用 <code>document.getElementById(&#39;id&#39;)</code> 一樣。</li>
+<li>資源操作：伺服器再回傳資料時，一率都是統一一種格式，例如：JSON 格式，這樣串接的開發者就不用再重新學習新格式的問題，現今開發也都大多採用 <code>Content-Type: application/json</code> 這種格式</li>
+<li>自我描述：伺服器回傳的資料中，必須要有足夠的資訊讓開發者可以理解，不需要再去查閱文件，例如：HTTP 狀態碼、錯誤訊息等，例如：<code>HTTP Code: 200</code> 代表成功，<code>HTTP Code: 400</code> 代表錯誤，接著再回傳一些錯誤訊息，像是 <code>&#123;&quot;message&quot;: &quot;錯誤訊息&quot;&#125;</code> 這樣</li>
+<li>超媒體應用狀態：簡單來講就是，當你在取得資料時，伺服器會回傳一些超連結，好處在於前端不用再去處理 Url，而是透過伺服器回傳的超連結來取得資料，只需要後端去維護這些超連結即可，這樣可以讓前端更專注在畫面的呈現上，通常裡面會包含 <code>self</code>（當前） 、<code>next</code>（下一筆） 、<code>prev</code>（上一筆） 、<code>first</code>（第一筆） 、<code>last</code>（最後一筆） 等等連結。</li>
+</ul>
+<p>基本上只要符合上述這四項約束，就可以稱為符合 Uniform Interface 這個原則。</p>
+<blockquote>
+<p><strong>Note</strong><br>以我目前自己開發經驗來講，超媒體應用狀態這件事情比較常見在管理側邊欄的欄位連結，例如…當你登入後，後台並不會直接呈現所有前端的頁面連結，而是透過後端驗證之後，回傳給你前端的頁面連結。</p>
+</blockquote>
+<h4 id="Stateless（無狀態）"><a href="#Stateless（無狀態）" class="headerlink" title="Stateless（無狀態）"></a>Stateless（無狀態）</h4><p>RESTful APIs 必須是無狀態的，這邊所謂的無狀態是指，每一次的請求都是獨立的，不會受到前一次請求的影響，這樣的好處在於伺服器不需要去維護使用者的狀態，只需要處理請求即可。</p>
+<p>不好懂的話，這邊舉例使用者登入的情境，當使用者登入後，伺服器會回傳一個 Token 給使用者</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;token&quot;</span><span class="punctuation">:</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>此時這個 Token 將會記憶在使用者的瀏覽器中，當使用者再次發送請求時，只需要帶上這個 Token，伺服器就可以知道這個使用者是誰，而不需要再去維護使用者的狀態（意旨早期 Session 的概念）。</p>
+<h4 id="Client-Server（客戶端-伺服器）"><a href="#Client-Server（客戶端-伺服器）" class="headerlink" title="Client-Server（客戶端-伺服器）"></a>Client-Server（客戶端-伺服器）</h4><p>Client-Server 是在講分離客戶端與伺服器，使得用客戶端與伺服器之間可以獨立演進，而不會互相影響，在早期的網頁開發中，我們會將 HTML、CSS、JavaScript、後端程式碼全部混在一起，這樣的開發方式是不符合 Client-Server 這個原則的，如果這樣還不好懂的話，更白話文一點就是指「<strong>前後端分離</strong>」這件事。</p>
+<h4 id="Layered-System（分層系統）"><a href="#Layered-System（分層系統）" class="headerlink" title="Layered System（分層系統）"></a>Layered System（分層系統）</h4><p>Layered System 意思是指將整個應用程式切成多的獨立的層級，每一層只做好自己的事情，不會去干涉到其他層級的事情。</p>
+<p>最好懂的例子大多都是舉例 MVC 模式：</p>
+<ul>
+<li>Model：負責處理資料的邏輯</li>
+<li>View：負責處理畫面的邏輯</li>
+<li>Controller：負責處理邏輯的控制器</li>
+</ul>
+<p>MVC 的經典設計模式中，就可以知道 View 不會直接跟 Model 溝通，而是透過 Controller 來處理，這樣就符合 Layered System 這個原則。</p>
+<p>所以 Layered System 概念就像是一個團隊，每個人各司其職，只和隔壁的同事協作，這樣整個工作流程會更順暢。</p>
+<p>在應用程式開發中，我們也會把檢查 Token 與處理使用者邏輯分在不同的 Service&#x2F;Module，這也是一種分層的概念，如果套用到我們 APIs 設計上也就是指 APIs 會分成多層，例如一個使用者登入的行為，就會被拆成以下幾個層級：</p>
+<ul>
+<li><code>POST /api/v1/auth/</code>：負責處理驗證的邏輯，但不會去處理使用者的邏輯</li>
+<li><code>POST /api/v1/user/</code>：負責處理使用者的邏輯，但不會去處理 Token 的邏輯</li>
+<li><code>POST /api/v1/token/</code>：負責處理 Token 的邏輯，但不會去處理使用者的邏輯</li>
+</ul>
+<p>接著底下還會區分成更細的層級，例如：<code>POST /api/v1/auth/signin</code>、<code>POST /api/v1/auth/signup</code>、<code>POST /api/v1/auth/signout</code>，這樣就可以達到 Layered System 這個原則。</p>
+<h4 id="Cacheable（可快取）"><a href="#Cacheable（可快取）" class="headerlink" title="Cacheable（可快取）"></a>Cacheable（可快取）</h4><p>Cacheable 意思是指伺服器回傳的資料可以被快取，這樣可以提升效能，減少伺服器的負擔。</p>
+<p>這邊以串接 APIs 來講，我們可以針對一些不常變動的資料進行快取（設定 Cache-Control），這樣當使用者再次發送請求時，就可以直接從快取中取得資料，而不用再次向伺服器發送請求，這樣可以提升效能。</p>
+<p>但這部分比較偏向由後端工程師來處理，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="title function_">get</span>(<span class="string">&#x27;/api/v1/user&#x27;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 設定快取時間為 1 小時</span></span><br><span class="line">  res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Cache-Control&#x27;</span>, <span class="string">&#x27;max-age=3600&#x27;</span>)</span><br><span class="line">  res.<span class="title function_">json</span>(&#123; <span class="attr">message</span>: <span class="string">&#x27;Hello World&#x27;</span> &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>接下來當使用者再次發送請求時，就可以直接從快取中取得資料，而不用再次向伺服器發送請求，這樣可以提升效能。</p>
+<h4 id="Code-on-Demand（可程式碼化）"><a href="#Code-on-Demand（可程式碼化）" class="headerlink" title="Code on Demand（可程式碼化）"></a>Code on Demand（可程式碼化）</h4><p>這個並不是非必要的，但以 Code on Demand 這個原則來講，就是指伺服器可以回傳一些程式碼給客戶端執行，這樣可以提升客戶端的功能性，只是這個 Code on Demand 通常不會是必要的，就算是我也還沒遇過這種需求。</p>
+<h2 id="RESTful-APIs-x3D-RESTful-APIs"><a href="#RESTful-APIs-x3D-RESTful-APIs" class="headerlink" title="RESTful + APIs &#x3D; RESTful APIs"></a>RESTful + APIs &#x3D; RESTful APIs</h2><p>前面我們認識了什麼是 APIs，也了解了什麼是 REST，那麼當這兩個東西組合在一起時，只要符合 REST 的設計風格，那這個 APIs 就可以稱為 RESTful APIs，所以這一篇我將會以 Web 開發領域的角度去說明該如何設計 RESTful APIs。</p>
+<p>首先我們先假設一個情景，也就是今天有一個電商系統，目前線稿圖上有以下功能：</p>
+<ul>
+<li>使用者登入</li>
+<li>使用者註冊</li>
+<li>使用者登出</li>
+<li>取得商品列表</li>
+<li>取得商品詳細資訊</li>
+<li>加入購物車</li>
+<li>刪除購物車商品</li>
+<li>結帳</li>
+</ul>
+<p>你可以試著暫停一下，你會如何設計這些 APIs 路徑（溝通橋樑）呢？這邊就舉例我真人真事遇過的例子，當時我在 A 公司，那間公司的後端工程師就是這樣設計的：</p>
+<ul>
+<li>使用者登入：<code>POST /login</code></li>
+<li>使用者註冊：<code>POST /register</code></li>
+<li>使用者登出：<code>POST /logout</code></li>
+<li>取得商品列表：<code>GET /products</code></li>
+<li>取得商品詳細資訊：<code>GET /products/:id</code></li>
+<li>加入購物車：<code>POST /cart</code></li>
+<li>刪除購物車商品：<code>POST /cart/:id</code></li>
+<li>結帳：<code>POST /checkout</code></li>
+<li>建立商品（後台）：<code>POST /admin/products</code></li>
+<li>刪除商品（後台）：<code>POST /admin/products/:id</code></li>
+</ul>
+<p>感覺好像沒有什麼，接著我離職後到另一間公司，那間公司的後端工程師就是這樣設計的：</p>
+<ul>
+<li>使用者登入：<code>POST /userSignIn</code></li>
+<li>使用者註冊：<code>POST /userSignUp</code></li>
+<li>使用者登出：<code>POST /userSignOut</code></li>
+<li>取得商品列表：<code>GET /productList</code></li>
+<li>取得商品詳細資訊：<code>GET /productDetail</code></li>
+<li>加入購物車：<code>POST /addCart</code></li>
+<li>刪除購物車商品：<code>POST /deleteCart</code></li>
+<li>結帳：<code>POST /checkout</code></li>
+<li>建立商品（後台）：<code>POST /adminCreateProduct</code></li>
+<li>刪除商品（後台）：<code>POST /adminDeleteProduct</code></li>
+</ul>
+<p>雖然看起來好像還算 ok，沒有什麼問題，但是這個問題就會變成每一間公司都有屬於自己的特色命名方式，那麼這樣的命名就會有以下問題：</p>
+<ol>
+<li>不容易使用現代化工具（標準化工具）來產生文件，如：Swagger、Postman 這些都是基於 RESTful APIs 來設計的</li>
+<li>以「動作」為主的命名方式，容易導致發生所謂的 RPC（Remote Procedure Call）風格，導致資源不明確，路徑也會因此複雜化</li>
+<li>不符合 HTTP Method 的規範，例如：POST（新增）、GET（取得）、PUT（更新）、DELETE（刪除），開發者難以透過 HTTP Method 來判斷這個 APIs 是做什麼的</li>
+<li>難以直觀的瞭解到這個 APIs 是做什麼的，容易有各自解釋的問題，動詞與名詞上會有不同的命名方式與解釋</li>
+<li>對於版本與路徑的管理不易，後續若要新增功能或者修改功能，會導致路徑的變動，這樣會對前端開發者造成困擾</li>
+<li>每進一間公司就要重新學習他們的 APIs or 閱讀文件才能知道這個 APIs 是做什麼的</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong><br>RPC 是另一種設計方式，通常是以「動作」為主的命名方式，也需要知道相關參數才能夠使用。</p>
+</blockquote>
+<p>因此這邊如果將這些 APIs 路徑重新設計一下，那應該要怎麼設計呢？這邊我將會以 RESTful APIs 的設計風格來重新設計這些 APIs 路徑：</p>
+<ul>
+<li>使用者登入：<code>POST /api/v1/auth/signin</code></li>
+<li>使用者註冊：<code>POST /api/v1/auth/signup</code></li>
+<li>使用者登出：<code>POST /api/v1/auth/signout</code></li>
+<li>取得商品列表：<code>GET /api/v1/products</code></li>
+<li>取得商品詳細資訊：<code>GET /api/v1/products/:id</code></li>
+<li>加入購物車：<code>POST /api/v1/cart</code></li>
+<li>刪除購物車商品：<code>DELETE /api/v1/cart/:id</code></li>
+<li>結帳：<code>POST /api/v1/checkout</code></li>
+<li>建立商品（後台）：<code>POST /api/v1/admin/products</code></li>
+<li>刪除商品（後台）：<code>DELETE /api/v1/admin/products/:id</code></li>
+</ul>
+<p>接著這些格式請求（Request）與回應（Response）的格式，一率都是統一使用 JSON 格式（<code>Content-Type: application/json</code>） 進行傳輸，你可能會問：</p>
+<p>「為什麼要使用 JSON 格式呢？」</p>
+<p>最主要原因是，JSON 格式是一種輕量級的資料交換格式，由於 JSON 是輕量且易讀的資料交換格式，多數程式語言都有支援，因此前後端開發者能以最低成本解析與調整。</p>
+<p>由於我們是採用 Web 開發來講，所以就會搭配 HTTP Method 來設計這些 APIs 路徑：</p>
+<ul>
+<li><code>POST</code>：新增資料（or 資料狀態的改變）</li>
+<li><code>GET</code>：取得資料</li>
+<li><code>PUT</code>：更新資料</li>
+<li><code>PATCH</code>：部分更新資料</li>
+<li><code>DELETE</code>：刪除資料</li>
+</ul>
+<p>接著會搭配 HTTP Code 來回傳資料，例如：</p>
+<ul>
+<li><code>HTTP Code: 200</code>：成功</li>
+<li><code>HTTP Code: 400</code>：錯誤</li>
+<li><code>HTTP Code: 401</code>：未授權</li>
+<li><code>HTTP Code: 404</code>：找不到資源</li>
+<li><code>HTTP Code: 500</code>：伺服器錯誤</li>
+</ul>
+<p>因此，一個符合 RESTful APIs 風格的 APIs 會像以下這樣：</p>
+<p>使用者登入：<code>POST /api/v1/auth/signin</code></p>
+<p>Request（請求）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> data = &#123;</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&#x27;example@example.com&#x27;</span>,</span><br><span class="line">  <span class="attr">password</span>: <span class="string">&#x27;123456&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span>,</span><br><span class="line">  <span class="attr">headers</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">body</span>: <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">fetch</span>(<span class="string">&#x27;/api/v1/auth/signin&#x27;</span>, options)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">response</span> =&gt;</span> response.<span class="title function_">json</span>())</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">data</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(data))</span><br><span class="line">  .<span class="title function_">catch</span>(<span class="function"><span class="params">error</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">error</span>(error))</span><br></pre></td></tr></table></figure>
+
+<p>Response（回應, HTTP Code: 200）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;登入成功&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;token&quot;</span><span class="punctuation">:</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>上方 Token 稱之為 JWT Token，如果你對於 JWT Token 不熟悉，可以參考這篇文章：<a href="https://israynotarray.com/nodejs/20231013/3280561145/">關於 JWT 驗證</a></p>
+</blockquote>
+<p>Response（回應, HTTP Code: 400）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;登入失敗&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;error&quot;</span><span class="punctuation">:</span> <span class="string">&quot;帳號或密碼錯誤&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊也提供一下 RESTful APIs 與原本的三者比較表格給你參考：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>RESTful APIs</th>
+<th>A 公司</th>
+<th>B 公司</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用者登入</td>
+<td><code>POST /api/v1/auth/signin</code></td>
+<td><code>POST /login</code></td>
+<td><code>POST /userSignIn</code></td>
+</tr>
+<tr>
+<td>使用者註冊</td>
+<td><code>POST /api/v1/auth/signup</code></td>
+<td><code>POST /register</code></td>
+<td><code>POST /userSignUp</code></td>
+</tr>
+<tr>
+<td>使用者登出</td>
+<td><code>POST /api/v1/auth/signout</code></td>
+<td><code>POST /logout</code></td>
+<td><code>POST /userSignOut</code></td>
+</tr>
+<tr>
+<td>取得商品列表</td>
+<td><code>GET /api/v1/products</code></td>
+<td><code>GET /products</code></td>
+<td><code>GET /productList</code></td>
+</tr>
+<tr>
+<td>取得商品詳細資訊</td>
+<td><code>GET /api/v1/products/:id</code></td>
+<td><code>GET /products/:id</code></td>
+<td><code>GET /productDetail</code></td>
+</tr>
+<tr>
+<td>加入購物車</td>
+<td><code>POST /api/v1/cart</code></td>
+<td><code>POST /cart</code></td>
+<td><code>POST /addCart</code></td>
+</tr>
+<tr>
+<td>刪除購物車商品</td>
+<td><code>DELETE /api/v1/cart/:id</code></td>
+<td><code>POST /cart/:id</code></td>
+<td><code>POST /deleteCart</code></td>
+</tr>
+<tr>
+<td>結帳</td>
+<td><code>POST /api/v1/checkout</code></td>
+<td><code>POST /checkout</code></td>
+<td><code>POST /checkout</code></td>
+</tr>
+<tr>
+<td>建立商品（後台）</td>
+<td><code>POST /api/v1/admin/products</code></td>
+<td><code>POST /admin/products</code></td>
+<td><code>POST /adminCreateProduct</code></td>
+</tr>
+<tr>
+<td>刪除商品（後台）</td>
+<td><code>DELETE /api/v1/admin/products/:id</code></td>
+<td><code>POST /admin/products/:id</code></td>
+<td><code>POST /adminDeleteProduct</code></td>
+</tr>
+</tbody></table>
+<p>透過上述講解與範例，相信你對於為什麼我們會推薦你開 APIs 時，使用 RESTful APIs 的設計風格，應該有一定的概念囉～</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>但這邊最後要特別提醒一件事情，我們這邊所使用的 HTTP Method 並不等於 REST，也不等於 REST 是絕對的規範，這僅僅只是一種約定俗成的方式，只要符合 REST 的設計風格，那這個 APIs 就可以稱為 RESTful APIs。</p>
+<p>RESTful 雖然主流，但也不代表唯一解；如果需要複雜查詢或縮減資料傳輸，GraphQL 可能更適合，在某些企業內部會用 SOAP &#x2F; RPC 等傳統方案哩。</p>
+<p>另外，通常來講不會在意 API 的路徑長度，因為 RESTful API 的設計核心理念在於資源的表現，而不是在意路徑的長度，所以不要因為路徑長度而去犧牲資源的表現，導致資源不明確、開發者難以理解哩。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/RESTful/" rel="tag"># RESTful</a>
+              <a href="/tags/REST/" rel="tag"># REST</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/vue/20250216/532019259/" rel="prev" title="不同於 ref 的 shallowRef 宣告">
+                  <i class="fa fa-angle-left"></i> 不同於 ref 的 shallowRef 宣告
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20250313/3008873732/" rel="next" title="六角專題班學習組電商 API 之完整教學">
+                  六角專題班學習組電商 API 之完整教學 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
