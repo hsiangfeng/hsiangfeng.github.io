@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="接下來這一篇開始會是一系列的奇淫技巧(怪怪的名詞)，第一篇就先獻給自動化部屬吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(26) 試著學 Hexo - 奇淫技巧 - 自動化部屬(Travis CI)">
+<meta property="og:url" content="https://israynotarray.com/hexo/20201009/3159624676/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="接下來這一篇開始會是一系列的奇淫技巧(怪怪的名詞)，第一篇就先獻給自動化部屬吧。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-14%2021.56.43.png?alt=media&token=2c075937-daa2-4fa3-aa3c-e6bb6506d575">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-14%2022.02.52.png?alt=media&token=a470bcac-f381-4d87-8b86-c42ad1e44d97">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2FRay_-_Profile_-_Travis_CI.png?alt=media&token=ea8c1179-118a-41bf-9c76-43ceaf2d586e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.14.57.png?alt=media&token=e006f5e2-9b96-427a-82a7-2bc09ba76261">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.17.55.png?alt=media&token=ae85d589-727b-4e53-99ba-4d367327687d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F1600237180965.jpg?alt=media&token=9d6bdbfe-0073-47ba-b2b9-c417452242ab">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F1600237782375.jpg?alt=media&token=b5f24fe2-73cc-4645-9401-7e98bd24d58f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.25.20.png?alt=media&token=1cf04a05-f325-4a54-93ba-e7885106df68">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.45.53.png?alt=media&token=85f286b9-b0db-4311-901a-2302f8866cad">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.58.07.png?alt=media&token=574a21cb-c6b0-4e5e-975d-9d6c5a372890">
+<meta property="article:published_time" content="2020-10-08T16:01:00.000Z">
+<meta property="article:modified_time" content="2020-10-08T16:01:00.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="Travis CI">
+<meta property="article:tag" content="試著學 Hexo">
+<meta property="article:tag" content="第 12 屆 iT邦幫忙鐵人賽">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-14%2021.56.43.png?alt=media&token=2c075937-daa2-4fa3-aa3c-e6bb6506d575">
+
+
+<link rel="canonical" href="https://israynotarray.com/hexo/20201009/3159624676/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/hexo/20201009/3159624676/","path":"hexo/20201009/3159624676/","title":"(26) 試著學 Hexo - 奇淫技巧 - 自動化部屬(Travis CI)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>(26) 試著學 Hexo - 奇淫技巧 - 自動化部屬(Travis CI) | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8B%95%E5%8C%96%E9%83%A8%E5%B1%AC"><span class="nav-number">2.</span> <span class="nav-text">自動化部屬</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E5%82%B3-Hexo-%E5%B0%88%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">上傳 Hexo 專案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Travis-CI"><span class="nav-number">4.</span> <span class="nav-text">Travis CI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Travis-CI-%E9%9D%9E%E7%87%9F%E5%88%A9%E7%89%88"><span class="nav-number">4.1.</span> <span class="nav-text">Travis CI 非營利版</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Github-Access-Token"><span class="nav-number">5.</span> <span class="nav-text">Github Access Token</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-travis-yml"><span class="nav-number">6.</span> <span class="nav-text">建立 .travis.yml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%9C%E5%85%85"><span class="nav-number">7.</span> <span class="nav-text">補充</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">943</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">710</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/hexo/20201009/3159624676/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="(26) 試著學 Hexo - 奇淫技巧 - 自動化部屬(Travis CI) | 是 Ray 不是 Array">
+      <meta itemprop="description" content="接下來這一篇開始會是一系列的奇淫技巧(怪怪的名詞)，第一篇就先獻給自動化部屬吧。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          (26) 試著學 Hexo - 奇淫技巧 - 自動化部屬(Travis CI)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-10-09 00:01:00" itemprop="dateCreated datePublished" datetime="2020-10-09T00:01:00+08:00">2020-10-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">接下來這一篇開始會是一系列的奇淫技巧(怪怪的名詞)，第一篇就先獻給自動化部屬吧。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來這一篇開始會是一系列的奇淫技巧(怪怪的名詞)，第一篇就先獻給自動化部屬吧。</p>
+<h2 id="自動化部屬"><a href="#自動化部屬" class="headerlink" title="自動化部屬"></a>自動化部屬</h2><p>通常我們在寫完一篇文章時都必須輸入 <code>hexo d -g</code> 來編譯生成靜態網頁並上傳到 gh-pages，而這個編譯過程其實也會消耗電腦本身的運算，因此我相信你在輸入 <code>hexo d -g</code> 都有感受到電腦突然風扇高速運轉。</p>
+<p>那麼為了解決這個問題，我們就必須藉助 CI&#x2F;CD，而什麼是 CI&#x2F;CD 呢？這邊推薦之前的前輩所撰寫的文章</p>
+<p><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10219083">Day12 什麼是 CICD</a></p>
+<p>介紹什麼是 CI&#x2F;CD 並不是本篇的重點，而是如何使用才是重點，因此本篇將會介紹兩種做法，分別是</p>
+<ul>
+<li>Travis CI</li>
+<li>GitHub Actions</li>
+</ul>
+<h2 id="上傳-Hexo-專案"><a href="#上傳-Hexo-專案" class="headerlink" title="上傳 Hexo 專案"></a>上傳 Hexo 專案</h2><p>在準備做後面的 Travis CI or GitHub Action 之前我們必須先將專案上傳到特定的遠端儲存庫，否則後面操作會無法操作唷~</p>
+<p>因此這邊會先建立一個遠端儲存庫是屬於 Travis 專用的</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-14%2021.56.43.png?alt=media&token=2c075937-daa2-4fa3-aa3c-e6bb6506d575" alt="公開儲存庫"></p>
+<p>初次上傳的方式很簡單，我這邊就不再次重複說明，如果你對於 Git 指令還是不熟悉的話，可以考慮回顧一下「<a href="/hexo/20200925/1602283117/">(12) 試著學 Hexo - 你不能不學的 Git 基本指令</a>」章節或者是參考「<a target="_blank" rel="noopener" href="https://w3c.hexschool.com/git/cfdbd310">Git &amp; GitHub 教學手冊</a>」，所以我這邊就直接貼上出事上傳的指令快速帶過否則這一篇會很長。</p>
+<figure class="highlight c"><figcaption><span>d</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">gti commit -m <span class="string">&#x27;first&#x27;</span></span><br><span class="line">git remote add origin https:<span class="comment">//github.com/jc-eng/Travis-hexo-project.git</span></span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<p>基本上之後你新增文章時，就只需要輸入以下就可以了</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">gti commit -m &#x27;first&#x27;</span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<p>這邊請確認您的這個儲存庫是像這樣再繼續往下操作唷</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-14%2022.02.52.png?alt=media&token=a470bcac-f381-4d87-8b86-c42ad1e44d97" alt="上傳 Hexo 專案"></p>
+<h2 id="Travis-CI"><a href="#Travis-CI" class="headerlink" title="Travis CI"></a>Travis CI</h2><p>Travis CI 相信滿多人都聽過，我們會使用 Travis CI 的 CI（持續整合）來達到自動部署到我們的 gh-pages，而 CI 的運作模式大概是怎樣呢？簡單來講當使用者將程式碼 commit 到遠端儲存庫時，就會被這個程式自動化處理一些事情，舉凡測試、打包甚至是部署等行為。</p>
+<p>而在使用時 Travis CI 必須注意到一件事情就是它有分企業版與非營利版，只需要看網址就可以知道哪一個是企業版與非營利版</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://travis-ci.org/">https://travis-ci.org/</a> - 非營利版</li>
+<li><a target="_blank" rel="noopener" href="https://travis-ci.com/">https://travis-ci.com/</a> - 企業版</li>
+</ul>
+<p>這兩者有什麼差別呢？以我個人來講我是推薦使用「非營利版」就好，因為是免費的。</p>
+<p>只是唯一缺點是你必須開源你的專案才能夠使用，如果你的專案是 Private，那麼就必須使用企業版，而企業版最大缺點就是前 100 次免費而已，因此當你 100 次使用完畢就必須付費囉~</p>
+<p>因此這邊我將會介紹「非營利版」為主。</p>
+<h3 id="Travis-CI-非營利版"><a href="#Travis-CI-非營利版" class="headerlink" title="Travis CI 非營利版"></a>Travis CI 非營利版</h3><p>基本上 Travis CI 是可以使用 GitHub 帳號登入，所以註冊帳號就真的非常沒有什麼直接快速跳過。</p>
+<p>進入到 Travis CI 之後點一下上方 menu 的 setting</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2FRay_-_Profile_-_Travis_CI.png?alt=media&token=ea8c1179-118a-41bf-9c76-43ceaf2d586e" alt="setting"></p>
+<p>接下來我們必須找到剛剛我們建立的「Travis-hexo-project」儲存庫，如果沒看到的話可以按一下左側的「Sync Account」按鈕，這邊主要是確定專案是找得到為主。</p>
+<h2 id="Github-Access-Token"><a href="#Github-Access-Token" class="headerlink" title="Github Access Token"></a>Github Access Token</h2><p>確定可以在 Travis CI 找到專案之後，讓我們回到 GitHub，進入 Github Access Token 頁面，若找不到的人可以直接點下面連結</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/settings/tokens">Github Access Token</a></p>
+<p>進入到 Github Access Token 之後點一下位於右上的 Generate new token 按鈕</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.14.57.png?alt=media&token=e006f5e2-9b96-427a-82a7-2bc09ba76261" alt="Generate new token"></p>
+<p>名稱可以隨你取名，重點是 repo 下的 public_repo，然後再滾到下方儲存產生 token</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.17.55.png?alt=media&token=ae85d589-727b-4e53-99ba-4d367327687d" alt="public_repo"></p>
+<p>當你送出之後你會取得一組 token (綠色框內)麻煩請複製下來(不要外流)</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F1600237180965.jpg?alt=media&token=9d6bdbfe-0073-47ba-b2b9-c417452242ab" alt="token"></p>
+<p>然後這邊回到 Travis CI 找到我們剛剛建立的專案，按一下 setting 進入 setting 畫面，下面會有一個「Environment Variables」欄位填入以下資訊</p>
+<ul>
+<li>name: <code>GITHUBHEXO_TOKEN</code></li>
+<li>value: <code>剛剛的 token</code></li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F1600237782375.jpg?alt=media&token=b5f24fe2-73cc-4645-9401-7e98bd24d58f" alt="Environment Variables"></p>
+<p>填入完畢後按下 Add 按鈕即可。</p>
+<h2 id="建立-travis-yml"><a href="#建立-travis-yml" class="headerlink" title="建立 .travis.yml"></a>建立 .travis.yml</h2><p>接下來的流程很重要，我們要建立一個檔案是屬於 Travis CI 的設定檔，Travis CI 的運作都會透過該檔案，例如：產生網頁、安裝環境等，因此我們要在 Hexo 的專案下建立一個檔案叫做 <code>.travis.yml</code>(這邊要注意是根目錄哦)</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.25.20.png?alt=media&token=1cf04a05-f325-4a54-93ba-e7885106df68" alt=".travis.yml"></p>
+<p>內容填入要填什麼呢？這邊我直接提供現成的範本給你們，這樣就不用擔心了。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 設置系統語言環境</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="comment"># 是否需要 sudo 權限</span></span><br><span class="line"><span class="attr">sudo:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment"># 設置node_js版本</span></span><br><span class="line"><span class="attr">node_js:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">&#x27;12&#x27;</span></span><br><span class="line"><span class="comment"># 設置暫存區塊</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line">  <span class="attr">apt:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">directories:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">node_modules</span> <span class="comment"># 不經常變動的資料夾</span></span><br><span class="line"><span class="comment"># 指定部落格分支，一般來講是 Master，這是在告知當這個分支有 commit 時候就執行部屬指令</span></span><br><span class="line"><span class="attr">branches:</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master</span></span><br><span class="line"><span class="comment">## 安裝 Hexo-Cli</span></span><br><span class="line"><span class="attr">before_script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-cli</span> <span class="string">-g</span>  <span class="comment"># 安裝 Hexo 環境</span></span><br><span class="line"><span class="comment"># 清除緩存並執行編譯</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">clean</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">generate</span></span><br><span class="line"><span class="comment">## deploy 相關設置</span></span><br><span class="line"><span class="attr">after_success:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">sed</span> <span class="string">-i&#x27;&#x27;</span> <span class="string">&quot;/^ *repo/s~github\.com~$&#123;GITHUBHEXO_TOKEN&#125;@github.com~&quot;</span> <span class="string">_config.yml</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來你只要新增文章到 Hexo 專案的 GitHub 進去(也就是有 <code>git push</code> 行為)，它就會幫你自動部屬囉~</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.45.53.png?alt=media&token=85f286b9-b0db-4311-901a-2302f8866cad" alt="自動部署"></p>
+<h2 id="補充"><a href="#補充" class="headerlink" title="補充"></a>補充</h2><p>如果你發現你的 Travis CI 不管怎樣都不甩你的話，你可到 setting 上看一下你的專案有沒有啟用</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FHexo%2F%E8%A9%A6%E8%91%97%E5%AD%B8%20Hexo%20%E7%B3%BB%E5%88%97%2F%E6%88%AA%E5%9C%96%202020-09-16%2014.58.07.png?alt=media&token=574a21cb-c6b0-4e5e-975d-9d6c5a372890" alt="啟用狀態"></p>
+<p>最後這個坑算是滿多人會踩到的，也就是你使用 CI 之後你會發現主題無法正常出現，首先你必需打開你的 Hexo 專案到你目前的主題下，然後啟用顯示隱藏資料夾，並刪除主題下的 <code>.git</code> 資料夾，因為主題都是採用 git clone 下來的，所以本身會有一個 <code>.git</code> 資料夾，那由於我們已經有上傳過一次，因此會需要輸入以下指令針對資料夾重新加入版本控制</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cache themes/</span><br></pre></td></tr></table></figure>
+
+<p>接下來再重新輸入以下指令就可以正常自動部屬囉</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &#x27;fix&#x27;</span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+              <a href="/tags/Travis-CI/" rel="tag"># Travis CI</a>
+              <a href="/tags/%E8%A9%A6%E8%91%97%E5%AD%B8-Hexo/" rel="tag"># 試著學 Hexo</a>
+              <a href="/tags/%E7%AC%AC-12-%E5%B1%86-iT%E9%82%A6%E5%B9%AB%E5%BF%99%E9%90%B5%E4%BA%BA%E8%B3%BD/" rel="tag"># 第 12 屆 iT邦幫忙鐵人賽</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/hexo/20201008/4026232510/" rel="prev" title="(25) 試著學 Hexo - SEO 篇 - SEO 觀念補充">
+                  <i class="fa fa-angle-left"></i> (25) 試著學 Hexo - SEO 篇 - SEO 觀念補充
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/hexo/20201010/1989721020/" rel="next" title="(27) 試著學 Hexo - 奇淫技巧 - 自動化部屬(GitHub Actions)">
+                  (27) 試著學 Hexo - 奇淫技巧 - 自動化部屬(GitHub Actions) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
