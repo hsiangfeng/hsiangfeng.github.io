@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這一章節開始讓自己腦袋輕鬆一點好了，畢竟前面也學了不少的東西，所以這邊就聊點簡單的好了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="從 JavaScript 角度學 Python(26) - 指定直譯器">
+<meta property="og:url" content="https://israynotarray.com/python/20210927/2772560677/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="這一章節開始讓自己腦袋輕鬆一點好了，畢竟前面也學了不少的東西，所以這邊就聊點簡單的好了。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F%E6%88%91%E7%9A%84%E6%A2%97%E5%9C%96%E5%89%B5%E4%BD%9C-1632056517.png?alt=media&token=69edc6ee-50a0-4652-8ee5-e8188de61102">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F%E6%88%91%E7%9A%84%E6%A2%97%E5%9C%96%E5%89%B5%E4%BD%9C-1632057694.png?alt=media&token=14e3ac62-afbf-4f20-ba17-34d4eb0c20ba">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F1632059326644.png?alt=media&token=4ca9c48e-c276-4891-beaf-4aa060c678b5">
+<meta property="og:image" content="https://i.imgur.com/PwE2UE9.jpg">
+<meta property="article:published_time" content="2021-09-26T16:00:10.000Z">
+<meta property="article:modified_time" content="2021-09-26T16:00:10.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="從 JavaScript 角度學 Python">
+<meta property="article:tag" content="第 13 屆 iT邦幫忙鐵人賽">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F%E6%88%91%E7%9A%84%E6%A2%97%E5%9C%96%E5%89%B5%E4%BD%9C-1632056517.png?alt=media&token=69edc6ee-50a0-4652-8ee5-e8188de61102">
+
+
+<link rel="canonical" href="https://israynotarray.com/python/20210927/2772560677/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/python/20210927/2772560677/","path":"python/20210927/2772560677/","title":"從 JavaScript 角度學 Python(26) - 指定直譯器"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>從 JavaScript 角度學 Python(26) - 指定直譯器 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E7%9B%B4%E8%AD%AF%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">指定直譯器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="nav-number">3.</span> <span class="nav-text">參考文獻</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E8%80%85%E7%9A%84%E8%A9%B1"><span class="nav-number">4.</span> <span class="nav-text">作者的話</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%9C%E6%96%BC%E5%85%94%E5%85%94%E5%80%91"><span class="nav-number">5.</span> <span class="nav-text">關於兔兔們</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">943</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">710</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/python/20210927/2772560677/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="從 JavaScript 角度學 Python(26) - 指定直譯器 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="這一章節開始讓自己腦袋輕鬆一點好了，畢竟前面也學了不少的東西，所以這邊就聊點簡單的好了。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          從 JavaScript 角度學 Python(26) - 指定直譯器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-09-27 00:00:10" itemprop="dateCreated datePublished" datetime="2021-09-27T00:00:10+08:00">2021-09-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">這一章節開始讓自己腦袋輕鬆一點好了，畢竟前面也學了不少的東西，所以這邊就聊點簡單的好了。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一章節開始讓自己腦袋輕鬆一點好了，畢竟前面也學了不少的東西，所以這邊就聊點簡單的好了。</p>
+<h2 id="指定直譯器"><a href="#指定直譯器" class="headerlink" title="指定直譯器"></a>指定直譯器</h2><p>你有注意到許多 Python 的程式碼前面都會有一行神奇的語法，例如：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br></pre></td></tr></table></figure>
+
+<p>那麼這幾行到底是什麼意思呢？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F%E6%88%91%E7%9A%84%E6%A2%97%E5%9C%96%E5%89%B5%E4%BD%9C-1632056517.png?alt=media&token=69edc6ee-50a0-4652-8ee5-e8188de61102" alt="茫然的比利"></p>
+<p>簡單來講就是在指定 Python 直譯器而已。</p>
+<p>這時候你可能會想說為什麼還要特別去指定 Python 的直譯器呢？這個原因是因為有些人在開發的時候電腦會同時安裝 Python2 與 Python3，例如：我。</p>
+<p>而 Python2 與 Python3 不論是套件或者是語法上都是不相容的，在前面章節其實都有加減舉例到一些 Python2 與 Python3 兩者寫法上的差異，所以應該都可以注意到語法上的不同。</p>
+<p>而 <code>#!</code> 這個語法其實被稱為 <strong>Shebang</strong> 或者是 <strong>Hashbang</strong>，主要是用於指定直譯器的類型，雖然在解釋上是說指定直譯器的類型，但實際上是在指定直譯器的執行檔案位置，因此其實不只有 Python 會用到，就連 PHP 也會有機會看到：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/php</span></span><br></pre></td></tr></table></figure>
+
+<p>而這一行指令主要用於「類 Unix」系統，而類 Unix 意思是指各種 Unix 延伸出來的版本，但這不是這一章節想聊的東西，如果想更了解什麼是「類 Unix」的話，會建議閱讀維基百科 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%B1%BBUnix%E7%B3%BB%E7%BB%9F">這一篇</a> 的解釋。</p>
+<p>那麼我們該如何驗證這一行真的有效呢？如果你是 Mac 開發者的話，恭喜你！你可以試著實驗看看，但是如果你是 Window 開發者的話就只能跟你說一聲 Sorry 了，畢竟 Windows 不支援 Shebang。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F%E6%88%91%E7%9A%84%E6%A2%97%E5%9C%96%E5%89%B5%E4%BD%9C-1632057694.png?alt=media&token=14e3ac62-afbf-4f20-ba17-34d4eb0c20ba" alt="被排擠的 Windows"></p>
+<p>透過前面迷因的解釋，我們就知道接下來完全不會圍繞在 Windows 上，所以這邊就只會圍繞在 Mac 解釋，那為什麼要特別指定直譯器呢？在安裝的章節我們有解釋過 Mac 本身就有內建 Python 2.x，如果你要使用 Python3.x 的話，通常會需要額外安裝。</p>
+<p>講到這邊你發現了嗎？我們一台 Mac 中會有兩個版本的 Python 呢！雖然我們在前面都沒有什麼太大執行上的狀況，因為我們有特別指定使用 <code>python3</code> 指令去跑 Python 檔案，如果拿到 Node.js 來講的話…這個概念類似於我們在執行 Node.js 的時候，通常都會輸入 <code>node app.js</code> 的概念一樣，然後假設某一天 Node.js 大改版，以後指令預設安裝之後你必須輸入 <code>node3 app.js</code> 是雷同的想法。</p>
+<p>這時候你可能會想說「那這樣我還要寫 <code>#!/usr/bin/python3</code> 嗎？」答案還是建議要寫，除了可以確保 Python 檔案在雙系統(Python2 與 Python3) 的 Unix 可以正常運作之外，你也可以透過這一行就知道這個檔案所要運行的是 Python2 還是 Python3 唷。</p>
+<p>而 <code>#!/usr/bin/python3</code> 與 <code>#!/usr/bin/env python3</code> 也是有一定差異的，有些開發者在安裝環境的時候，並不會將 <code>python</code> 安裝在預設 <code>/usr/bin</code> 路徑下，因此為了避免這種狀況發生，通常就會使用 <code>/usr/bin/env</code>，當使用者沒有將 Python 安裝在預設路徑時，就會改讀取 env 路徑去找 Python 直譯器，所以你說哪一種比較好？以我的認知來講是推薦使用 <code>/usr/bin/env</code> 哩。</p>
+<p>oh!對了，除了 <code>#!/usr/bin/python3</code> 指定直譯器的方式之外，還有指定原始碼的字元編碼，雖然 Python 通常預設字元編碼是 UTF-8(又稱之為萬國碼)，但是總會有另外狀況，所以當你希望調整字元編碼時只需要在檔案前面寫你要的字元編碼即可：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: big5 -*-</span></span><br></pre></td></tr></table></figure>
+
+<p>但是通常來講保持 UTF-8 是比較好，因此你也會看到有人為了避免一些怪狀況，所以都會寫死就是了：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br></pre></td></tr></table></figure>
+
+<p>這時候你可能會想說，為什麼我都沒有去撰寫這個指定直譯器的方式呢？原因很簡單，我忘了。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FPython%2F%E5%BE%9E%20JavaScript%20%E8%A7%92%E5%BA%A6%E5%AD%B8%20Python%2F1632059326644.png?alt=media&token=4ca9c48e-c276-4891-beaf-4aa060c678b5" alt="被揍"></p>
+<p>好啦，時間也差不多了，這邊算是簡單輕鬆聊一下這個而已，那麼我們下一篇見囉~</p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/tutorial/interpreter.html">使用 Python 直譯器</a></li>
+</ul>
+<h2 id="作者的話"><a href="#作者的話" class="headerlink" title="作者的話"></a>作者的話</h2><p>都市地區住習慣之後再回到鄉下住整個簡直快崩潰一樣，因為一直沒有訊號，超怕一個不小心鐵人賽就沒有發出去 QQ</p>
+<h2 id="關於兔兔們"><a href="#關於兔兔們" class="headerlink" title="關於兔兔們"></a>關於兔兔們</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://tailwindcss.tw/">Tailwind CSS 臺灣官網</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/tailwindcss.tw">Tailwind CSS 臺灣</a> (臉書粉絲專頁)</li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/groups/tailwindcss.taiwan">兔兔教 × Tailwind CSS Taiwan</a> (臉書社群)</li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/lalarabbits-%E5%85%94%E5%85%94%E6%95%99%E5%A4%A7%E6%9C%AC%E7%87%9F-102150975410839/">兔兔教大本營</a></li>
+</ul>
+<p><img src="https://i.imgur.com/PwE2UE9.jpg" alt="兔法無邊"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E5%BE%9E-JavaScript-%E8%A7%92%E5%BA%A6%E5%AD%B8-Python/" rel="tag"># 從 JavaScript 角度學 Python</a>
+              <a href="/tags/%E7%AC%AC-13-%E5%B1%86-iT%E9%82%A6%E5%B9%AB%E5%BF%99%E9%90%B5%E4%BA%BA%E8%B3%BD/" rel="tag"># 第 13 屆 iT邦幫忙鐵人賽</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/python/20210926/4028850576/" rel="prev" title="從 JavaScript 角度學 Python(25) - 例外處理">
+                  <i class="fa fa-angle-left"></i> 從 JavaScript 角度學 Python(25) - 例外處理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/vscode/20210927/2674618084/" rel="next" title="VSCode terminal.integrated.shell.osx 屬性失效">
+                  VSCode terminal.integrated.shell.osx 屬性失效 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

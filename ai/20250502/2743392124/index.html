@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="相信大家已經被 AI、ChatGPT 等各種大型語言模型轟炸了好一段時間，然後也都是使用 ChatGPT、Claude.AI 這種 Web 服務，這些服務的好處是可以快速上手、使用方便，但缺點就是需要網路連線、資料隱私問題、API 費用等等，那有沒有辦法可以本地自行架設 AI 呢？答案是有的，所以這一篇將會來介紹一個很方便使用的工具，它就叫做 LM Studio。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架設自己的 AI 語言模型實驗室不求人之 LM Studio">
+<meta property="og:url" content="https://israynotarray.com/ai/20250502/2743392124/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="相信大家已經被 AI、ChatGPT 等各種大型語言模型轟炸了好一段時間，然後也都是使用 ChatGPT、Claude.AI 這種 Web 服務，這些服務的好處是可以快速上手、使用方便，但缺點就是需要網路連線、資料隱私問題、API 費用等等，那有沒有辦法可以本地自行架設 AI 呢？答案是有的，所以這一篇將會來介紹一個很方便使用的工具，它就叫做 LM Studio。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2FAI_LM_Studio.png?alt=media&token=a9192290-3018-4fc7-b335-0d106be79562">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502092814.png?alt=media&token=62596726-e5de-4bb3-9dce-ec8850daa16a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502093100.png?alt=media&token=51eb2879-ee8e-496d-9f7b-09182a4d255e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502093101.png?alt=media&token=42a0625d-6337-4652-bc3d-b28dd19200d7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094320.png?alt=media&token=bc6a0a4a-4490-402e-81fa-5398f3406312">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094545.png?alt=media&token=cc7d7b12-9672-40c2-bc2b-7e6657e16bc4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094832.png?alt=media&token=88960000-fdeb-4e1a-8a68-2276513413a9">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502101429.png?alt=media&token=560cff7e-33b0-4a47-95ca-24e93f4124e4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502101557.png?alt=media&token=73c3f494-da38-46aa-aa01-6fd75690a2bf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502103919.png?alt=media&token=47ddc6cf-b575-4aba-acd4-734006e23852">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502110324.png?alt=media&token=148e8af5-0dfd-4641-add2-0a6fb996d5e0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502110525.png?alt=media&token=2e99de49-994a-40ee-8108-20b5e596d52c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502111926.png?alt=media&token=5bd62795-cbbc-4ff2-8e57-a1910bf422be">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112059.png?alt=media&token=b7f81129-d4c8-4bde-aec8-bd55168b1bea">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112532.png?alt=media&token=4c2fbe57-9b30-47f5-8532-12000ff90879">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112705.png?alt=media&token=0941fdcb-eb4f-4560-9c1c-a7a9a0bf05e2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112827.png?alt=media&token=52ee7075-8484-4327-951f-3a168e38369c">
+<meta property="article:published_time" content="2025-05-02T01:21:30.000Z">
+<meta property="article:modified_time" content="2025-05-02T01:21:30.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="ChatGPT">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="LM Studio">
+<meta property="article:tag" content="語言模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2FAI_LM_Studio.png?alt=media&token=a9192290-3018-4fc7-b335-0d106be79562">
+
+
+<link rel="canonical" href="https://israynotarray.com/ai/20250502/2743392124/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/ai/20250502/2743392124/","path":"ai/20250502/2743392124/","title":"架設自己的 AI 語言模型實驗室不求人之 LM Studio"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>架設自己的 AI 語言模型實驗室不求人之 LM Studio | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-LM-Studio"><span class="nav-number">2.</span> <span class="nav-text">什麼是 LM Studio</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-LM-Studio"><span class="nav-number">3.</span> <span class="nav-text">安裝 LM Studio</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-LM-Studio"><span class="nav-number">4.</span> <span class="nav-text">使用 LM Studio</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%96%E5%82%99%E4%B8%8B%E8%BC%89%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">準備下載模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E5%8F%83%E6%95%B8%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">模型參數？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%84%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">還需要注意什麼？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF%E9%87%8F%E5%8C%96%EF%BC%88Quantization%EF%BC%89%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">什麼是量化（Quantization）？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BC%89%E4%B8%A6%E9%96%8B%E5%A7%8B%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">下載並開始用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">943</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">710</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/ai/20250502/2743392124/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="架設自己的 AI 語言模型實驗室不求人之 LM Studio | 是 Ray 不是 Array">
+      <meta itemprop="description" content="相信大家已經被 AI、ChatGPT 等各種大型語言模型轟炸了好一段時間，然後也都是使用 ChatGPT、Claude.AI 這種 Web 服務，這些服務的好處是可以快速上手、使用方便，但缺點就是需要網路連線、資料隱私問題、API 費用等等，那有沒有辦法可以本地自行架設 AI 呢？答案是有的，所以這一篇將會來介紹一個很方便使用的工具，它就叫做 LM Studio。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          架設自己的 AI 語言模型實驗室不求人之 LM Studio
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-05-02 09:21:30" itemprop="dateCreated datePublished" datetime="2025-05-02T09:21:30+08:00">2025-05-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ai/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">相信大家已經被 AI、ChatGPT 等各種大型語言模型轟炸了好一段時間，然後也都是使用 ChatGPT、Claude.AI 這種 Web 服務，這些服務的好處是可以快速上手、使用方便，但缺點就是需要網路連線、資料隱私問題、API 費用等等，那有沒有辦法可以本地自行架設 AI 呢？答案是有的，所以這一篇將會來介紹一個很方便使用的工具，它就叫做 LM Studio。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2FAI_LM_Studio.png?alt=media&token=a9192290-3018-4fc7-b335-0d106be79562" alt="LM Studio"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>相信大家已經被 AI、ChatGPT 等各種大型語言模型轟炸了好一段時間，然後也都是使用 ChatGPT、Claude.AI 這種 Web 服務，這些服務的好處是可以快速上手、使用方便，但缺點就是需要網路連線、資料隱私問題、API 費用等等，那有沒有辦法可以本地自行架設 AI 呢？答案是有的，所以這一篇將會來介紹一個很方便使用的工具，它就叫做 LM Studio。</p>
+<h2 id="什麼是-LM-Studio"><a href="#什麼是-LM-Studio" class="headerlink" title="什麼是 LM Studio"></a>什麼是 LM Studio</h2><p>LM Studio 是一款專門可以讓你輕鬆在本地使用 LLM（大型語言模型）的工具，這個工具的特色是可以讓你在本地使用各種不同的 LLM 模型，並且可以很方便的進行模型的調整、測試等等，這樣就不需要再依賴網路上的服務了。</p>
+<p>雖然整體介面都是英文的，但是其實操作起來很簡單，所以只需要懂一些基本概念，就算是小白也可以在本地起一個屬於自己的 Chat Bot。</p>
+<blockquote>
+<p><strong>Note</strong><br>本篇文章將會用 Mac 作爲示範環境，Windows 的介面基本上大同小異。</p>
+</blockquote>
+<h2 id="安裝-LM-Studio"><a href="#安裝-LM-Studio" class="headerlink" title="安裝 LM Studio"></a>安裝 LM Studio</h2><p>安裝的方式很簡單，你只需要到 <a target="_blank" rel="noopener" href="https://lmstudio.ai/">LM Studio</a> 的官方網站就可以下載相關的版本了。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502092814.png?alt=media&token=62596726-e5de-4bb3-9dce-ec8850daa16a" alt="LM Studio"></p>
+<p>安裝過程我就不多介紹了，因為非常簡單，就只是單純的點擊安裝而已。</p>
+<h2 id="使用-LM-Studio"><a href="#使用-LM-Studio" class="headerlink" title="使用 LM Studio"></a>使用 LM Studio</h2><p>初次打開 LM Studio 的時候，基本上你會看到以下畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502093100.png?alt=media&token=51eb2879-ee8e-496d-9f7b-09182a4d255e" alt="LM Studio"></p>
+<p>初次看到不用太擔心，這邊我會附上中文翻譯讓你比較好理解，這邊讓我們先從左側邊欄開始介紹：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502093101.png?alt=media&token=42a0625d-6337-4652-bc3d-b28dd19200d7" alt="LM Studio"></p>
+<ul>
+<li><strong>Chat</strong>：讓你跟 AI 聊天的地方，簡單來講就是 ChatGPT 的地方。</li>
+<li><strong>Developer</strong>：這邊稍微比較進階一點，就是讓你可以針對你選擇的模型轉換成 API 的地方，這邊可以讓你使用 Python、Node.js、Go 等等的語言來進行開發。</li>
+<li><strong>My Models</strong>：就是你下載的模型放置處</li>
+<li><strong>Discover</strong>：簡單來講，就是發現&#x2F;探索模型的地方，你可以在這邊下載各種不同的模型，這邊會有一些推薦的模型，還有一些熱門的模型等等。</li>
+<li><strong>Downloads</strong>：顯示你下載的模型的進度，還有一些下載的紀錄等等。</li>
+</ul>
+<h2 id="準備下載模型"><a href="#準備下載模型" class="headerlink" title="準備下載模型"></a>準備下載模型</h2><p>如果你沒有把這一篇看完，就急著接過去 Chat 跟機器人聊天的話，基本上你會收到這個錯誤訊息：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">No model selected</span><br><span class="line"></span><br><span class="line">Select a model to send a message</span><br></pre></td></tr></table></figure>
+
+<p>因為我們還沒有下載任何一款大型語言模型。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094320.png?alt=media&token=bc6a0a4a-4490-402e-81fa-5398f3406312" alt="LM Studio"></p>
+<p>所以這邊要請你點一下 Discover 的圖示，這時候會跳出一個視窗</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094545.png?alt=media&token=cc7d7b12-9672-40c2-bc2b-7e6657e16bc4" alt="Discover"></p>
+<p>再開始下載之前，我們要先認識幾個東西，也就是模型參數。</p>
+<h2 id="模型參數？"><a href="#模型參數？" class="headerlink" title="模型參數？"></a>模型參數？</h2><p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502094832.png?alt=media&token=88960000-fdeb-4e1a-8a68-2276513413a9" alt="Models"></p>
+<p>在模型列表上，我們可以看到每個模型後面都有個神秘的英文字母＋數字，這邊我隨便挑幾個來解釋一下：</p>
+<ul>
+<li>Qwen3 235B A22B（MoE）</li>
+<li>Qwen3 4B</li>
+<li>Gemma 34B QAT</li>
+<li>DeepSeek R1 Distill (Qwen 7B)</li>
+<li>Llama 3.3 70B Instruct</li>
+</ul>
+<p>首先，以 <code>Qwen3 4B</code> 來講，Qwen3 是模型的名稱，4B 是參數的大小，也就是這個模型有 40 億個參數，參數量越多也代表著模型可以學習到的資訊越多，這個模型的表現也會越好。</p>
+<p>而常見的代號有：</p>
+<ul>
+<li><code>B</code>：表示 Billion（十億），例如 4B 就是 40 億個參數。</li>
+<li><code>M</code>：表示 Million（百萬），例如 4M 就是 400 萬個參數。</li>
+<li><code>T</code>：表示 Trillion（兆），例如 4T 就是 4000 億個參數。</li>
+</ul>
+<p>那…MoE 跟 QAT 這些又是什麼呢？</p>
+<ul>
+<li><code>MoE</code>：Mixture of Experts，簡單來講，你可以想像成這個模型邀請了不少專家來幫忙，這樣可以讓模型在某些特定的任務上表現得更好，但這樣的模型通常會比較大，因為它需要儲存更多的專家模型。</li>
+<li><code>QAT</code>：Quantization Aware Training，這種類型模型在一開始設計與規劃時，就會把它壓縮的比較小，這樣佔用記憶體以及邏輯推理上也會比較快，但也不會失準太多。</li>
+<li><code>Instruct</code>：這個模型已經有經過微調（Fine-Tuning）過，通常是針對某些特定的任務進行微調，這樣可以讓模型在這些任務上表現得更好。</li>
+<li><code>Distill</code>：簡單來講，這個模型已經精簡（Distillation）過，通常這種都是經過較大的模型，然後萃取出精華的部分，所以會比較小也比較快，但缺點就有可能少一些知識等。</li>
+</ul>
+<p>所以這邊我們看到 <code>Qwen3 4B</code> 的時候，就可以知道這麼模型叫做 Qwen3，參數量是 40 億個，這個模型沒有 MoE、QAT、Instruct、Distill 等等的標記，所以這個模型就是一個原始的模型。</p>
+<p>但裡面有一個很特別的名稱，也就是 <code>Qwen3 235B A22B（MoE）</code> 這個代表著，它雖然有 2350 億個參數，並且是多位專家一起合作的模型，只是實際上運作只會使用 22B 的參數量，因為它想要節省資源哩，更白話一點解釋就是，雖然我們有  2350 億本書，但是每次只會借 22 本書來看，不用每次都翻閱 2350 億本書，藉此來節省資源，所以這個 A22B 就是代表著這個模型的運作參數量（Active 22B）。</p>
+<h2 id="還需要注意什麼？"><a href="#還需要注意什麼？" class="headerlink" title="還需要注意什麼？"></a>還需要注意什麼？</h2><p>下載模型之前，也都會建議你要點一下 Model Card，這邊會有一些模型的介紹、使用建議等等。</p>
+<p>這邊舉例來講，我挑選 <code>DeepSeek R1 Distill (Qwen 7B)</code> 這個模型</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502101429.png?alt=media&token=560cff7e-33b0-4a47-95ca-24e93f4124e4" alt="DeepSeek R1 Distill (Qwen 7B)"></p>
+<p>我們可以先看幾個重點：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502101557.png?alt=media&token=73c3f494-da38-46aa-aa01-6fd75690a2bf" alt="DeepSeek R1 Distill (Qwen 7B)"></p>
+<ul>
+<li>DeepSeek R1 Distill (Qwen 7B)</li>
+<li>Q4_K_M DeepSeek R1 Distill Qwen 7B  4.68B</li>
+</ul>
+<p>我們可以看到這一組模型很特別，它名稱是 <code>DeepSeek R1 Distill (Qwen 7B)</code>，所以該怎麼看呢？</p>
+<ul>
+<li>DeepSeek：模型名稱</li>
+<li>R1：這個模型是 R1 的版本</li>
+<li>Distill：這個模型是經過精簡的模型</li>
+<li>Qwen 7B：這個模型是從 Qwen 7B 的模型精簡過來的</li>
+</ul>
+<p>簡單一點來講就是 DeepSeek 跑去跟 Qwen 7B 學習請教，然後把 Qwen 7B 的知識萃取出來精簡成小型版本，所以這個模型會更小更快，但還能保留大部分原本的聰明才智哩！</p>
+<p>而 Q4_K_M 這個代表著這個模型的量化方式（Quantization）。</p>
+<h2 id="什麼是量化（Quantization）？"><a href="#什麼是量化（Quantization）？" class="headerlink" title="什麼是量化（Quantization）？"></a>什麼是量化（Quantization）？</h2><p>你如果嘗試點一下 Q4_K_M，你可以看到更多這種奇妙的數字</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502103919.png?alt=media&token=47ddc6cf-b575-4aba-acd4-734006e23852" alt="Q4_K_M"></p>
+<ul>
+<li>Q3_K_L</li>
+<li>Q4_K_M</li>
+<li>Q6_K</li>
+<li>Q8_0</li>
+</ul>
+<p>那這些奇妙的數字又是什麼意思呢？簡單來講，這些數字就是代表著這個模型的量化方式，以 Q4_K_M 來拆解舉例的話</p>
+<ul>
+<li>Q4：這個模型是 4-bit 的超小版本，通常越小越省記憶體</li>
+<li>K_M：是指這個模型的壓縮方式<ul>
+<li>K_L：代表壓縮比較少，保留最多原本模型細節，效果最好</li>
+<li>K_M：壓縮方式適中，速度雖然快但也有不錯的表現（常見推薦版本）</li>
+<li>K_S：壓縮最多的版本，速度是最快的</li>
+<li>K_0：代表接近原始版本，但還是有一點壓縮</li>
+<li>_0：代表使用最基本的量化方式，效果接近原版，但仍然是有進行量化壓縮的。</li>
+</ul>
+</li>
+</ul>
+<p>當然，還有很多細節沒說明，這邊就不一一介紹了，這邊只是讓你知道這些代號的意義，方便你可以快速下載想要的</p>
+<h2 id="下載並開始用"><a href="#下載並開始用" class="headerlink" title="下載並開始用"></a>下載並開始用</h2><p>前面基本知識熟悉差不多後，我們就可以來正式下載模型了。</p>
+<p>這邊請你在 <code>Search</code> 的地方輸入 <code>DeepSeek R1 Distill (Qwen 7B)</code>，接著選擇 <code>Q4_K_M</code> 這個版本，然後點擊 <code>Download</code> 按鈕</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502110324.png?alt=media&token=148e8af5-0dfd-4641-add2-0a6fb996d5e0" alt="Download"></p>
+<p>接著就等這個模型下載完畢吧～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502110525.png?alt=media&token=2e99de49-994a-40ee-8108-20b5e596d52c" alt="Download"></p>
+<p>下載完畢後，你就可以點一下 <code>Load Model</code></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502111926.png?alt=media&token=5bd62795-cbbc-4ff2-8e57-a1910bf422be" alt="Model"></p>
+<p>點下去後，你就會跳到 Chat 頁面，然後上面可以看到 Model 正在載入中（上方讀取條）</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112059.png?alt=media&token=b7f81129-d4c8-4bde-aec8-bd55168b1bea" alt="Chat"></p>
+<p>跑完之後，你就可以對話啦～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112532.png?alt=media&token=4c2fbe57-9b30-47f5-8532-12000ff90879" alt="Chat"></p>
+<p>那該如何退出或終止模型呢？很簡單，你只要點一下上方 Eject 就可以啦～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112705.png?alt=media&token=0941fdcb-eb4f-4560-9c1c-a7a9a0bf05e2" alt="Eject"></p>
+<p>想要重新掛載回去也很簡單，點一下 Select a model to load，就會跳出視窗讓你選擇模型哩</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Flm-studio%2F20250502112827.png?alt=media&token=52ee7075-8484-4327-951f-3a168e38369c" alt="Select a model to load"></p>
+<p>就介紹到這裡囉～<br>以上就是 LM Studio 的基本使用方式，讓你可以很快速地搭建屬於自己的 AI 聊天機器人哩！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/ChatGPT/" rel="tag"># ChatGPT</a>
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/LM-Studio/" rel="tag"># LM Studio</a>
+              <a href="/tags/%E8%AA%9E%E8%A8%80%E6%A8%A1%E5%9E%8B/" rel="tag"># 語言模型</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ai/20250425/3215958971/" rel="prev" title="你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙">
+                  <i class="fa fa-angle-left"></i> 你聽過 LLM、RAG、Prompt 嗎？一文帶你看懂生成式 AI 常見技術詞彙
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20250513/3343643828/" rel="next" title="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定">
+                  不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

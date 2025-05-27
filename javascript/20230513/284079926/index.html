@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="如果你的公司專案沒辦法使用 TypeScript 的話，但又希望可以有類似 TypeScript 的類型檢查，那麼你可以試試看 JSDoc 來標注類型，這樣就可以有類似 TypeScript 的類型檢查了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="沒辦法用 TypeScript？別擔心，你還可以寫 JSDoc 標注類型">
+<meta property="og:url" content="https://israynotarray.com/javascript/20230513/284079926/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="如果你的公司專案沒辦法使用 TypeScript 的話，但又希望可以有類似 TypeScript 的類型檢查，那麼你可以試試看 JSDoc 來標注類型，這樣就可以有類似 TypeScript 的類型檢查了。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/n4QxX62.png">
+<meta property="og:image" content="https://i.imgur.com/v73vEgs.png">
+<meta property="og:image" content="https://i.imgur.com/KPLD9M6.png">
+<meta property="og:image" content="https://i.imgur.com/UN5U3wr.png">
+<meta property="og:image" content="https://i.imgur.com/z88Ygca.png">
+<meta property="og:image" content="https://i.imgur.com/j5EkcBH.png">
+<meta property="og:image" content="https://i.imgur.com/gLjGZ5d.png">
+<meta property="og:image" content="https://i.imgur.com/OhNxREP.png">
+<meta property="og:image" content="https://i.imgur.com/qt8lXbb.png">
+<meta property="og:image" content="https://i.imgur.com/Z9542SQ.png">
+<meta property="og:image" content="https://i.imgur.com/LkHiriq.png">
+<meta property="og:image" content="https://i.imgur.com/tOqCYHQ.png">
+<meta property="og:image" content="https://i.imgur.com/BT7mnIG.png">
+<meta property="og:image" content="https://i.imgur.com/YwvikmS.png">
+<meta property="og:image" content="https://i.imgur.com/X7RECok.png">
+<meta property="og:image" content="https://i.imgur.com/4mAAMwg.png">
+<meta property="og:image" content="https://i.imgur.com/BRyxInT.png">
+<meta property="og:image" content="https://i.imgur.com/2fVvLC1.png">
+<meta property="og:image" content="https://i.imgur.com/xwkqthf.png">
+<meta property="article:published_time" content="2023-05-13T14:51:08.000Z">
+<meta property="article:modified_time" content="2023-05-13T14:51:08.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="JSDoc">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/n4QxX62.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/javascript/20230513/284079926/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/javascript/20230513/284079926/","path":"javascript/20230513/284079926/","title":"沒辦法用 TypeScript？別擔心，你還可以寫 JSDoc 標注類型"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>沒辦法用 TypeScript？別擔心，你還可以寫 JSDoc 標注類型 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">JSDoc 是什麼？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%96%E5%82%99%E5%8B%95%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">準備動作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E7%9A%84%E6%92%B0%E5%AF%AB%E6%96%B9%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">JSDoc 的撰寫方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E9%A1%9E%E5%9E%8B%E6%AA%A2%E6%9F%A5%E5%92%8C%E8%87%AA%E5%8B%95%E5%AE%8C%E6%88%90"><span class="nav-number">5.</span> <span class="nav-text">JSDoc 類型檢查和自動完成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E5%85%B6%E4%BB%96%E5%AF%AB%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">JSDoc 其他寫法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%8A%E6%95%B8%E5%AE%A3%E5%91%8A"><span class="nav-number">6.1.</span> <span class="nav-text">變數宣告</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%96%AE%E5%9E%8B%E5%88%A5%E9%99%A3%E5%88%97"><span class="nav-number">6.2.</span> <span class="nav-text">單型別陣列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%9E%8B%E5%88%A5%E9%99%A3%E5%88%97"><span class="nav-number">6.3.</span> <span class="nav-text">多型別陣列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%A9%E4%BB%B6"><span class="nav-number">6.4.</span> <span class="nav-text">物件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E5%BC%8F"><span class="nav-number">6.5.</span> <span class="nav-text">函式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E9%80%B2%E9%9A%8E%E5%AF%AB%E6%B3%95-typedef"><span class="nav-number">7.</span> <span class="nav-text">JSDoc 進階寫法 - @typedef</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDoc-%E5%B8%B8%E8%A6%8B%E8%AA%9E%E6%B3%95%E7%B8%BD%E7%B5%90"><span class="nav-number">8.</span> <span class="nav-text">JSDoc 常見語法總結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">9.</span> <span class="nav-text">結論</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">943</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">710</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/javascript/20230513/284079926/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="沒辦法用 TypeScript？別擔心，你還可以寫 JSDoc 標注類型 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="如果你的公司專案沒辦法使用 TypeScript 的話，但又希望可以有類似 TypeScript 的類型檢查，那麼你可以試試看 JSDoc 來標注類型，這樣就可以有類似 TypeScript 的類型檢查了。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          沒辦法用 TypeScript？別擔心，你還可以寫 JSDoc 標注類型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2023-05-13 22:51:08" itemprop="dateCreated datePublished" datetime="2023-05-13T22:51:08+08:00">2023-05-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/javascript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">如果你的公司專案沒辦法使用 TypeScript 的話，但又希望可以有類似 TypeScript 的類型檢查，那麼你可以試試看 JSDoc 來標注類型，這樣就可以有類似 TypeScript 的類型檢查了。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://i.imgur.com/n4QxX62.png" alt="JavaScript"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果你的公司專案沒辦法使用 TypeScript 的話，但又希望可以有類似 TypeScript 的類型檢查，那麼你可以試試看 JSDoc 來標注類型，這樣就可以有類似 TypeScript 的類型檢查了。</p>
+<h2 id="JSDoc-是什麼？"><a href="#JSDoc-是什麼？" class="headerlink" title="JSDoc 是什麼？"></a>JSDoc 是什麼？</h2><p>首先先聊一下 JSDoc 是什麼東西，JSDoc 全名是「JavaScript Documentation」，中文翻譯是「JavaScript 文件」，它是一個專門用來標註 JavaScript 文件的工具。</p>
+<p>那它可以做什麼呢？其實它可以幫助你標註類型，例如：型別、參數與回傳值等等，因此在還沒有 TypeScript 之前，JSDoc 會是一個非常好用的工具，因為已經足夠堪用了。</p>
+<p>那麼接下來我們就準備來看看 JSDoc 該怎麼使用吧！但是在開始之前我想先說明一下我的 IDE，也就是 Visual Studio Code，身為地表上最強大最好用的 IDE，它對於 JSDoc 的支援也是非常的好，因此我會以 Visual Studio Code 來做為示範。</p>
+<blockquote>
+<p><strong>Note</strong><br>JSDoc 其實很早就出現了，約 1999 年左右，所以其實比 TypeScript 還要早出來唷。</p>
+</blockquote>
+<h2 id="準備動作"><a href="#準備動作" class="headerlink" title="準備動作"></a>準備動作</h2><p>首先我們先使用 VSCode 建立一個專案叫做 <code>jsdoc-demo</code>，並且請在該專案初始化 npm</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init -y</span><br></pre></td></tr></table></figure>
+
+<p>接著建立一個 <code>index.js</code> 檔案，所以你目前的專案結構應該會長這樣</p>
+<p><img src="https://i.imgur.com/v73vEgs.png" alt="init"></p>
+<p>準備好差不多之後，我們就繼續往下吧。</p>
+<h2 id="JSDoc-的撰寫方式"><a href="#JSDoc-的撰寫方式" class="headerlink" title="JSDoc 的撰寫方式"></a>JSDoc 的撰寫方式</h2><p>JSDoc 的撰寫方式並不困難，首先我這邊先寫一段範例程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>接下來該怎麼撰寫呢？你只需要在該函式的上方加上 <code>/**</code>，我們強大的 VSCode 就會提示你 JSDoc 註解</p>
+<p><img src="https://i.imgur.com/KPLD9M6.png" alt="JSDoc 註解"></p>
+<p>此時你只需要按下 Enter 鍵，就會自動幫你產生 JSDoc 註解了，如下圖</p>
+<p><img src="https://i.imgur.com/UN5U3wr.png" alt="JSDoc 註解"></p>
+<p>是不是超級方便呢？那麼這邊我們可以看到 VSCode 自動幫我們產生了 <code>@param &#123;*&#125; name</code> 與 <code>@returns</code>，那這邊我們該怎麼撰寫呢？其實很簡單，通常我們會去描述該函式的功能、參數的型別以及回傳值的型別，所以會這樣子撰寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>接下來當你滑鼠只要移動過去 <code>sayHi</code> 這個函式，就會出現提示訊息</p>
+<p><img src="https://i.imgur.com/z88Ygca.png" alt="sayHi"></p>
+<p>因此當如果你在其他地方使用到該函式的時候，就可以透過 JSDoc 來提示你該函式的功能、參數的型別以及回傳值的型別，大大減少你還要去看函式是幹嘛的、該傳什麼參數以及回傳什麼值的時間。</p>
+<p>當然 JSDoc 不只有這樣，你也可以使用 <code>@example</code> 來描述該函式的使用方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#x27;John&#x27;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/j5EkcBH.png" alt="@example"></p>
+<p>那麼如果是可以接受多個型別呢？例如：<code>string</code> 或是 <code>number</code>，那麼你可以這樣寫</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string | number </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#x27;John&#x27;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/gLjGZ5d.png" alt="type"></p>
+<p>那麼這邊也來提一件事情，為什麼會說如果不能使用 TypeScript 的話，JSDoc 也是一個不錯的選擇呢？透過上面示範我們可以知道 JSDoc 確實是可以幫助到我們一些問題，但是這樣子遠遠是不夠的，因為開發者是人，所以可能 <code>sayHi</code> 我們就已經寫了 <code>@param &#123; string &#125; name 名字</code>，但是我們還是不小心在呼叫 <code>sayHi</code> 的時候傳入了 <code>number</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#x27;John&#x27;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">sayHi</span>(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>那這樣子就會造成錯誤，對於我們開發者來講，是有可能發生一些 Bug 的，所以就只能認命使用 TypeScript 嗎？不，其實 JSDoc 也可以做到型別驗證的，只是目前我們的環境還沒有設定好，所以我們先來設定一下。</p>
+<h2 id="JSDoc-類型檢查和自動完成"><a href="#JSDoc-類型檢查和自動完成" class="headerlink" title="JSDoc 類型檢查和自動完成"></a>JSDoc 類型檢查和自動完成</h2><p>首先我們在專案根目錄建立一個 <code>jsconfig.json</code> 檔案，並且輸入以下內容</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;compilerOptions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;checkJs&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;allowJs&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;node_modules&quot;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著你應該就可以看到錯誤提示訊息囉</p>
+<p><img src="https://i.imgur.com/OhNxREP.png" alt="JSDoc 型別驗證"></p>
+<p>而且如果你沒有正確傳入參數的話，也會有提示訊息</p>
+<p><img src="https://i.imgur.com/qt8lXbb.png" alt="JSDoc 參數驗證"></p>
+<p>如果你是 TypeScript 的開發者應該會覺得 <code>jsconfig.json</code> 很熟悉，因為 <code>jsconfig.js</code> 是由 <code>tsconfig.js</code> 所衍生出來的，所以你可以在 <code>jsconfig.js</code> 中使用 <code>tsconfig.js</code> 的設定，例如：<code>&quot;target&quot;: &quot;es6&quot;</code>、<code>&quot;module&quot;: &quot;commonjs&quot;</code> 等等，這邊我們就不多做介紹，如果你想要了解更多，可以參考<a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs/languages/jsconfig">官方文件</a>。</p>
+<h2 id="JSDoc-其他寫法"><a href="#JSDoc-其他寫法" class="headerlink" title="JSDoc 其他寫法"></a>JSDoc 其他寫法</h2><p>講完了前面 JSDoc 的基本寫法跟基本設置後，我們繼續來聊一下 JSDoc 的其他寫法，以實戰開發來講，我們不可能這麼單純，畢竟還會有陣列跟物件等狀況，所以一開始我們先以一個單純的變數宣告來講，如果要替變數宣告上型別的話，那就會使用到新的 JSDoc 語法，也就是 <code>@type</code>，底下我也列出一些示範寫法</p>
+<h3 id="變數宣告"><a href="#變數宣告" class="headerlink" title="變數宣告"></a>變數宣告</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 我的名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> string </span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> myName = <span class="string">&#x27;Ray&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/Z9542SQ.png" alt="型別"></p>
+<p>透過定義變數其實也可以像 TypeScript 讓下拉選取變得很正確</p>
+<p><img src="https://i.imgur.com/LkHiriq.png" alt="下拉選取"></p>
+<h3 id="單型別陣列"><a href="#單型別陣列" class="headerlink" title="單型別陣列"></a>單型別陣列</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 我的名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> string[] </span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> myName = [<span class="string">&#x27;Ray&#x27;</span>, <span class="string">&#x27;John&#x27;</span>];</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/tOqCYHQ.png" alt="單一型別陣列"></p>
+<h3 id="多型別陣列"><a href="#多型別陣列" class="headerlink" title="多型別陣列"></a>多型別陣列</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 我的名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> (string | number)[] </span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> myName = [<span class="string">&#x27;Ray&#x27;</span>, <span class="string">&#x27;John&#x27;</span>, <span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/BT7mnIG.png" alt="多型別陣列"></p>
+<h3 id="物件"><a href="#物件" class="headerlink" title="物件"></a>物件</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 我的名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> &#123; name: string, age: number </span>&#125; &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> myName = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/YwvikmS.png" alt="物件"></p>
+<p>如果你先寫 JSDoc 再去寫物件屬性時，當你屬性沒有對上 JSDoc 也會出現警告</p>
+<p><img src="https://i.imgur.com/X7RECok.png" alt="物件"></p>
+<h3 id="函式"><a href="#函式" class="headerlink" title="函式"></a>函式</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#x27;John&#x27;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">name</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面是我們前面所示範的函式，但是我們實戰開發上是很長傳入物件的，所以我們來看一下物件的寫法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> object </span>&#125; options 選項</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> string </span>&#125; options.name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> number </span>&#125; options.age 年齡</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#123; name: &#x27;John&#x27;, age: 18 &#125;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">&#123; name, age &#125;</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>，今年 <span class="subst">$&#123;age&#125;</span> 歲`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/4mAAMwg.png" alt="物件"></p>
+<p>當然也是一樣可以驗證的</p>
+<p><img src="https://i.imgur.com/BRyxInT.png" alt="驗證"></p>
+<p>如果是函式的話呢？其實也很簡單</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> Function </span>&#125; callback 回呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(() =&gt; &#123;&#125;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">callback</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;callback()&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">sayHi</span>(<span class="function">() =&gt;</span> <span class="string">&#x27;John&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/2fVvLC1.png" alt="函式"></p>
+<p>如果函式沒打算回傳值的話，那就可以使用 <code>void</code> 來定義</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> Function </span>&#125; callback 回呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> void </span>&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(() =&gt; &#123;&#125;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHi</span> = (<span class="params">callback</span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Hi, <span class="subst">$&#123;callback()&#125;</span>`</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">sayHi</span>(<span class="function">() =&gt;</span> <span class="string">&#x27;John&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="JSDoc-進階寫法-typedef"><a href="#JSDoc-進階寫法-typedef" class="headerlink" title="JSDoc 進階寫法 - @typedef"></a>JSDoc 進階寫法 - @typedef</h2><p>當我們型別比較複雜時，我們是可以使用 <code>@typedef</code> 來定義型別的，這樣就不用一直重複寫了，例如：我們要定義一個物件型別，裡面有 <code>name</code> 跟 <code>age</code> 兩個屬性，這時候我們就可以使用 <code>@typedef</code> 來定義</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@typedef</span> &#123;<span class="type"> object </span>&#125; User 選項</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> number </span>&#125; age 年齡</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<p>通常 <code>@typedef</code> 會放在檔案的最上面，因此就會像這樣</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@typedef</span> &#123;<span class="type"> object </span>&#125; User 選項</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> number </span>&#125; age 年齡</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> User </span>&#125; user 使用者資料</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#123; name: &#x27;John&#x27;, age: 18 &#125;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHiFn</span> = (<span class="params">&#123; name, age &#125;</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>，今年 <span class="subst">$&#123;age&#125;</span> 歲`</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 使用者資料</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> User </span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">sayHiFn</span>(user)</span><br></pre></td></tr></table></figure>
+
+<p>同樣的，如果你傳入錯誤的型別，也會出現警告</p>
+<p><img src="https://i.imgur.com/xwkqthf.png" alt="錯誤"></p>
+<p>那麼如果我們定義的 <code>@typedef</code> 需要跨檔案使用時，我們可以使用 <code>@typedef</code> 的 <code>@global</code> 來定義，這樣就可以跨檔案使用了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@typedef</span> &#123;<span class="type"> object </span>&#125; User 選項</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> number </span>&#125; age 年齡</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@global</span></span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來你就可以在其他檔案使用了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打招呼函式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type"> User </span>&#125; user 使用者資料</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type"> string </span>&#125; Hi, $&#123;name&#125;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@example</span></span></span><br><span class="line"><span class="comment"> * sayHi(&#123; name: &#x27;John&#x27;, age: 18 &#125;); // Hi, John</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">sayHiFn</span> = (<span class="params">&#123; name, age &#125;</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`Hi, <span class="subst">$&#123;name&#125;</span>，今年 <span class="subst">$&#123;age&#125;</span> 歲`</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 使用者資料</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@type</span> &#123;<span class="type"> User </span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> user = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;Ray&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">sayHiFn</span>(user)</span><br></pre></td></tr></table></figure>
+
+<p>通常會把 <code>@typedef</code> 定義在 <code>types.js</code> 檔案中，所以會建立一個資料夾叫做 <code>types</code>，然後在裡面建立 <code>index.js</code> 檔案，內容如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@typedef</span> &#123;<span class="type"> object </span>&#125; User 選項</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> string </span>&#125; name 名字</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@property</span> &#123;<span class="type"> number </span>&#125; age 年齡</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@global</span></span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="JSDoc-常見語法總結"><a href="#JSDoc-常見語法總結" class="headerlink" title="JSDoc 常見語法總結"></a>JSDoc 常見語法總結</h2><p>最後就差不多要來準備下個結論，也就是上面文章中有使用到的 JSDoc 語法</p>
+<ul>
+<li><code>@param</code>：函式參數</li>
+<li><code>@returns</code>：函式回傳值</li>
+<li><code>@example</code>：使用範例</li>
+<li><code>@typedef</code>：自定義型別</li>
+<li><code>@global</code>：跨檔案使用 <code>@typedef</code></li>
+<li><code>@property</code>：物件屬性</li>
+<li><code>@type</code>：型別</li>
+</ul>
+<p>當然不只有這些，所以如果你想要更深入了解的話，我會建議你直接看 <a target="_blank" rel="noopener" href="https://jsdoc.app/">JSDoc 官方文件</a>，因為 JSDoc 語法真的非常多，不太可能每一個都介紹到，所以我只介紹了常用的，如果你想要更深入了解的話，可以直接看官方文件哩~</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>其實我們可以發現就算沒有使用 TypeScript，也可以達到類似 TypeScript 的型別驗證，最後這邊我也將上面範例檔案整理了一下，以便你可以搭配這一篇文章來看</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/jsdoc-demo">jsdoc-demo</a></li>
+</ul>
+<p>基本上裡面我都有寫一些範例了，應該是可以讓你更了解 JSDoc 的使用方式哩</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+              <a href="/tags/JSDoc/" rel="tag"># JSDoc</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20230510/3539065095/" rel="prev" title="關於 Discord 常見的問題">
+                  <i class="fa fa-angle-left"></i> 關於 Discord 常見的問題
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/javascript/20230516/1249700747/" rel="next" title="讓同事進入混亂貓咪的假 jQuery 技巧">
+                  讓同事進入混亂貓咪的假 jQuery 技巧 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
