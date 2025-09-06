@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定">
+<meta property="og:url" content="https://israynotarray.com/other/20250513/3343643828/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&token=5443e485-61da-4d65-9c8e-ef21aaa4cdca">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214238.png?alt=media&token=bab1ed74-f4f3-4a0f-a345-d1e9a2b4032a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214527.png?alt=media&token=35567200-58f3-4c4b-8cd3-449ac548930c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214815.png?alt=media&token=177a1f18-8a6d-4832-966c-42c0085cf346">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220226.png?alt=media&token=1ff7156e-83c3-4e6c-8529-aa4ca059f8f8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220849.png?alt=media&token=7135ff13-53c1-4ad6-ba42-dcdc18ed7771">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514221056.png?alt=media&token=06da7e46-a56b-4b5e-96d5-51bfdd7e8a47">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514222800.png?alt=media&token=9d9a3243-db39-45b4-96bc-a70678685043">
+<meta property="article:published_time" content="2025-05-13T13:47:04.000Z">
+<meta property="article:modified_time" content="2025-05-13T13:47:04.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="Postman">
+<meta property="article:tag" content="curl">
+<meta property="article:tag" content="測試">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&token=5443e485-61da-4d65-9c8e-ef21aaa4cdca">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20250513/3343643828/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20250513/3343643828/","path":"other/20250513/3343643828/","title":"不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-curl"><span class="nav-number">2.</span> <span class="nav-text">什麼是 curl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#curl-%E8%AA%9E%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">curl 語法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%BB%E5%86%8A%E5%B8%B3%E8%99%9F%EF%BC%88POST-x2F-users-x2F-sign-up%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">註冊帳號（POST &#x2F;users&#x2F;sign_up）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A9%97%E8%AD%89-Token%EF%BC%88GET-x2F-users-x2F-checkout%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">驗證 Token（GET &#x2F;users&#x2F;checkout）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%96%E5%BE%97%E6%89%80%E6%9C%89%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88GET-x2F-todos%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">取得所有待辦事項（GET &#x2F;todos）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88POST-x2F-todos%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">新增待辦事項（POST &#x2F;todos）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88PUT-x2F-todos-x2F-id%EF%BC%89"><span class="nav-number">3.5.</span> <span class="nav-text">修改待辦事項（PUT &#x2F;todos&#x2F;:id）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88DELETE-x2F-todos-x2F-id%EF%BC%89"><span class="nav-number">3.6.</span> <span class="nav-text">刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E6%8F%9B%E4%BB%A3%E8%BE%A6%E7%8B%80%E6%85%8B%EF%BC%88PATCH-x2F-todos-x2F-id-x2F-toggle%EF%BC%89"><span class="nav-number">3.7.</span> <span class="nav-text">切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%AF%E7%A4%BA%E9%80%A3%E7%B7%9A%E8%B3%87%E8%A8%8A"><span class="nav-number">4.</span> <span class="nav-text">顯示連線資訊</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%87%E5%9B%9E%E6%87%89%E5%85%A7%E5%AE%B9%E5%AF%AB%E5%85%A5%E6%AA%94%E6%A1%88"><span class="nav-number">5.</span> <span class="nav-text">將回應內容寫入檔案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A-User-Agent"><span class="nav-number">6.</span> <span class="nav-text">指定 User-Agent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">7.</span> <span class="nav-text">結論</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">951</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">713</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20250513/3343643828/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-05-13 21:47:04" itemprop="dateCreated datePublished" datetime="2025-05-13T21:47:04+08:00">2025-05-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以考慮花 <strong>30 秒登入 LikeCoin</strong> 並點擊下方拍手按鈕(最多五下)免費支持與鼓勵我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  
+
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&token=5443e485-61da-4d65-9c8e-ef21aaa4cdca" alt="curl"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 <code>curl</code> 來測試 API。</p>
+<h2 id="什麼是-curl"><a href="#什麼是-curl" class="headerlink" title="什麼是 curl"></a>什麼是 curl</h2><p>curl 全名為 <code>Client URL</code>，這是一套網路協定工具，支援非常多種形式，舉凡…FTP、FTPS、HTTP、HTTPS 等等，幾乎所有的網路協定都可以使用 curl 來進行測試。</p>
+<blockquote>
+<p><strong>Note</strong><br>有的人會說 <code>curl</code> 或者是 <code>cURL</code>，本篇統一稱為 <code>curl</code>。</p>
+</blockquote>
+<p>許多的工具其實都可以看到它的身影，這邊舉例六角學院所提供的 <a target="_blank" rel="noopener" href="https://hexschool.github.io/ec-courses-api-swaggerDoc/#/">Swagger API 文件</a></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214238.png?alt=media&token=bab1ed74-f4f3-4a0f-a345-d1e9a2b4032a" alt="Swagger API 測試工具"></p>
+<p>底下可以看到有一段：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">curl -X <span class="string">&#x27;POST&#x27;</span> \</span><br><span class="line">  <span class="string">&#x27;https://ec-course-api.hexschool.io/v2/admin/signin&#x27;</span> \</span><br><span class="line">  -H <span class="string">&#x27;accept: application/json&#x27;</span> \</span><br><span class="line">  -H <span class="string">&#x27;Content-Type: application/json&#x27;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;username&quot;: &quot;example@test.com&quot;,</span></span><br><span class="line"><span class="string">  &quot;password&quot;: &quot;example&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>這段可以直接複製貼上到終端機使用</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214527.png?alt=media&token=35567200-58f3-4c4b-8cd3-449ac548930c" alt="終端機"></p>
+<p>還有哪些地方可以看到它的身影呢？像是 <a href="https://israynotarray.com/other/20211207/427026/">Postman</a> 這個 API 測試工具，當你在 Postman 測試完 API 後，點擊 <code>Code</code> 按鈕，就可以看到 curl 的語法了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214815.png?alt=media&token=177a1f18-8a6d-4832-966c-42c0085cf346" alt="Postman"></p>
+<p>所以接下來我們就來認識一下 curl 該如何使用吧！</p>
+<h2 id="curl-語法"><a href="#curl-語法" class="headerlink" title="curl 語法"></a>curl 語法</h2><p>curl 的語法非常的簡單，如果你只是測試 GET API 的話，基本上只要這一行就可以了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl [URL]</span><br></pre></td></tr></table></figure>
+
+<p>但實際上使用我們會需要傳遞一些參數，像是：</p>
+<ul>
+<li>Post、Get、Put、Delete 等等的 HTTP 方法</li>
+<li>Header 參數</li>
+<li>Body 參數</li>
+<li>其他的參數</li>
+</ul>
+<p>所以通常 <code>curl</code> 的語法會是這樣的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl [options] [URL]</span><br></pre></td></tr></table></figure>
+
+<p>這邊的 <code>options</code> 就是我們要傳遞的參數，<code>URL</code> 就是我們要測試的網址，參數部分不用擔心，我們後面會用 CRUD 來介紹一輪。</p>
+<p>那我這邊將會使用六角學院所提供的課程練習用 TodoList API 作為範例，API Path 是 <code>https://todolist-api.hexschool.io/</code>，這邊的 API 文件可以參考 <a target="_blank" rel="noopener" href="https://todolist-api.hexschool.io/doc/">這裡</a>。</p>
+<blockquote>
+<p><strong>Note</strong><br>由於這是課程練習用，所以資料會在每日凌晨 1:15 清除。</p>
+</blockquote>
+<h3 id="註冊帳號（POST-x2F-users-x2F-sign-up）"><a href="#註冊帳號（POST-x2F-users-x2F-sign-up）" class="headerlink" title="註冊帳號（POST &#x2F;users&#x2F;sign_up）"></a>註冊帳號（POST &#x2F;users&#x2F;sign_up）</h3><p>這邊我們會需要先註冊一個帳號，透過 API 文件我們可以知道註冊帳號需要傳遞那些參數</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example@gmail.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;nickname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著呢？我們該如何使用 curl 來呼叫這個 API 呢？</p>
+<p>我們這邊將會使用一個 <code>-X</code> 參數來指定 HTTP 方法，這邊的 <code>-X</code> 參數後面接著我們要使用的 HTTP 方法，這邊我們要使用 <code>POST</code> 方法，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST https://todolist-api.hexschool.io/users/sign_up</span><br></pre></td></tr></table></figure>
+
+<p>但這樣寫肯定太長，所以你可以把 <code>-X POST</code> 簡寫成 <code>-XPOST</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/users/sign_up</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請注意，必須要為大寫的 <code>X</code>，小寫的 <code>x</code> 會變成另一種模式，也就是 Proxy 模式。</p>
+</blockquote>
+<p>接著我們要告訴 Server 我們要傳遞的格式是一個 JSON 格式，這邊就要使用 <code>-H</code> 參數，這邊的 <code>-H</code> 參數後面接著我們要傳遞的 Header 參數，這邊我們要傳遞的 Header 參數是 <code>Content-Type: application/json</code>，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/users/sign_up -H <span class="string">&quot;Content-Type: application/json&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著資料該如何傳遞呢？這邊我們可以使用 <code>-d</code> 參數來傳遞資料，這邊的 <code>-d</code> 參數後面接著我們要傳遞的資料，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/users/sign_up -H <span class="string">&quot;Content-Type: application/json&quot;</span> -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;email&quot;: &quot;example@gmail.com&quot;,</span></span><br><span class="line"><span class="string">  &quot;password&quot;: &quot;example&quot;,</span></span><br><span class="line"><span class="string">  &quot;nickname&quot;: &quot;example&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>接著你貼到終端機就會發現這個帳號註冊成功了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220226.png?alt=media&token=1ff7156e-83c3-4e6c-8529-aa4ca059f8f8" alt="註冊成功"></p>
+<p>這邊也出個小功課，登入其實也是一樣的做法，但我這邊就不贅述了，登入的 API 是 <code>POST /users/sign_in</code>，傳遞的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example@gmail.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>登入成功的話，它會回傳一個 <code>token</code>，這個 <code>token</code> 是用來驗證你是否有權限使用這個 API 的，這邊讓你自己去試試看吧！</p>
+<details>
+<summary>點我看解答(請認真思考後再看解答)</summary>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/users/sign_in -H <span class="string">&quot;Content-Type: application/json&quot;</span> -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;email&quot;: &quot;example@gmail.com&quot;,</span></span><br><span class="line"><span class="string">  &quot;password&quot;: &quot;example&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+</details>
+
+<h3 id="驗證-Token（GET-x2F-users-x2F-checkout）"><a href="#驗證-Token（GET-x2F-users-x2F-checkout）" class="headerlink" title="驗證 Token（GET &#x2F;users&#x2F;checkout）"></a>驗證 Token（GET &#x2F;users&#x2F;checkout）</h3><p>這隻 API 相對單純，因為只是一個 GET API，通常我們 GET API 並不會帶上資料，以文件來講，你要將登入之後回傳的 Token 放在 Header 裡面，然後名稱是 <code>Authorization</code>，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XGET https://todolist-api.hexschool.io/users/checkout -H <span class="string">&quot;Content-Type: application/json&quot;</span> -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> <span class="comment"># ← 請將 &#123;&#123; token &#125;&#125; 替換為實際取得的 JWT Token</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220849.png?alt=media&token=7135ff13-53c1-4ad6-ba42-dcdc18ed7771" alt="驗證 Token"></p>
+<p>這邊的 <code>[Token]</code> 就是你登入成功後回傳的 Token，這邊你可以直接將它複製貼上到終端機上使用。</p>
+<p>這邊的 <code>-X</code> 其實是可以省略的，因為 <code>GET</code> 是預設的 HTTP 方法，所以我們可以這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://todolist-api.hexschool.io/users/checkout -H <span class="string">&quot;Content-Type: application/json&quot;</span> -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514221056.png?alt=media&token=06da7e46-a56b-4b5e-96d5-51bfdd7e8a47" alt="驗證 Token"></p>
+<p>這邊也額外補充一下，其實就連 <code>-XPOST</code> 也可以省略，因為 <code>curl</code> 如果偵測到有 <code>-d</code> 參數的話，會自動將 HTTP 方法改為 POST，所以我們可以這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl https://todolist-api.hexschool.io/todos -H <span class="string">&quot;Content-Type: application/json&quot;</span> -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;content&quot;: &quot;買晚餐&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="取得所有待辦事項（GET-x2F-todos）"><a href="#取得所有待辦事項（GET-x2F-todos）" class="headerlink" title="取得所有待辦事項（GET &#x2F;todos）"></a>取得所有待辦事項（GET &#x2F;todos）</h3><p>這邊我們要取得所有的待辦事項，這邊的 API 是 <code>GET /todos</code>，這邊的做法跟驗證 Token 一樣，我們只要將 Token 放在 Header 裡面就可以了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://todolist-api.hexschool.io/todos -H <span class="string">&quot;Content-Type: application/json&quot;</span> -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>是不是超簡單的呢？</p>
+<h3 id="新增待辦事項（POST-x2F-todos）"><a href="#新增待辦事項（POST-x2F-todos）" class="headerlink" title="新增待辦事項（POST &#x2F;todos）"></a>新增待辦事項（POST &#x2F;todos）</h3><p>這邊我們要新增一個待辦事項，這邊的 API 是 <code>POST /todos</code>，這邊的做法跟註冊帳號一樣，我們要將資料放在 <code>-d</code> 參數裡面，這邊的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;買晚餐&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/todos -H <span class="string">&quot;Content-Type: application/json&quot;</span> -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;content&quot;: &quot;買晚餐&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>這時候你應該會發現 <code>curl</code> 的長度變得很長，很難閱讀，這邊我們可以使用 <code>\</code> 來換行，這樣就會變得比較好閱讀了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST https://todolist-api.hexschool.io/todos \</span><br><span class="line">  -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">  -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;content&quot;: &quot;買晚餐&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>\</code> 這個符號代表著換行的意思，這樣就可以讓我們的程式碼變得比較好閱讀了。</p>
+<p>寫到現在你應該會開始疑惑為什麼 <code>-H</code> 參數要寫兩次，因為 HTTP 協定規定每個 Header 是獨立的一行，curl 沒有提供將多個 Header 寫成單行的能力，每個都要各自 <code>-H</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: application/json</span><br><span class="line">Authorization: &#123;&#123; token &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以才會需要兩次 <code>-H</code> 參數。</p>
+<p>如果把這邊套用到 <code>Fetch</code> 語法上，你或許會比較容易懂，因為也很相似：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">fetch</span>(<span class="string">&quot;https://todolist-api.hexschool.io/todos&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">  <span class="attr">headers</span>: &#123;</span><br><span class="line">    <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Authorization&quot;</span>: <span class="string">&quot;xxxxxx&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">body</span>: <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; <span class="attr">content</span>: <span class="string">&quot;買晚餐&quot;</span> &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>本質上就是一個 Key-Value 的概念。</p>
+<h3 id="修改待辦事項（PUT-x2F-todos-x2F-id）"><a href="#修改待辦事項（PUT-x2F-todos-x2F-id）" class="headerlink" title="修改待辦事項（PUT &#x2F;todos&#x2F;:id）"></a>修改待辦事項（PUT &#x2F;todos&#x2F;:id）</h3><p>這個相信對你來講非常簡單了，我就不多做解釋，直接給答案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -XPUT https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_ \</span><br><span class="line">  -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">  -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;content&quot;: &quot;改買早餐&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊的 <code>&#123;&#123; id &#125;&#125;</code> 就是你要修改的待辦事項的 ID，這邊你可以從 <code>GET /todos</code> 的 API 取得。</p>
+<h3 id="刪除待辦事項（DELETE-x2F-todos-x2F-id）"><a href="#刪除待辦事項（DELETE-x2F-todos-x2F-id）" class="headerlink" title="刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）"></a>刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）</h3><p>邏輯其實與修改待辦事項一樣，只是這邊的 HTTP 方法是 <code>DELETE</code>，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -XDELETE https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_ \</span><br><span class="line">  -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">  -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="切換代辦狀態（PATCH-x2F-todos-x2F-id-x2F-toggle）"><a href="#切換代辦狀態（PATCH-x2F-todos-x2F-id-x2F-toggle）" class="headerlink" title="切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）"></a>切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）</h3><p>這邊我們要切換代辦事項的狀態，這邊的 API 是 <code>PATCH /todos/:id/toggle</code>，這邊的做法跟修改待辦事項一樣，我們要將資料放在 <code>-d</code> 參數裡面，這邊的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;completed&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -XPATCH https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_/toggle \</span><br><span class="line">  -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">  -H <span class="string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">  &quot;completed&quot;: true</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>到這邊為止很簡單吧？</p>
+<h2 id="顯示連線資訊"><a href="#顯示連線資訊" class="headerlink" title="顯示連線資訊"></a>顯示連線資訊</h2><p>curl 有一個很強大的功能，你可以針對你所發送的請求，顯示出詳細的連線資訊，這邊我們可以使用 <code>-v</code> 參數來顯示詳細的連線資訊，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -v https://google.com</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514222800.png?alt=media&token=9d9a3243-db39-45b4-96bc-a70678685043" alt="顯示連線資訊"></p>
+<p><code>-v</code> 除了顯示 <code>request/response</code> 之外，還會顯示 DNS、TCP 握手、TLS 握手等過程，這些都是有助於 Debug 的（內容太多所以可以自己試試看）。</p>
+<h2 id="將回應內容寫入檔案"><a href="#將回應內容寫入檔案" class="headerlink" title="將回應內容寫入檔案"></a>將回應內容寫入檔案</h2><p>如果回傳的內容比較多時，你可以使用 <code>-o</code> 將回應的內容寫入檔案，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -o google.html https://google.com</span><br></pre></td></tr></table></figure>
+
+<p><code>-o</code> 參數後面接著你要寫入的檔案名稱，這邊我們就將回應的內容寫入 <code>google.html</code> 檔案裡面，這樣就可以將回應的內容寫入檔案了。</p>
+<h2 id="指定-User-Agent"><a href="#指定-User-Agent" class="headerlink" title="指定 User-Agent"></a>指定 User-Agent</h2><p>那麼可不可以指定 User-Agent（告訴 Server 我是誰、我使用什麼瀏覽器）呢？當然可以，這邊我們可以使用 <code>-A</code> 參數來指定 User-Agent，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -A <span class="string">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3&quot;</span> https://google.com</span><br></pre></td></tr></table></figure>
+
+<p>這邊的 <code>-A</code> 參數後面接著你要指定的 User-Agent，這樣就可以指定 User-Agent 了。</p>
+<p>為什麼會特別提到 <code>-A</code> 呢？因為有些網站會針對無法辨識的 User-Agent 做一些限制，所以就會特別補上 User-Agent 的部分。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>最後這邊我也整理一下表格，整理一下本篇文章有介紹到的參數哩～</p>
+<table>
+<thead>
+<tr>
+<th>參數</th>
+<th>功能說明</th>
+<th>實際範例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-X</code></td>
+<td>指定 HTTP 方法（例如：POST、PUT、DELETE）</td>
+<td><code>curl -XPOST https://api.example.com/items</code></td>
+</tr>
+<tr>
+<td><code>-H</code></td>
+<td>傳送 Header（每個 Header 一個 <code>-H</code>）</td>
+<td><code>curl -H &quot;Authorization: Bearer YOUR_TOKEN&quot;</code></td>
+</tr>
+<tr>
+<td><code>-d</code></td>
+<td>傳送資料（Request Body，常用於 POST&#x2F;PUT）</td>
+<td><code>curl -d &#39;&#123;&quot;content&quot;:&quot;買晚餐&quot;&#125;&#39; -H &quot;Content-Type: application/json&quot; https://api.example.com/todos</code></td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>顯示詳細連線資訊（包含 request&#x2F;response headers）</td>
+<td><code>curl -v https://example.com</code></td>
+</tr>
+<tr>
+<td><code>-o</code></td>
+<td>將回應輸出到檔案</td>
+<td><code>curl -o result.html https://example.com</code></td>
+</tr>
+<tr>
+<td><code>-A</code></td>
+<td>指定 User-Agent（模擬瀏覽器或裝置）</td>
+<td><code>curl -A &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64)&quot; https://example.com</code></td>
+</tr>
+<tr>
+<td><code>\</code>（反斜線）</td>
+<td>換行指令，讓多行 curl 比較好閱讀</td>
+<td><code>curl -XPOST https://api.example.com \  -H &quot;Authorization: Bearer ...&quot; \  -d &#39;&#123;&quot;key&quot;:&quot;value&quot;&#125;&#39;</code></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    Liker 讚賞
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇文章如果對你有幫助，你可以花 30 秒登入 LikeCoin 並點擊下方拍手按鈕(最多五下)免費支持與<del>牡蠣</del><ins>鼓勵</ins>我。
+    <br />
+    或者你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+  <div style='height: 212px; width: 100%;'>
+    <script type="text/javascript">
+      document.write(
+      "<iframe scrolling='no' frameborder='0' sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sand" +
+        "box allow-storage-access-by-user-activation' style='height: 212px; width: 100%;' src='https://button.like.co/in/embed/is" +
+        "raynotarray/button?referrer=" + encodeURIComponent(location
+        .href
+        .split("?")[0]
+        .split("#")[0]) + "'></iframe>");
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/Postman/" rel="tag"># Postman</a>
+              <a href="/tags/curl/" rel="tag"># curl</a>
+              <a href="/tags/%E6%B8%AC%E8%A9%A6/" rel="tag"># 測試</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ai/20250502/2743392124/" rel="prev" title="架設自己的 AI 語言模型實驗室不求人之 LM Studio">
+                  <i class="fa fa-angle-left"></i> 架設自己的 AI 語言模型實驗室不求人之 LM Studio
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20250521/617540884/" rel="next" title="Google Domains 停止後怎麼辦？用 Cloudflare 建立網域、部署網站完整圖文教學">
+                  Google Domains 停止後怎麼辦？用 Cloudflare 建立網域、部署網站完整圖文教學 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
