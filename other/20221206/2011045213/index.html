@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="滿多人都會架設自己的技術部落格並放置在 GitHub Pages、GitLab Pages 上，然後也會想要客製化自己的部落格網址，所以這一篇將會介紹如何客製化自己部落格網址，然後從零開始購買網址，一路到將原本 GitHub Pages 網址替換成自己購買的網址並搭上免費的 SSH CloudFlare！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="從零開始教你買網址(Google Domain)到設定成自己部落格網址">
+<meta property="og:url" content="https://israynotarray.com/other/20221206/2011045213/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="滿多人都會架設自己的技術部落格並放置在 GitHub Pages、GitLab Pages 上，然後也會想要客製化自己的部落格網址，所以這一篇將會介紹如何客製化自己部落格網址，然後從零開始購買網址，一路到將原本 GitHub Pages 網址替換成自己購買的網址並搭上免費的 SSH CloudFlare！">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/gdGyaRl.png">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain.jpg?alt=media&token=0a1dcaf3-a137-48fd-9c90-2f860846f990">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.43.19.png?alt=media&token=5bd5b015-1bf7-4be7-8993-f11fcf270ea8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-2.jpg?alt=media&token=99fa893d-0938-45ba-8f9b-ea07ab2e056f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.53.43.png?alt=media&token=e5a6ced1-ea61-4b28-aef4-4ea4299d5a7a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.56.33.png?alt=media&token=7099a169-a2f9-4045-ad9f-cf2e9289790e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-3.jpg?alt=media&token=a0c422e5-b05f-4d4d-b3f4-d63d4c801ee5">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-4.jpg?alt=media&token=b641e8a3-8ec6-4c8e-ab8e-d50a7c56ec81">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.13.09.png?alt=media&token=422fcfdc-77f7-4cb7-b664-e61711f33038">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.14.16.png?alt=media&token=174cf8dc-57db-43e7-b0f2-a42f809fd387">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.33.30.png?alt=media&token=9f06df12-ea1f-4c8a-b8d1-490b6b0b5917">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-dns-1.jpg?alt=media&token=2c2e4278-2946-4a9c-9d88-22468ea98c3b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-dns-2.jpg?alt=media&token=d68fc7a1-4e30-4a4a-a473-c3988ad639cf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.52.59.png?alt=media&token=fe722545-b0ef-48dd-8615-243fcbf16d65">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fsetting-domain.jpg?alt=media&token=33e3c305-eac9-4807-8f46-499e7ec6ae42">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fsetting-domain-2.jpg?alt=media&token=f02479ec-ea51-471b-b3cd-04cbaf477c70">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-1.jpg?alt=media&token=800fea64-f4a4-4f7d-a087-470bd2544a40">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.50.25.png?alt=media&token=c77cc3fe-295e-4441-9ebb-e6787b0a11d0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-2.jpg?alt=media&token=e58828cd-46ed-451a-8874-4302c4c9e882">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.52.29.png?alt=media&token=7926d1ea-2d56-4e71-b2a8-e0e77d547ea1">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.58.05.png?alt=media&token=8ceeee60-b59d-4a89-8532-038091cdce59">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.00.13.png?alt=media&token=72886aaf-65de-4fbd-b934-f6596196338b">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fdns-clf-1.jpg?alt=media&token=6dfb81b7-fa1a-4f42-9e4c-266492d0f517">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.03.27.png?alt=media&token=1de8a8ad-ad89-407d-b54a-b33e6dad59cd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fdns-clf-2.jpg?alt=media&token=25fc49ed-a4c3-4b05-bd9a-f26e87389279">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.04.13.png?alt=media&token=9827d4f0-b007-4623-80bb-fd8d28758551">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.09.37.png?alt=media&token=c437f45f-dab7-4ff0-b82f-b7fa53acd781">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.10.42.png?alt=media&token=2933676b-1a61-4aca-aabd-180612eb7ec3">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2019.24.05.png?alt=media&token=5e5199ae-1334-4cf5-b620-7d84df50adf2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-bug.jpg?alt=media&token=3c58a0d5-01ab-4925-9252-c9366e244b78">
+<meta property="article:published_time" content="2022-12-06T06:15:01.000Z">
+<meta property="article:modified_time" content="2023-02-13T07:30:00.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="GitHub Pages">
+<meta property="article:tag" content="Domain">
+<meta property="article:tag" content="Google Domain">
+<meta property="article:tag" content="CloudFlare">
+<meta property="article:tag" content="GitLab Pages">
+<meta property="article:tag" content="網址">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/gdGyaRl.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/other/20221206/2011045213/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/other/20221206/2011045213/","path":"other/20221206/2011045213/","title":"從零開始教你買網址(Google Domain)到設定成自己部落格網址"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>從零開始教你買網址(Google Domain)到設定成自己部落格網址 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%85%8D%E8%B2%BB-Domain-%E7%9A%84%E5%95%8F%E9%A1%8C"><span class="nav-number">2.</span> <span class="nav-text">使用免費 Domain 的問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Domain"><span class="nav-number">3.</span> <span class="nav-text">Google Domain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%8F%E9%81%8E-Google-Domain-%E8%B3%BC%E8%B2%B7%E7%B6%B2%E5%9D%80"><span class="nav-number">4.</span> <span class="nav-text">透過 Google Domain 購買網址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Google-Domain-DNS"><span class="nav-number">5.</span> <span class="nav-text">設定 Google Domain DNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-GitHub-Pages"><span class="nav-number">6.</span> <span class="nav-text">設定 GitHub Pages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E7%A2%BC%EF%BC%9A%E6%90%AD%E9%85%8D-CloudFlare-%E4%BD%BF%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">加碼：搭配 CloudFlare 使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CloudFlare-%E9%9B%B7%E9%BB%9E%E8%A3%9C%E5%85%85"><span class="nav-number">8.</span> <span class="nav-text">CloudFlare 雷點補充</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">966</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">798</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/other/20221206/2011045213/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="從零開始教你買網址(Google Domain)到設定成自己部落格網址 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="滿多人都會架設自己的技術部落格並放置在 GitHub Pages、GitLab Pages 上，然後也會想要客製化自己的部落格網址，所以這一篇將會介紹如何客製化自己部落格網址，然後從零開始購買網址，一路到將原本 GitHub Pages 網址替換成自己購買的網址並搭上免費的 SSH CloudFlare！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          從零開始教你買網址(Google Domain)到設定成自己部落格網址
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-12-06 14:15:01" itemprop="dateCreated datePublished" datetime="2022-12-06T14:15:01+08:00">2022-12-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新於</span>
+      <time title="修改時間：2023-02-13 15:30:00" itemprop="dateModified" datetime="2023-02-13T15:30:00+08:00">2023-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/other/" itemprop="url" rel="index"><span itemprop="name">雜談</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">滿多人都會架設自己的技術部落格並放置在 GitHub Pages、GitLab Pages 上，然後也會想要客製化自己的部落格網址，所以這一篇將會介紹如何客製化自己部落格網址，然後從零開始購買網址，一路到將原本 GitHub Pages 網址替換成自己購買的網址並搭上免費的 SSH CloudFlare！</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD001 MD033 -->
+<p><img src="https://i.imgur.com/gdGyaRl.png" alt="Google Domains"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>滿多人都會架設自己的技術部落格並放置在 GitHub Pages、GitLab Pages 上，然後也會想要客製化自己的部落格網址，所以這一篇將會介紹如何客製化自己部落格網址，然後從零開始購買網址，一路到將原本 GitHub Pages 網址替換成自己購買的網址並搭上免費的 SSH CloudFlare！</p>
+<h2 id="使用免費-Domain-的問題"><a href="#使用免費-Domain-的問題" class="headerlink" title="使用免費 Domain 的問題"></a>使用免費 Domain 的問題</h2><p>一開始先來聊一下為什麼好好的免費 Url 不用還要花錢特別去買一個 Domain 來去使用的原因。</p>
+<p>首先通常我們會將自己的部落格(技術部落格)託管在 GitHub Pages 或是 GitLab Pages 上，而官方本身會依據你的帳號生成一組你專屬 Url，假設你的 GitHub 帳號是 「israynotarray」，那麼就會是 「israynotarray.github.io」，而 GitLab 則是 「israynotarray.gitlab.io」，而這些 Url 通常就會是你部落格的網址或是你作品儲存庫的網址。</p>
+<p>那什麼不好呢？首先這些 Url 本身是 GitHub 或是 GitLab 提供的，因此就會有幾個問題發生：</p>
+<ul>
+<li>提供服務的平台出事，你的網站就會掛掉，因為網址連不上</li>
+<li>提供服務的平台取消該機制，你辛苦養的 SEO 就沒了</li>
+<li>網址通常不會很好記，而且也不太好看</li>
+</ul>
+<p>其中最麻煩的就是「轉移部落格」，如果你是想要將部落格改轉移到自己準備的機器中，那麼這些 SEO 流量就無法跟著你走，因此免費的 Url 通常都是用來做作品儲存庫或是簡單的部落格，而不是想要長期維護的部落格，如果你有想要長期維護或分享你的部落格，那麼就會建議你去買一個 Domain 來使用。</p>
+<p>看到這邊，如果你不知道什麼是 Domain 也不知道 Domain 的知識，你可以參考我先前寫的<a href="/hexo/20201005/1370103497/">這一篇</a>文章。</p>
+<h2 id="Google-Domain"><a href="#Google-Domain" class="headerlink" title="Google Domain"></a>Google Domain</h2><p>接下來你可以打開你的瀏覽器，在網址列上輸入「<a target="_blank" rel="noopener" href="https://domains.google.com/registrar/search">https://domains.google.com/registrar/search</a>」(或者點<a target="_blank" rel="noopener" href="https://domains.google.com/registrar/search">這個連結</a>)，然後你就會看到 Google Domain 的頁面。</p>
+<p>接下來呢？接下來你可以在圖片的箭頭所指處輸入你想要的 Domain</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain.jpg?alt=media&token=0a1dcaf3-a137-48fd-9c90-2f860846f990" alt="Domain"></p>
+<p>例如：你可以試著搜尋 「RayIsGood」，當你按下搜尋後下方就會跳出相關的 Domain，而你可以選擇你想要的 Domain 來使用</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.43.19.png?alt=media&token=5bd5b015-1bf7-4be7-8993-f11fcf270ea8" alt="RayIsGood"></p>
+<p>挑選的時候要稍微注意一下，每一個 Domain 都會有一個價格，隨著尾碼的不同價格也會不同，而價格的高低也會影響到 Domain 的價值，例如：「<code>.com</code>」的 Domain 有些會比較貴，而「<code>.tw</code>」的 Domain 有些則會比較便宜，而你可以在圖片的箭頭所指處看到 Domain 的價格。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-2.jpg?alt=media&token=99fa893d-0938-45ba-8f9b-ea07ab2e056f" alt="Domain 價錢"></p>
+<p>當你選好你要的 Domain + 尾碼後，你也可以看一下它給你的建議，例如：這個網域好不好記、常不常見等優點，這些都是購買 Domain 的時候可以考慮的因素，因為這些可以讓你的網站更容易被人找到。</p>
+<p>早期 Google Domain 只能在美國購買，但是現在已經可以在台灣購買了，而且也有提供中文的介面，所以你可以放心的使用，但是因為我另一個帳號是在美國購買，因此接下來我會用美國帳號來示範(金額會顯示美金是正常的。)</p>
+<p>那麼有一件注意事項要提醒，當你使用選擇使用美國地區購買時，你的 Google 帳單將會強制綁定在美國，也就是說你的 Google Play 商店就會強制綁定在美國，如果你有要送禮給朋友的話就會無法送禮，這個要稍微注意一下。</p>
+<h2 id="透過-Google-Domain-購買網址"><a href="#透過-Google-Domain-購買網址" class="headerlink" title="透過 Google Domain 購買網址"></a>透過 Google Domain 購買網址</h2><p>那麼前面我們挑選一組 Domain 來購買，接下來我們就來看看如何透過 Google Domain 購買網址並分享購買流程。</p>
+<p>首先假使我們目前挑選的 Domain 是「israynotarray.dev」，你可以先將它加入到購物車</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.53.43.png?alt=media&token=e5a6ced1-ea61-4b28-aef4-4ea4299d5a7a" alt="加入購物車"></p>
+<p>接下來進入購物車後可以看到一推東西</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2014.56.33.png?alt=media&token=7099a169-a2f9-4045-ad9f-cf2e9289790e" alt="購物車介面"></p>
+<p>這邊有幾件事情要注意…</p>
+<ul>
+<li>第一件事情是目前我們購買的網址預設狀況下是沒有安全資料傳輸層 (SSL) 憑證的，但是這個我們後面會介紹 Cloudflare 來幫我們解決，所以這邊不用擔心。</li>
+<li>第二件事情是「註冊約期」，如果你想要長期經營的話，會建議你買滿十年，通常一個 Domain 只能最多持有十年，最少一年，但這邊我僅只是示範，所以就只買一年</li>
+<li>第三件事情是「隱私保護」，這個是可以選擇是否要開啟，如果你不想要讓其他人知道 Domain 的持有者是誰的話，可以選擇開啟，如果不開啟的話，你的個人資訊是可以在 <a target="_blank" rel="noopener" href="https://www.twnic.tw/whois_n.php">WHOIS</a> 查詢到的，而且是會包含你的電話、地址、Email 等等資訊，所以我會建議要開啟，剛好 Google Domain 這部分是免費的，但部分 Domain 商會針對這一點額外收費，所以這邊我們也會選擇開啟。</li>
+<li>第四件事情是「已啟用自動續約」，這個功能是可以讓你的 Domain 在到期前自動續約，這個功能是免費的，但是如果你不想要自動續約的話，可以取消勾選，但是這樣的話，你的 Domain 到期後就會被釋放，其他人就可以使用這個 Domain 了，而這邊我只是示範而已，所以我會關閉這個功能（避免我信用卡突然被刷一筆）</li>
+</ul>
+<p>基於以上來講，目前你的所有設定應該是長這樣</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-3.jpg?alt=media&token=a0c422e5-b05f-4d4d-b3f4-d63d4c801ee5" alt="當前畫面"></p>
+<blockquote>
+<p><strong>Warning</strong><br>上方設定只是示範而已，請務必確定你的需求，如果你想要長期持有該 Domain 的話，請務必確定「已啟用自動續約」已經被啟用以及「隱私保護」有被開啟。</p>
+</blockquote>
+<p>都沒有問題後你就可以按下「結帳」按鈕，到達結帳畫面時，會要求你填寫一些購買資訊等，請務必核對圖片中圈起來的地方，如果沒問題就按下「結帳」吧！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-4.jpg?alt=media&token=b641e8a3-8ec6-4c8e-ab8e-d50a7c56ec81" alt="結帳資訊"></p>
+<p>按下結帳後，會需要稍微等一下…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.13.09.png?alt=media&token=422fcfdc-77f7-4cb7-b664-e61711f33038" alt="正在註冊網域"></p>
+<p>等它跑完後你就可以看到你的 Domain 已經被註冊成功了！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.14.16.png?alt=media&token=174cf8dc-57db-43e7-b0f2-a42f809fd387" alt="註冊成功"></p>
+<h2 id="設定-Google-Domain-DNS"><a href="#設定-Google-Domain-DNS" class="headerlink" title="設定 Google Domain DNS"></a>設定 Google Domain DNS</h2><p>接下來由於這一篇範例是使用 GitHub Pages 為主，所以如果你是使用其他的服務的話，就會建議你自己稍微搜尋一下，因為每個服務的 DNS 設定方式都不太一樣，這邊我就不一一示範了。</p>
+<p>那麼由於我們目前購買的就只是一個單純的 Domain，而這個 Domain 還沒有被指定到任何的服務上，所以你直接輸入你的 Domain 進去瀏覽器，是無法看到任何東西的。</p>
+<p>那麼由於我們要將這個 Domain 指向到 GitHub Pages 上，但是我們並不知道 GitHub Pages 的 IP 位址，所以你可以透過 GitHub Pages 的<a target="_blank" rel="noopener" href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site">官方文件</a>找到 IP</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.33.30.png?alt=media&token=9f06df12-ea1f-4c8a-b8d1-490b6b0b5917" alt="GitHub Page IP"></p>
+<p>如果你找不到的話，我也直接貼上來</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">185.199.108.153</span><br><span class="line">185.199.109.153</span><br><span class="line">185.199.110.153</span><br><span class="line">185.199.111.153</span><br></pre></td></tr></table></figure>
+
+<p>接下來我們就可以開始設定 DNS 了，首先我們要先進入 Google Domain 的管理頁面，點選「DNS」，進入 DNS 管理頁面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-dns-1.jpg?alt=media&token=2c2e4278-2946-4a9c-9d88-22468ea98c3b" alt="DNS"></p>
+<p>接下來我們要新增一個 A 紀錄，點選「自訂記錄」，並且填入以下資訊(主機名稱可以不用填寫)</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fgoogle-domain-dns-2.jpg?alt=media&token=d68fc7a1-4e30-4a4a-a473-c3988ad639cf" alt="自訂紀錄"></p>
+<p>恭喜你，到目前為止你的 Domain 就已經設定完成了，接下來我們就可以開始將 GitHub Pages 設定上去了。</p>
+<h2 id="設定-GitHub-Pages"><a href="#設定-GitHub-Pages" class="headerlink" title="設定 GitHub Pages"></a>設定 GitHub Pages</h2><p>接下來打開你的 GitHub Pages 的 Repository，請注意這個儲存庫必須為你的主要儲存庫，也就是你的 GitHub 帳號名稱，例如：我的部落格帳號是 <code>hsiangfeng</code>，所以我的儲存庫名稱應該會是 <code>hsiangfeng.github.io</code>，如同我部落格<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/hsiangfeng.github.io">這個專案</a>相同。</p>
+<p>接下來我將會使用我新開的 GitHub 帳號「<code>share-jack</code>」當作示範，確保你的流程一切正確。</p>
+<p>首先請依照你帳號名稱，建立一個儲存庫，並且命名為 <code>share-jack.github.io</code>，如同下圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2015.52.59.png?alt=media&token=fe722545-b0ef-48dd-8615-243fcbf16d65" alt="初始儲存庫"></p>
+<p>那麼由於這個儲存庫太空了，所以我先上傳了一個 index.html 當作示範，內容很簡單就只是這樣而已</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;zh-Hant-TW&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;IE=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Google Domain 綁定 GitHub Pages 示範<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>這是一個 Google Domain 綁定 GitHub Pages 示範網站<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">    如要看完整教學原文，請見：</span><br><span class="line">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;https://israynotarray.com/other/20221206/2011045213/&quot;</span>&gt;</span>從零開始教你買網址(Google Domain)到設定成自己部落格網址<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>接下來打開這個 Repository 的設定頁面，點選「Pages」，找到「Custom domain」，並且填入你剛剛購買的 Domain 按下 Save，如同下圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fsetting-domain.jpg?alt=media&token=33e3c305-eac9-4807-8f46-499e7ec6ae42" alt="Custom domain"></p>
+<p>基本上到這邊你應該會出現以下這個錯誤</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://www.israynotarray.dev/">www.israynotarray.dev</a> is improperly configured<br>Domain’s DNS record could not be retrieved. For more information, see documentation (InvalidDNSError).</p>
+</blockquote>
+<p>這一段不用理他，因為過段時間你會發現，你的 Domain 已經可以正常使用了，如同下圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fsetting-domain-2.jpg?alt=media&token=f02479ec-ea51-471b-b3cd-04cbaf477c70" alt="自動網域"></p>
+<p>恭喜你，你的自訂網域已經設定完成了，而且你可以發現 Repository 自己增加了一個 <code>CNAME</code> 檔案，內容就是你剛剛設定的 Domain</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">israynotarray.dev</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/DavidAnson/markdownlint/blob/v0.26.2/doc/Rules.md#md001">label</a><br>這個檔案主要用途就是告訴 GitHub Pages 你的 Domain 是什麼，這樣 GitHub Pages 才知道要將你的 Domain 導向哪個 Repository。</p>
+<p>而且你會發現 GitHub 本身就有提供 SSL 憑證，所以你的 Domain 也會自動使用 SSL 憑證，這樣你就可以安心的使用自己的 Domain 了。</p>
+<blockquote>
+<p><strong>Warning</strong><br>當你將你的 GitHub Pages 的 Custom domain 改成你自訂的網域後，接下來你全部的網址都要改成你自訂的網域，除此之外只要有人透過你的舊網址進入時，GitHub Pages 都會自動將他導向你的新網址，可以說是非常方便且無痛轉移，轉移時也會給予正確的狀態碼，也就是 301，這樣你的 SEO 也不會受到影響。</p>
+</blockquote>
+<h2 id="加碼：搭配-CloudFlare-使用"><a href="#加碼：搭配-CloudFlare-使用" class="headerlink" title="加碼：搭配 CloudFlare 使用"></a>加碼：搭配 CloudFlare 使用</h2><p>那麼這邊先提一下為什麼本身 GitHub Pages 有幫忙提供 SSL 了還要額外搭上 CloudFlare，其實主要原因是因為 CloudFlare 還有提供更多 GitHub Pages 所沒有的功能，例如：</p>
+<ul>
+<li>網站加速</li>
+<li>DDOS 防護</li>
+<li>網站監控</li>
+<li>網站防火牆</li>
+<li>網站防護</li>
+<li>網站分析</li>
+<li>網站緩存</li>
+<li>網站壓縮</li>
+</ul>
+<p>…等等非常多功能，而且這些功能都是免費的，所以後面這個算是加碼的部分，如果你覺得你的網站不需要這些功能，那麼你可以不用搭配 CloudFlare 使用。</p>
+<p>接下來就準備來介紹如何搭配 CloudFlare 使用，首先你要先到 <a target="_blank" rel="noopener" href="https://www.cloudflare.com/">CloudFlare</a> 註冊一個帳號吧。</p>
+<p>註冊好後，你會看到下圖的畫面，這邊我們要點選「新增網站」來新增一個網站</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-1.jpg?alt=media&token=800fea64-f4a4-4f7d-a087-470bd2544a40" alt="新增網站"></p>
+<p>ps.如果你畫面不是中文版的話，可以切換一下語言，CloudFlare 本身是有提供中文版的。</p>
+<p>接著請在欄位輸入你的 Domain</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.50.25.png?alt=media&token=c77cc3fe-295e-4441-9ebb-e6787b0a11d0" alt="新增 Domain"></p>
+<p>輸入後你會跳到一個好像要你付費的畫面，這邊不要怕，往下方滾動就會看到「免費版」，點選後就會跳到下一個畫面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-2.jpg?alt=media&token=e58828cd-46ed-451a-8874-4302c4c9e882" alt="Free"></p>
+<p>其實你這邊就可以看到免費版本身就提供滿多功能了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.52.29.png?alt=media&token=7926d1ea-2d56-4e71-b2a8-e0e77d547ea1" alt="免費版"></p>
+<p>接下來就是要設定 CloudFlare 的 DNS，這邊我們要把原本的 DNS 設定改成 CloudFlare 的 DNS，這樣才能讓 CloudFlare 來幫忙處理 SSL 的問題跟擁有它更多的免費加值服務，所以這邊要新增一些 DNS 設定，只需要點一下「新增紀錄」，欄位填寫成以下圖片的樣子即可</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2017.58.05.png?alt=media&token=8ceeee60-b59d-4a89-8532-038091cdce59" alt="新增紀錄"></p>
+<p>比較需要注意的是 <code>CNAME</code> 名稱必須為 <code>www</code> 然後內容要填你的原始 GitHub Pages 網址，例如我的網址是 <code>share-jack.github.io</code>，所以我就要填 <code>share-jack.github.io</code>。</p>
+<p>最後這邊 CloudFlare 會跟你說要去改一下你的名稱伺服器</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.00.13.png?alt=media&token=72886aaf-65de-4fbd-b934-f6596196338b" alt="名稱伺服器"></p>
+<p>你會在這個畫面取得以下兩個名稱伺服器</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jillian.ns.cloudflare.com</span><br><span class="line">kaiser.ns.cloudflare.com</span><br></pre></td></tr></table></figure>
+
+<p>請將這兩個保留起來，稍後會使用到。</p>
+<p>接下來打開 Google Domain 到你購買的網址 DNS 中，並選擇「自訂名稱伺服器」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fdns-clf-1.jpg?alt=media&token=6dfb81b7-fa1a-4f42-9e4c-266492d0f517" alt="自訂名稱伺服器"></p>
+<p>接著將剛剛那兩個名稱伺服器填入底下欄位，並按下儲存</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.03.27.png?alt=media&token=1de8a8ad-ad89-407d-b54a-b33e6dad59cd" alt="自訂名稱伺服器"></p>
+<p>接著按一下上方「切換為這些設定」按鈕才換真正完成唷！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fdns-clf-2.jpg?alt=media&token=25fc49ed-a4c3-4b05-bd9a-f26e87389279" alt="切換為這些設定"></p>
+<p>如果有切換成功，基本上你會得到這一個訊息「<code>這些 DNS 設定均為有效。變更會立即發布，但可能需要一些時間才能生效</code>」，並且原本的標題會變成「自訂名稱伺服器(使用中)」，這樣子才有真正的套用成自訂的。</p>
+<p>最後回到 CloudFlare 的畫面，點選「完成，檢查名稱伺服器」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.04.13.png?alt=media&token=9827d4f0-b007-4623-80bb-fd8d28758551" alt="完成，檢查名稱伺服器"></p>
+<p>這時候你應該會跳到一個「快速入門手冊」，你可以斟酌要不要看，不然就是按下「稍後完成」，這樣就可以跳回 CloudFlare 的畫面了，那麼其實到這邊就已經完成將我們自己的網域套用到 CloudFlare 的設定，只是這邊 CloudFlare 會需要一點時間去檢查你的名稱伺服器，所以你可以先去做其他事情，等待一段時間後再回來看看。</p>
+<p>如果啟用成功的話，你就會收到一封信告知你啟用成功哩</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.09.37.png?alt=media&token=c437f45f-dab7-4ff0-b82f-b7fa53acd781" alt="啟用成功"></p>
+<p>而且你也可以在 CloudFlare 的畫面上看到你的網域已經啟用成功了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2018.10.42.png?alt=media&token=2933676b-1a61-4aca-aabd-180612eb7ec3" alt="啟用成功"></p>
+<p>其餘的 CloudFlare 設定就留給你自己去摸索了，有中文介面其實也很好懂，所以這邊就不額外介紹囉~</p>
+<h2 id="CloudFlare-雷點補充"><a href="#CloudFlare-雷點補充" class="headerlink" title="CloudFlare 雷點補充"></a>CloudFlare 雷點補充</h2><p>最後補充一個你可能會發生的問題，當你設定完以上之後，你會發現 Domain 過段時間就掛掉了，這個原因是因為沒有完全的加密導致，在預設的狀況下 Cloudflare 的 SSL&#x2F;TLS 採用的是「彈性」模式，因此這邊會建議改成「完整」，否則你可能會看到以下這個畫面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2F%E6%88%AA%E5%9C%96%202022-12-06%2019.24.05.png?alt=media&token=5e5199ae-1334-4cf5-b620-7d84df50adf2" alt="掛掉"></p>
+<p>這個錯誤訊息基本上是隨著瀏覽器不同而出現。</p>
+<p>那麼該如何解決呢？只需要打開你的 CloudFlare 畫面，點選「SSL&#x2F;TLS」，然後將「SSL&#x2F;TLS 設定」改成「完整」即可</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fother%2Fgoogle-domain%2Fclf-bug.jpg?alt=media&token=3c58a0d5-01ab-4925-9252-c9366e244b78" alt="完整"></p>
+<p>這樣子你的網站基本上就可以立即使用囉～</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/GitHub-Pages/" rel="tag"># GitHub Pages</a>
+              <a href="/tags/Domain/" rel="tag"># Domain</a>
+              <a href="/tags/Google-Domain/" rel="tag"># Google Domain</a>
+              <a href="/tags/CloudFlare/" rel="tag"># CloudFlare</a>
+              <a href="/tags/GitLab-Pages/" rel="tag"># GitLab Pages</a>
+              <a href="/tags/%E7%B6%B2%E5%9D%80/" rel="tag"># 網址</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/gsap/20221205/1185711476/" rel="prev" title="(7)前端好好玩用 GSAP 做一個特效 - 座標軸">
+                  <i class="fa fa-angle-left"></i> (7)前端好好玩用 GSAP 做一個特效 - 座標軸
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nodejs/20221210/1224824056/" rel="next" title="用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例">
+                  用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
