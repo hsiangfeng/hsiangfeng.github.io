@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="深入解析 ASCII、EASCII 與 Unicode 的差異，說明字元集與編碼方式的原理，帶你全面理解 UTF-8 與亂碼問題的根源。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Day 19】從 ASCII 到 Unicode——文字編碼全面升級">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250919/1115708242/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="深入解析 ASCII、EASCII 與 Unicode 的差異，說明字元集與編碼方式的原理，帶你全面理解 UTF-8 與亂碼問題的根源。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%886%E6%97%A5%20%E4%B8%8B%E5%8D%8802_34_23.png?alt=media&token=af1f042b-2976-4f89-bce4-d336badba27f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2F20250612210705.png?alt=media&token=a289d320-c214-49d6-a2b3-fd408148b39d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2F202509061425.png?alt=media&token=80cf9d37-ccfd-4265-96e0-b2cef1c2138b">
+<meta property="article:published_time" content="2025-09-18T16:00:01.000Z">
+<meta property="article:modified_time" content="2025-09-18T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路">
+<meta property="article:tag" content="Unicode 編碼教學">
+<meta property="article:tag" content="UTF-8 字元集">
+<meta property="article:tag" content="亂碼問題解決">
+<meta property="article:tag" content="十六進位轉換">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%886%E6%97%A5%20%E4%B8%8B%E5%8D%8802_34_23.png?alt=media&token=af1f042b-2976-4f89-bce4-d336badba27f">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250919/1115708242/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250919/1115708242/","path":"learnexp/20250919/1115708242/","title":"【Day 19】從 ASCII 到 Unicode——文字編碼全面升級"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【Day 19】從 ASCII 到 Unicode——文字編碼全面升級 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%9E-ASCII-%E5%88%B0-Unicode%E2%80%94%E2%80%94%E6%96%87%E5%AD%97%E7%B7%A8%E7%A2%BC%E5%85%A8%E9%9D%A2%E5%8D%87%E7%B4%9A"><span class="nav-number">1.</span> <span class="nav-text">從 ASCII 到 Unicode——文字編碼全面升級</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E5%AD%97%E7%B7%A8%E7%A2%BC%E7%9A%84%E5%9F%BA%E7%A4%8E"><span class="nav-number">2.</span> <span class="nav-text">文字編碼的基礎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">3.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0"><span class="nav-number">4.</span> <span class="nav-text">同步更新</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">973</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">826</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250919/1115708242/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【Day 19】從 ASCII 到 Unicode——文字編碼全面升級 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="深入解析 ASCII、EASCII 與 Unicode 的差異，說明字元集與編碼方式的原理，帶你全面理解 UTF-8 與亂碼問題的根源。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Day 19】從 ASCII 到 Unicode——文字編碼全面升級
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-19 00:00:01" itemprop="dateCreated datePublished" datetime="2025-09-19T00:00:01+08:00">2025-09-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">深入解析 ASCII、EASCII 與 Unicode 的差異，說明字元集與編碼方式的原理，帶你全面理解 UTF-8 與亂碼問題的根源。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%886%E6%97%A5%20%E4%B8%8B%E5%8D%8802_34_23.png?alt=media&token=af1f042b-2976-4f89-bce4-d336badba27f" alt="從 ASCII 到 Unicode——文字編碼全面升級"></p>
+<h2 id="從-ASCII-到-Unicode——文字編碼全面升級"><a href="#從-ASCII-到-Unicode——文字編碼全面升級" class="headerlink" title="從 ASCII 到 Unicode——文字編碼全面升級"></a>從 ASCII 到 Unicode——文字編碼全面升級</h2><p>有一次在網咖查資料時，我打開某個網頁，結果裡面的文字全都是亂碼，看起來就像這樣……</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2F20250612210705.png?alt=media&token=a289d320-c214-49d6-a2b3-fd408148b39d" alt="亂碼"></p>
+<p>我已經忘了當時是在查什麼，只記得那時候用 Google 找資料，點進去某個網站後整頁全是亂碼。</p>
+<p>「ㄟ，這網站怎麼變這樣啊？」我忍不住問了在網咖認識的朋友。</p>
+<p>他笑了一下，說：「很簡單啦，打開瀏覽器設定，把字元編碼改成 UTF-8 就好了。」</p>
+<blockquote>
+<p><strong>Note</strong><br>早期可以透過瀏覽器手動設定字元編碼，但現在大部分的瀏覽器都會自動偵測並設定，因此亂碼的情況已經很少見了。</p>
+</blockquote>
+<p>「哎！變成正常了！為什麼啊？」我問。</p>
+<p>「阿災～反正遇到亂碼就改成 UTF-8 就對了。」他說。</p>
+<p>當下我想說問題解決就好，所以也沒多問，哪知道隔天資訊課就教到當下我只覺得問題能解決就好，也沒多想，哪知道隔天的資訊課，老師剛好就在講 <strong>「文字編碼」</strong> 。</p>
+<h2 id="文字編碼的基礎"><a href="#文字編碼的基礎" class="headerlink" title="文字編碼的基礎"></a>文字編碼的基礎</h2><p>還記得前一篇提到的 ASCII 嗎？我們說過 ASCII 是一種 <strong>「文字編碼」</strong> ，它透過二進位對應到字母、數字和符號，讓這些內容能顯示在電腦畫面上。</p>
+<p>不過，ASCII 早期僅支援 7 位元，也就是 <code>2^7 = 128</code> 個字元（代表 128 種不同符號）。這樣的限制，使得 ASCII 無法涵蓋其他語言的字元，例如中文、日文、韓文等等——畢竟它在設計之初，就是專門針對英語而來。</p>
+<blockquote>
+<p><strong>Note</strong><br>也因為早期 ASCII 是針對英語設計的，所以後來才會改叫 <strong>「US-ASCII」</strong> ，意指「美國標準資訊交換碼」。</p>
+</blockquote>
+<p>為了彌補 ASCII 的不足，後來又延伸出了 <strong>「EASCII（Extended ASCII）」</strong> 。那麼，EASCII 和 ASCII 有什麼差別呢？最主要的不同點是：EASCII 擴充到 8 位元，也就是 <code>2^8 = 256</code> 個字元，因此能支援更多符號。</p>
+<p>由於 EASCII 是在 ASCII 的基礎上擴充而來，所以它也具備以下特性：</p>
+<ul>
+<li><strong>向下相容：</strong> EASCII 的 0~127 字元與 ASCII 完全相同，這意味著所有的 ASCII 字元在 EASCII 中仍然可以使用。</li>
+<li><strong>擴充字元集：</strong> 在原本 ASCII 的基礎上，EASCII 新增了 128～255 的字元範圍，用來表示更多符號，例如歐洲語言的特殊字母、數學符號等等。</li>
+</ul>
+<p>不過這裡要特別注意，<strong>EASCII 並不是一個國際統一標準</strong>，因為不同的系統或應用程式可能會使用不同的 EASCII 編碼方式，當時可說是「各自為政」，也因此常常引發「亂碼」問題。</p>
+<p>以下提供一個 ASCII 與 EASCII 表格給參考：</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>ASCII</th>
+<th>EASCII（Extended ASCII）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全名</td>
+<td>American Standard Code for Information Interchange</td>
+<td>Extended ASCII</td>
+</tr>
+<tr>
+<td>位元數（bit）</td>
+<td><strong>7 bits</strong> → 128 組合</td>
+<td><strong>8 bits</strong> → 256 組合</td>
+</tr>
+<tr>
+<td>數值範圍</td>
+<td>0 ~ 127</td>
+<td>0 ~ 255</td>
+</tr>
+<tr>
+<td>是否標準定義</td>
+<td>是，<strong>國際標準</strong></td>
+<td>各家自定擴充 → 沒有「全球一致標準」</td>
+</tr>
+<tr>
+<td>高位元區（128~255）</td>
+<td>無定義</td>
+<td>各家放特殊符號、國際字元、圖形字元</td>
+</tr>
+<tr>
+<td>主要用途</td>
+<td>基本英文、數字、標點、控制碼</td>
+<td>支援歐洲語言、圖形符號、商用需求等</td>
+</tr>
+</tbody></table>
+<p>那為什麼現在我們已經不用再擔心編碼問題了呢？<br>是因為瀏覽器夠聰明能自己辨識？還是因為電腦硬體升級了？</p>
+<p>其實都不是，真正的原因是後來出現了 <strong>「UNICODE（萬國碼）」</strong> 這個標準。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday19%2F202509061425.png?alt=media&token=80cf9d37-ccfd-4265-96e0-b2cef1c2138b" alt="UNICODE（萬國碼）"></p>
+<p>這裡先破個迷思：很多人（包含以前的我）都以為 Unicode 是一種字元編碼方式。</p>
+<p>前面介紹過的 ASCII、EASCII 確實屬於字元編碼方式，但 Unicode 實際上並不是編碼方式，而是一個「字元集」。</p>
+<p>你可以把它想像成一本「國際字典」，收錄了世界上所有文字和符號，並且為每個字元分配一個獨特的編碼，這個編碼就叫做 <strong>「碼點（Code Point）」</strong> 。<br>例如：</p>
+<table>
+<thead>
+<tr>
+<th>字元</th>
+<th>碼點（Code Point）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>U+0041</td>
+</tr>
+<tr>
+<td>B</td>
+<td>U+0042</td>
+</tr>
+<tr>
+<td>C</td>
+<td>U+0043</td>
+</tr>
+<tr>
+<td>你</td>
+<td>U+4F60</td>
+</tr>
+<tr>
+<td>我</td>
+<td>U+6211</td>
+</tr>
+<tr>
+<td>中</td>
+<td>U+4E2D</td>
+</tr>
+<tr>
+<td>😀</td>
+<td>U+1F600</td>
+</tr>
+<tr>
+<td>🐱</td>
+<td>U+1F431</td>
+</tr>
+</tbody></table>
+<p>透過這樣的設計，Unicode 能夠支援全世界的文字與符號，並有效避免亂碼問題。而從上面的表格也能看出，Unicode 的碼點都是以 U+ 開頭的十六進位數字來表示。</p>
+<p>那麼 UNICODE 所採用的位元是多少呢？</p>
+<p>是 21 位元，這也代表 UNICODE 比 ASCII 和 EASCII 都要大得多，因為：</p>
+<ul>
+<li>ASCII 只有 7 位元，能表示 2^7 &#x3D; 128 個碼點。</li>
+<li>EASCII 擴充到 8 位元，能表示 2^8 &#x3D; 256 個碼點。</li>
+<li>UNICODE 擴充到 21 位元，能表示 2^21 &#x3D; 2,097,152 個碼點。</li>
+</ul>
+<p>這樣的位元數已經足夠支援世界上所有的文字、符號等。</p>
+<p>在前面我們說 UNCODE 是一個「字元集」，那麼它的編碼方式又是什麼呢？其實 UNICODE 有三種編碼方式：</p>
+<ol>
+<li><strong>UTF-8：</strong> 又稱可變長度字元編碼，使用 1 到 4 個位元組來表示一個字元，向下相容 ASCII，適合用於網路傳輸。  </li>
+<li><strong>UTF-16：</strong> 使用 2 或 4 個位元組來表示一個字元，適合用於內存和檔案存儲。</li>
+<li><strong>UTF-32：</strong> 使用 4 個位元組來表示一個字元，簡單但佔用空間較大。</li>
+</ol>
+<p>以我們最常見使用的是 UTF-8 為例，UTF-8 的編碼方式是可變長度的，什麼是可變長度呢？</p>
+<p>簡單來講，每個字元所佔用的位元組會隨著字元的複雜度而有所不同</p>
+<ul>
+<li><strong>對於 ASCII 字元（0~127）</strong> ，剛好對應 U+0000 到 U+007F，使用 1 個位元組表示。</li>
+<li><strong>對於 U+0080 ~ U+07FF 的字元</strong> ，使用 2 個位元組表示（這是屬於歐系語言的字元）。</li>
+<li><strong>對於 U+0800 ~ U+FFFF 的字元</strong> ，使用 3 個位元組表示（這是屬於中日韓、數學符號的區間）。</li>
+<li><strong>對於 U+10000 ~ U+10FFFF 的字元</strong> ，使用 4 個位元組表示（這是屬於表情符號、特殊符號或是生僻字元的區間）。</li>
+</ul>
+<p>這也是為什麼前面表格你會看到 A 的編碼是 U+0041，而 😀 的編碼是 U+1F600 的原因。</p>
+<p>最後，我們也來聊聊 UTF-8 常用的進位方式－ <strong>「十六進位（Hexadecimal）」</strong> 。<br>簡單來說，十六進位就是十進位的延伸。我們知道十進位用 0<del>9 表示數字，超過 9 就進位。<br>而在十六進位中，除了 0</del>9 之外，還加入了 A<del>F 這六個字母來表示 10</del>15。</p>
+<p>所以表示方式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0 1 2 3 4 5 6 7 8 9 A B C D E F</span><br></pre></td></tr></table></figure>
+
+<p>關於 UTF-8，你只要先掌握幾個重點就好，其他細節有需要再去查就行：</p>
+<ul>
+<li><strong>UTF-8 是一種可變長度的編碼方式</strong> ，隨著字元的複雜度而有所不同。</li>
+<li><strong>UTF-8 向下相容 ASCII</strong> ，也就是說，所有的 ASCII 字元在 UTF-8 中仍然可以使用。</li>
+<li><strong>十六進位是 UTF-8 的表示方式</strong> ，這樣可以更方便地表示字元的編碼。</li>
+<li><strong>UNICODE 是一個字元集</strong> ，它收錄了世界上所有的文字、符號等，並且不會有亂碼的問題。</li>
+</ul>
+<p>以上就是關於 UNICODE 的基礎介紹，這樣的編碼方式讓我們可以在網路上自由地使用各種文字、符號，而不必擔心亂碼的問題囉～</p>
+<p>當然，你也可以寫程式來查詢 UNICODE 的碼點，這邊我就以 JavaScript 為例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;keydown&#x27;</span>, <span class="function">(<span class="params">event</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> key = event.<span class="property">key</span>;</span><br><span class="line">  <span class="keyword">const</span> codePoint = key.<span class="title function_">codePointAt</span>(<span class="number">0</span>).<span class="title function_">toString</span>(<span class="number">16</span>).<span class="title function_">toUpperCase</span>().<span class="title function_">padStart</span>(<span class="number">4</span>, <span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Key: <span class="subst">$&#123;key&#125;</span>, Code Point: U+<span class="subst">$&#123;codePoint&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p class="codepen" data-height="300" data-default-tab="js,result" data-slug-hash="XJbYByG" data-pen-title="UNICODE UTF-8" data-user="hsiangfeng" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+  <span>See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng/pen/XJbYByG">
+  UNICODE UTF-8</a> by Ray (<a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng">@hsiangfeng</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://public.codepenassets.com/embed/index.js"></script>
+
+<p>這段程式碼會在你按下鍵盤時，顯示「按下的鍵」以及對應的 Unicode 碼點：</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>這裡先提醒一下讀者，因為接下來的章節會開始介紹一些程式碼與工程相關的知識，過程中可能會需要用到開發者環境，例如：</p>
+<ul>
+<li><a href="https://israynotarray.com/nodejs/20230916/1389040602/">Node.js</a></li>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">Visual Studio Code</a></li>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/">Git</a></li>
+</ul>
+<p>當然，你也可以選擇不安裝這些工具，單純閱讀內容也完全沒問題，只是會少了一些實作體驗。<br>如果你有興趣，還是建議把工具安裝起來，這樣會更有感覺。</p>
+<p>另外也不用擔心，後面的章節並不會深入鑽研程式碼，而是以基本概念為主，輕鬆帶過就好～</p>
+<h2 id="同步更新"><a href="#同步更新" class="headerlink" title="同步更新"></a>同步更新</h2><p>本文將同步更新至以下網站：</p>
+<ul>
+<li><a href="https://israynotarray.com/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/">是 Ray 不是 Array</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/users/20119486/ironman/8232">Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路（佛心分享-IT 人自學之術）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.threads.com/@isray_notarray">Threads - 時常會聊軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/israynotarray">Facebook - 搞怪迷因分享</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.instagram.com/israynotarray/">Instagram - 搞怪迷因分享 + 軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://portaly.cc/israynotarray">Portaly - 入口主頁</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/" rel="tag"># Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路</a>
+              <a href="/tags/Unicode-%E7%B7%A8%E7%A2%BC%E6%95%99%E5%AD%B8/" rel="tag"># Unicode 編碼教學</a>
+              <a href="/tags/UTF-8-%E5%AD%97%E5%85%83%E9%9B%86/" rel="tag"># UTF-8 字元集</a>
+              <a href="/tags/%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C%E8%A7%A3%E6%B1%BA/" rel="tag"># 亂碼問題解決</a>
+              <a href="/tags/%E5%8D%81%E5%85%AD%E9%80%B2%E4%BD%8D%E8%BD%89%E6%8F%9B/" rel="tag"># 十六進位轉換</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20250918/1019906872/" rel="prev" title="JavaScript 數字格式化：最簡單的方法（千分位與貨幣）">
+                  <i class="fa fa-angle-left"></i> JavaScript 數字格式化：最簡單的方法（千分位與貨幣）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250920/3804872672/" rel="next" title="【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！">
+                  【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="專題發表看似順利，回頭一檢卻是蜂巢滿洞：從老師提醒到實際踩雷，談 WannaCry、備份策略、SQL 注入與欄位長度 DoS 的血淚教訓。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Day 24】資安攻防戰">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250924/2137873228/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="專題發表看似順利，回頭一檢卻是蜂巢滿洞：從老師提醒到實際踩雷，談 WannaCry、備份策略、SQL 注入與欄位長度 DoS 的血淚教訓。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday24%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_57_09.png?alt=media&token=8d1fb2d2-8355-445e-9780-7b4435d3e72e">
+<meta property="article:published_time" content="2025-09-23T16:00:01.000Z">
+<meta property="article:modified_time" content="2025-09-23T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路">
+<meta property="article:tag" content="網站資安防護">
+<meta property="article:tag" content="SQL 注入攻擊防範">
+<meta property="article:tag" content="WannaCry 病毒分析">
+<meta property="article:tag" content="系統漏洞修補">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday24%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_57_09.png?alt=media&token=8d1fb2d2-8355-445e-9780-7b4435d3e72e">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250924/2137873228/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250924/2137873228/","path":"learnexp/20250924/2137873228/","title":"【Day 24】資安攻防戰"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【Day 24】資安攻防戰 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E5%AE%89%E6%94%BB%E9%98%B2%E6%88%B0"><span class="nav-number">1.</span> <span class="nav-text">資安攻防戰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E5%AE%89%E9%98%B2%E7%A6%A6%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">資安防禦的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">3.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0"><span class="nav-number">4.</span> <span class="nav-text">同步更新</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">973</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">826</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250924/2137873228/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【Day 24】資安攻防戰 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="專題發表看似順利，回頭一檢卻是蜂巢滿洞：從老師提醒到實際踩雷，談 WannaCry、備份策略、SQL 注入與欄位長度 DoS 的血淚教訓。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Day 24】資安攻防戰
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-24 00:00:01" itemprop="dateCreated datePublished" datetime="2025-09-24T00:00:01+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">專題發表看似順利，回頭一檢卻是蜂巢滿洞：從老師提醒到實際踩雷，談 WannaCry、備份策略、SQL 注入與欄位長度 DoS 的血淚教訓。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday24%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_57_09.png?alt=media&token=8d1fb2d2-8355-445e-9780-7b4435d3e72e" alt="資安攻防戰"></p>
+<h2 id="資安攻防戰"><a href="#資安攻防戰" class="headerlink" title="資安攻防戰"></a>資安攻防戰</h2><p>因為大學專題的關係，我選擇了 PHP 作為開發語言。不過那時候環境還不成熟，PHP 從 4.x 正要升級到 5.x，沒有 Framework 可用，整個開發過程幾乎是土法煉鋼，非常辛苦。</p>
+<p>「Ray，你的 PHP 有做資安防禦嗎？」老師在我製作專題的過程中，問了我這個問題。</p>
+<p>老實說，那時候我完全沒想到這件事。可老師既然特別強調，顯然代表這點非常重要。於是我開始在心裡猜測：到底是哪裡需要特別注意？</p>
+<p>就在我還在思索的瞬間，老師的下一句話，直接打斷了我的思考——</p>
+<p>「到時候發表時，你們會先把作品交給系主任和其他老師試用，但記得不要提供後台，發表時由你們自己操作就好，這樣才能避免被其他老師亂搞。」老師叮嚀著說。</p>
+<p>ㄟ…原來老師這樣提醒不是沒道理的。<br>說穿了，專題不只學生在拚，老師之間其實也在暗暗較勁，畢竟誰不想自己的學生做出最亮眼的成果？所以偶爾就會出現一些小心機、小競爭。</p>
+<p>我心裡只能默默想：<br>「哇，原來專題戰場不只在學生之間，老師們背後也有小劇場啊 XD」</p>
+<p>一路從跌跌撞撞到最後的專題發表，過程雖然辛苦，但也因為老師對細節的嚴格把關，從簡報內容到報告方式都幫我們拉了一把，結果發表會當天一切都非常順利，不只拿到系上老師們的讚賞，最後作品甚至被選為招生範例。</p>
+<p>對我們這組來說，這完全是一場漂亮的逆轉勝。</p>
+<p>專題發表的時候看起來風光順利，但等我後來仔細研究資安防禦，回頭檢視我們的系統時才發現 ——那根本不是作品，是一塊蜂巢，滿滿都是洞啊 XD</p>
+<p>至於後來我們的專題系統嘛……直接被我玩到壞掉，結局比發表會還要精彩。XD</p>
+<h2 id="資安防禦的基本概念"><a href="#資安防禦的基本概念" class="headerlink" title="資安防禦的基本概念"></a>資安防禦的基本概念</h2><p>那麼資安防禦到底在講什麼呢？簡單來講就是不被駭客入侵，或者是防止駭客入侵後造成的損害。</p>
+<p>有些人可能不太懂什麼是駭客以及駭客其實有區分為三大類：</p>
+<ul>
+<li><strong>白帽駭客：</strong> 這類駭客是為了保護系統而存在的，他們會找出系統的漏洞並且通知系統管理員修補漏洞，又稱道德駭客。</li>
+<li><strong>黑帽駭客：</strong> 主要是以自己利益為優先，利用系統的漏洞來獲取非法利益。</li>
+<li><strong>灰帽駭客：</strong> 這類駭客介於白帽與黑帽之間。</li>
+</ul>
+<p>其中我們最不希望遇到的就是黑帽駭客。</p>
+<p>早些年有一場非常知名的黑帽駭客事件 —— <strong>「WannaCry（中文：想哭、想解密）」</strong> 那次攻擊讓許多企業與個人都蒙受巨大損失。</p>
+<p>前面章節中我們提到過，中毒本身就是件麻煩的事，更何況有些病毒並不是單純重新安裝作業系統就能解決。因為它們可能早已潛伏在你的檔案或備份裡，所以即使重灌系統，依然會再次被感染。</p>
+<p>這邊也簡單講一下當年的令人聞風喪膽的 WannaCry 病毒。</p>
+<p><strong>WannaCry</strong> 是一種利用 <strong>Microsoft Windows</strong> 系統漏洞的勒索病毒，當電腦遭到感染時，它會立即加密你的檔案，接著要求你支付比特幣才能解鎖。</p>
+<p>它採用了 <strong>非對稱加密</strong> 的方式，這種加密的特點是使用一組金鑰：公開金鑰與私密金鑰。公開金鑰負責加密資料，而只有私密金鑰才能解密，也就是說，如果你不按照駭客的指示支付贖金，就無法拿到解密所需的私密金鑰，你的檔案也就等於被永久鎖死。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果想多了解加密的議題，可以參考我之前寫的文章：<a href="https://israynotarray.com/other/20231022/2787463355/">加密是什麼呢？為什麼要加密？關於加密的基本觀念</a></p>
+</blockquote>
+<p>你可能會想：「那我只要定期備份就好了吧？」<br>沒錯，定期備份是一個手段，但問題在於 —— 如果連備份也被感染了，那麼當你還原時，病毒也會一併回來。</p>
+<p>老實說，我早期也曾中過一次毒，當時用雲端硬碟備份檔案，但因為沒有回溯功能，連備份也被感染，幸好資料不重要，我只好直接放棄，畢竟照當時的 Bitcoin 價格來算，贖金得要好幾萬台幣。</p>
+<p>這也是為什麼大家都強調：只要出現重大資安漏洞，就一定要立刻更新系統。因為如果不更新，就等於把大門敞開，讓駭客隨時能進來。</p>
+<p>通常來講備份方式會有兩種：</p>
+<ul>
+<li><strong>本地備份</strong>：簡單來講就是將自己電腦的重要資料拷貝一份到其他儲存裝置上，例如：外接硬碟、USB 隨身碟等。</li>
+<li><strong>異地備份</strong>：將資料備份到其他地方，例如：雲端儲存服務、遠端伺服器等。</li>
+</ul>
+<p>這兩種備份方式各有優缺點，本地備份的優點是速度快、成本低，但是如果你的電腦被入侵了，那麼本地備份也會被感染；異地備份的優點是可以避免本地備份被感染，但是速度較慢、成本較高。</p>
+<p>上面我們所講的比較偏向個人電腦的資安防禦，但如果今天我們是寫程式呢？那麼要考慮的方向就不同了。</p>
+<p>這邊要來提一個很常見的攻擊手法，也就是 <strong>SQL Injection（SQL 注入攻擊）</strong>，這種攻擊是利用程式在處理 SQL 語句時，沒有對使用者輸入進行適當過濾或轉義，讓攻擊者有機會注入惡意的 SQL 指令，進而操控資料庫。</p>
+<p>在當時 ORM（俗稱：物件關聯對映）還不流行，大家幾乎都是直接用 SQL 語句操作資料庫，所以 SQL 注入攻擊 變得特別常見。</p>
+<p>這邊舉例一下前一篇章節所介紹的 PHP 程式碼：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=<span class="string">&quot;zh-Hant-TW&quot;</span>&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=<span class="string">&quot;UTF-8&quot;</span>&gt;</span><br><span class="line">  &lt;meta name=<span class="string">&quot;viewport&quot;</span> content=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span><br><span class="line">  &lt;title&gt;第一個 PHP 程式&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  <span class="meta">&lt;?php</span></span><br><span class="line">      <span class="variable">$username</span> = <span class="string">&quot;admin&quot;</span>;</span><br><span class="line">      <span class="variable">$password</span> = <span class="string">&quot;password123&quot;</span>;</span><br><span class="line"></span><br><span class="line">      <span class="variable">$connection</span> = <span class="title function_ invoke__">mysqli_connect</span>(<span class="string">&quot;localhost&quot;</span>, <span class="variable">$username</span>, <span class="variable">$password</span>);</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable">$connection</span>) &#123;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">&quot;&lt;div&gt;成功連接到 MySQL 資料庫！&lt;/div&gt;&quot;</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">&quot;&lt;div&gt;無法連接到 MySQL 資料庫！&lt;/div&gt;&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="title function_ invoke__">mysqli_close</span>(<span class="variable">$connection</span>);</span><br><span class="line">  <span class="meta">?&gt;</span></span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>一般情況下，使用者會在畫面上輸入帳號和密碼，程式再把這些資料傳送到資料庫做驗證，這時候就會用到 SQL 語句來進行資料庫操作，例如：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$sql</span> = <span class="string">&quot;SELECT * FROM users WHERE username = &#x27;<span class="subst">$username</span>&#x27; AND password = &#x27;<span class="subst">$password</span>&#x27;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>這段程式碼的意思是：從 <code>users</code> 資料表中，找出使用者名稱等於 <code>$username</code> 、密碼等於 <code>$password</code> 的資料，如果找到符合條件的紀錄，就代表使用者輸入的帳號與密碼正確。</p>
+<p>但如果今天使用者輸入的是 <code>$username = &quot;admin&#39; OR &#39;1&#39;=&#39;1&quot;</code> 呢？那就會變成以下的 SQL 語句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> username <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">OR</span> <span class="string">&#x27;1&#x27;</span><span class="operator">=</span><span class="string">&#x27;1&#x27;</span> <span class="keyword">AND</span> password <span class="operator">=</span> <span class="string">&#x27;$password&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>這句 SQL 意思是「選取使用者名稱為 ‘admin’ 或者 ‘1’ 等於 ‘1’ 的使用者資料」，由於 ‘1’ 等於 ‘1’ 永遠成立，所以這個 SQL 語句會返回所有使用者的資料，這樣就可以繞過驗證，直接登入系統。</p>
+<p>你可能會疑惑一件事情：</p>
+<p>「後面不是有 AND password &#x3D; ‘$password’ 嗎？那麼這樣不就還是會被驗證嗎？」</p>
+<p>其實這個問題很好，因為在 SQL 語句中，OR 的優先級是高於 AND 的，所以這個 SQL 語句會先執行 OR 的部分，然後再執行 AND 的部分，所以最後的結果就是會返回所有使用者的資料。</p>
+<p>最後再提一個常見的攻擊手法，在建立資料庫時，我們通常會對欄位設定型別限制，例如使用者名稱只能存放字串，密碼欄位也只能存放字串。</p>
+<p>但如果沒有對欄位設定長度限制，攻擊者就可能利用這個漏洞發動攻擊。</p>
+<p>那這種攻擊手法是什麼呢？其實它屬於 DoS（Denial of Service，阻斷服務攻擊） 的一種，做法就是在欄位裡存入一筆超長的字串，導致資料庫在處理時因為字串過長而消耗大量系統資源，最終把系統拖到當機。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>WannaCry 爆發的時候，我身邊的朋友都陸續中毒，就連我也沒能倖免，幸好當時資料不重要，所以我也就直接放棄。</p>
+<p>不知道有沒有人中過 WannaCry 的經驗呢？</p>
+<h2 id="同步更新"><a href="#同步更新" class="headerlink" title="同步更新"></a>同步更新</h2><p>本文將同步更新至以下網站：</p>
+<ul>
+<li><a href="https://israynotarray.com/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/">是 Ray 不是 Array</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/users/20119486/ironman/8232">Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路（佛心分享-IT 人自學之術）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.threads.com/@isray_notarray">Threads - 時常會聊軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/israynotarray">Facebook - 搞怪迷因分享</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.instagram.com/israynotarray/">Instagram - 搞怪迷因分享 + 軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://portaly.cc/israynotarray">Portaly - 入口主頁</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/" rel="tag"># Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路</a>
+              <a href="/tags/%E7%B6%B2%E7%AB%99%E8%B3%87%E5%AE%89%E9%98%B2%E8%AD%B7/" rel="tag"># 網站資安防護</a>
+              <a href="/tags/SQL-%E6%B3%A8%E5%85%A5%E6%94%BB%E6%93%8A%E9%98%B2%E7%AF%84/" rel="tag"># SQL 注入攻擊防範</a>
+              <a href="/tags/WannaCry-%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90/" rel="tag"># WannaCry 病毒分析</a>
+              <a href="/tags/%E7%B3%BB%E7%B5%B1%E6%BC%8F%E6%B4%9E%E4%BF%AE%E8%A3%9C/" rel="tag"># 系統漏洞修補</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250923/2062222122/" rel="prev" title="【Day 23】PHP？蛤？一隻大象？">
+                  <i class="fa fa-angle-left"></i> 【Day 23】PHP？蛤？一隻大象？
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250925/228905455/" rel="next" title="【Day 25】為什麼我莫名其妙變成了寫 HTML 跟 CSS 的人？">
+                  【Day 25】為什麼我莫名其妙變成了寫 HTML 跟 CSS 的人？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="最近 OpenAI 的 ChatGPT 非常的火紅，剛好這個 OpenAI 是有提供 API 可以串接的，雖然是以 GPT-3 為主軸，但是後面我也有分享如何轉換到 ChatGPT API，所以這一篇我就來介紹如何使用 Node.js 基於 OpenAI 的 API 來建立一個 Line 聊天機器人吧！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20221210/1224824056/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="最近 OpenAI 的 ChatGPT 非常的火紅，剛好這個 OpenAI 是有提供 API 可以串接的，雖然是以 GPT-3 為主軸，但是後面我也有分享如何轉換到 ChatGPT API，所以這一篇我就來介紹如何使用 Node.js 基於 OpenAI 的 API 來建立一個 Line 聊天機器人吧！">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/2lo6Ynj.png">
+<meta property="og:image" content="https://i.imgur.com/p91aMB9.png">
+<meta property="og:image" content="https://i.imgur.com/Oim3CDc.png">
+<meta property="og:image" content="https://i.imgur.com/qVET6jI.png">
+<meta property="og:image" content="https://i.imgur.com/W9vG5xL.png">
+<meta property="og:image" content="https://i.imgur.com/Bi3Brmd.png">
+<meta property="og:image" content="https://i.imgur.com/ThU9rgl.png">
+<meta property="og:image" content="https://i.imgur.com/7ocAeSh.png">
+<meta property="og:image" content="https://i.imgur.com/XSdXBOh.png">
+<meta property="og:image" content="https://i.imgur.com/AZxGFZk.png">
+<meta property="og:image" content="https://i.imgur.com/ynbHP69.png">
+<meta property="og:image" content="https://i.imgur.com/VyYlM4L.png">
+<meta property="og:image" content="https://i.imgur.com/An3Y5ye.png">
+<meta property="og:image" content="https://i.imgur.com/dOLJLYU.png">
+<meta property="og:image" content="https://i.imgur.com/sQTAfcN.png">
+<meta property="og:image" content="https://i.imgur.com/CuH1Hv4.png">
+<meta property="og:image" content="https://i.imgur.com/pRml6jU.png">
+<meta property="og:image" content="https://i.imgur.com/eunRRTH.png">
+<meta property="og:image" content="https://i.imgur.com/hTj4Tu8.png">
+<meta property="og:image" content="https://i.imgur.com/52ycXOO.png">
+<meta property="og:image" content="https://i.imgur.com/1t0DM63.png">
+<meta property="og:image" content="https://i.imgur.com/QrnXocV.png">
+<meta property="og:image" content="https://i.imgur.com/h6GGOsW.png">
+<meta property="og:image" content="https://i.imgur.com/Lcde1RP.png">
+<meta property="og:image" content="https://i.imgur.com/Q39XiV9.png">
+<meta property="og:image" content="https://i.imgur.com/CD4N6G4.png">
+<meta property="og:image" content="https://i.imgur.com/sktUN25.png">
+<meta property="og:image" content="https://i.imgur.com/30H6jH6.png">
+<meta property="og:image" content="https://i.imgur.com/IQn9Fjp.png">
+<meta property="og:image" content="https://i.imgur.com/CQtnVl8.png">
+<meta property="og:image" content="https://i.imgur.com/aqPo7eV.png">
+<meta property="og:image" content="https://i.imgur.com/X7aU7BA.png">
+<meta property="og:image" content="https://i.imgur.com/HvKIHYj.png">
+<meta property="og:image" content="https://i.imgur.com/ySLHrI0.png">
+<meta property="og:image" content="https://i.imgur.com/SQPAXEU.png">
+<meta property="og:image" content="https://i.imgur.com/kFyMAZW.png">
+<meta property="og:image" content="https://i.imgur.com/E3ktdNJ.png">
+<meta property="og:image" content="https://i.imgur.com/j8xuJgN.png">
+<meta property="article:published_time" content="2022-12-10T09:12:11.000Z">
+<meta property="article:modified_time" content="2023-03-06T07:30:00.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="OpenAI">
+<meta property="article:tag" content="ChatGPT">
+<meta property="article:tag" content="GPT-3">
+<meta property="article:tag" content="GPT-3.5">
+<meta property="article:tag" content="LINE Bot">
+<meta property="article:tag" content="LiNE">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="Render">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/2lo6Ynj.png">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20221210/1224824056/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20221210/1224824056/","path":"nodejs/20221210/1224824056/","title":"用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E5%8B%95%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">前置動作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B3%E8%AB%8B-OpenAI-API"><span class="nav-number">2.1.</span> <span class="nav-text">申請 OpenAI API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%8D%E5%A4%96%E8%A3%9C%E5%85%85"><span class="nav-number">2.1.1.</span> <span class="nav-text">額外補充</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B3%E8%AB%8B-Line-Developer"><span class="nav-number">2.2.</span> <span class="nav-text">申請 Line Developer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%80%E5%80%8B%E5%B0%88%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">建立一個專案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D%E7%9B%B8%E9%97%9C%E5%A5%97%E4%BB%B6"><span class="nav-number">3.1.</span> <span class="nav-text">安裝相關套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-LINE-Bot"><span class="nav-number">3.2.</span> <span class="nav-text">撰寫 LINE Bot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E5%88%B0-Render"><span class="nav-number">3.3.</span> <span class="nav-text">部署到 Render</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5-Line-Bot-%E5%A5%BD%E5%8F%8B"><span class="nav-number">4.</span> <span class="nav-text">加入 Line Bot 好友</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AA%BF%E6%95%B4-Line-Bot"><span class="nav-number">4.1.</span> <span class="nav-text">調整 Line Bot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%9C%E6%8E%89%E9%A0%90%E8%A8%AD%E5%9B%9E%E9%A5%8B"><span class="nav-number">4.2.</span> <span class="nav-text">關掉預設回饋</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%B2%E6%8E%A5-OpenAI-API"><span class="nav-number">5.</span> <span class="nav-text">串接 OpenAI API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-OpenAI-%E5%A5%97%E4%BB%B6"><span class="nav-number">5.1.</span> <span class="nav-text">安裝 OpenAI 套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AA%BF%E6%95%B4-app-js-%E7%9A%84%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.2.</span> <span class="nav-text">調整 app.js 的程式碼</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AA%BF%E6%95%B4-OpenAI-%E7%9A%84%E5%9B%9E%E5%82%B3%E8%A8%8A%E6%81%AF"><span class="nav-number">5.3.</span> <span class="nav-text">調整 OpenAI 的回傳訊息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPT-3-5-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">GPT-3.5 的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">7.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%9C%E5%85%85"><span class="nav-number">8.</span> <span class="nav-text">補充</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">973</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">826</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20221210/1224824056/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="最近 OpenAI 的 ChatGPT 非常的火紅，剛好這個 OpenAI 是有提供 API 可以串接的，雖然是以 GPT-3 為主軸，但是後面我也有分享如何轉換到 ChatGPT API，所以這一篇我就來介紹如何使用 Node.js 基於 OpenAI 的 API 來建立一個 Line 聊天機器人吧！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-12-10 17:12:11" itemprop="dateCreated datePublished" datetime="2022-12-10T17:12:11+08:00">2022-12-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新於</span>
+      <time title="修改時間：2023-03-06 15:30:00" itemprop="dateModified" datetime="2023-03-06T15:30:00+08:00">2023-03-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">最近 OpenAI 的 ChatGPT 非常的火紅，剛好這個 OpenAI 是有提供 API 可以串接的，雖然是以 GPT-3 為主軸，但是後面我也有分享如何轉換到 ChatGPT API，所以這一篇我就來介紹如何使用 Node.js 基於 OpenAI 的 API 來建立一個 Line 聊天機器人吧！</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://i.imgur.com/2lo6Ynj.png" alt="Robot"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p><strong>Danger</strong><br>雖然主軸介紹是以 GPT-3 為主，但是後面有補充如何轉換以及提供 GPT-3.5 的範例程式碼，如果你想要使用 GPT-3.5 的話，可以參考後面的範例程式碼。</p>
+</blockquote>
+<p>最近 OpenAI 的 ChatGPT 非常的火紅，剛好這個 OpenAI 是有提供 API 可以串接的，雖然是以 GPT-3 為主軸，但是後面我也有分享如何轉換到 ChatGPT API，所以這一篇我就來介紹如何使用 Node.js 基於 OpenAI 的 API 來建立一個 Line 聊天機器人吧！</p>
+<blockquote>
+<p><strong>Note</strong><br>請注意，該篇文章不會特別針對每一行程式碼去說明，因為光是申請流程其實就滿繁瑣的。<br>除此之外，如果你不想看到最後才拿到範例程式碼的話，這邊也提前提供給你參考<br><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-line-bot">本篇範例程式碼</a></p>
+</blockquote>
+<h2 id="前置動作"><a href="#前置動作" class="headerlink" title="前置動作"></a>前置動作</h2><p>首先這邊有幾個前置準備動作要先完成，否則後面的步驟都是免談的唷！</p>
+<blockquote>
+<p><strong>Note</strong><br>這一篇是在 2022 年 12 月 10 日寫的，所以後續未來如果畫面有變動的話，會建議請以當下的畫面為準。</p>
+</blockquote>
+<h3 id="申請-OpenAI-API"><a href="#申請-OpenAI-API" class="headerlink" title="申請 OpenAI API"></a>申請 OpenAI API</h3><p>首先，請你先進入 <a target="_blank" rel="noopener" href="https://openai.com/api/">OpenAI</a> 的網站<a target="_blank" rel="noopener" href="https://chat.openai.com/auth/login">註冊會員</a>，這邊你可以選擇第三方服務帳號(如：Google、Microsoft)或是 Email 帳號註冊</p>
+<p><img src="https://i.imgur.com/p91aMB9.png" alt="註冊會員"></p>
+<p>註冊完後，你就可以開始申請 API 了~</p>
+<p>如果你本身有帳號的話，那就直接登入 OpenAI 吧。</p>
+<p>登入後，你應該會看到這個畫面</p>
+<p><img src="https://i.imgur.com/Oim3CDc.png" alt="Welcome to OpenAI"></p>
+<p>接著找到你的頭像點它，找到「View API keys」</p>
+<p><img src="https://i.imgur.com/qVET6jI.png" alt="View API keys"></p>
+<p>找到後你會看到「API keys」的申請畫面，點一下下方的「Create New Secret key」，這樣你就拿到串接 OpenAI 的 key，請先把它記下來，後面會用到。</p>
+<p><img src="https://i.imgur.com/W9vG5xL.png" alt="OpenAI Key"></p>
+<blockquote>
+<p><strong>Danger</strong><br>API key generated 是非常重要的，因此請不要隨意提供給他人，以免造成不必要的損失。</p>
+</blockquote>
+<p>那麼我們申請這個是 API Key 要幹嘛呢？主要是稍後後面會串接 OpenAI 所提供的 API 來使用 GPT，如果你還不知道什麼是 GPT 的話，你可以試著玩一下 <a target="_blank" rel="noopener" href="https://chat.openai.com/chat">ChatGPT</a>，簡單來講 ChatGPT 比 GPT-3 更厲害更聰明的聊天機器人，它可以做到的事情非常多，例如像是…</p>
+<ul>
+<li>請它規劃日本旅遊行程</li>
+<li>寫一篇行銷文案</li>
+<li>幫忙找出程式碼錯誤</li>
+<li>程式碼解題</li>
+</ul>
+<p>…等等，非常多</p>
+<p>雖然目前 ChatGPT 還沒有開放，但是我們可以改串它的 GPT-3 來玩玩，因此我們申請這個 API Key 就是用來串接 GPT-3 的~</p>
+<blockquote>
+<p><strong>Note</strong><br>OpenAI 本身有提供免費的額度，三個月 18 美金，除此之外，OpenAI 的計算方式會因你使用的 <code>model</code> 不同而有不同的計算方式，例如像是「Davinci」的計算方式是 $0.0200(美金) &#x2F; 1K tokens，如果你想要了解更多的話，可以參考<a target="_blank" rel="noopener" href="https://beta.openai.com/pricing">這邊</a>。</p>
+</blockquote>
+<h4 id="額外補充"><a href="#額外補充" class="headerlink" title="額外補充"></a>額外補充</h4><p>什麼是 tokens？<br>tokens 是指你輸入的字數，例如：「我想要去日本旅遊」，這句話有 8 個字，因此 tokens 就是 8。</p>
+<h3 id="申請-Line-Developer"><a href="#申請-Line-Developer" class="headerlink" title="申請 Line Developer"></a>申請 Line Developer</h3><p>接下來我們要來申請 Line Developer 帳號，你可以透過這個連結快速進入 <a target="_blank" rel="noopener" href="https://developers.line.biz/zh-hant/">Line Developer</a> 網站，登入方式，基本上就是使用 LINE 帳號登入</p>
+<p><img src="https://i.imgur.com/Bi3Brmd.png" alt="LINE 帳號登入"></p>
+<p>登入後，你可以透過<a target="_blank" rel="noopener" href="https://developers.line.biz/console/">這個連結</a>，進入 LINE 的開發者後台</p>
+<p><img src="https://i.imgur.com/ThU9rgl.png" alt="開發者後台"></p>
+<p>接著，你會看到畫面上什麼都沒有，所以這邊你要點一下中間的「Create a new provider」，這個類似於一個公司帳號的概念，底下會有許多的專案，所以你可以把它想像成一個公司，而這個公司底下有許多的專案，例如：Line Bot、Line MUSIC 等等之類你的服務。</p>
+<p>這邊的話，範例我們就叫做「Example Bot」</p>
+<p><img src="https://i.imgur.com/7ocAeSh.png" alt="Example Bot"></p>
+<p>建立的過程是非常快的，因此當你點下「Create」 之後，你就可以馬上看到 Example Bot 的畫面</p>
+<p><img src="https://i.imgur.com/XSdXBOh.png" alt="Example Bot"></p>
+<p>接著，點一下畫面上的 「Create a Messaging API channel」，因為我們要來申請一個聊天機器人，所以我們要使用「Messaging API」</p>
+<p><img src="https://i.imgur.com/AZxGFZk.png" alt="Create a Messaging API channel"></p>
+<p>進入「Create a Messaging API channel」後，會有一些欄位要填寫</p>
+<ul>
+<li>Channel type<ul>
+<li>保持預設 Messages API</li>
+</ul>
+</li>
+<li>Provider<ul>
+<li>保持預設 「Example Bot」 即可</li>
+</ul>
+</li>
+<li>Company or owner’s country or region<ul>
+<li>依據你的公司所在地選擇，這邊我選擇台灣</li>
+</ul>
+</li>
+<li>Channel icon<ul>
+<li>你可以之後再上傳，所以這邊先不用管</li>
+</ul>
+</li>
+<li>Channel name<ul>
+<li>這邊我們就叫「溜腳學院」吧（老闆不要扁我）</li>
+</ul>
+</li>
+<li>Channel description<ul>
+<li>你可以簡單描述一下，這個聊天機器人的功能，例如：「大家好，我是溜腳學院的小客服」</li>
+</ul>
+</li>
+<li>Category<ul>
+<li>就選擇…「其他媒體」</li>
+</ul>
+</li>
+<li>Subcategory<ul>
+<li>接著一樣選「媒體（其他）」</li>
+</ul>
+</li>
+<li>Email address<ul>
+<li>這是當你的聊天機器人有問題時，信箱聯絡你的方式</li>
+</ul>
+</li>
+<li>Privacy policy URL 與 Terms of use URL<ul>
+<li>這兩個就不用理它，因為我們目前用不到。</li>
+</ul>
+</li>
+</ul>
+<p>最後再打勾兩個條管，你就可以點下「Create」建立你的聊天機器人了。</p>
+<p>（由於這個頁面圖片太大張了，所以就不額外截圖。）</p>
+<p>當你按下「Create」之後，它會出現一個視窗，主要是告知你一些資訊，所以你可以按下 ok 關閉它。</p>
+<p><img src="https://i.imgur.com/ynbHP69.png" alt="Create"></p>
+<p>到目前為止，我們只是申請好了一個 Line Bot，接著要來取得一些資訊，首先在「Base settings」中找到以下資訊並複製起來</p>
+<ul>
+<li>Channel ID</li>
+<li>Channel secret</li>
+</ul>
+<p>接著切換到「Messaging API」，找到「Channel access token」</p>
+<p><img src="https://i.imgur.com/VyYlM4L.png" alt="Channel access token"></p>
+<p>接著按下 「issue」，你會取得一串很長的 Token，請複製起來，後面我們會使用到。</p>
+<p>到目前為止，我們已經準備好了 Line Bot 的申請以及 Open API 的申請，接下來就是準備進入撰寫程式碼的部分囉。</p>
+<h2 id="建立一個專案"><a href="#建立一個專案" class="headerlink" title="建立一個專案"></a>建立一個專案</h2><p>建立專案方式我就不多述了，相信大家應該都很熟悉怎麼建立專案以及安裝 Node.js，而這邊我稍微會有一點特別，我會使用 <code>pnpm</code> 來建立，如果你真的完全沒想法，你可以參考我以下指令來建立一個專案，當然你也可以使用 <code>npm</code> 或是 <code>yarn</code> 來建立。</p>
+<blockquote>
+<p><strong>Note</strong><br>以下指令適用於 Mac 系統，若為 Mac 建議額外 Google 一下指令。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 建立一個資料夾</span></span><br><span class="line"><span class="built_in">mkdir</span> example-line-bot</span><br><span class="line"><span class="comment"># 進入資料夾</span></span><br><span class="line"><span class="built_in">cd</span> example-line-bot</span><br><span class="line"><span class="comment"># 初始化專案</span></span><br><span class="line">pnpm init</span><br></pre></td></tr></table></figure>
+
+<p>基本上到這邊就算是初始化好一個專案了，接著就是準備要來安裝 Line Bot 的套件了。</p>
+<h3 id="安裝相關套件"><a href="#安裝相關套件" class="headerlink" title="安裝相關套件"></a>安裝相關套件</h3><p>接下來我們要安裝 <code>@line/bot-sdk</code> 這個套件，請在專案終端機下輸入以下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm i @line/bot-sdk express dotenv</span><br></pre></td></tr></table></figure>
+
+<p>安裝好之後，你可以先在專案底下建立一個 app.js 的檔案，稍後我們就會開始撰寫 LINE Bot 的程式碼囉。</p>
+<h3 id="撰寫-LINE-Bot"><a href="#撰寫-LINE-Bot" class="headerlink" title="撰寫 LINE Bot"></a>撰寫 LINE Bot</h3><p>前面我們已經準備好了 app.js 檔案，接著就是要撰寫程式碼，不外乎前面就是引入 <code>@line/bot-sdk</code> 、 <code>express</code> 與 <code>dotenv</code> 這三個套件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;dotenv&#x27;</span>).<span class="title function_">config</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> line = <span class="built_in">require</span>(<span class="string">&#x27;@line/bot-sdk&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>接著呢？其實 Line 官方有提供<a target="_blank" rel="noopener" href="https://github.com/line/line-bot-sdk-nodejs/blob/master/examples/echo-bot/index.js">範例程式碼</a>，因此我們是可以直接嘗試挪過來測試看看</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;dotenv&#x27;</span>).<span class="title function_">config</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> line = <span class="built_in">require</span>(<span class="string">&#x27;@line/bot-sdk&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// create LINE SDK config from env variables</span></span><br><span class="line"><span class="keyword">const</span> config = &#123;</span><br><span class="line">  <span class="attr">channelAccessToken</span>: process.<span class="property">env</span>.<span class="property">CHANNEL_ACCESS_TOKEN</span>,</span><br><span class="line">  <span class="attr">channelSecret</span>: process.<span class="property">env</span>.<span class="property">CHANNEL_SECRET</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// create LINE SDK client</span></span><br><span class="line"><span class="keyword">const</span> client = <span class="keyword">new</span> line.<span class="title class_">Client</span>(config);</span><br><span class="line"></span><br><span class="line"><span class="comment">// create Express app</span></span><br><span class="line"><span class="comment">// about Express itself: https://expressjs.com/</span></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// register a webhook handler with middleware</span></span><br><span class="line"><span class="comment">// about the middleware, please refer to doc</span></span><br><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/callback&#x27;</span>, line.<span class="title function_">middleware</span>(config), <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title class_">Promise</span></span><br><span class="line">    .<span class="title function_">all</span>(req.<span class="property">body</span>.<span class="property">events</span>.<span class="title function_">map</span>(handleEvent))</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">result</span>) =&gt;</span> res.<span class="title function_">json</span>(result))</span><br><span class="line">    .<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">      res.<span class="title function_">status</span>(<span class="number">500</span>).<span class="title function_">end</span>();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// event handler</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">handleEvent</span>(<span class="params">event</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (event.<span class="property">type</span> !== <span class="string">&#x27;message&#x27;</span> || event.<span class="property">message</span>.<span class="property">type</span> !== <span class="string">&#x27;text&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// ignore non-text-message event</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>(<span class="literal">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// create a echoing text message</span></span><br><span class="line">  <span class="keyword">const</span> echo = &#123; <span class="attr">type</span>: <span class="string">&#x27;text&#x27;</span>, <span class="attr">text</span>: event.<span class="property">message</span>.<span class="property">text</span> &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// use reply API</span></span><br><span class="line">  <span class="keyword">return</span> client.<span class="title function_">replyMessage</span>(event.<span class="property">replyToken</span>, echo);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// listen on port</span></span><br><span class="line"><span class="keyword">const</span> port = process.<span class="property">env</span>.<span class="property">PORT</span> || <span class="number">3000</span>;</span><br><span class="line">app.<span class="title function_">listen</span>(port, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`listening on <span class="subst">$&#123;port&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>記得在專案底下建立一個 <code>.env</code> 並填寫以下資訊跟 Key</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CHANNEL_ACCESS_TOKEN=</span><br><span class="line">CHANNEL_SECRET=</span><br></pre></td></tr></table></figure>
+
+<p>理論上來講，你目前專案應該是已經可以輸入 <code>node app.js</code> 啟動了，所以你可以嘗試啟動看看，如果無法啟動的話，會建議你往前面的步驟再檢查一下。</p>
+<h3 id="部署到-Render"><a href="#部署到-Render" class="headerlink" title="部署到 Render"></a>部署到 Render</h3><p>到目前為止我們要先嘗試將專案部署到 Render 上面，否則我們並不清楚專案是否可以正常運作，因為在使用 Render 之前，我們需要先建立一個 Render 的帳號，如果你還沒有的話，可以先到<a target="_blank" rel="noopener" href="https://render.com/">這邊</a>註冊一個帳號。</p>
+<p>建立好後，會建議你將專案程式碼上傳到 GitHub 上，因為 Render 有提供 GitHub 的整合，這樣可以讓我們更方便的部署專案，而上傳到 GitHub 這流程就不再贅述了，因此我這邊假使你已經完成了將程式碼上傳到 GitHub 這個動作後，接著就是直接進入到 <a target="_blank" rel="noopener" href="https://dashboard.render.com/">Render 後台</a></p>
+<p><img src="https://i.imgur.com/An3Y5ye.png" alt="Render 後台"></p>
+<p>這邊請選擇 「Web Services」</p>
+<p><img src="https://i.imgur.com/dOLJLYU.png" alt="New Web Services"></p>
+<p>接著你可以在這個畫面上選擇專案，如果你發現你的畫面上一個專案都沒有的話，可以點一下旁邊的「Configure account」</p>
+<p><img src="https://i.imgur.com/sQTAfcN.png" alt="Configure account"></p>
+<p>接著你可以在這邊選擇專案，懶一點的話你可以乾脆給它全部的權限，因為我們只是要部署一個簡單的專案，所以我就選擇我要的單一專案即可</p>
+<p><img src="https://i.imgur.com/CuH1Hv4.png" alt="單一專案"></p>
+<p>接下來畫面上應該就可以看到你的專案了，接著點選你要部署的專案</p>
+<p><img src="https://i.imgur.com/pRml6jU.png" alt="專案"></p>
+<p>在這邊點一下「Connect」</p>
+<p><img src="https://i.imgur.com/eunRRTH.png" alt="Connect"></p>
+<p>這邊會要求你填一些欄位，我就不多說明了，我直接附上我的設定</p>
+<p><img src="https://i.imgur.com/hTj4Tu8.png" alt="設定"></p>
+<p>接著往下滾，就選擇 「Free」專案即可，然後再點一下下方的「Advanced」</p>
+<p><img src="https://i.imgur.com/52ycXOO.png" alt="Advanced"></p>
+<p>因為我們要在「Advanced」區塊填入環境變數</p>
+<p><img src="https://i.imgur.com/1t0DM63.png" alt="Environment Variable"></p>
+<p>接著點一下「Add Environment Variable」，依照欄位填入</p>
+<p><img src="https://i.imgur.com/QrnXocV.png" alt="Add Environment Variable"></p>
+<p>最後其他設定可以不用管，直接點一下最後的「Create Web Service」</p>
+<p>預設 Render 會去偵測 Commit 紀錄，所以如果有新的 Commit，Render 會自動重新部署，如果你不想要這個功能的話，可以在「Advanced」區塊裡面，將「Auto Deploy」關閉</p>
+<p><img src="https://i.imgur.com/h6GGOsW.png" alt="Auto Deploy"></p>
+<p>那麼由於為了方便示範，因此我這邊預設會採用「Yes」</p>
+<p>接著你就可以看到你的專案正在部署了</p>
+<p><img src="https://i.imgur.com/Lcde1RP.png" alt="部署"></p>
+<p>這個過程稍微會比較久一點，因為 Render 會將它打包成一個 Docker Image，然後再部署到它的伺服器上，所以這個過程會稍微比較久一點，但是不用擔心，因為它會自動幫你做這些事情，你只要等待它完成即可。</p>
+<p>部署完畢的話，你可以在畫面看到他提示你專案已經運行起來並且開始部署</p>
+<p><img src="https://i.imgur.com/Q39XiV9.png" alt="運行開始"></p>
+<p>而你的專案的網址，就會在這邊</p>
+<p><img src="https://i.imgur.com/CD4N6G4.png" alt="專案網址"></p>
+<p>不出意外的話，應該是無法開啟的，因為我們只有做一個 <code>post</code> 的 API，那麼到這邊我們專案就正式部署出去了，基本上都不用理會它了。</p>
+<p>這邊請記住網址，因為後面我們會在使用到。</p>
+<h2 id="加入-Line-Bot-好友"><a href="#加入-Line-Bot-好友" class="headerlink" title="加入 Line Bot 好友"></a>加入 Line Bot 好友</h2><p>接下來我們就要來實際測試一下，我們的 Line Bot 是否可以正常運作，而取得這個 LINE Bot 的 ID 方式就在 Developer Console 的「Messaging API」裡面</p>
+<p><img src="https://i.imgur.com/sktUN25.png" alt="Line Bot"></p>
+<p>加入好友後，你應該就會立刻看到好友歡迎的訊息通知</p>
+<p><img src="https://i.imgur.com/30H6jH6.png" alt="歡迎的訊息通知"></p>
+<p>接著你可以試著發送訊息給它，例如「<code>Test</code>」，但是你會發現它沒有辦法正常回應你</p>
+<p><img src="https://i.imgur.com/IQn9Fjp.png" alt="Test"></p>
+<p>因此接下來，我們要做一點調整，讓它可以正常回應你。</p>
+<h3 id="調整-Line-Bot"><a href="#調整-Line-Bot" class="headerlink" title="調整 Line Bot"></a>調整 Line Bot</h3><p>這邊請你回到 Line Bot 的<a target="_blank" rel="noopener" href="https://developers.line.biz/console/">後台</a>，點一下「Messaging API」，然後找到「Webhook settings」</p>
+<p><img src="https://i.imgur.com/CQtnVl8.png" alt="Webhook settings"></p>
+<p>接著點一下「Edit」，然後將「Webhook URL」填入你的專案網址，例如 <code>https://example.com/callback</code></p>
+<p><img src="https://i.imgur.com/aqPo7eV.png" alt="Webhook URL"></p>
+<p>callback 是因為我們 Express 專案的路由是 <code>/callback</code>，如果你的路由不是這個的話，請自行修改</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/callback&#x27;</span>, line.<span class="title function_">middleware</span>(config), <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title class_">Promise</span></span><br><span class="line">    .<span class="title function_">all</span>(req.<span class="property">body</span>.<span class="property">events</span>.<span class="title function_">map</span>(handleEvent))</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">result</span>) =&gt;</span> res.<span class="title function_">json</span>(result))</span><br><span class="line">    .<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">      res.<span class="title function_">status</span>(<span class="number">500</span>).<span class="title function_">end</span>();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>按下儲存後，你可以點一下 「Verify」，來驗證你的網址是否正確以及專案是否正常，只要能看到「Success」就代表你的網址以及專案是正確的</p>
+<p><img src="https://i.imgur.com/X7aU7BA.png" alt="Success"></p>
+<p>接著將下方的 「Use webhook」打開</p>
+<p><img src="https://i.imgur.com/HvKIHYj.png" alt="Use webhook"></p>
+<p>打開後，你再去試著發送訊息給你的 Line Bot，你就會發現它可以正常回應你了，而且是不論你打什麼，他都會回應你剛剛打的字</p>
+<p><img src="https://i.imgur.com/ySLHrI0.png" alt="成功回應"></p>
+<p>恭喜你，截至為止，我們終於把 Line Bot 正式處理好了</p>
+<h3 id="關掉預設回饋"><a href="#關掉預設回饋" class="headerlink" title="關掉預設回饋"></a>關掉預設回饋</h3><p>接下來你可能會想要把那段該死的提示回饋</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">感謝您的訊息！</span><br><span class="line"></span><br><span class="line">很抱歉，本帳號無法個別回覆用戶的訊息。</span><br><span class="line">敬請期待我們下次發送的內容喔(moon smile)</span><br></pre></td></tr></table></figure>
+
+<p>以及加入好友通知</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Ray您好！</span><br><span class="line">我是溜腳學院。</span><br><span class="line">感謝您加入好友</span><br><span class="line"></span><br><span class="line">此官方帳號將定期發放最新資訊給您</span><br><span class="line">敬請期待</span><br></pre></td></tr></table></figure>
+
+<p>這兩個關掉，關掉方式很簡單，一樣回到 Line Bot 的<a target="_blank" rel="noopener" href="https://developers.line.biz/console/">後台</a>，點一下「Messaging API」，然後找到「Auto-reply messages」</p>
+<p><img src="https://i.imgur.com/SQPAXEU.png" alt="Auto-reply messages"></p>
+<p>你會跳到 LINE@ 管理介面，將「加入好友歡迎訊息」以及「自動回覆訊息」關掉就搞定囉~</p>
+<p><img src="https://i.imgur.com/kFyMAZW.png" alt="關掉預設通知"></p>
+<h2 id="串接-OpenAI-API"><a href="#串接-OpenAI-API" class="headerlink" title="串接 OpenAI API"></a>串接 OpenAI API</h2><p>終於到了我們的重頭戲了，前面你可以發現 LINE Bot 的流程與申請非常的多且繁瑣，因此前面花很多時間在介紹，主要是希望你可以順利建立好你的 LINE Bot，確保你接下來的步驟不會有問題。</p>
+<h3 id="安裝-OpenAI-套件"><a href="#安裝-OpenAI-套件" class="headerlink" title="安裝 OpenAI 套件"></a>安裝 OpenAI 套件</h3><p>首先不外乎我們要先安裝 OpenAI 的套件，請在專案底下輸入以下指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm i openai</span><br></pre></td></tr></table></figure>
+
+<p>接著 openai 本身有提供範例程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; <span class="title class_">Configuration</span>, <span class="title class_">OpenAIApi</span> &#125; = <span class="built_in">require</span>(<span class="string">&quot;openai&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> configuration = <span class="keyword">new</span> <span class="title class_">Configuration</span>(&#123;</span><br><span class="line">  <span class="attr">apiKey</span>: process.<span class="property">env</span>.<span class="property">OPENAI_API_KEY</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> openai = <span class="keyword">new</span> <span class="title class_">OpenAIApi</span>(configuration);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createCompletion</span>(&#123;</span><br><span class="line">  <span class="attr">model</span>: <span class="string">&quot;text-davinci-002&quot;</span>,</span><br><span class="line">  <span class="attr">prompt</span>: <span class="string">&quot;Hello world&quot;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(completion.<span class="property">data</span>.<span class="property">choices</span>[<span class="number">0</span>].<span class="property">text</span>);</span><br></pre></td></tr></table></figure>
+
+<p>因此基於上方這一段，我們稍候可以來修改一下，讓它可以跟我們的 LINE Bot 串接。</p>
+<p>openAI 有提供多個 <code>model</code> 可以選擇，分別是</p>
+<ul>
+<li><code>text-davinci-003</code></li>
+<li><code>text-curie-001</code></li>
+<li><code>text-babbage-001</code></li>
+<li><code>text-ada-001</code></li>
+</ul>
+<p>其中目前比較厲害的就是 <code>text-davinci-003</code>，因此我們這邊也會使用這個 model，每一個 model 都有不同的特性，你可以在<a target="_blank" rel="noopener" href="https://beta.openai.com/docs/models/gpt-3">這裡</a>找到它的介紹。</p>
+<h3 id="調整-app-js-的程式碼"><a href="#調整-app-js-的程式碼" class="headerlink" title="調整 app.js 的程式碼"></a>調整 app.js 的程式碼</h3><p>首先我們要先在 app.js 中引入 OpenAI 的套件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; <span class="title class_">Configuration</span>, <span class="title class_">OpenAIApi</span> &#125; = <span class="built_in">require</span>(<span class="string">&quot;openai&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>接下來我們要來實例化 OpenAI</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> configuration = <span class="keyword">new</span> <span class="title class_">Configuration</span>(&#123;</span><br><span class="line">  <span class="attr">apiKey</span>: process.<span class="property">env</span>.<span class="property">OPENAI_API_KEY</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> openai = <span class="keyword">new</span> <span class="title class_">OpenAIApi</span>(configuration);</span><br></pre></td></tr></table></figure>
+
+<p><code>apiKey</code> 就是我們最早前面所申請的 OpenAI API Key，而這一段一樣是放在 <code>.env</code> 的。</p>
+<p>如果你沒申請的話你會無法往下繼續的，請務必申請 OpenAI API Key 唷。</p>
+<p>目前來講，你的 <code>.env</code> 應該長這樣</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CHANNEL_ACCESS_TOKEN=</span><br><span class="line">CHANNEL_SECRET=</span><br><span class="line"></span><br><span class="line">OPENAI_API_KEY=</span><br></pre></td></tr></table></figure>
+
+<p>接下來呢？我們就要將原本 Line 官方所提供的範例程式碼稍微調整一下，主要調整的範圍是 <code>handleEvent</code> 的程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">handleEvent</span>(<span class="params">event</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (event.<span class="property">type</span> !== <span class="string">&#x27;message&#x27;</span> || event.<span class="property">message</span>.<span class="property">type</span> !== <span class="string">&#x27;text&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// ignore non-text-message event</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>(<span class="literal">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createCompletion</span>(&#123;</span><br><span class="line">    <span class="attr">model</span>: <span class="string">&quot;text-davinci-003&quot;</span>,</span><br><span class="line">    <span class="attr">prompt</span>: event.<span class="property">message</span>.<span class="property">text</span> ,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// create a echoing text message</span></span><br><span class="line">  <span class="keyword">const</span> echo = &#123; <span class="attr">type</span>: <span class="string">&#x27;text&#x27;</span>, <span class="attr">text</span>: completion.<span class="property">data</span>.<span class="property">choices</span>[<span class="number">0</span>].<span class="property">text</span> &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// use reply API</span></span><br><span class="line">  <span class="keyword">return</span> client.<span class="title function_">replyMessage</span>(event.<span class="property">replyToken</span>, echo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們將原本的 <code>prompt</code> 改成 <code>event.message.text</code>，也就是使用者輸入的訊息，而 <code>completion.data.choices[0].text</code> 就是 OpenAI 所回傳的訊息。</p>
+<p>沒問題後就儲存檔案，並 commit push 出去到 GitHub 上，屆時 Render 就會自動幫你重新部署了。</p>
+<blockquote>
+<p><strong>Note</strong><br>記得要去 Render 上面增加 <code>OPENAI_API_KEY</code> 的環境變數，否則會出現錯誤唷。</p>
+</blockquote>
+<p>當部署完畢後，你再去試著跟你的 LINE Bot 聊天，你會發現它已經會講話囉~</p>
+<p><img src="https://i.imgur.com/E3ktdNJ.png" alt="開始聊天"></p>
+<p>只是你會發現它好像沒辦法回你很多話，這原因是我們沒有告知它要使用多少 Tokens，因此這邊我們調整一下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createCompletion</span>(&#123;</span><br><span class="line">  <span class="attr">model</span>: <span class="string">&quot;text-davinci-003&quot;</span>,</span><br><span class="line">  <span class="attr">prompt</span>: event.<span class="property">message</span>.<span class="property">text</span> ,</span><br><span class="line">  <span class="attr">max_tokens</span>: <span class="number">200</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這個 <code>max_tokens</code> 會影響到 OpenAI 所回傳的訊息長度，因此我們這邊設定為 200，這樣就可以讓它回很多話了。</p>
+<h3 id="調整-OpenAI-的回傳訊息"><a href="#調整-OpenAI-的回傳訊息" class="headerlink" title="調整 OpenAI 的回傳訊息"></a>調整 OpenAI 的回傳訊息</h3><p>那麼這邊也有一件很有趣的事情，也就是 OpenAI 的訊息都有一大推空白，這是因為 OpenAI 會將你的訊息分成一個個的段落，而每個段落之間都會有一個空白，因此我們也要來調整一下。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createCompletion</span>(&#123;</span><br><span class="line">  <span class="attr">model</span>: <span class="string">&quot;text-davinci-003&quot;</span>,</span><br><span class="line">  <span class="attr">prompt</span>: event.<span class="property">message</span>.<span class="property">text</span> ,</span><br><span class="line">  <span class="attr">max_tokens</span>: <span class="number">200</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> echo = &#123; <span class="attr">type</span>: <span class="string">&#x27;text&#x27;</span>, <span class="attr">text</span>: completion.<span class="property">data</span>.<span class="property">choices</span>[<span class="number">0</span>].<span class="property">text</span>.<span class="title function_">trim</span>() &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>再重新上傳程式碼後，你就可以看到機器人正常的回你了</p>
+<p><img src="https://i.imgur.com/j8xuJgN.png" alt="正常回覆"></p>
+<p>恭喜你，完成了一個可以跟你聊天的機器人！而且是串接了 OpenAI 的機器人！</p>
+<h2 id="GPT-3-5-的使用"><a href="#GPT-3-5-的使用" class="headerlink" title="GPT-3.5 的使用"></a>GPT-3.5 的使用</h2><p>由於後來 OpenAI 開放了 ChatGPT 的 API，所以這一篇我算是補充一下該怎麼接，而不會整個重新介紹一次，因為其實整個的程式碼轉換成本上算低了。</p>
+<p>首先原本的程式碼是這樣的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createCompletion</span>(&#123;</span><br><span class="line">  <span class="attr">model</span>: <span class="string">&quot;text-davinci-003&quot;</span>,</span><br><span class="line">  <span class="attr">prompt</span>: event.<span class="property">message</span>.<span class="property">text</span>,</span><br><span class="line">  <span class="attr">max_tokens</span>: <span class="number">200</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們要將 <code>createCompletion</code> 改成 <code>createChatCompletion</code> 方法（<del>官方文件竟然沒提到</del>），接著我們要將 <code>prompt</code> 改成 <code>messages</code> 以及 <code>model</code> 也要調整一下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> completion = <span class="keyword">await</span> openai.<span class="title function_">createChatCompletion</span>(&#123;</span><br><span class="line">  <span class="attr">model</span>: <span class="string">&quot;gpt-3.5-turbo&quot;</span>,</span><br><span class="line">  <span class="attr">messages</span>: [&#123;</span><br><span class="line">    <span class="attr">role</span>: <span class="string">&#x27;user&#x27;</span>,</span><br><span class="line">    <span class="attr">content</span>: event.<span class="property">message</span>.<span class="property">text</span>,</span><br><span class="line">  &#125;],</span><br><span class="line">  <span class="attr">max_tokens</span>: <span class="number">200</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>接著 <code>const echo = &#123; type: &#39;text&#39;, text: completion.data.choices[0].text.trim() &#125;;</code> 這一段也要調整，需要調整成以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> echo = &#123; <span class="attr">type</span>: <span class="string">&#x27;text&#x27;</span>, <span class="attr">text</span>: choices.<span class="property">message</span>.<span class="property">content</span>.<span class="title function_">trim</span>() || <span class="string">&#x27;抱歉，我沒有話可說了。&#x27;</span> &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這樣子你就可以從 GPT-3 轉換成 GPT-3.5 了囉！</p>
+<p>完整程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;dotenv&#x27;</span>).<span class="title function_">config</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> line = <span class="built_in">require</span>(<span class="string">&#x27;@line/bot-sdk&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; <span class="title class_">Configuration</span>, <span class="title class_">OpenAIApi</span> &#125; = <span class="built_in">require</span>(<span class="string">&quot;openai&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> configuration = <span class="keyword">new</span> <span class="title class_">Configuration</span>(&#123;</span><br><span class="line">  <span class="attr">apiKey</span>: process.<span class="property">env</span>.<span class="property">OPENAI_API_KEY</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> openai = <span class="keyword">new</span> <span class="title class_">OpenAIApi</span>(configuration);</span><br><span class="line"></span><br><span class="line"><span class="comment">// create LINE SDK config from env variables</span></span><br><span class="line"><span class="keyword">const</span> config = &#123;</span><br><span class="line">  <span class="attr">channelAccessToken</span>: process.<span class="property">env</span>.<span class="property">CHANNEL_ACCESS_TOKEN</span>,</span><br><span class="line">  <span class="attr">channelSecret</span>: process.<span class="property">env</span>.<span class="property">CHANNEL_SECRET</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// create LINE SDK client</span></span><br><span class="line"><span class="keyword">const</span> client = <span class="keyword">new</span> line.<span class="title class_">Client</span>(config);</span><br><span class="line"></span><br><span class="line"><span class="comment">// create Express app</span></span><br><span class="line"><span class="comment">// about Express itself: https://expressjs.com/</span></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// register a webhook handler with middleware</span></span><br><span class="line"><span class="comment">// about the middleware, please refer to doc</span></span><br><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/callback&#x27;</span>, line.<span class="title function_">middleware</span>(config), <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title class_">Promise</span></span><br><span class="line">    .<span class="title function_">all</span>(req.<span class="property">body</span>.<span class="property">events</span>.<span class="title function_">map</span>(handleEvent))</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">result</span>) =&gt;</span> res.<span class="title function_">json</span>(result))</span><br><span class="line">    .<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">      res.<span class="title function_">status</span>(<span class="number">500</span>).<span class="title function_">end</span>();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// event handler</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">handleEvent</span>(<span class="params">event</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (event.<span class="property">type</span> !== <span class="string">&#x27;message&#x27;</span> || event.<span class="property">message</span>.<span class="property">type</span> !== <span class="string">&#x27;text&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// ignore non-text-message event</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>(<span class="literal">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> openai.<span class="title function_">createChatCompletion</span>(&#123;</span><br><span class="line">    <span class="attr">model</span>: <span class="string">&quot;gpt-3.5-turbo&quot;</span>,</span><br><span class="line">    <span class="attr">messages</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">role</span>: <span class="string">&#x27;user&#x27;</span>,</span><br><span class="line">        <span class="attr">content</span>: event.<span class="property">message</span>.<span class="property">text</span>,</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">max_tokens</span>: <span class="number">500</span>,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// create a echoing text message</span></span><br><span class="line">  <span class="keyword">const</span> [choices] = data.<span class="property">choices</span>;</span><br><span class="line">  <span class="keyword">const</span> echo = &#123; <span class="attr">type</span>: <span class="string">&#x27;text&#x27;</span>, <span class="attr">text</span>: choices.<span class="property">message</span>.<span class="property">content</span>.<span class="title function_">trim</span>() || <span class="string">&#x27;抱歉，我沒有話可說了。&#x27;</span> &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// use reply API</span></span><br><span class="line">  <span class="keyword">return</span> client.<span class="title function_">replyMessage</span>(event.<span class="property">replyToken</span>, echo);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// listen on port</span></span><br><span class="line"><span class="keyword">const</span> port = process.<span class="property">env</span>.<span class="property">PORT</span> || <span class="number">3000</span>;</span><br><span class="line">app.<span class="title function_">listen</span>(port, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`listening on <span class="subst">$&#123;port&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>最後也稍微講一下 <code>messages</code>，我們目前可以看到傳送了一個陣列物件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[&#123;</span><br><span class="line">  <span class="attr">role</span>: <span class="string">&#x27;user&#x27;</span>,</span><br><span class="line">  <span class="attr">content</span>: event.<span class="property">message</span>.<span class="property">text</span>,</span><br><span class="line">&#125;]</span><br></pre></td></tr></table></figure>
+
+<p>這個的代表著我們發送出去的訊息是來自「使用者」，如果你後續想要做到跟 ChatGPT 一樣可以貫穿前後文的話，<code>role</code> 還有一個屬性是 <code>system</code>，你只要將機器人回覆你的訊息也放進去就可以了，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">role</span>: <span class="string">&#x27;user&#x27;</span>,</span><br><span class="line">    <span class="attr">content</span>: event.<span class="property">message</span>.<span class="property">text</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">role</span>: <span class="string">&#x27;system&#x27;</span>,</span><br><span class="line">    <span class="attr">content</span>: <span class="string">&#x27;你好，我是機器人&#x27;</span>,</span><br><span class="line">  &#125;</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+
+<p>這樣子 ChatGPT 就知道哪一段訊息是它發的，哪一段是你發的囉~</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>相信你應該發現這個 Line Bot 的建立流程超級無敵的長，而且非常的多流程跟細節，但是你也可以因此認識到如何串接第三方服務，以及如何將你的程式碼部署到 Render 上面，所以我覺得是一個相當不錯的小練習，所以如果你想嘗試做一個聊天機器人，是可以考慮使用這個方法的。</p>
+<p>但是要注意一件事情 OpenAI 的 GPT 有一個重點使用，如果你要讓你聰明一點的回覆你，那麼你就要將它的上下文（包含你的回覆）一起撈出來丟給它，否則你會發現它有點笨，可是 LINE 的聊天機器人不太適合這種方式，因為過程你可能會問很多事情，這樣子訊息量會非常龐大且沒辦法刪除，因此這邊我們就不做這件事情了，而是讓它針對你每個問題去回覆即可，而不包含前一個問題的回覆。</p>
+<p>最後這邊我也附上<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-line-bot">範例程式碼</a>，如果你想直接拉回去用也是可以的，因為這一份程式碼基本上都是以官方所提供的為主，很少有大幅度調整的部分，所以你可以直接拿來用。</p>
+<p>希望這一篇可以讓你快快樂樂做出一個 LINE Bot。</p>
+<blockquote>
+<p><strong>Info</strong><br>如果你覺得部署到 Render 很難去除錯，其實是可以考慮使用 <code>ngrok</code> 的，這是一個可以讓你將本機的服務對外開放的服務，你可以參考<a href="/other/20230210/1090666501/">這篇文章</a>。</p>
+</blockquote>
+<h2 id="補充"><a href="#補充" class="headerlink" title="補充"></a>補充</h2><p>Render 本身選擇免費方案時，若有一段時間(印象是 15 分鐘)沒有使用則會進入睡眠狀態，如同先前 Heroku 免費版一樣，一但進入睡眠狀態後，重新啟動也要大約 30 秒～1 分鐘左右，因此如果你想避免這種狀況的話，你可以考慮使用 <a target="_blank" rel="noopener" href="https://uptimerobot.com/">UpTimeRoBot</a> 服務強迫它不准睡覺(<del>壓榨勞工</del>)。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/OpenAI/" rel="tag"># OpenAI</a>
+              <a href="/tags/ChatGPT/" rel="tag"># ChatGPT</a>
+              <a href="/tags/GPT-3/" rel="tag"># GPT-3</a>
+              <a href="/tags/GPT-3-5/" rel="tag"># GPT-3.5</a>
+              <a href="/tags/LINE-Bot/" rel="tag"># LINE Bot</a>
+              <a href="/tags/LiNE/" rel="tag"># LiNE</a>
+              <a href="/tags/API/" rel="tag"># API</a>
+              <a href="/tags/Render/" rel="tag"># Render</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20221206/2011045213/" rel="prev" title="從零開始教你買網址(Google Domain)到設定成自己部落格網址">
+                  <i class="fa fa-angle-left"></i> 從零開始教你買網址(Google Domain)到設定成自己部落格網址
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/gsap/20221211/2330475296/" rel="next" title="(8)前端好好玩用 GSAP 做一個特效 - 特殊屬性">
+                  (8)前端好好玩用 GSAP 做一個特效 - 特殊屬性 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
