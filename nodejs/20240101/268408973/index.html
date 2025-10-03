@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="六角旅館 API 系統（freyja）之後端完整部署教學">
+<meta property="og:url" content="https://israynotarray.com/nodejs/20240101/268408973/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting.png?alt=media&token=1070d698-a0f8-4cfb-9500-4d7eccac630e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting2.jpg?alt=media&token=3985355a-ec23-44c8-a812-4174edb99e47">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcopy_url.jpg?alt=media&token=de853a0e-b4d8-4656-a142-ee7c5b7d2e58">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fenv_cp.jpg?alt=media&token=41e99169-542b-4549-9ec0-0490bcf1542d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FMongoDB_sigin.jpg?alt=media&token=74f9a9b3-be1e-4457-957b-3c7f19232bea">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmongodb_sigin_account.png?alt=media&token=6d0c0276-15da-4ed3-aab1-288216e5051a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmogodb_Organizations.png?alt=media&token=4afaf3d8-472d-4154-a16f-f7a12f6736d4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization.jpg?alt=media&token=b18c25fd-a746-442a-a774-ad2e3f84ee4d">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization2.jpg?alt=media&token=e012fbea-36a5-4cc6-a06a-da98d6d4dc83">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FProjects.jpg?alt=media&token=630004a9-dd3c-476c-9c62-5f23efd33af8">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffreyja-project.png?alt=media&token=441b9fe1-3601-4786-97a3-cbc65e28e5da">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcreate_db.jpg?alt=media&token=9aaa28dd-3d02-4a45-919b-a6e215bf9fbe">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FDeploy_your_database.jpg?alt=media&token=f8838fdd-7440-4e88-bb10-482270ea25c9">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FSecurity_Quickstart.jpg?alt=media&token=c6945a0b-d82c-4326-a94c-8188110b7e19">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FNetwork%20Access.png?alt=media&token=dcb85df5-387e-4fff-b3d8-de14b0665a83">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnent_Db.jpg?alt=media&token=06102c4a-f2a7-4da9-87b4-c95e638f68ec">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnect%20Db2.jpg?alt=media&token=0ae9e2ae-d32e-41bf-b555-038b71563d11">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.19.15.png?alt=media&token=5d31780f-8cc3-4c01-b09c-a6514424b8ee">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FTwo%20Security.jpg?alt=media&token=cd90951a-d3e8-4836-9823-8e6efad2c264">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password.png?alt=media&token=4f08087f-5d76-4e66-8007-a7ea69326160">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password2.jpg?alt=media&token=5857b96e-65e4-42d8-bbf6-5ba1433971f2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password3.jpg?alt=media&token=ae77297a-f5af-4a40-ad28-a99fe98a79bd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fstart.png?alt=media&token=242cb6e6-f755-4f09-9683-d143aff3ac1a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FRender_Dashboard.jpg?alt=media&token=cda0a9f2-02f3-488a-96e7-26239f139625">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_setp1.jpg?alt=media&token=7ea196fb-6347-436b-bca5-432903c221bc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fconnect_repository.jpg?alt=media&token=5408ee01-27d9-468f-8c65-ea7ba31c638e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FEnvironment%20Variables.jpg?alt=media&token=07a6f78c-69c4-48fd-9faf-2167becf23e2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy.jpg?alt=media&token=7a5a8e07-8627-4793-b24f-51aa514c9ed4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_2.jpg?alt=media&token=47fc6538-d658-4255-b1f1-19feb2dc3070">
+<meta property="article:published_time" content="2024-01-01T13:46:51.000Z">
+<meta property="article:modified_time" content="2024-01-01T13:46:51.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="Express">
+<meta property="article:tag" content="MongoDB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578">
+
+
+<link rel="canonical" href="https://israynotarray.com/nodejs/20240101/268408973/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/nodejs/20240101/268408973/","path":"nodejs/20240101/268408973/","title":"六角旅館 API 系統（freyja）之後端完整部署教學"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>六角旅館 API 系統（freyja）之後端完整部署教學 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%96%E5%BE%97%E5%B0%88%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">取得專案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E7%92%B0%E5%A2%83"><span class="nav-number">3.</span> <span class="nav-text">初始化環境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MongoDB-%E9%80%A3%E7%B5%90%E8%88%87%E5%AF%86%E7%A2%BC"><span class="nav-number">3.1.</span> <span class="nav-text">MongoDB 連結與密碼</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gmail-%E5%B8%B3%E8%99%9F%E8%88%87%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F%E5%AF%86%E7%A2%BC"><span class="nav-number">3.2.</span> <span class="nav-text">Gmail 帳號與應用程式密碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E5%88%B0-Render-com"><span class="nav-number">4.</span> <span class="nav-text">部署到 Render.com</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">975</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">830</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/nodejs/20240101/268408973/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="六角旅館 API 系統（freyja）之後端完整部署教學 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          六角旅館 API 系統（freyja）之後端完整部署教學
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-01-01 21:46:51" itemprop="dateCreated datePublished" datetime="2024-01-01T21:46:51+08:00">2024-01-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/nodejs/" itemprop="url" rel="index"><span itemprop="name">Nodejs</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。</p>
+<h2 id="取得專案"><a href="#取得專案" class="headerlink" title="取得專案"></a>取得專案</h2><p>首先一開始先點擊<a target="_blank" rel="noopener" href="https://github.com/hexschool/freyja">這裡</a> 進入到六角學院的後端範例專案，然後這邊我會使用「Fork」的方式將專案複製到自己的 GitHub 帳號底下</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578" alt="fork"></p>
+<p>接著你會進入 Fork 的頁面，你只需要點一下「Create Fork」就可以了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting.png?alt=media&token=1070d698-a0f8-4cfb-9500-4d7eccac630e" alt="fork setting"></p>
+<blockquote>
+<p><strong>Note</strong><br>如果你發現你的畫面上有出現「The repository freyja already exists on this account.」的話，那就代表你已經 Fork 過，那麼就可以不用重複 Fork 了。</p>
+</blockquote>
+<p>這樣你的專案底下就會多出一個專案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting2.jpg?alt=media&token=3985355a-ec23-44c8-a812-4174edb99e47" alt="Fork Repository"></p>
+<p>（紅框處通常會變成你的 GitHub 帳號名稱）</p>
+<p>接下來請你在你剛剛 Fork 的專案底下點擊「Code」，然後複製你的專案網址</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcopy_url.jpg?alt=media&token=de853a0e-b4d8-4656-a142-ee7c5b7d2e58" alt="Copy Url"></p>
+<p>取得網址後，請打開你的終端機，並且輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> [剛剛複製的網址]</span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以將專案複製到你的電腦上囉～</p>
+<h2 id="初始化環境"><a href="#初始化環境" class="headerlink" title="初始化環境"></a>初始化環境</h2><p>接下來我們要進入到專案底下，並且安裝相關套件，請輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> freyja</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請注意這個專案至少要 Node.js 18.16.0 以上版本才可以執行喔～</p>
+</blockquote>
+<p>還原專案後，接著我們要設定一下環境變數，請你在終端機下輸入以下指令將 <code>.env.example</code> 複製一份 <code>.env</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> .env.example .<span class="built_in">env</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fenv_cp.jpg?alt=media&token=41e99169-542b-4549-9ec0-0490bcf1542d" alt="cp env"></p>
+<p>接下來打開 <code>.env</code> 檔案，你會看到以下內容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 環境變數，區分開發或正式環境( development、production )</span></span><br><span class="line">NODE_ENV = <span class="string">&quot;development&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 伺服器埠號</span></span><br><span class="line">PORT = 3005</span><br><span class="line"></span><br><span class="line"><span class="comment"># MongoDB 連結</span></span><br><span class="line">DATABASE =</span><br><span class="line"><span class="comment"># MongoDB 密碼</span></span><br><span class="line">DATABASE_PASSWORD =</span><br><span class="line"></span><br><span class="line"><span class="comment"># JTW Token 到期日</span></span><br><span class="line">JWT_EXPIRES_DAY = <span class="string">&quot;7d&quot;</span></span><br><span class="line"><span class="comment"># JTW Token 密鑰</span></span><br><span class="line">JWT_SECRET = <span class="string">&quot;hexschool&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Gmail 帳號</span></span><br><span class="line">EMAILER_USER =</span><br><span class="line"><span class="comment"># Gmail 應用程式密碼</span></span><br><span class="line">EMAILER_PASSWORD =</span><br></pre></td></tr></table></figure>
+
+<p>這邊有幾個東西要準備一下，分別是：</p>
+<ul>
+<li>MongoDB 連結與密碼</li>
+<li>Gmail 帳號與應用程式密碼</li>
+</ul>
+<p>所以就讓我們來一個一個設定吧～</p>
+<h3 id="MongoDB-連結與密碼"><a href="#MongoDB-連結與密碼" class="headerlink" title="MongoDB 連結與密碼"></a>MongoDB 連結與密碼</h3><p>首先我們這邊將會使用 MongoDB Atlas 來當作我們的資料庫（這邊我會直接忽略註冊的過程），所以請你點一下<a target="_blank" rel="noopener" href="https://www.mongodb.com/">這裡</a>進入到 MongoDB Atlas 的官網，然後點一下「Sign in」，如下圖：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FMongoDB_sigin.jpg?alt=media&token=74f9a9b3-be1e-4457-957b-3c7f19232bea" alt="Sign in"></p>
+<p>接著你會進入到登入頁面，請你選擇適合你自己的方式登入</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmongodb_sigin_account.png?alt=media&token=6d0c0276-15da-4ed3-aab1-288216e5051a" alt="Sign in"></p>
+<p>這邊我會選擇「GitHub」的方式登入，所以就麻煩你選擇你自己的方式登入囉～</p>
+<p>登入後，如果你是一個全新的帳號，那麼你會先被要求建立一個組織</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmogodb_Organizations.png?alt=media&token=4afaf3d8-472d-4154-a16f-f7a12f6736d4" alt="Organizations"></p>
+<p>所以就請你點一下「Create Organization」，然後輸入你的組織名稱，然後選「MongoDB Atlas」，就可以儲存建立組織了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization.jpg?alt=media&token=b18c25fd-a746-442a-a774-ad2e3f84ee4d" alt="Create Organization"></p>
+<p>按下儲存後，下一頁會是「Members and Security」，也就是成員與安全性的設定，這邊你可以選擇要不要邀請其他人加入，或是直接點擊「Create Organization」（基本上這邊都是預設的，所以你可以直接點擊「Create Organization」）</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization2.jpg?alt=media&token=e012fbea-36a5-4cc6-a06a-da98d6d4dc83" alt="Members and Security"></p>
+<p>接下來我們要來建立一個專案，因為 MongoDB Atlas 是以組織為單位，所以前面才會需要設置組織，所以現在我們要建立一個專案，請你點一下「New Project」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FProjects.jpg?alt=media&token=630004a9-dd3c-476c-9c62-5f23efd33af8" alt="New Project"></p>
+<p>這個專案名稱可以隨便取，我就取「freyja-project」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffreyja-project.png?alt=media&token=441b9fe1-3601-4786-97a3-cbc65e28e5da" alt="freyja-project"></p>
+<p>然後下一步基本上會問你要不要邀請其他人加入，這邊你可以直接點擊「Create Project」，然後就會進入到專案的首頁，這時候請你點一下畫面上的「Create」，因為我們要來部署一個資料庫</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcreate_db.jpg?alt=media&token=9aaa28dd-3d02-4a45-919b-a6e215bf9fbe" alt="Create Db"></p>
+<p>接下來你會進入「Deploy your database」頁面，這邊要請你選擇 「M0 Free」專案，就可以按下「Create」了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FDeploy_your_database.jpg?alt=media&token=f8838fdd-7440-4e88-bb10-482270ea25c9" alt="Deploy your database"></p>
+<blockquote>
+<p><strong>Note</strong><br>底下的 Provider 跟 Region 的意思是指你的資料庫要部署在哪個雲端服務商的哪個地區以及哪個區域，基本上預設就很足夠了。</p>
+</blockquote>
+<p>然後你就會進入 MongoDB 的快速入門設定頁面，底下你會比較需要注意一件事情，請你記下你底下的帳號與密碼，因為這個帳號與密碼會是你連接資料庫的帳號與密碼，沒問題就可以按下「Create User」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FSecurity_Quickstart.jpg?alt=media&token=c6945a0b-d82c-4326-a94c-8188110b7e19" alt="Security Quickstart"></p>
+<p>接著往下滾，是要設定 IP 位址的部分，也就是你會怎麼連接到資料庫，由於我們只是練習而已，所以請你在 IP 欄位輸入 <code>0.0.0.0/0</code>，並按下「Add Entry」，然後按下「Finish And Close」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FNetwork%20Access.png?alt=media&token=dcb85df5-387e-4fff-b3d8-de14b0665a83" alt="Network Access"></p>
+<blockquote>
+<p><strong>Note</strong><br>通常在正式環境下，我們會設定主機的固定 IP 位址，但因為這邊只是練習，所以我們就直接設定 <code>0.0.0.0/0</code>，代表任何 IP 位址都可以連接到資料庫。</p>
+</blockquote>
+<p>建立好後，畫面上有一個「Connect」的按鈕，請你點一下</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnent_Db.jpg?alt=media&token=06102c4a-f2a7-4da9-87b4-c95e638f68ec" alt="Connect Db"></p>
+<p>接著應該會跳出一個視窗，請你選擇「Connect your application」的「Driver」，然後選擇「Node.js」，然後複製你的連結字串</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnect%20Db2.jpg?alt=media&token=0ae9e2ae-d32e-41bf-b555-038b71563d11" alt="Connect Db2"></p>
+<p>這就是我們的 MongoDB 連結字串，請你複製起來，然後回到剛剛的 <code>.env</code> 檔案，將 <code>DATABASE</code> 與 <code>DATABASE_PASSWORD</code> 的值改成你剛剛複製的連結字串，並且將 <code>&lt;password&gt;</code> 改成你剛剛設定的密碼，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># MongoDB 連結</span><br><span class="line">DATABASE = &quot;mongodb+srv://typescript-30-ray:&lt;password&gt;@cluster0.937ixka.mongodb.net/?retryWrites=true&amp;w=majority&quot;</span><br><span class="line"># MongoDB 密碼</span><br><span class="line">DATABASE_PASSWORD = jqZsdqdwqwd31 # 不用擔心這是假密碼</span><br></pre></td></tr></table></figure>
+
+<p>恭喜你，到目前為止，終於完成了 MongoDB 的設定了～</p>
+<h3 id="Gmail-帳號與應用程式密碼"><a href="#Gmail-帳號與應用程式密碼" class="headerlink" title="Gmail 帳號與應用程式密碼"></a>Gmail 帳號與應用程式密碼</h3><p>接下來我們要來取得 Gmail 的帳號以及應用程式密碼，首先請你到 Google 設定中心，然後點選「<a target="_blank" rel="noopener" href="https://myaccount.google.com/u/1/security">安全性</a>」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.19.15.png?alt=media&token=5d31780f-8cc3-4c01-b09c-a6514424b8ee" alt="Google 設定中心"></p>
+<p>這邊要麻煩你先確定你的帳號是否有先啟用<strong>兩步驗驗證</strong>，否則 Google 不會讓你繼續往下的哦！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FTwo%20Security.jpg?alt=media&token=cd90951a-d3e8-4836-9823-8e6efad2c264" alt="Two Security"></p>
+<p>確定有啟用後，麻煩你在上方搜尋欄位搜尋「應用程式密碼」，然後點一下「應用程式密碼」，如下圖：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password.png?alt=media&token=4f08087f-5d76-4e66-8007-a7ea69326160" alt="Application Password"></p>
+<blockquote>
+<p><strong>Note</strong><br>早期可以在畫面上直接找到「應用程式密碼」，但是現在要搜尋才可以找到。</p>
+</blockquote>
+<p>接著你會進入到「應用程式密碼」的頁面，請你在 App Name 欄位輸入「freyja」，然後按下「建立」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password2.jpg?alt=media&token=5857b96e-65e4-42d8-bbf6-5ba1433971f2" alt="Application Password"></p>
+<p>接下來畫面就會彈跳出由 Google 產生的密碼四組四位數的 16 字元密碼，如…</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">abba dqwd asbc d3hr # 這是假密碼</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password3.jpg?alt=media&token=ae77297a-f5af-4a40-ad28-a99fe98a79bd" alt="Application Password3"></p>
+<p>接下來你就可以回到專案的 <code>.env</code> 檔案，將 <code>EMAILER_USER</code> 與 <code>EMAILER_PASSWORD</code> 的值改成你剛剛產生的密碼，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># Gmail 帳號</span><br><span class="line">EMAILER_USER = &quot;example@gmail.com&quot; # 你用來申請應用程式密碼的 Gmail 帳號</span><br><span class="line"># Gmail 應用程式密碼</span><br><span class="line">EMAILER_PASSWORD = &quot;abba dqwd asbc d3hr&quot; # 你申請的應用程式密碼</span><br></pre></td></tr></table></figure>
+
+<p>到目前為止，你已經把這個 Freyja 專案所需要的環境變數都設定好了，接下來我們要來執行專案了～</p>
+<p>你只需要輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+
+<p>你就可以看到終端機出現以下畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fstart.png?alt=media&token=242cb6e6-f755-4f09-9683-d143aff3ac1a" alt="npm run dev"></p>
+<p>這樣我們 Freyja 專案的後端就算是完成囉！</p>
+<h2 id="部署到-Render-com"><a href="#部署到-Render-com" class="headerlink" title="部署到 Render.com"></a>部署到 Render.com</h2><p>接下來請你打開 「<a target="_blank" rel="noopener" href="https://render.com/">Render.com</a>」，然後點一下「Sign up」，登入到 <a href="Render.com">Render.com</a></p>
+<blockquote>
+<p><strong>Note</strong><br>如果你還沒註冊就請你註冊一下，這邊我會直接忽略註冊過程。（建議使用 GitHub 登入）</p>
+</blockquote>
+<p>接著要麻煩你點一下上方的「New」，然後選擇「New Web Service」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FRender_Dashboard.jpg?alt=media&token=cda0a9f2-02f3-488a-96e7-26239f139625" alt="Web Service"></p>
+<p>進入「Create a new Web Service」之後，我們選「Build and deploy from a Git repository」，並點下一步</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_setp1.jpg?alt=media&token=7ea196fb-6347-436b-bca5-432903c221bc" alt="Build and deploy from a Git repository"></p>
+<p>接下來請在「Connect a repository」欄位搜尋我們前面所 Fork 的名稱，也就是「freyja」，然後選擇「freyja」，並點 Connect</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fconnect_repository.jpg?alt=media&token=5408ee01-27d9-468f-8c65-ea7ba31c638e" alt="Connect a Repository"></p>
+<blockquote>
+<p><strong>Note</strong><br>如果找不到的話，代表你註冊 Render.com 的帳號跟你 Fork 的帳號不一樣，或者你的 GitHub 沒有正確給予 Render.com 的權限。</p>
+</blockquote>
+<p>接下來請你輸入以下欄位</p>
+<ul>
+<li>Name：請輸入「freyja」</li>
+<li>Instance Type：請選擇「Free」</li>
+<li>Environment Variables：請依照 .env 檔案的內容輸入</li>
+</ul>
+<p>所以會長的像這樣：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FEnvironment%20Variables.jpg?alt=media&token=07a6f78c-69c4-48fd-9faf-2167becf23e2" alt="Environment Variables"></p>
+<blockquote>
+<p><strong>Note</strong><br>這邊並不需要設定 PROT 跟 NODE_ENV，因為 Dockerfile 裡面已經有設定了；建議填寫在 Environment Variables 時，不用補上引號。</p>
+</blockquote>
+<p>接下來請你點一下「Create Web Service」，Render.com 就會開始幫你部署專案囉！</p>
+<p>你只要看到畫面出現以下畫面，就代表部署成功囉！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy.jpg?alt=media&token=7a5a8e07-8627-4793-b24f-51aa514c9ed4" alt="部署成功"></p>
+<p>接著你就可以滾到上方找到 Render.com 給你的網址，點一下就可以看到你的專案囉！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_2.jpg?alt=media&token=47fc6538-d658-4255-b1f1-19feb2dc3070" alt="部署成功"></p>
+<blockquote>
+<p><strong>Note</strong><br>正常點網址進入你會收到一個 JSON 物件，所以建議你在網址後方補上 <code>swagger</code>，這樣就可以進入到 API Doc 頁面囉！</p>
+</blockquote>
+<p>以上就是完整的部署教學囉！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+              <a href="/tags/Express/" rel="tag"># Express</a>
+              <a href="/tags/MongoDB/" rel="tag"># MongoDB</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/other/20231224/4103794407/" rel="prev" title="Windows 自然人憑證網頁總是出現「localhost 拒絕連線」的解決方式">
+                  <i class="fa fa-angle-left"></i> Windows 自然人憑證網頁總是出現「localhost 拒絕連線」的解決方式
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/vue/20240106/910015012/" rel="next" title="遲早你會面對的問題，Vue3 Composition API 的 ref 與 reactive 差異是什麼？">
+                  遲早你會面對的問題，Vue3 Composition API 的 ref 與 reactive 差異是什麼？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

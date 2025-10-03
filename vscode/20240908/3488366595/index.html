@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="身為用了 GitHub Copilot 一陣子的使用者，這一篇我將會分享一些我使用 GitHub Copilot 的心得與技巧，讓大家開發時更加得心應手，那麼廢話就不多說，我們來聊聊 GitHub Copilot 吧！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitHub Copilot 好難用？說不定是你不懂 Copilot 之技巧全攻略不藏私！">
+<meta property="og:url" content="https://israynotarray.com/vscode/20240908/3488366595/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="身為用了 GitHub Copilot 一陣子的使用者，這一篇我將會分享一些我使用 GitHub Copilot 的心得與技巧，讓大家開發時更加得心應手，那麼廢話就不多說，我們來聊聊 GitHub Copilot 吧！">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F68747470733a2f2f7265732e636c6f7564696e6172792e636f6d2f70726163746963616c6465762f696d6167652f66657463682f732d2d70454d3650587a582d2d2f635f696d616767615f7363616c652c665f6175746f2c666c5f70726f67726573736976652c685f3432302c715f6175746f2c775f313030302f687.webp?alt=media&token=0e8520ed-b563-469b-9c7d-9c8dd6a1b092">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2013.33.12.png?alt=media&token=c543799b-b964-4090-b432-73d10b435f16">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E5%85%A8%E7%86%92%E5%B9%95_2024_9_8_13_36.jpg?alt=media&token=daf0c11e-f00e-4c84-a5b2-87316e3725ab">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-41-26.gif?alt=media&token=9de56760-d5eb-4604-873e-f5c259043bae">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-53-04.gif?alt=media&token=da8b51fd-a96e-4591-8da3-621c54f90be7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-55-23.gif?alt=media&token=b5e72a2b-d012-4e26-9981-21233f9d9873">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.25.32.png?alt=media&token=abac5686-fa76-4bdf-a9c7-219661cc04d1">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.26.38.png?alt=media&token=a6acc695-106d-4e29-a860-f7063fbe98fc">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.26.51.png?alt=media&token=73924c66-5fc9-4319-8915-21fffb88092f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2013.59.50.png?alt=media&token=89d96c96-b06f-4bc3-96dd-a2ce6ffa0d11">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2014-04-13.gif?alt=media&token=cf7b21c4-38c1-45ee-b3eb-d2b13d5de7ab">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.07.04.png?alt=media&token=64a0b130-771e-4213-9ab0-c7d16442e3e2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.09.19.png?alt=media&token=b9510f5b-96a9-402f-829b-cbbf454a20bd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.10.43.png?alt=media&token=e40a2f48-aa25-458a-b12c-116622f37176">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.32.58.png?alt=media&token=e9085320-fb94-4cc0-9aae-c706982b210a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.46.00.png?alt=media&token=b0b0cdb2-6c11-4029-a323-05aaaa53a057">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.47.54.png?alt=media&token=6cd4b8ae-c48b-48b2-8c85-8846fa294f50">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.49.30.png?alt=media&token=4d66e688-b073-431f-afc2-9e5dd11eea12">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.55.49.png?alt=media&token=0285c74d-e670-4221-859f-6dd3257f622c">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.09.14.png?alt=media&token=eb63e931-9fcc-425a-a78d-2e1944fa1bcf">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.10.28.png?alt=media&token=7a9ef363-1f5d-4971-8ac9-bf3ab4aab9fd">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.14.28.png?alt=media&token=25875ea9-ed5a-4c5d-9570-e3024c6149d6">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.20.08.png?alt=media&token=226726e9-2c8f-4c0c-8331-dffa065043b5">
+<meta property="article:published_time" content="2024-09-08T05:06:00.000Z">
+<meta property="article:modified_time" content="2024-09-08T05:06:00.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Visual Studio Code">
+<meta property="article:tag" content="GitHub Copilot">
+<meta property="article:tag" content="開發技巧">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F68747470733a2f2f7265732e636c6f7564696e6172792e636f6d2f70726163746963616c6465762f696d6167652f66657463682f732d2d70454d3650587a582d2d2f635f696d616767615f7363616c652c665f6175746f2c666c5f70726f67726573736976652c685f3432302c715f6175746f2c775f313030302f687.webp?alt=media&token=0e8520ed-b563-469b-9c7d-9c8dd6a1b092">
+
+
+<link rel="canonical" href="https://israynotarray.com/vscode/20240908/3488366595/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/vscode/20240908/3488366595/","path":"vscode/20240908/3488366595/","title":"GitHub Copilot 好難用？說不定是你不懂 Copilot 之技巧全攻略不藏私！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GitHub Copilot 好難用？說不定是你不懂 Copilot 之技巧全攻略不藏私！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-GitHub-Copilot%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什麼是 GitHub Copilot？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-GitHub-Copilot"><span class="nav-number">3.</span> <span class="nav-text">安裝 GitHub Copilot</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-Copilot-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">GitHub Copilot 的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%BB%E8%A7%A3%E7%94%A2%E7%94%9F%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">4.1.</span> <span class="nav-text">註解產生程式碼</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E5%91%BC%E5%8F%AB-Copilot-%E6%92%B0%E5%AF%AB%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">4.2.</span> <span class="nav-text">指令呼叫 Copilot 撰寫程式碼</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%84%E5%8A%A0%E6%AA%94%E6%A1%88%E8%AB%8B-Copilot-%E5%B9%AB%E4%BD%A0%E6%92%B0%E5%AF%AB%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">4.3.</span> <span class="nav-text">附加檔案請 Copilot 幫你撰寫程式碼</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%B8%E5%8F%96%E7%A8%8B%E5%BC%8F%E7%A2%BC%E8%AE%93-Copilot-%E5%B9%AB%E4%BD%A0%E4%BF%AE%E6%AD%A3-x2F-%E8%AA%BF%E6%95%B4"><span class="nav-number">4.4.</span> <span class="nav-text">選取程式碼讓 Copilot 幫你修正&#x2F;調整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B3%E9%8D%B5%E9%81%B8%E5%96%AE%E5%91%BC%E5%8F%AB-Copilot"><span class="nav-number">4.5.</span> <span class="nav-text">右鍵選單呼叫 Copilot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Copilot-Chat-%E7%9A%84-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.</span> <span class="nav-text">Copilot Chat 的 @ 指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#terminal%EF%BC%88%E8%A9%A2%E5%95%8F%E5%A6%82%E4%BD%95%E5%9C%A8%E7%B5%82%E7%AB%AF%E6%A9%9F%E4%B8%AD%E5%9F%B7%E8%A1%8C%E6%9F%90%E4%BA%9B%E5%8B%95%E4%BD%9C%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">@terminal（詢問如何在終端機中執行某些動作）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vscode%EF%BC%88%E8%A9%A2%E5%95%8F%E6%9C%89%E9%97%9C-VS-Code-%E7%9A%84%E5%95%8F%E9%A1%8C%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">@vscode（詢問有關 VS Code 的問題）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#workspace%EF%BC%88%E6%8F%90%E5%87%BA%E6%9C%89%E9%97%9C%E6%82%A8%E5%B7%A5%E4%BD%9C%E5%8D%80%E7%9A%84%E5%95%8F%E9%A1%8C%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">@workspace（提出有關您工作區的問題）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">6.</span> <span class="nav-text">結論</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">975</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">830</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/vscode/20240908/3488366595/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GitHub Copilot 好難用？說不定是你不懂 Copilot 之技巧全攻略不藏私！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="身為用了 GitHub Copilot 一陣子的使用者，這一篇我將會分享一些我使用 GitHub Copilot 的心得與技巧，讓大家開發時更加得心應手，那麼廢話就不多說，我們來聊聊 GitHub Copilot 吧！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GitHub Copilot 好難用？說不定是你不懂 Copilot 之技巧全攻略不藏私！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-09-08 13:06:00" itemprop="dateCreated datePublished" datetime="2024-09-08T13:06:00+08:00">2024-09-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/vscode/" itemprop="url" rel="index"><span itemprop="name">VSCode</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">身為用了 GitHub Copilot 一陣子的使用者，這一篇我將會分享一些我使用 GitHub Copilot 的心得與技巧，讓大家開發時更加得心應手，那麼廢話就不多說，我們來聊聊 GitHub Copilot 吧！</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F68747470733a2f2f7265732e636c6f7564696e6172792e636f6d2f70726163746963616c6465762f696d6167652f66657463682f732d2d70454d3650587a582d2d2f635f696d616767615f7363616c652c665f6175746f2c666c5f70726f67726573736976652c685f3432302c715f6175746f2c775f313030302f687.webp?alt=media&token=0e8520ed-b563-469b-9c7d-9c8dd6a1b092" alt="GitHub Copilot"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>身為用了 GitHub Copilot 一陣子的使用者，這一篇我將會分享一些我使用 GitHub Copilot 的心得與技巧，讓大家開發時更加得心應手，那麼廢話就不多說，我們來聊聊 GitHub Copilot 吧！</p>
+<h2 id="什麼是-GitHub-Copilot？"><a href="#什麼是-GitHub-Copilot？" class="headerlink" title="什麼是 GitHub Copilot？"></a>什麼是 GitHub Copilot？</h2><p>首先這邊要說明一下 GitHub Copilot 跟 Copilot 是兩種東西，Copilot 是指 Microsoft Copilot 而非 GitHub Copilot，這邊我們要講的是 GitHub Copilot。</p>
+<p>那麼為什麼會特別提到這件事情呢？因為原本 Microsoft Copilot 是叫做「Bing AI」，但某一天 Microsoft 決定改叫 Copilot，這樣就會跟 GitHub Copilot 有點混淆，所以這邊才特別說明一下，避免大家搞混。</p>
+<p>而本文因為會有簡寫，<strong>所以在本文所提到的 Copilot 就是 GitHub Copilot 而非 Microsoft Copilot 唷！</strong></p>
+<p>回頭講一下 Copilot 到底是什麼東西，簡單來講 Copilot 是一個由 GitHub 與 OpenAI 合作開發的 AI 程式，透過放在 GitHub 上的開源程式碼所訓練出來的 AI 模型，讓開發者們在撰寫程式碼時可以更快速的完成程式碼。</p>
+<p>那麼由於軟體更新速度非常快速，所以這邊我要特別標記一下，本文是基於 <strong>2024 年 9 月的 GitHub 1.229.0 版本</strong>所撰寫的，所以如果有任何更新的功能或是變動，請以 GitHub 官方文件為主唷！</p>
+<blockquote>
+<p><strong>Note</strong><br>其實 GitHub Copilot 的定位是「<code>Pair programming（結隊開發）</code>」，Pair programming 的意思是說，兩個人一起開發，其中一個人是主要的開發者，另一個人是幫忙的開發者，而 Copilot 就是幫忙的開發者，只是從人類換成了 AI 而已，透過 AI 的幫助，讓開發者可以更快速的完成程式碼。<br>所以 GitHub 中文又稱 GitHub 副駕駛。</p>
+</blockquote>
+<h2 id="安裝-GitHub-Copilot"><a href="#安裝-GitHub-Copilot" class="headerlink" title="安裝 GitHub Copilot"></a>安裝 GitHub Copilot</h2><p>安裝方式非常簡單，只需要在 Visual Studio Code 的擴充功能商店搜尋「GitHub Copilot」，然後點選安裝即可。</p>
+<blockquote>
+<p><strong>Note</strong><br>Copilot 不止支援 Visual Studio Code，也支援其他的編輯器，例如：Microsoft Visual Studio、Vim、Cursor 或 JetBrains，但這邊會著重於 Visual Studio Code。</p>
+</blockquote>
+<p>你會找到兩個擴充功能，一個是 <a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot">GitHub Copilot</a>，另一個是 <a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat">GitHub Copilot Chat</a></p>
+<p>不論你安裝哪一個，兩者都會一起安裝，所以你可以選擇安裝哪一個都可以，一個是 Copilot 的主要套件，另一個是 Copilot 的聊天室</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2013.33.12.png?alt=media&token=c543799b-b964-4090-b432-73d10b435f16" alt="GitHub Copilot"></p>
+<p>安裝完成後，你會看到 Visual Studio Code 的右下角會出現一個 Copilot 的圖示以及左側的 Copilot 聊天室</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E5%85%A8%E7%86%92%E5%B9%95_2024_9_8_13_36.jpg?alt=media&token=daf0c11e-f00e-4c84-a5b2-87316e3725ab" alt="GitHub Copilot"></p>
+<blockquote>
+<p><strong>Note</strong><br>GitHub Copilot 是付費的擴充功能，一年約 <code>100</code> 美金（相當於台幣約 <code>3000</code> 元），但如果你是學生的話，你可以透過 <a href="https://israynotarray.com/other/20201102/32425/">GitHub Education</a> 來免費使用唷！</p>
+</blockquote>
+<h2 id="GitHub-Copilot-的使用"><a href="#GitHub-Copilot-的使用" class="headerlink" title="GitHub Copilot 的使用"></a>GitHub Copilot 的使用</h2><p>基本上，你只要寫程式碼時，Copilot 就會自動幫你完成程式碼，而且 Copilot 並不局限於程式碼的部分，包含我在寫這篇文章時，Copilot 也會幫我往後面產生一些文字，幫我預測我預計要打的文字是什麼，然後你只需要按下 <code>Tab</code> 鍵就可以完成程式碼。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-41-26.gif?alt=media&token=9de56760-d5eb-4604-873e-f5c259043bae" alt="Copilot 預測"></p>
+<p>而這個是 GitHub Copilot 的基本功能，但 Copilot 還有很多其他的功能，這邊我們來看看一些 Copilot 的技巧。</p>
+<blockquote>
+<p><strong>Note</strong><br>GitHub Copilot 會以你開啟的工作區（Workspace）來訓練 Copilot，因此程式碼的品質會依照你的工作區來訓練並生成。</p>
+</blockquote>
+<h3 id="註解產生程式碼"><a href="#註解產生程式碼" class="headerlink" title="註解產生程式碼"></a>註解產生程式碼</h3><p>前面有簡單展示了一下 Copilot 可以自動幫我們預測後面要打的內容，但 Copilot 還有一個很厲害的功能，就是透過註解來產生程式碼！</p>
+<p>而這功能很簡單，你只需要寫好註解，然後讓 Copilot 幫你產生程式碼即可，例如：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-53-04.gif?alt=media&token=da8b51fd-a96e-4591-8da3-621c54f90be7" alt="註解產生程式碼"></p>
+<p>如果上方我使用了 <a href="https://israynotarray.com/javascript/20230513/284079926/">JSDoc</a> 來撰寫註解，然後 Copilot 就會自動幫我產生程式碼，這樣就可以讓我們更快速的完成程式碼，如果你只是單純寫註解也可以</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2013-55-23.gif?alt=media&token=b5e72a2b-d012-4e26-9981-21233f9d9873" alt="註解產生程式碼"></p>
+<p>如果你不滿意這個結果時，有時候你可以滑鼠移動過去選取其他預測結果</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.25.32.png?alt=media&token=abac5686-fa76-4bdf-a9c7-219661cc04d1" alt="預測結果"></p>
+<p>如果你發現就算點了下一頁看其他預測結果也不滿意的話，你可以點「<code>...</code>」並找到 <code>Open Completions Panel</code> 來查看更多可能的預測結果</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.26.38.png?alt=media&token=a6acc695-106d-4e29-a860-f7063fbe98fc" alt="Open Completions Panel"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.26.51.png?alt=media&token=73924c66-5fc9-4319-8915-21fffb88092f" alt="Open Completions Panel"></p>
+<p>若有滿意的，你只需要點「<code>Accept Suggestion（接受建議）</code>」即可。</p>
+<h3 id="指令呼叫-Copilot-撰寫程式碼"><a href="#指令呼叫-Copilot-撰寫程式碼" class="headerlink" title="指令呼叫 Copilot 撰寫程式碼"></a>指令呼叫 Copilot 撰寫程式碼</h3><p>如果你不想要在檔案中保留&#x2F;撰寫註解，你可以透過指令的方式來呼叫 Copilot 來幫你撰寫程式碼，這樣就不會在檔案中留下註解，你只需要在程式碼頁面按下 <code>Command + I</code>（Mac）或是 <code>Ctrl + I</code>（Windows）即可呼叫出 Copilot 視窗，然後你只需要輸入你期望它幫你產出來的內容即可。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2013.59.50.png?alt=media&token=89d96c96-b06f-4bc3-96dd-a2ce6ffa0d11" alt="Copilot 視窗"></p>
+<p>舉例來講，我請 Copilot 幫我做一個 AJAX 行為</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">請幫我用 fetch 來撈取 TodoList API 資料，Url 是 https://jsonplaceholder.typicode.com/todos/1， 然後使用 console.log 來輸出結果到 console，請注意 Error 的處理，如果 AJAX 出現錯誤時，請跳出「AJAX 發生錯誤」的訊息。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2FSep-08-2024%2014-04-13.gif?alt=media&token=cf7b21c4-38c1-45ee-b3eb-d2b13d5de7ab" alt="指令呼叫 Copilot 撰寫程式碼"></p>
+<p>如果你不滿意它寫的內容，你還可以繼續接續要求它修正，直到你滿意為止</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.07.04.png?alt=media&token=64a0b130-771e-4213-9ab0-c7d16442e3e2" alt="再次修正"></p>
+<p>你也可以點一下「下拉」它轉到 Chat 模式，這樣 Copilot 就會變成 Chat 模式，這樣你就可以跟 Copilot 進行對話，讓 Copilot 幫你撰寫程式碼，直到你按下「打勾」為止</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.09.19.png?alt=media&token=b9510f5b-96a9-402f-829b-cbbf454a20bd" alt="Chat - 1"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.10.43.png?alt=media&token=e40a2f48-aa25-458a-b12c-116622f37176" alt="Chat - 2"></p>
+<h3 id="附加檔案請-Copilot-幫你撰寫程式碼"><a href="#附加檔案請-Copilot-幫你撰寫程式碼" class="headerlink" title="附加檔案請 Copilot 幫你撰寫程式碼"></a>附加檔案請 Copilot 幫你撰寫程式碼</h3><p>指令模式其實還可以讀取檔案來產生程式碼，例如：你可以讓 Copilot 幫你讀取一個 Markdown 檔案，然後讓它幫你產好全部程式碼。</p>
+<p>舉例我有一個 Markdown 叫做 Prompt.md，裡面的內容是：</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 程式碼題詞</span></span><br><span class="line"></span><br><span class="line">請幫我用 fetch 來撈取 TodoList API 資料，Url 是 <span class="code">`https://jsonplaceholder.typicode.com/todos/1`</span>， 然後使用 console.log 來輸出結果到 console，請注意 Error 的處理，如果 AJAX 出現錯誤時，請跳出「AJAX 發生錯誤」的訊息。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然後我在程式碼頁面按下 <code>Command + I</code>（Mac）或是 <code>Ctrl + I</code>（Windows）呼叫 Copilot 視窗，然後點附加檔案的圖案，在輸入你要它做的事情，這樣 Copilot 就會讀取 Prompt.md 的內容，然後幫你產生程式碼</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.32.58.png?alt=media&token=e9085320-fb94-4cc0-9aae-c706982b210a" alt="讀取檔案產生程式碼"></p>
+<h3 id="選取程式碼讓-Copilot-幫你修正-x2F-調整"><a href="#選取程式碼讓-Copilot-幫你修正-x2F-調整" class="headerlink" title="選取程式碼讓 Copilot 幫你修正&#x2F;調整"></a>選取程式碼讓 Copilot 幫你修正&#x2F;調整</h3><p>假設你有一段程式碼出現 Bug，你可以將那一段程式碼給選取起來，然後呼叫出 Copilot 視窗，請幫它修正</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.46.00.png?alt=media&token=b0b0cdb2-6c11-4029-a323-05aaaa53a057" alt="修正程式碼"></p>
+<h3 id="右鍵選單呼叫-Copilot"><a href="#右鍵選單呼叫-Copilot" class="headerlink" title="右鍵選單呼叫 Copilot"></a>右鍵選單呼叫 Copilot</h3><p>選取片段程式碼之後，你可以點擊右鍵找到「Copilot」選項，請它幫你做一些事情</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.47.54.png?alt=media&token=6cd4b8ae-c48b-48b2-8c85-8846fa294f50" alt="右鍵選單"></p>
+<p>例如我想要產生測試程式碼，我就可以選擇「產生測試」，然後 Copilot 就會幫我產生測試程式碼，而且會馬上另外開啟一個檔案給你，並且一次寫完</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.49.30.png?alt=media&token=4d66e688-b073-431f-afc2-9e5dd11eea12" alt="產生測試"></p>
+<p>當然你也可以請它針對專案生成 README.md 也完全 ok，也就是搭配讀取檔案的功能</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2014.55.49.png?alt=media&token=0285c74d-e670-4221-859f-6dd3257f622c" alt="README.md"></p>
+<h2 id="Copilot-Chat-的-指令"><a href="#Copilot-Chat-的-指令" class="headerlink" title="Copilot Chat 的 @ 指令"></a>Copilot Chat 的 <code>@</code> 指令</h2><p>Copilot 其實有內建一些指令，這些指令是以 <code>@</code> 開頭的，但這些指令大多都是在 Chat 模式下才能使用，這邊我們來看看一些 Copilot 的指令。</p>
+<blockquote>
+<p><strong>Note</strong><br>這些指令有助於更精準的給予回饋，而非一般的對話唷！</p>
+</blockquote>
+<h3 id="terminal（詢問如何在終端機中執行某些動作）"><a href="#terminal（詢問如何在終端機中執行某些動作）" class="headerlink" title="@terminal（詢問如何在終端機中執行某些動作）"></a><code>@terminal</code>（詢問如何在終端機中執行某些動作）</h3><p>這個指令是用來詢問如何在終端機中執行某些動作，例如：我該如何啟動我的專案？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.09.14.png?alt=media&token=eb63e931-9fcc-425a-a78d-2e1944fa1bcf" alt="@terminal"></p>
+<p>或者是該如何用終端機建立檔案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.10.28.png?alt=media&token=7a9ef363-1f5d-4971-8ac9-bf3ab4aab9fd" alt="@terminal"></p>
+<p>簡單來講，你可以用 <code>@terminal</code> 來詢問一些終端機的操作，這個產出來的指令會更精準且符合你的需求產出。</p>
+<h3 id="vscode（詢問有關-VS-Code-的問題）"><a href="#vscode（詢問有關-VS-Code-的問題）" class="headerlink" title="@vscode（詢問有關 VS Code 的問題）"></a><code>@vscode</code>（詢問有關 VS Code 的問題）</h3><p>這個指令是用來詢問有關 VS Code 的問題，例如：我該如何預設讓 CRLF 變成 LF？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.14.28.png?alt=media&token=25875ea9-ed5a-4c5d-9570-e3024c6149d6" alt="@vscode"></p>
+<p>透過 <code>@vscode</code> 這個指令，你可以快速詢問 VS Code 的問題，直接解決了你在 VSCode 上的一些問題。</p>
+<h3 id="workspace（提出有關您工作區的問題）"><a href="#workspace（提出有關您工作區的問題）" class="headerlink" title="@workspace（提出有關您工作區的問題）"></a><code>@workspace</code>（提出有關您工作區的問題）</h3><p>這個是 Chat 最強大的功能之一，這個指令是用來詢問有關你的工作區的問題，例如：你可以幫我針對 <code>utils/time.js</code> 中的 <code>expiresInToMilliseconds</code> 生成測試嗎？</p>
+<p>通常來講 <code>@workspace</code> 會跑比較慢，因為它會去掃描你的工作區，然後生成程式碼，同時告知你它參考了哪些檔案</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fvscode%2Fgithub-copilot%2F%E6%88%AA%E5%9C%96%202024-09-08%2015.20.08.png?alt=media&token=226726e9-2c8f-4c0c-8331-dffa065043b5" alt="@workspace"></p>
+<blockquote>
+<p><strong>Note</strong><br>有時候 <code>@workspace</code> 會因為工作區太大而無法參考整份檔案，因為 Token 有一定的限制（此處是指傳給 Copilot 的 Token），所以有時候會無法參考整份檔案，這時候你可以將檔案分割成小檔案，然後再詢問 Copilot。</p>
+</blockquote>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>GitHub Copilot 其實一直都有在優化，而且功能越來越多，只要你能夠掌握一些技巧，你就可以更快速的完成需求，但是還是要注意一件事情，AI 只是輔助你加速開發，實際上產出來的東西還是要自己檢查一遍，這樣才能確保程式碼的品質以及安全性。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Visual-Studio-Code/" rel="tag"># Visual Studio Code</a>
+              <a href="/tags/GitHub-Copilot/" rel="tag"># GitHub Copilot</a>
+              <a href="/tags/%E9%96%8B%E7%99%BC%E6%8A%80%E5%B7%A7/" rel="tag"># 開發技巧</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript/20240727/2019383251/" rel="prev" title="常見面試考題之 Vue 與 React 差異在哪裡？以及為什麼 React 比較紅？">
+                  <i class="fa fa-angle-left"></i> 常見面試考題之 Vue 與 React 差異在哪裡？以及為什麼 React 比較紅？
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/nuxt/20240919/4102603832/" rel="next" title="還原專案噴 Cannot find module @rollup/rollup-darwin-arm64 錯誤">
+                  還原專案噴 Cannot find module @rollup/rollup-darwin-arm64 錯誤 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="PM2 的全名是 Process Manager 2，它是一款 Node.js 的進程管理工具，並不是指 Particulate Matter（懸浮微粒）2.5 的縮寫，所以不要搞錯了！那麼我們就準備來認識已經學習使用 Node.js 的工程師不能不懂的 PM2 吧！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PM2 是 Process Manager 不是 PM2.5！">
+<meta property="og:url" content="https://israynotarray.com/Node-js/20241225/794319627/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="PM2 的全名是 Process Manager 2，它是一款 Node.js 的進程管理工具，並不是指 Particulate Matter（懸浮微粒）2.5 的縮寫，所以不要搞錯了！那麼我們就準備來認識已經學習使用 Node.js 的工程師不能不懂的 PM2 吧！">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2Fpm2-logo-1.png?alt=media&token=ed6dd5ba-d109-410c-930f-bb66647c4dc4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.31.39.png?alt=media&token=16ec9361-81ac-40b5-8ad2-9cc3b6d234b4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.37.07.png?alt=media&token=b3c072d7-9874-4724-ad92-2a78c493cb4e">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.46.29.png?alt=media&token=2e4b5041-1d95-4228-a1aa-b20d6e5e0e43">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.54.51.png?alt=media&token=790dd170-995f-4452-9694-098aba44f275">
+<meta property="article:published_time" content="2024-12-25T02:31:33.000Z">
+<meta property="article:modified_time" content="2024-12-25T02:31:33.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="PM2">
+<meta property="article:tag" content="Process Manager 2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2Fpm2-logo-1.png?alt=media&token=ed6dd5ba-d109-410c-930f-bb66647c4dc4">
+
+
+<link rel="canonical" href="https://israynotarray.com/Node-js/20241225/794319627/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/Node-js/20241225/794319627/","path":"Node-js/20241225/794319627/","title":"PM2 是 Process Manager 不是 PM2.5！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PM2 是 Process Manager 不是 PM2.5！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PM2%EF%BC%88Process-Manager-2%EF%BC%89%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">PM2（Process Manager 2）是什麼？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%88%9D%E5%A7%8B%E7%92%B0%E5%A2%83"><span class="nav-number">3.</span> <span class="nav-text">建立初始環境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-PM2"><span class="nav-number">4.</span> <span class="nav-text">安裝 PM2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PM2-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">PM2 的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B-PM2-%E7%8B%80%E6%85%8B%E8%88%87%E5%88%97%E8%A1%A8"><span class="nav-number">5.1.</span> <span class="nav-text">查看 PM2 狀態與列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B-PM2-Logs"><span class="nav-number">5.2.</span> <span class="nav-text">查看 PM2 Logs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%82%B3%E9%81%9E%E5%8F%83%E6%95%B8%E7%B5%A6-pm2-start"><span class="nav-number">5.3.</span> <span class="nav-text">傳遞參數給 pm2 start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E5%95%9F%E5%8B%95%E5%B0%88%E6%A1%88"><span class="nav-number">5.4.</span> <span class="nav-text">重新啟動專案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E5%B0%88%E6%A1%88"><span class="nav-number">5.5.</span> <span class="nav-text">停止專案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E5%B0%88%E6%A1%88"><span class="nav-number">5.6.</span> <span class="nav-text">刪除專案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PM2-%E9%80%B2%E9%9A%8E%E8%A8%AD%E5%AE%9A%EF%BC%88Ecosystem-File%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">PM2 進階設定（Ecosystem File）</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">975</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">830</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/Node-js/20241225/794319627/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="PM2 是 Process Manager 不是 PM2.5！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="PM2 的全名是 Process Manager 2，它是一款 Node.js 的進程管理工具，並不是指 Particulate Matter（懸浮微粒）2.5 的縮寫，所以不要搞錯了！那麼我們就準備來認識已經學習使用 Node.js 的工程師不能不懂的 PM2 吧！">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PM2 是 Process Manager 不是 PM2.5！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-12-25 10:31:33" itemprop="dateCreated datePublished" datetime="2024-12-25T10:31:33+08:00">2024-12-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Node-js/" itemprop="url" rel="index"><span itemprop="name">Node.js</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">PM2 的全名是 Process Manager 2，它是一款 Node.js 的進程管理工具，並不是指 Particulate Matter（懸浮微粒）2.5 的縮寫，所以不要搞錯了！那麼我們就準備來認識已經學習使用 Node.js 的工程師不能不懂的 PM2 吧！</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2Fpm2-logo-1.png?alt=media&token=ed6dd5ba-d109-410c-930f-bb66647c4dc4" alt="PM2"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>PM2 的全名是 Process Manager 2，它是一款 Node.js 的進程管理工具，並不是指 Particulate Matter（懸浮微粒）2.5 的縮寫，所以不要搞錯囉～</p>
+<h2 id="PM2（Process-Manager-2）是什麼？"><a href="#PM2（Process-Manager-2）是什麼？" class="headerlink" title="PM2（Process Manager 2）是什麼？"></a>PM2（Process Manager 2）是什麼？</h2><p>首先依照常見的文獻說法會說 PM2 是…</p>
+<blockquote>
+<p>PM2 是 JavaScript 執行環境時的 Node.js 進程管理工具。</p>
+</blockquote>
+<p>雖然這句話看似非常的短，但實質上也包含了很多的內容，所以我們來拆解一下這句話，或許你會更了解 PM2 是什麼用途：</p>
+<ul>
+<li><strong>JavaScript 執行環境</strong>：這句話意思是指 JavaScript 在運作執行時會產生一個環境，也就是我們說的 Runtime（執行環境），這個 Runtime 會負責執行 JavaScript 的程式碼。</li>
+<li><strong>Node.js</strong>：這是一個基於 Chrome V8 引擎的 JavaScript 開發框架，它可以讓 JavaScript 在伺服器端執行，並且可以使用一些系統的 API。</li>
+<li><strong>進程管理工具</strong>：這是指一個可以管理進程（Process）的工具，所謂的進程就是一個正在運行的程式，而進程管理工具就是可以讓我們管理這些程式的工具。</li>
+</ul>
+<p>透過上述拆解說明，我們對於 PM2 是什麼就有一定的基礎概念，但是我們為什麼要用呢？</p>
+<p>這邊我舉例一個最簡單的場景，假設你有一個 Node.js 應用程式，你希望它可以一直處於運行狀態下，但應用程式可能會一些我們無法預期的 Bug 而導致程式掛掉，這時候如果沒有使用 PM2 來做管理的話，很常見的狀況就是我們要被 onCall 了，這時候就會需要一個進程管理工具來幫助我們管理這些進程哩～</p>
+<h2 id="建立初始環境"><a href="#建立初始環境" class="headerlink" title="建立初始環境"></a>建立初始環境</h2><p>首先我們要來建立一個初始環境，這樣在使用 PM2 的時候才會比較有感覺，請你輸入以下指令快速建立一個 Node.js 應用程式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> pm2-example</span><br><span class="line"><span class="built_in">cd</span> pm2-example</span><br><span class="line">express --no-view</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+
+<p>上方指令我們做了一下行為</p>
+<ul>
+<li>建立一個名為 <code>pm2-example</code> 的資料夾</li>
+<li>進入 <code>pm2-example</code> 資料夾</li>
+<li>使用 <code>express</code> 快速建立一個 Express 應用程式，並且不使用 View Engine（因為我們只是要示範 PM2，所以使用純 API 的方式）</li>
+<li>安裝 Express 的相依套件</li>
+</ul>
+<p>接著請務必養成一個習慣，專案建立完畢後，請先執行一次程式，確保程式可以正常運行，這樣在後續使用 PM2 的時候才不會有問題：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>你現在已經可以透過 <a href="https://israynotarray.com/other/20211207/427026/">Postman</a> 來去測試你的 API</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET http://localhost:3000/users</span><br></pre></td></tr></table></figure>
+
+<p>不意外應該會回傳以下結果：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">respond with a resource</span><br></pre></td></tr></table></figure>
+
+<p>到這邊為主，代表你的專案是正常運作的，後面我們會再微調一下專案，讓它可以透過 PM2 來管理，而不是我們手動去輸入 <code>npm start</code> 來啟動。</p>
+<h2 id="安裝-PM2"><a href="#安裝-PM2" class="headerlink" title="安裝 PM2"></a>安裝 PM2</h2><p>首先請打開終端機，並輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install pm2 -g</span><br></pre></td></tr></table></figure>
+
+<p>這樣就安裝完畢，非常的簡單呢！當然，如果你是使用 yarn 的話，也可以使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn global add pm2</span><br></pre></td></tr></table></figure>
+
+<h2 id="PM2-的基本操作"><a href="#PM2-的基本操作" class="headerlink" title="PM2 的基本操作"></a>PM2 的基本操作</h2><p>使用的方式非常簡單，你主要需要記得的指令為以下：</p>
+<ul>
+<li><code>pm2 start &lt;檔案名稱&gt;</code>：啟動一個應用程式</li>
+</ul>
+<p>就是這麼簡單，如果是直接啟動一個專案時，通常可能的指令會是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start app.js</span><br></pre></td></tr></table></figure>
+
+<p>但是我們的專案是使用 Express 來產生的專案，所以我們要修改一下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start bin/www</span><br></pre></td></tr></table></figure>
+
+<p>輸入完畢後，你就可以看到以下畫面：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.31.39.png?alt=media&token=16ec9361-81ac-40b5-8ad2-9cc3b6d234b4" alt="Start"></p>
+<p>此時你會發現終端機跟以前完全不一樣，原本你輸入 <code>npm start</code> 會看到以下狀況：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.37.07.png?alt=media&token=b3c072d7-9874-4724-ad92-2a78c493cb4e" alt="npm start"></p>
+<p>而使用 PM2 後，我們會發現所有的請求以及畫面都不會再呈現於終端機畫面上，這是因為 PM2 啟動專案後，它會將該啟動行為轉移到背景執行，這樣我們就可以不用擔心終端機關閉後，專案就會停止運行的問題。</p>
+<h3 id="查看-PM2-狀態與列表"><a href="#查看-PM2-狀態與列表" class="headerlink" title="查看 PM2 狀態與列表"></a>查看 PM2 狀態與列表</h3><p>那這時候問題來了，我們該怎麼查看 PM2 的狀態呢？首先你必須要先使用 <code>pm2 list</code> 來查看目前 PM2 的狀態：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 list</span><br></pre></td></tr></table></figure>
+
+<p>這時候你會看到運行於 PM2 上的專案：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.46.29.png?alt=media&token=2e4b5041-1d95-4228-a1aa-b20d6e5e0e43" alt="PM2"></p>
+<p>這個畫面類似於儀表板，可以讓你查看目前 PM2 上運行的專案，以及一些基本資訊。</p>
+<p>其中，其實有很多語法可以使用，例如：</p>
+<ul>
+<li><code>pm2 status</code></li>
+<li><code>pm2 ls</code></li>
+<li><code>pm2 list</code></li>
+</ul>
+<p>這些指令都是可以查看目前 PM2 上運行的專案，而我自己比較習慣使用 <code>pm2 list</code> 這個指令。</p>
+<p>底下我也條列每個欄位的意義：</p>
+<ul>
+<li><code>id</code>：專案的 ID，由 PM2 自動產生</li>
+<li><code>name</code>：專案的名稱，通常是專案的檔案名稱，預設會是指令後面的檔案名稱，如：<code>bin/www</code> &#x3D;&gt; <code>www</code></li>
+<li><code>namespace</code>：專案的命名空間，預設為 <code>default</code>，簡單來講就是專案的群組</li>
+<li><code>version</code>：專案的版本，PM2 會參考 <code>package.json</code> 的版本</li>
+<li><code>mode</code>：專案的模式，通常是 <code>fork</code>，也就是單一進程模式，當然也可以是 <code>cluster</code>，也就是多進程模式</li>
+<li><code>pid</code>：專案的 PID，也就是 Process ID</li>
+<li><code>uptime</code>：專案的運行時間，也就是啟動後的時間</li>
+<li><code>status</code>：專案的狀態，通常是 <code>online</code>，主要有 <code>online</code>（運作中）、<code>stopped</code>（專案已停止）、<code>errored</code>（發生錯誤）、<code>launching</code>（正在啟動） 以及<code>unknown</code>（狀態未知） 等狀態</li>
+<li><code>cpu</code>：專案的 CPU 使用率</li>
+<li><code>mem</code>：專案的記憶體使用率</li>
+<li><code>user</code>：專案的使用者，這會撈取目前使用者的名稱</li>
+<li><code>watching</code>：專案是否有監聽檔案變化，通常是 <code>false</code>，當有監聽檔案變化時，會是 <code>true</code></li>
+</ul>
+<h3 id="查看-PM2-Logs"><a href="#查看-PM2-Logs" class="headerlink" title="查看 PM2 Logs"></a>查看 PM2 Logs</h3><p>接著我們要查看該專案運行的 Logs 呢？只需要輸入以下指令即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 logs &lt;專案名稱/ID/名稱空間&gt;</span><br></pre></td></tr></table></figure>
+
+<p>以我們範例來講，就是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pm2 logs 0 <span class="comment"># 0 是專案的 ID</span></span><br><span class="line">pm2 logs www <span class="comment"># www 是專案的名稱</span></span><br><span class="line">pm2 logs default <span class="comment"># default 是專案的名稱空間</span></span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以持續查看專案的 Logs 了！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fpm2-express%2F%E6%88%AA%E5%9C%96%202024-12-25%2013.54.51.png?alt=media&token=790dd170-995f-4452-9694-098aba44f275" alt="Logs"></p>
+<p>我這邊也詳細說明一下 <code>pm2 logs</code> 的指令：</p>
+<ul>
+<li><code>pm2 logs</code>：查看所有專案的 Logs</li>
+<li><code>pm2 logs &lt;專案名稱/ID&gt;</code>：查看指定專案的 Logs</li>
+<li><code>pm2 logs &lt;命名空間&gt;</code>：概念其實類似於群組，你可以將專案分類，這樣就可以使用命名空間來查看該群組的 Logs</li>
+</ul>
+<p>除此之外，<code>pm2 logs</code> 搭配不同的參數，可以讓你更精準的查看 Logs，例如：</p>
+<ul>
+<li><code>pm2 logs --out</code>：只查看標準輸出，也就是正常輸出</li>
+<li><code>pm2 logs --err</code>：只查看錯誤輸出</li>
+<li><code>pm2 logs --json &gt; logs.json</code>：將 Logs 輸出成 JSON 格式，這樣你就可以透過程式來處理 Logs</li>
+<li><code>pm2 logs &lt;專案名稱/ID&gt; | grep &quot;關鍵字&quot;</code>：查看特定關鍵字的 Logs，概念就是一個篩選器，例如：<code>pm2 logs www | grep &quot;GET&quot;</code>，就可以查看所有 GET 的 Logs</li>
+<li><code>pm2 logs &lt;專案名稱/ID&gt; --lines 100</code>：只查看最後 100 行的 Logs，也就是最新的 100 行</li>
+</ul>
+<p>以上差不多是很常用的指令。</p>
+<h3 id="傳遞參數給-pm2-start"><a href="#傳遞參數給-pm2-start" class="headerlink" title="傳遞參數給 pm2 start"></a>傳遞參數給 <code>pm2 start</code></h3><p><code>pm2 start</code> 並不是這麼單純的指令，你可以透過傳遞參數給 <code>pm2 start</code> 來做更多的事情，例如：</p>
+<ul>
+<li><code>--name</code>：指定專案名稱</li>
+<li><code>--watch</code>：監聽檔案變化，當檔案變化時，自動重新啟動專案</li>
+<li><code>--cron-restart</code>：透過 Cron 表達式定時重新啟動專案</li>
+<li><code>--max-memory-restart</code>：當記憶體使用超過指定值時，自動重新啟動專案</li>
+<li><code>--namespace</code>：指定專案名稱空間</li>
+</ul>
+<p>這邊我舉例一個常見的使用方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start bin/www --name <span class="string">&quot;hexschool-example&quot;</span> --watch</span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以指定專案名稱為 <code>hexschool-example</code>，並且監聽檔案變化，當檔案變化時，自動重新啟動專案。</p>
+<p>如果我想要指定專案名稱空間的話，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start bin/www --namespace <span class="string">&quot;hexschool&quot;</span> --watch</span><br></pre></td></tr></table></figure>
+
+<p>如果想要同時更改專案名稱以及名稱空間的話，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start bin/www --name <span class="string">&quot;hexschool-example&quot;</span> --namespace <span class="string">&quot;hexschool&quot;</span> --watch</span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以同時指定專案名稱以及名稱空間了！</p>
+<h3 id="重新啟動專案"><a href="#重新啟動專案" class="headerlink" title="重新啟動專案"></a>重新啟動專案</h3><p>當你的專案有異常時，你可以透過 <code>pm2 restart</code> 來重新啟動專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 restart &lt;專案名稱/ID/名稱空間&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果是想要重新啟動所有專案的話，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 restart all</span><br></pre></td></tr></table></figure>
+
+<h3 id="停止專案"><a href="#停止專案" class="headerlink" title="停止專案"></a>停止專案</h3><p>當你的專案不再需要運行時，你可以透過 <code>pm2 stop</code> 來停止專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 stop &lt;專案名稱/ID/名稱空間&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果是想要停止所有專案的話，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 stop all</span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除專案"><a href="#刪除專案" class="headerlink" title="刪除專案"></a>刪除專案</h3><p>請注意，輸入 <code>pm2 stop</code> 並不會刪除專案，只是停止專案而已，如果你想要刪除專案的話，可以透過 <code>pm2 delete</code> 來刪除專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 delete &lt;專案名稱/ID/名稱空間&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果是想要刪除所有專案的話，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 delete all</span><br></pre></td></tr></table></figure>
+
+<h2 id="PM2-進階設定（Ecosystem-File）"><a href="#PM2-進階設定（Ecosystem-File）" class="headerlink" title="PM2 進階設定（Ecosystem File）"></a>PM2 進階設定（Ecosystem File）</h2><p>PM2 有一個進階的設定檔案，稱為 Ecosystem File，你可以透過這個檔案直接做到更多的設定，而 Ecosystem File 支援 JavaScript、JSON 以及 YAML 格式。</p>
+<p>但以實戰來講，比較常見使用 ecosystem.config.js（JavaScript 格式）。</p>
+<p>那麼我們該如何使用呢？你只需要輸入以下指令，PM2 就會自動幫你產出一個 Ecosystem File（ecosystem.config.js）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 ecosystem</span><br></pre></td></tr></table></figure>
+
+<p>基本上他會基於你當前的專案環境，產出一個 Ecosystem File，這樣你就可以直接使用這個檔案來做進階設定。</p>
+<p>格式大概長這樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  apps : [&#123;</span><br><span class="line">    <span class="attr">script</span>: <span class="string">&#x27;index.js&#x27;</span>,</span><br><span class="line">    <span class="attr">watch</span>: <span class="string">&#x27;.&#x27;</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    <span class="attr">script</span>: <span class="string">&#x27;./service-worker/&#x27;</span>,</span><br><span class="line">    <span class="attr">watch</span>: [<span class="string">&#x27;./service-worker&#x27;</span>]</span><br><span class="line">  &#125;],</span><br><span class="line"></span><br><span class="line">  deploy : &#123;</span><br><span class="line">    production : &#123;</span><br><span class="line">      user : <span class="string">&#x27;SSH_USERNAME&#x27;</span>,</span><br><span class="line">      host : <span class="string">&#x27;SSH_HOSTMACHINE&#x27;</span>,</span><br><span class="line">      ref  : <span class="string">&#x27;origin/master&#x27;</span>,</span><br><span class="line">      repo : <span class="string">&#x27;GIT_REPOSITORY&#x27;</span>,</span><br><span class="line">      path : <span class="string">&#x27;DESTINATION_PATH&#x27;</span>,</span><br><span class="line">      <span class="string">&#x27;pre-deploy-local&#x27;</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      <span class="string">&#x27;post-deploy&#x27;</span> : <span class="string">&#x27;npm install &amp;&amp; pm2 reload ecosystem.config.js --env production&#x27;</span>,</span><br><span class="line">      <span class="string">&#x27;pre-setup&#x27;</span>: <span class="string">&#x27;&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>因此我們可以看到 PM2 非常之強大，你可以透過 Ecosystem File 來做到更多的設定。</p>
+<p>那麼以上就是 PM2 的基本操作，希望你可以透過這篇文章來了解 PM2 的基本操作，並且可以在你的專案中使用 PM2 來管理你的 Node.js 應用程式 :D</p>
+<p>ps. PM2 不單純只是可以用於 Node.js，你也可以使用 PM2 來管理其他的應用程式，例如：Python、Ruby、Java 等等。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/PM2/" rel="tag"># PM2</a>
+              <a href="/tags/Process-Manager-2/" rel="tag"># Process Manager 2</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/nodejs/20241222/3785478335/" rel="prev" title="手把手教你如何替自己的專案引入 Google reCAPTCHA v3">
+                  <i class="fa fa-angle-left"></i> 手把手教你如何替自己的專案引入 Google reCAPTCHA v3
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20241231/998165636/" rel="next" title="AI 當道，為什麼我還是推薦寫部落格？">
+                  AI 當道，為什麼我還是推薦寫部落格？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
