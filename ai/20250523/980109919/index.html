@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="MCP Server 現在非常之紅，各大服務商都跟著在釋出自己家的 MCP Server，那麼為了讓自己更理解 MCP Server 的運作原理，那當然就是要自己來做一個 MCP Server 啦！而這一篇將會帶你從零開始，搭建一個屬於自己的 MCP Server，並且搭配 GitHub Copilot Chat 來使用，讓我們可以更方便的使用 MCP Server。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="打造 AI Agent 專屬 MCP Server：整合 GitHub Copilot Chat 的完整實作教學">
+<meta property="og:url" content="https://israynotarray.com/ai/20250523/980109919/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="MCP Server 現在非常之紅，各大服務商都跟著在釋出自己家的 MCP Server，那麼為了讓自己更理解 MCP Server 的運作原理，那當然就是要自己來做一個 MCP Server 啦！而這一篇將會帶你從零開始，搭建一個屬於自己的 MCP Server，並且搭配 GitHub Copilot Chat 來使用，讓我們可以更方便的使用 MCP Server。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8823%E6%97%A5%20%E4%B8%8B%E5%8D%8805_04_19.png?alt=media&token=02226da8-9043-407f-b50f-1139019414d9">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523154136.png?alt=media&token=63ebca65-3a67-40c9-a94e-240a2f1abd56">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-github-copilot%2F20250522103719.png?alt=media&token=18139412-d9ac-4b8e-8188-b440c1a02120">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523162807.png?alt=media&token=1a2d6f4f-48f2-4bee-b968-37682b341fa7">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523162908.png?alt=media&token=3156fe53-10da-4633-998a-742ce8820e26">
+<meta property="article:published_time" content="2025-05-23T07:02:03.000Z">
+<meta property="article:modified_time" content="2025-05-23T07:02:03.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="GitHub Copilot">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="教學">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8823%E6%97%A5%20%E4%B8%8B%E5%8D%8805_04_19.png?alt=media&token=02226da8-9043-407f-b50f-1139019414d9">
+
+
+<link rel="canonical" href="https://israynotarray.com/ai/20250523/980109919/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/ai/20250523/980109919/","path":"ai/20250523/980109919/","title":"打造 AI Agent 專屬 MCP Server：整合 GitHub Copilot Chat 的完整實作教學"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>打造 AI Agent 專屬 MCP Server：整合 GitHub Copilot Chat 的完整實作教學 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%96%E5%82%99%E7%92%B0%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">準備環境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-MCP-Server-%E5%88%9D%E5%A7%8B%E7%92%B0%E5%A2%83"><span class="nav-number">3.</span> <span class="nav-text">建立 MCP Server 初始環境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-Tool"><span class="nav-number">4.</span> <span class="nav-text">撰寫 Tool</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6-MCP-Server"><span class="nav-number">5.</span> <span class="nav-text">測試 MCP Server</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">978</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">840</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/ai/20250523/980109919/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="打造 AI Agent 專屬 MCP Server：整合 GitHub Copilot Chat 的完整實作教學 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="MCP Server 現在非常之紅，各大服務商都跟著在釋出自己家的 MCP Server，那麼為了讓自己更理解 MCP Server 的運作原理，那當然就是要自己來做一個 MCP Server 啦！而這一篇將會帶你從零開始，搭建一個屬於自己的 MCP Server，並且搭配 GitHub Copilot Chat 來使用，讓我們可以更方便的使用 MCP Server。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          打造 AI Agent 專屬 MCP Server：整合 GitHub Copilot Chat 的完整實作教學
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-05-23 15:02:03" itemprop="dateCreated datePublished" datetime="2025-05-23T15:02:03+08:00">2025-05-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ai/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">MCP Server 現在非常之紅，各大服務商都跟著在釋出自己家的 MCP Server，那麼為了讓自己更理解 MCP Server 的運作原理，那當然就是要自己來做一個 MCP Server 啦！而這一篇將會帶你從零開始，搭建一個屬於自己的 MCP Server，並且搭配 GitHub Copilot Chat 來使用，讓我們可以更方便的使用 MCP Server。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8823%E6%97%A5%20%E4%B8%8B%E5%8D%8805_04_19.png?alt=media&token=02226da8-9043-407f-b50f-1139019414d9" alt="MCP Server"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>MCP Server 現在非常之紅，各大服務商都跟著在釋出自己家的 MCP Server，那麼為了讓自己更理解 MCP Server 的運作原理，那當然就是要自己來做一個 MCP Server 啦！而這一篇將會帶你從零開始，搭建一個屬於自己的 MCP Server，並且搭配 GitHub Copilot Chat 來使用，讓我們可以更方便的使用 MCP Server。</p>
+<h2 id="準備環境"><a href="#準備環境" class="headerlink" title="準備環境"></a>準備環境</h2><p>開始之前，請優先準備好以下環境：</p>
+<ul>
+<li>VSCode</li>
+<li>Node.js</li>
+<li>GitHub Copilot</li>
+</ul>
+<p>想要做一個 MCP Server 也要有一個主題來做為我們的範本，這裡我們就使用六角學院所提供的 <a target="_blank" rel="noopener" href="https://todolist-api.hexschool.io/doc/">todolist api</a> 來做為我們的範本，這個 API 提供了許多的功能，像是新增、刪除、修改等等的功能，這些功能將成為我們 MCP Server 實作的練習範本。</p>
+<p>那麼首先請你先打開終端機，並輸入以下指令，建立一個 <code>todolist-hexschool-mcp</code> 的資料夾：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> todolist-hexschool-mcp</span><br></pre></td></tr></table></figure>
+
+<p>接著請移動到這個資料夾裡面：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> todolist-hexschool-mcp</span><br></pre></td></tr></table></figure>
+
+<p>然後初始化一下這個專案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init -y</span><br></pre></td></tr></table></figure>
+
+<p>初始化完畢之後，這個專案就會產生一個 <code>package.json</code> 的檔案，這個檔案裡面會有一些基本的資訊，像是專案的名稱、版本、描述等等的資訊。</p>
+<p>在 MCP 官方網站上面是建議你使用  <code>@types/node</code>、<code>typescript</code> 來開發，但是我這個專案我希望盡可能簡單一點，好懂一點，所以我們只需要安裝以下即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install @modelcontextprotocol/sdk zod axios</span><br></pre></td></tr></table></figure>
+
+<p>這邊我也簡單說明一下這兩個套件：</p>
+<ul>
+<li><code>@modelcontextprotocol/sdk</code>：這是 MCP Server 的核心套件，我們會使用這個套件來建立我們的 MCP Server。</li>
+<li><code>zod</code>：這是用來做資料驗證的套件，我們會使用這個套件來驗證我們的資料是否正確。</li>
+</ul>
+<p>接著打開 package.json，並新增以下屬性使專案使用 ES Module 語法：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;module&quot;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>簡單來講就是將這個專案的模組化，這樣我們就可以使用 ES Module 的語法來撰寫程式碼了。</p>
+<p>最後再來建立一個 <code>index.js</code> 檔案，這個檔案就是我們的主程式，這個檔案會是我們的 MCP Server 的進入點。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> index.js</span><br></pre></td></tr></table></figure>
+
+<p>到目前為止，我們已經準備差不多了，如果沒有問題的話，我們就來準備撰寫程式碼吧！</p>
+<h2 id="建立-MCP-Server-初始環境"><a href="#建立-MCP-Server-初始環境" class="headerlink" title="建立 MCP Server 初始環境"></a>建立 MCP Server 初始環境</h2><p>基本上起手式很簡單，我們先引入這幾隻檔案</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">McpServer</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@modelcontextprotocol/sdk/server/mcp.js&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">StdioServerTransport</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@modelcontextprotocol/sdk/server/stdio.js&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&quot;axios&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; z &#125; <span class="keyword">from</span> <span class="string">&quot;zod&quot;</span>; <span class="comment">// 後面才會用到</span></span><br></pre></td></tr></table></figure>
+
+<p>引入完畢後，接著要來實例化 MCP Server</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> <span class="title class_">McpServer</span>(&#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&quot;hexschool-todolist&quot;</span>,</span><br><span class="line">  <span class="attr">version</span>: <span class="string">&quot;1.0.0&quot;</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>McpServer 的建構子需要傳入一個物件，這個物件裡面有兩個屬性，分別是 <code>name</code> 和 <code>version</code>，這兩個屬性是必填的，這邊的 <code>name</code> 是我們的 MCP Server 的名稱，<code>version</code> 是我們的 MCP Server 的版本。</p>
+<p>然後最後面再補一個伺服器啟動的呼叫即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">main</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> transport = <span class="keyword">new</span> <span class="title class_">StdioServerTransport</span>();</span><br><span class="line">  <span class="keyword">await</span> server.<span class="title function_">connect</span>(transport);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;六角學院 TodoList MCP Server 啟動中...&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">main</span>().<span class="title function_">catch</span>(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;Fatal error in main():&quot;</span>, error);</span><br><span class="line">  process.<span class="title function_">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>到這邊為止，我們已經把 MCP Server 的基本架構搭建完成了，接下來我們要來撰寫一些功能，讓這個 MCP Server 可以實際運作起來。</p>
+<h2 id="撰寫-Tool"><a href="#撰寫-Tool" class="headerlink" title="撰寫 Tool"></a>撰寫 Tool</h2><p>接下來我們要使用 <code>server</code> 中的一個方法，這個方法叫做 <code>tool</code>，這個方法類似於 OpenAI 在講的 <code>Function Calling/Tools Calling</code> 的功能，這個方法可以讓我們定義一些工具，然後讓 AI 可以去呼叫這些工具來完成一些任務。</p>
+<p>那我們要先做什麼呢？</p>
+<p>以 TodoList API 為例，第一個動作就是先「註冊帳號」，接著才是「登入帳號」，所以我們可以先舉例一個使用者可能的自然語言輸入：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我想要註冊一個 todolist 帳號，帳號是 example@gmail.com，密碼是 example123，暱稱是 example</span><br></pre></td></tr></table></figure>
+
+<p>那麼當 AI 接收到這個輸入的時候，它就會知道使用者想要註冊一個帳號，然後就會去呼叫我們定義好的 <code>tool</code>，然後這個 <code>tool</code> 就會去呼叫 API 來完成這個任務。</p>
+<p>首先，透過 Swagger 文件我們可以知道這個 API 的網址是 <code>POST https://todolist-api.hexschool.io/users/sign_up</code>，然後要傳送的資料格式是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example@gmail.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;nickname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;example&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果以純 JavaScript 的寫法來說，我們可以這樣寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&quot;axios&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">API_URL</span> = <span class="string">&quot;https://todolist-api.hexschool.io/users/sign_up&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> res = <span class="keyword">await</span> axios.<span class="title function_">post</span>(<span class="variable constant_">API_URL</span>, &#123;</span><br><span class="line">  <span class="attr">email</span>: <span class="string">&quot;example@gmail.com&quot;</span>,</span><br><span class="line">  <span class="attr">password</span>: <span class="string">&quot;example123&quot;</span>,</span><br><span class="line">  <span class="attr">nickname</span>: <span class="string">&quot;example&quot;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>非常的簡單且單純，但是因為我們要透過 <code>server.tool</code> 來呼叫這個 API，所以我們要把這個 API 的網址和資料格式都定義在 <code>tool</code> 裡面，這樣 AI 才可以知道要怎麼去呼叫這個 API。</p>
+<p>而 <code>server.tool</code> 的寫法大概是這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">server.<span class="title function_">tool</span>(</span><br><span class="line">  <span class="string">&quot;工具名稱&quot;</span>, <span class="comment">// 需要為英文名稱</span></span><br><span class="line">  <span class="string">&quot;工具描述&quot;</span>,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// 參數驗證</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">async</span> (input) =&gt; &#123;</span><br><span class="line">    <span class="comment">// 實際執行邏輯</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 回傳給 AI 的內容</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">content</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">type</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">          <span class="attr">text</span>: <span class="string">&quot;回傳的內容&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      ],</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>透過上面的範例，我們就可以知道 <code>server.tool</code> 的寫法了，這邊就允許我直接貼上程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">McpServer</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@modelcontextprotocol/sdk/server/mcp.js&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&quot;axios&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; z &#125; <span class="keyword">from</span> <span class="string">&quot;zod&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">API_URL</span> = <span class="string">&quot;https://todolist-api.hexschool.io/users/sign_up&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> <span class="title class_">McpServer</span>(&#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&quot;hexschool-todolist&quot;</span>,</span><br><span class="line">  <span class="attr">version</span>: <span class="string">&quot;1.0.0&quot;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">tool</span>(</span><br><span class="line">  <span class="string">&quot;hexschool_todolist_sign_up&quot;</span>,</span><br><span class="line">  <span class="string">&quot;註冊一個帳號&quot;</span>,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">email</span>: z.<span class="title function_">string</span>().<span class="title function_">email</span>(),</span><br><span class="line">    <span class="attr">password</span>: z.<span class="title function_">string</span>(),</span><br><span class="line">    <span class="attr">nickname</span>: z.<span class="title function_">string</span>(),</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">async</span> (input) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; email, password, nickname &#125; = input;</span><br><span class="line">    <span class="keyword">const</span> res = <span class="keyword">await</span> axios.<span class="title function_">post</span>(<span class="variable constant_">API_URL</span>, &#123;</span><br><span class="line">      email,</span><br><span class="line">      password,</span><br><span class="line">      nickname,</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">content</span>: [&#123;</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">        <span class="attr">text</span>: <span class="string">&#x27;註冊成功&#x27;</span>,</span><br><span class="line">      &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">main</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> transport = <span class="keyword">new</span> <span class="title class_">StdioServerTransport</span>();</span><br><span class="line">  <span class="keyword">await</span> server.<span class="title function_">connect</span>(transport);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;六角學院 TodoList MCP Server 啟動中...&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">main</span>().<span class="title function_">catch</span>(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;Fatal error in main():&quot;</span>, error);</span><br><span class="line">  process.<span class="title function_">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>以上方 <code>server.tool</code> 的運作來講，AI + MCP Server 運作概念類似於以下流程：</p>
+<ol>
+<li>使用者跟 AI 説想要註冊一個 Todolist 帳號</li>
+<li>AI 分析需要使用「<code>hexschool_todolist_sign_up</code>」這個工具</li>
+<li>接著「<code>hexschool_todolist_sign_up</code>」這個工具會被呼叫</li>
+<li>工具會接收到 AI 傳入的參數（<code>email</code>、<code>password</code>、<code>nickname</code>），並同時透過 zod 驗證參數格式</li>
+<li>呼叫完畢之後，會將結果回傳給 AI</li>
+<li>AI 會將結果回傳給使用者</li>
+</ol>
+<p>以上就是我們的 <code>server.tool</code> 的運作流程。</p>
+<h2 id="測試-MCP-Server"><a href="#測試-MCP-Server" class="headerlink" title="測試 MCP Server"></a>測試 MCP Server</h2><p>那我們該如何測試這個 MCP Server 呢？使用 <code>node index.js</code> 嗎？</p>
+<p>不，因為我們要搭配 GitHub Copilot Chat 來使用，為了避免污染 VSCode Global 的 setting.json 檔案，所以要請你輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> .vscode</span><br></pre></td></tr></table></figure>
+
+<p>接著建立一個 <code>mcp.json</code> 檔案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> .vscode/mcp.json</span><br></pre></td></tr></table></figure>
+
+<p>上面這兩個檔案是在這個專案底下建立一個專案用的 <code>.vscode</code> 資料夾，這個資料夾裡面會有一個 <code>mcp.json</code> 的檔案，這個檔案是用來設定 MCP Server 的。</p>
+<p>接著打開 <code>.vscode/mcp.json</code>，並輸入以下內容：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;servers&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;todolist-hexschool-mcp&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;stdio&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;args&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;/Users/rayxu/todolist-hexschool-mcp/src/index.js&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br><code>&quot;/Users/rayxu/todolist-hexschool-mcp/src/index.js&quot;</code>請換成你自己的檔案絕對路徑唷</p>
+</blockquote>
+<p>這邊我來簡單說明一下這個檔案的內容：</p>
+<ul>
+<li><code>servers</code>：這個是我們的 MCP Server 的設定屬性</li>
+<li><code>todolist-hexschool-mcp</code>：這是我們的 MCP Server 的名稱，你可以隨意取名</li>
+<li><code>type</code>：這是我們的 MCP Server 的類型，這邊我們使用的是 <code>stdio</code>，也就是標準輸入輸出</li>
+<li><code>command</code>：這是我們的 MCP Server 的指令，這邊我們使用的是 <code>node</code></li>
+<li><code>args</code>：這是我們要執行的檔案，這邊我們使用的是 <code>index.js</code>，這個檔案就是我們的 MCP Server 的主程式</li>
+</ul>
+<p>接著你就可以點一下 VSCode 畫面上的「開始」按鈕</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523154136.png?alt=media&token=63ebca65-3a67-40c9-a94e-240a2f1abd56" alt="開始"></p>
+<p>這樣 MCP Server 就會啟動了，然後你就可以在 VSCode 的終端機裡面看到以下的訊息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">2025-05-23 16:13:00.241 [info] 正在啟動伺服器 todolist-hexschool-mcp</span><br><span class="line">2025-05-23 16:13:00.243 [info] 連線狀態: 正在啟動</span><br><span class="line">2025-05-23 16:13:00.257 [info] Starting server from LocalProcess extension host</span><br><span class="line">2025-05-23 16:13:00.271 [info] 連線狀態: 正在啟動</span><br><span class="line">2025-05-23 16:13:00.271 [info] 連線狀態: 正在執行</span><br><span class="line">2025-05-23 16:13:00.596 [warning] [server stderr] 六角學院 TodoList MCP Server 啟動中...</span><br><span class="line">2025-05-23 16:13:00.603 [info] Discovered 2 tools</span><br></pre></td></tr></table></figure>
+
+<p>那我們該如何驗證呢？打開你的 GitHub Copilot Chat，然後切換到 AI Agent 的狀態</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-github-copilot%2F20250522103719.png?alt=media&token=18139412-d9ac-4b8e-8188-b440c1a02120" alt="Agent 模式"></p>
+<p>然後你就可以開始詢問 AI 了，例如：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我想要註冊一個 todolist 帳號，帳號是 example-mcp@gmail.com，密碼是 example123，暱稱是 example</span><br></pre></td></tr></table></figure>
+
+<p>呼叫的時候，會跳出一些視窗，這些視窗是用來讓你確認要使用的工具，其實因為這是我們自己做的 MCP Server，所以不用太擔心直接點下「繼續」就可以了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523162807.png?alt=media&token=1a2d6f4f-48f2-4bee-b968-37682b341fa7" alt="繼續"></p>
+<p>接著你就可以看到 AI 回傳的結果啦～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fmcp-ai-chat%2F20250523162908.png?alt=media&token=3156fe53-10da-4633-998a-742ce8820e26" alt="註冊成功"></p>
+<p>到這裡為止，我們成功搭建了一個可與 GitHub Copilot Chat 互動的基本 MCP Server，從註冊 API 開始，建立了實際可執行的工具邏輯。</p>
+<p>接下來你可以嘗試新增更多功能，如登入、新增、刪除任務等，讓這個 Server 真正成為你的 AI 開發好幫手！</p>
+<p>當然這邊我還是會提供完整的程式碼給你參考，這邊我會將完整的程式碼放在 GitHub 上面，你可以直接下載下來使用：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/todolist-hexschool-mcp">GitHub Repository</a></li>
+</ul>
+<p>希望這一篇文章有幫助到你，學會建立自己的 MCP Server 哩！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/GitHub-Copilot/" rel="tag"># GitHub Copilot</a>
+              <a href="/tags/MCP/" rel="tag"># MCP</a>
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/%E6%95%99%E5%AD%B8/" rel="tag"># 教學</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ai/20250522/3579637231/" rel="prev" title="GitHub Copilot + MCP Server 串接 VSCode 打造 AI 開發流程教學">
+                  <i class="fa fa-angle-left"></i> GitHub Copilot + MCP Server 串接 VSCode 打造 AI 開發流程教學
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/other/20250605/2959757908/" rel="next" title="為什麼大家都用 3000？一文搞懂 Port 的用途與選擇">
+                  為什麼大家都用 3000？一文搞懂 Port 的用途與選擇 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

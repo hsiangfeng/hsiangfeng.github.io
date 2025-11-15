@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="想知道為什麼 HTTP 不安全？本文結合 Node.js + Wireshark 實驗，逐步示範如何攔截 HTTP 封包，並對照 HTTPS 的加密效果，深入淺出解釋網路安全的核心。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250920/3804872672/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="想知道為什麼 HTTP 不安全？本文結合 Node.js + Wireshark 實驗，逐步示範如何攔截 HTTP 封包，並對照 HTTPS 的加密效果，深入淺出解釋網路安全的核心。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%887%E6%97%A5%20%E4%B8%8B%E5%8D%8810_28_28.png?alt=media&token=8ebe5dfc-fd4b-42e1-a2a0-50ae08573196">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250914111757.png?alt=media&token=ba412478-870f-4d27-9a8c-44f4037866c0">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705234645.png?alt=media&token=a2306637-e195-4222-b7fb-ae559836daed">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705234906.png?alt=media&token=0e94f54b-d6f2-49fb-a10b-0b25322b3903">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250906222426.png?alt=media&token=a620c50f-42ec-4b7b-bb99-b47c6b628f5f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235110.png?alt=media&token=645aa5ea-fe21-4b93-997c-769132cd6b7a">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235559.png?alt=media&token=018cad3d-1f73-4173-bc4d-4af3d7899402">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235811.png?alt=media&token=9fbac8cb-51b4-4201-890b-8e06b2860384">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250906224059.png?alt=media&token=43c94bbc-5895-4360-8436-2e21635efbca">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250706122031.png?alt=media&token=835f1d29-6ce2-4043-9e81-aba0373f48d6">
+<meta property="article:published_time" content="2025-09-19T16:00:01.000Z">
+<meta property="article:modified_time" content="2025-09-19T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路">
+<meta property="article:tag" content="HTTP HTTPS 差異">
+<meta property="article:tag" content="Wireshark 封包分析">
+<meta property="article:tag" content="SSL 憑證教學">
+<meta property="article:tag" content="網路安全實作">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%887%E6%97%A5%20%E4%B8%8B%E5%8D%8810_28_28.png?alt=media&token=8ebe5dfc-fd4b-42e1-a2a0-50ae08573196">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250920/3804872672/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250920/3804872672/","path":"learnexp/20250920/3804872672/","title":"【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-vs-HTTPS-%E5%A4%9A%E4%B8%80%E5%80%8B-S-%E7%AB%9F%E7%84%B6%E5%B7%AE%E9%80%99%E9%BA%BC%E5%A4%9A"><span class="nav-number">1.</span> <span class="nav-text">HTTP vs HTTPS 多一個 S 竟然差這麼多</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E8%88%87-HTTPS-%E7%9A%84%E5%B7%AE%E7%95%B0"><span class="nav-number">2.</span> <span class="nav-text">HTTP 與 HTTPS 的差異</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">3.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0"><span class="nav-number">4.</span> <span class="nav-text">同步更新</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">978</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">840</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250920/3804872672/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="想知道為什麼 HTTP 不安全？本文結合 Node.js + Wireshark 實驗，逐步示範如何攔截 HTTP 封包，並對照 HTTPS 的加密效果，深入淺出解釋網路安全的核心。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Day 20】HTTP vs HTTPS 多一個 S 竟然差這麼多？！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-20 00:00:01" itemprop="dateCreated datePublished" datetime="2025-09-20T00:00:01+08:00">2025-09-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">想知道為什麼 HTTP 不安全？本文結合 Node.js + Wireshark 實驗，逐步示範如何攔截 HTTP 封包，並對照 HTTPS 的加密效果，深入淺出解釋網路安全的核心。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%887%E6%97%A5%20%E4%B8%8B%E5%8D%8810_28_28.png?alt=media&token=8ebe5dfc-fd4b-42e1-a2a0-50ae08573196" alt="HTTP vs HTTPS 多一個 S 竟然差這麼多？！"></p>
+<h2 id="HTTP-vs-HTTPS-多一個-S-竟然差這麼多"><a href="#HTTP-vs-HTTPS-多一個-S-竟然差這麼多" class="headerlink" title="HTTP vs HTTPS 多一個 S 竟然差這麼多"></a>HTTP vs HTTPS 多一個 S 竟然差這麼多</h2><p>隨著科技與網路越來越發達，我漸漸減少去網咖的次數，畢竟家裡已經有電腦了，家人為了避免我老是往網咖跑，還特地幫家裡申請了 HiNet 的寬頻服務，讓我能在家上網。</p>
+<blockquote>
+<p><strong>Note</strong><br>HiNet，全名「中華電信網際網路服務」，是台灣最大的網際網路服務供應商（ISP），提供寬頻上網、光纖等多種網路服務。</p>
+</blockquote>
+<p>當時我最投入的一款遊戲，就是《仙境傳說 Online》。這遊戲我至少玩了超過 10 年，從國小一路玩到出社會，中間甚至還多次回鍋。</p>
+<p>為什麼特別提這件事呢？因為我那時候帳號被盜超多次。而且幾乎都是我在遊戲官網輸入帳號密碼、儲值完點數之後。</p>
+<p>「X！又被盜了！」我氣得在即時通上抱怨。</p>
+<p>「蛤？你又被盜了？你盜之前有做什麼嗎？」網友問我。</p>
+<p>「就去官網輸入帳號密碼然後儲值，結果就被盜啦！Why！」我回答。</p>
+<p>對，就是滿滿的「Why」。因為我真的不懂為什麼會被盜：我確認過那是官網，不是釣魚網站，電腦也才剛重灌過，不可能中毒。況且如果真的是釣魚網站，點數卡理論上也該一起被盜走，但事實上並沒有。</p>
+<p>直到後來，資訊課老師用 Wireshark 示範了如何抓取網路封包，並解釋 HTTP 是一個 <strong>完全不安全的協定</strong> 。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250914111757.png?alt=media&token=ba412478-870f-4d27-9a8c-44f4037866c0" alt="不安全的協定"></p>
+<blockquote>
+<p><strong>Note</strong><br>上圖是『<a target="_blank" rel="noopener" href="http://www.slime.com.tw/">史萊姆第一個家</a>』的網站，由於該網站沒有使用 HTTPS 協定，因此瀏覽器會顯示 <strong>「不安全」</strong> 的警告訊息。</p>
+</blockquote>
+<p>那一瞬間我才恍然大悟——原來當年我在遊戲官網輸入帳號密碼時，因為官網用的竟然是 HTTP，導致帳密在傳輸途中被攔截了……</p>
+<h2 id="HTTP-與-HTTPS-的差異"><a href="#HTTP-與-HTTPS-的差異" class="headerlink" title="HTTP 與 HTTPS 的差異"></a>HTTP 與 HTTPS 的差異</h2><p>HTTP 完整名稱是 <strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，中文翻譯為「超文本傳輸協定」，它是用來在網路上傳輸資料的協定&#x2F;標準。</p>
+<p>當你打開瀏覽器並輸入一個網址時，瀏覽器會使用 HTTP 協定向伺服器請求資料，然後伺服器會回傳資料給瀏覽器，這樣你就可以在瀏覽器上看到網頁內容。</p>
+<p>那麼 HTTP 本身也是有版本之差，但這邊我們只需要知道 HTTP&#x2F;1.1、HTTP&#x2F;2 與 HTTP&#x2F;3 這三個版本就可以了。</p>
+<p>而 HTTP&#x2F;2 與 HTTP&#x2F;3 是 HTTP&#x2F;1.1 的升級版本，主要是為了提高網路傳輸效率與安全性，但我們比較需要知道 HTTP&#x2F;1.1 的特性，其中 <a href="https://israynotarray.com/learnexp/20250225/3903283315/">RESTful API</a> 就是基於 HTTP&#x2F;1.1 協定來設計的，在 HTTP&#x2F;1.1 中就定義了八種請求方法（Request Method），分別是：</p>
+<ul>
+<li>GET</li>
+<li>POST</li>
+<li>PUT</li>
+<li>DELETE</li>
+<li>HEAD</li>
+<li>OPTIONS</li>
+<li>TRACE 與 CONNECT</li>
+</ul>
+<p>這些請求方法用來告訴伺服器你想要做什麼操作，例如 GET 用來請求資料，POST 用來提交資料等。</p>
+<p>其中 GET 與 HEAD 是被定義為 <strong>「安全的」</strong> 請求，，也就是說它們不會對伺服器資源造成任何修改或影響。換句話說，你可以放心用 GET 或 HEAD 來請求資料，而不必擔心會動到伺服器。</p>
+<p>為什麼說這兩個請求方法是「安全的」呢？在網路世界裡有一個行為叫做「爬蟲」，它的原理就是透過 GET 請求 來抓取網頁資料。如果 GET 不是安全的，那就意味著爬蟲在取得資料的同時，也可能修改伺服器上的資源，這顯然會造成嚴重的安全問題。</p>
+<p>相對的，POST、PUT、DELETE 則被定義為 <strong>「不安全的」</strong> 請求，因為它們可能會修改或影響伺服器上的資源，因此在使用這些方法時，就需要特別謹慎。</p>
+<p>當然，實務上並不能百分之百保證 GET 請求一定安全，因為有些網站可能會用 GET 來修改伺服器上的資源。</p>
+<p>在理解 HTTP 基本概念後，這裡還要補充一點：HTTP 的傳輸是 <strong>「明文傳輸」</strong>，也就是說資料在傳輸過程中並沒有加密，任何人只要攔截到封包，就能直接讀取內容。</p>
+<blockquote>
+<p><strong>Note</strong><br>明文傳輸是指資料在傳輸過程中沒有經過任何加密處理，這意味著任何人都可以輕易地讀取到傳輸的內容。</p>
+</blockquote>
+<p>為了證明 HTTP 是明文傳輸，接下來我會示範如何利用 Wireshark 抓取 HTTP 封包，並展示其中的內容是多麼容易被直接讀取出來。</p>
+<blockquote>
+<p><strong>Note</strong><br>開始前，請到 <a target="_blank" rel="noopener" href="https://www.wireshark.org/">Wireshark 官方網站</a> 下載並安裝 Wireshark 工具。</p>
+</blockquote>
+<p>由於接下來範例都會需要撰寫程式碼，若不方便撰寫的話也不用擔心，本文將會各步驟截圖介紹盡可能讓讀者閱讀時，可以不用準備環境，但如果可以跟著一起做，那麼學習體感上絕對是比較好唷！</p>
+<p>首先，請先下載這份我準備好的 <a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/httpvshttps">GitHub 專案</a> 這個專案裡包含一個簡易的登入畫面，且只能使用以下帳號密碼登入：</p>
+<ul>
+<li>帳號：<code>admin</code> 密碼：<code>password123</code></li>
+<li>帳號：<code>user</code> 密碼：<code>secret456</code></li>
+<li>帳號：<code>test</code> 密碼：<code>test789</code></li>
+</ul>
+<p>下載並取得這個專案後，請依照以下步驟操作：</p>
+<ol>
+<li>在專案目錄中輸入： <code>npm install</code> 安裝相關套件</li>
+<li>接著輸入： <code>npm start</code> 啟動專案</li>
+<li>打開瀏覽器並輸入： <code>http://localhost:3000</code> 就能看到我準備好的範例登入畫面。</li>
+</ol>
+<p>接下來，請打開 Wireshark，並選擇要監控的網路介面（例如 Wi-Fi 或乙太網路）。在這個範例中，我們要監控的是本機的流量，所以請選擇 Loopback 介面（通常顯示為 <code>lo</code>）。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705234645.png?alt=media&token=a2306637-e195-4222-b7fb-ae559836daed" alt="Wireshark Loopback 介面"></p>
+<p>這時候你會發現，在 Wireshark 畫面中會不斷出現大量訊息，這就是因為 Wireshark 正在即時監控並顯示網路流量。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705234906.png?alt=media&token=0e94f54b-d6f2-49fb-a10b-0b25322b3903" alt="Wireshark 監控網路流量"></p>
+<p>接著，回到專案頁面，輸入帳號密碼登入。當你看到登入後的畫面時，就可以切回 Wireshark，準備查看剛剛產生的封包了。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250906222426.png?alt=media&token=a620c50f-42ec-4b7b-bb99-b47c6b628f5f" alt="輸入帳號密碼"></p>
+<p>這時候 Wireshark 畫面應該會像瘋狂跳動一樣持續刷新。為了避免干擾，你可以點一下上方的 「停止」 按鈕，讓 Wireshark 暫停監控網路流量。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235110.png?alt=media&token=645aa5ea-fe21-4b93-997c-769132cd6b7a" alt="Wireshark 停止監控網路流量"></p>
+<p>由於封包資訊量非常龐大，我們需要過濾結果，請在上方的搜尋列輸入以下過濾條件： <code>tcp.port == 3000 and http.request.method == &quot;POST&quot;</code></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235559.png?alt=media&token=018cad3d-1f73-4173-bc4d-4af3d7899402" alt="Wireshark 搜尋條件"></p>
+<blockquote>
+<p><strong>Note</strong><br>這個搜尋條件意思是指「只顯示 TCP 端口為 3000 ，且請求方法為 POST 的 HTTP 封包」，就能過濾掉其他不相關的封包。</p>
+</blockquote>
+<p>接著，你應該會看到一個 POST 請求 的封包。點擊它之後，在下方的 「封包內容」 區域就能看到詳細的請求資訊，包含你剛剛輸入的帳號與密碼！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250705235811.png?alt=media&token=9fbac8cb-51b4-4201-890b-8e06b2860384" alt="Wireshark 封包內容"></p>
+<p>這正是 HTTP 明文傳輸 的特性——任何人都能輕易讀取傳輸內容，而這也正是 HTTP 被認為 不安全 的主要原因。</p>
+<blockquote>
+<p><strong>Note</strong><br>在本地開發時，通常會預設使用 HTTP 協定，因為此時並不需要特別考慮安全性問題。但在實際的 生產環境 中，則必須使用 HTTPS 協定，來確保資料傳輸的安全。</p>
+</blockquote>
+<p>那如果是 HTTPS 呢？</p>
+<p>簡單來說，HTTPS 就是 HTTP + SSL&#x2F;TLS 加密協定，能確保資料在傳輸過程中是加密的。這代表即使有人截取了封包，也無法輕易讀取其中內容。</p>
+<p>要啟用 SSL&#x2F;TLS 加密，伺服器必須有一個 SSL 憑證（Certificate），而這個憑證需要由受信任的 憑證機構（CA） 簽發，才能確保連線安全。</p>
+<p>在我提供的範例專案中，我準備了一段 Shell Script 指令，方便你快速產生 SSL 憑證：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p cert</span><br><span class="line">openssl req -nodes -new -x509 -keyout cert/server.key -out cert/server.crt -days 365 -subj <span class="string">&quot;/C=TW/ST=Taiwan/L=Taipei/O=Demo/OU=Dev/CN=localhost&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;自簽名憑證已產生於 cert/server.key 和 cert/server.crt&quot;</span> </span><br></pre></td></tr></table></figure>
+
+<p>簡單來說，這段指令會在範例專案底下建立一個 <code>cert</code> 資料夾，並在其中產生 <code>server.key</code> 與 <code>server.crt</code> 兩個檔案，就是我們需要用來啟用 HTTPS 的 SSL 憑證。</p>
+<blockquote>
+<p><strong>Note</strong><br>OpenSSL 是一個開源的加密工具，可以用來生成 SSL 憑證與私鑰。不過要注意，正式環境 必須向受信任的憑證機構（CA）申請 SSL 憑證，自行產生的憑證僅適用於 開發與測試環境。</p>
+</blockquote>
+<p>所以，你只需要執行這個指令，就能產生 SSL 憑證。接著，就可以在專案中使用這個憑證來啟動 HTTPS 伺服器了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sh generate-cert.sh</span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>接著請輸入： <code>https://localhost:3443</code>，請特別注意這裡是 <code>https</code> 而不是 <code>http</code>。</p>
+<p>進入登入畫面後，你會發現 Chrome 瀏覽器跳出一個 警告訊息。這是因為我們使用的是 自簽名憑證，瀏覽器無法驗證其真實性，所以才會顯示警告。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250906224059.png?alt=media&token=43c94bbc-5895-4360-8436-2e21635efbca" alt="HTTPS 警告訊息"></p>
+<p>接下來的流程和前面相同：輸入帳號密碼登入，然後回到 Wireshark 查看封包內容。<br>不過這裡要特別注意，篩選條件需要改成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp.port == 3443</span><br></pre></td></tr></table></figure>
+
+<p>你會發現這裡少了 <code>http.request.method == &quot;POST&quot;</code>，原因是 HTTPS 在傳輸過程中會加密，所以我們無法直接看到請求方法。</p>
+<p>那要怎麼辨別呢？其實可以透過「封包大小」來推測，因為 POST 請求通常比 GET 大，在 Wireshark 中，可以查看「Length」欄位來判斷。</p>
+<p>例如這裡顯示花費了 4.059109 秒，我們就能推測這就是剛剛輸入帳號密碼時的 POST 請求。<br>但不管怎麼看，你都無法看到帳號密碼的內容，因為 HTTPS 的加密機制 已經把資料保護起來了～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday20%2F20250706122031.png?alt=media&token=835f1d29-6ce2-4043-9e81-aba0373f48d6" alt="Wireshark HTTPS 封包內容"></p>
+<p>那…我們有辦法看到嗎？</p>
+<p>其實還是有辦法解密的，不過這部分就不在今天的範圍內了。</p>
+<p>畢竟這篇的重點，只是要讓你了解 HTTP 與 HTTPS 的差異而已～</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>從這一章開始，難度相較前面會大幅提升，因為會出現許多你可能不熟悉的名詞，例如 <code>GitHub</code>、<code>npm</code>、<code>Node.js</code>、<code>Express</code>、<code>Wireshark</code> 等等。</p>
+<p>不過不用擔心，我會盡可能在每個步驟都附上 圖片 + 說明，即使沒有程式背景的人也能跟著完成。<br>當然，如果你本身有程式基礎，那我會建議你邊看邊實際操作，效果會更好、更有感！</p>
+<h2 id="同步更新"><a href="#同步更新" class="headerlink" title="同步更新"></a>同步更新</h2><p>本文將同步更新至以下網站：</p>
+<ul>
+<li><a href="https://israynotarray.com/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/">是 Ray 不是 Array</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/users/20119486/ironman/8232">Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路（佛心分享-IT 人自學之術）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.threads.com/@isray_notarray">Threads - 時常會聊軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/israynotarray">Facebook - 搞怪迷因分享</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.instagram.com/israynotarray/">Instagram - 搞怪迷因分享 + 軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://portaly.cc/israynotarray">Portaly - 入口主頁</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/" rel="tag"># Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路</a>
+              <a href="/tags/HTTP-HTTPS-%E5%B7%AE%E7%95%B0/" rel="tag"># HTTP HTTPS 差異</a>
+              <a href="/tags/Wireshark-%E5%B0%81%E5%8C%85%E5%88%86%E6%9E%90/" rel="tag"># Wireshark 封包分析</a>
+              <a href="/tags/SSL-%E6%86%91%E8%AD%89%E6%95%99%E5%AD%B8/" rel="tag"># SSL 憑證教學</a>
+              <a href="/tags/%E7%B6%B2%E8%B7%AF%E5%AE%89%E5%85%A8%E5%AF%A6%E4%BD%9C/" rel="tag"># 網路安全實作</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250919/1115708242/" rel="prev" title="【Day 19】從 ASCII 到 Unicode——文字編碼全面升級">
+                  <i class="fa fa-angle-left"></i> 【Day 19】從 ASCII 到 Unicode——文字編碼全面升級
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250921/4248331961/" rel="next" title="【Day 21】我的第一個 C 語言體驗之旅">
+                  【Day 21】我的第一個 C 語言體驗之旅 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

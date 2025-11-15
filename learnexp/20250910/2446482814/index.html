@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="USB 複製檔案卻遇到 4GB 限制？這篇從魔獸爭霸的課堂回憶出發，分享 格式化層次、FAT32 限制 以及 NTFS、exFAT 的差異，以故事帶出檔案系統的基礎概念。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Day 10】快借我 USB！我要打魔獸爭霸！">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250910/2446482814/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="USB 複製檔案卻遇到 4GB 限制？這篇從魔獸爭霸的課堂回憶出發，分享 格式化層次、FAT32 限制 以及 NTFS、exFAT 的差異，以故事帶出檔案系統的基礎概念。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2FChatGPT%20Image%202025%E5%B9%B48%E6%9C%8824%E6%97%A5%20%E4%B8%8B%E5%8D%8809_47_16.png?alt=media&token=58ef9866-b69e-4411-aa32-b0efeeb0e2c4">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F202508242107.jpg?alt=media&token=ec0aaff3-7c70-451b-bdad-4ad1a64dc90f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F202508242117.png?alt=media&token=a4e178a7-4b47-45e3-8cfe-eb45c48339f2">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2FChatGPT%20Image%202025%E5%B9%B48%E6%9C%8824%E6%97%A5%20%E4%B8%8B%E5%8D%8809_21_02.png?alt=media&token=4a9dbd29-57cd-40b9-a984-d6a338e01a5f">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F20250824213902.png?alt=media&token=99d589e9-1638-429d-a623-fcccd4f7923f">
+<meta property="article:published_time" content="2025-09-09T16:00:01.000Z">
+<meta property="article:modified_time" content="2025-09-09T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路">
+<meta property="article:tag" content="USB。格式化教學">
+<meta property="article:tag" content="檔案系統比較">
+<meta property="article:tag" content="魔獸爭霸回憶">
+<meta property="article:tag" content="4GB 檔案限制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2FChatGPT%20Image%202025%E5%B9%B48%E6%9C%8824%E6%97%A5%20%E4%B8%8B%E5%8D%8809_47_16.png?alt=media&token=58ef9866-b69e-4411-aa32-b0efeeb0e2c4">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250910/2446482814/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250910/2446482814/","path":"learnexp/20250910/2446482814/","title":"【Day 10】快借我 USB！我要打魔獸爭霸！"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【Day 10】快借我 USB！我要打魔獸爭霸！ | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E5%80%9F%E6%88%91-USB%EF%BC%81%E6%88%91%E8%A6%81%E6%89%93%E9%AD%94%E7%8D%B8%E7%88%AD%E9%9C%B8"><span class="nav-number">1.</span> <span class="nav-text">快借我 USB！我要打魔獸爭霸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%EF%BC%88Format%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">格式化（Format）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A6%8B%E7%9A%84%E6%AA%94%E6%A1%88%E7%B3%BB%E7%B5%B1%EF%BC%9AFAT32%E3%80%81NTFS%E3%80%81exFAT"><span class="nav-number">3.</span> <span class="nav-text">常見的檔案系統：FAT32、NTFS、exFAT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">4.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0"><span class="nav-number">5.</span> <span class="nav-text">同步更新</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">978</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">840</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250910/2446482814/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【Day 10】快借我 USB！我要打魔獸爭霸！ | 是 Ray 不是 Array">
+      <meta itemprop="description" content="USB 複製檔案卻遇到 4GB 限制？這篇從魔獸爭霸的課堂回憶出發，分享 格式化層次、FAT32 限制 以及 NTFS、exFAT 的差異，以故事帶出檔案系統的基礎概念。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Day 10】快借我 USB！我要打魔獸爭霸！
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-10 00:00:01" itemprop="dateCreated datePublished" datetime="2025-09-10T00:00:01+08:00">2025-09-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">USB 複製檔案卻遇到 4GB 限制？這篇從魔獸爭霸的課堂回憶出發，分享 格式化層次、FAT32 限制 以及 NTFS、exFAT 的差異，以故事帶出檔案系統的基礎概念。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2FChatGPT%20Image%202025%E5%B9%B48%E6%9C%8824%E6%97%A5%20%E4%B8%8B%E5%8D%8809_47_16.png?alt=media&token=58ef9866-b69e-4411-aa32-b0efeeb0e2c4" alt="快借我 USB！我要打魔獸爭霸"></p>
+<h2 id="快借我-USB！我要打魔獸爭霸"><a href="#快借我-USB！我要打魔獸爭霸" class="headerlink" title="快借我 USB！我要打魔獸爭霸"></a>快借我 USB！我要打魔獸爭霸</h2><p>雖然有一段時間都是用光碟來交作業，後來也有人改用 Email ，但後來忘記是在我國高中時， USB 開始慢慢取代光碟成為主要的儲存工具。在我的記憶中，那時候市面上的 USB 容量多半落在 4GB～16GB 之間，價格大概 300～500 元左右吧？</p>
+<p>後來學校下了一個新規定，要求之後一律要用 USB 繳交作業。沒辦法，我只好跑去家裡附近的書局，買了一支 8GB 的 USB 來用。</p>
+<p>「Ray 你有帶 USB 嗎？」同學在電腦課上問我。</p>
+<p>「有啊，怎麼了？」反正當同學問我有沒有什麼時，八成肯定沒有好事。</p>
+<p>「我有一個檔案容量有點大，你 USB 借我抓一下檔案，等一下我們一起玩。」同學用手指著螢幕，我在他畫面上看到一個叫「GAME」的壓縮檔資料夾，我就知道他想要揪人一起玩遊戲了。</p>
+<p>「好啊。」我就把 USB 插上去，準備把檔案複製到我的 USB 上。</p>
+<p>當時抓的那款遊戲叫做「魔獸爭霸」，每次開房（建立遊戲）都會開一個叫做「信長之野望」的地圖，沒記錯的話，地圖編號應該是 12.1c 吧？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F202508242107.jpg?alt=media&token=ec0aaff3-7c70-451b-bdad-4ad1a64dc90f" alt="魔獸爭霸之信長之野望（圖源網路）"></p>
+<p>從那之後，我們的電腦課從 CS（槍戰遊戲）進階成了魔獸爭霸了。</p>
+<p>在複製的過程中，電腦跳出了一個警告視窗：</p>
+<p>「檔案太大無法放置在目的地檔案系統。」</p>
+<p>「後來問了同學才知道，原來如果要在 USB 裡存放超過 4GB 以上的單一檔案，就必須先把 USB 格式化成特定的檔案格式才行。」</p>
+<p>不過當時我也搞不懂，為什麼那個 Game 資料夾會這麼大，更不清楚它到底是哪裡來的。後來才打聽到，原來那其實是以前學長留下來的『遺產（？）』，裡面塞滿了各種遊戲的安裝檔、破解檔，甚至還夾帶一些盜版軟體。難怪我在複製的時候，電腦一直跳出警告視窗。</p>
+<p>好不容易解決了檔案太大的問題，但某次使用 USB 的時候，我卻發現整台電腦竟然被病毒入侵——那又是另一個故事了。</p>
+<h2 id="格式化（Format）"><a href="#格式化（Format）" class="headerlink" title="格式化（Format）"></a>格式化（Format）</h2><p>基本上我們記憶卡跟 USB 剛到手時，都會需要先做一件事情，也就是「格式化」。</p>
+<p>我們大多數人對格式化的印象可能是：</p>
+<p>「右鍵點 USB，選擇格式化，然後跳出一個選單，選擇檔案系統，按下確定就搞定。」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F202508242117.png?alt=media&token=a4e178a7-4b47-45e3-8cfe-eb45c48339f2" alt="格式化"></p>
+<p>但其實你知道嗎？</p>
+<p>格式化大致可以分為兩種層次：低階格式化（Low-Level Formatting，LLF）和高階格式化（High-Level Formatting，HLF）。</p>
+<p>低階格式化又稱物理格式化，這個說法並不是真的叫你拿著一把錘子往硬碟猛敲，把它敲爛的意思</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2FChatGPT%20Image%202025%E5%B9%B48%E6%9C%8824%E6%97%A5%20%E4%B8%8B%E5%8D%8809_21_02.png?alt=media&token=4a9dbd29-57cd-40b9-a984-d6a338e01a5f" alt="敲爛硬碟"></p>
+<p>早期的硬碟雖然已經製造好磁碟片和機械結構，但裡面的磁軌、磁區劃分（邏輯結構）還是空白的，需要使用者透過低階格式化手動建立。</p>
+<p>如果要做這件事情，你自己要拿 BIOS 裡面的工具或 DOS 下的專用工具，手動把磁碟劃成一格一格，設定好每個磁軌和磁區的位置。</p>
+<p>對於現在來說，其實廠商都預設出場就幫你做好了這些磁碟的劃分，所以你不需要再去做這件事情了。</p>
+<p>這也是為什麼你買了一顆硬碟回來，只要插上去就能直接使用。只有少數還是會遇到一些小狀況，比如 BIOS 不支援，或者主機板的 SATA 版本不相容之類的啦。不過這些細節就先不在這裡多聊了～</p>
+<p>隨著時代進步，『低階格式化』這個名詞也產生了變化。早期的低階格式化，是指將磁碟劃分成一格一格的結構，並設定好每個磁軌與磁區的位置；而現在所說的低階格式化，則多是指把磁碟上的資料全部清除，並將所有內容寫成 0——這個過程也被稱為「<strong>寫零</strong>」。</p>
+<blockquote>
+<p><strong>Note</strong><br>磁碟的每個儲存單位都被清成 0，也就是把原本的資料覆蓋成空白狀態。實務上，這樣的操作更常被稱為『磁碟抹除』或『安全清除』，而不是真正意義上的低階格式化。</p>
+</blockquote>
+<p>為了讓你更清楚的理解，我在下面整理了一張對照表。</p>
+<table>
+<thead>
+<tr>
+<th align="left">時代</th>
+<th align="left">低階格式化的工作內容</th>
+<th align="left">誰來做？</th>
+<th align="left">目的是什麼？</th>
+<th align="left">補充說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">🕰️ 早期</td>
+<td align="left">✏️ 手動劃分柱面、磁軌、磁區</td>
+<td align="left">👨‍💻 使用者自己（BIOS操作）</td>
+<td align="left">🛠️ 讓硬碟能正常存資料</td>
+<td align="left">⚡ 沒劃格子就不能用</td>
+</tr>
+<tr>
+<td align="left">🚀 現代</td>
+<td align="left">🏭 出廠前自動劃分完成</td>
+<td align="left">🏢 工廠處理好</td>
+<td align="left">🔌 到手就能直接使用</td>
+<td align="left">📂 使用者只需要高階格式化</td>
+</tr>
+<tr>
+<td align="left">❓ 現代常見的「低階格式化」</td>
+<td align="left">🧹 把資料清成0（寫零）</td>
+<td align="left">👨‍🔧 使用者或工具軟體</td>
+<td align="left">🧼 資料消除但格局不變</td>
+<td align="left">✅ 磁區不動，只清除內容</td>
+</tr>
+</tbody></table>
+<p>講完了低階格式化，接下來就要來講一下第二種格式化，也就是<strong>進階格式化</strong>。</p>
+<p>進階格式化也被稱為邏輯格式化。每一個磁碟都有對應的檔案系統，而當你執行格式化時，其實就是在選擇要使用哪一種檔案系統，例如 FAT32、NTFS、exFAT 等。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday10%2F20250824213902.png?alt=media&token=99d589e9-1638-429d-a623-fcccd4f7923f" alt="檔案系統"></p>
+<p>選定檔案系統之後，系統會在磁碟上建立對應的檔案管理結構，比如：</p>
+<ul>
+<li>如果是 FAT32 或 exFAT，就建立檔案配置表（File Allocation Table，FAT）。</li>
+<li>如果是 NTFS，就建立主檔案表（Master File Table，MFT）。</li>
+</ul>
+<p>這些檔案管理表會記錄每個檔案的名稱、大小與所在位置，讓系統能正確存取和管理資料。</p>
+<p>你可能會想說：</p>
+<p>「欸？我從來沒看過這些表格啊？」</p>
+<p>沒錯，這些東西是直接寫在磁碟裡的，是系統在背後幫你偷偷管理著，所以你根本不會發現到它的存在。</p>
+<p>另外，在格式化整顆磁碟時，系統通常也會更新或重建磁碟開頭的主開機紀錄（MBR，Master Boot Record），這個 MBR 負責記錄整顆磁碟的分割區結構與開機資訊。</p>
+<p>所以進階格式化會有兩個重點東西：</p>
+<ul>
+<li>FAT（檔案配置表）</li>
+<li>MBR（主開機紀錄）</li>
+</ul>
+<p>這兩個東西是格式化的時候會自動建立的，當你格式化完之後，你就可以在這個磁碟上存放檔案了。</p>
+<p>最後來整理一下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">名稱</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">FAT 或 MFT</td>
+<td align="left">管理檔案的名稱、大小、位置等資訊</td>
+</tr>
+<tr>
+<td align="left">MBR（或 GPT）</td>
+<td align="left">記錄整顆磁碟的分割區資訊與開機設定</td>
+</tr>
+</tbody></table>
+<p>講完了格式化，接下來當然要來講講檔案系統了。</p>
+<h2 id="常見的檔案系統：FAT32、NTFS、exFAT"><a href="#常見的檔案系統：FAT32、NTFS、exFAT" class="headerlink" title="常見的檔案系統：FAT32、NTFS、exFAT"></a>常見的檔案系統：FAT32、NTFS、exFAT</h2><p>講到檔案系統，最常見的不外乎就是 FAT32、NTFS、exFAT 這三種。</p>
+<p>但往下講之前，我想先簡單介紹一下 FAT32 的部分，畢竟這是一個非常有歷史淵源的檔案格式。</p>
+<p>早期常見的檔案系統包括 FAT12、FAT16 和 FAT32，其中數字代表的是位元數，而這些位元數會決定檔案系統能支援的最大容量。以 FAT32 為例，單一檔案最大只能支援到 4GB，而整顆磁碟則最多可支援 2TB。</p>
+<p>所以 FAT 的結構可以說是相容性最好的檔案系統，如果你是老相機、老電腦要讀取使用的話，那麼選擇 FAT32 是最好的選擇。</p>
+<p>至於 NTFS 和 exFAT 則是較新的檔案系統。雖然它們都能在 Windows 和 Mac 上使用，但 NTFS 在 Mac 上僅支援讀取，無法直接寫入。這是因為 NTFS 是微軟自行開發的檔案系統，主要是為了 Windows 作業系統而設計的。</p>
+<p>exFAT 則是一種同時支援 Windows 與 Mac 的檔案系統，不僅能讀取也能寫入，非常適合用來存放大型檔案，例如 4K 影片或遊戲等，可以說是目前最常見的主流標準。</p>
+<p>最後這邊也來做個總結表格，未來你在選擇檔案系統的時候，可以參考一下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">檔案系統</th>
+<th align="left">最大單一檔案大小</th>
+<th align="left">相容性</th>
+<th align="left">使用情境</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">FAT32</td>
+<td align="left">4GB</td>
+<td align="left">Windows、Mac</td>
+<td align="left">相容性最好，適合舊設備使用</td>
+</tr>
+<tr>
+<td align="left">NTFS</td>
+<td align="left">16TB</td>
+<td align="left">Windows</td>
+<td align="left">適合大型檔案，Windows 專用</td>
+</tr>
+<tr>
+<td align="left">exFAT</td>
+<td align="left">64ZB</td>
+<td align="left">Windows、Mac</td>
+<td align="left">適合大型檔案，支援 Windows 和 Mac 使用</td>
+</tr>
+</tbody></table>
+<p>相信下次你要格式化 USB 的時候就知道該怎麼選擇檔案系統了～</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>基本上我幾乎每天都在搞丟 USB，就跟鑰匙一樣神奇，每次都會不見，然後又會在某個地方找到。</p>
+<p>不知道大家有沒有跟我一樣的經驗呢 QQ…</p>
+<h2 id="同步更新"><a href="#同步更新" class="headerlink" title="同步更新"></a>同步更新</h2><p>本文將同步更新至以下網站：</p>
+<ul>
+<li><a href="https://israynotarray.com/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/">是 Ray 不是 Array</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/users/20119486/ironman/8232">Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路（佛心分享-IT 人自學之術）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.threads.com/@isray_notarray">Threads - 時常會聊軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/israynotarray">Facebook - 搞怪迷因分享</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.instagram.com/israynotarray/">Instagram - 搞怪迷因分享 + 軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://portaly.cc/israynotarray">Portaly - 入口主頁</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/" rel="tag"># Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路</a>
+              <a href="/tags/USB%E3%80%82%E6%A0%BC%E5%BC%8F%E5%8C%96%E6%95%99%E5%AD%B8/" rel="tag"># USB。格式化教學</a>
+              <a href="/tags/%E6%AA%94%E6%A1%88%E7%B3%BB%E7%B5%B1%E6%AF%94%E8%BC%83/" rel="tag"># 檔案系統比較</a>
+              <a href="/tags/%E9%AD%94%E7%8D%B8%E7%88%AD%E9%9C%B8%E5%9B%9E%E6%86%B6/" rel="tag"># 魔獸爭霸回憶</a>
+              <a href="/tags/4GB-%E6%AA%94%E6%A1%88%E9%99%90%E5%88%B6/" rel="tag"># 4GB 檔案限制</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250909/3355359521/" rel="prev" title="【Day 9】為什麼我的檔案打不開？原來是副檔名在作怪！">
+                  <i class="fa fa-angle-left"></i> 【Day 9】為什麼我的檔案打不開？原來是副檔名在作怪！
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250911/3674862620/" rel="next" title="【Day 11】電腦中毒了！第一次學會重灌系統">
+                  【Day 11】電腦中毒了！第一次學會重灌系統 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

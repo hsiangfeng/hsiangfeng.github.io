@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="最近剛好有一個需求要把數字格式化成千分位或貨幣格式，剛好就寫一下這一篇該如何實現這個需求。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 數字格式化：最簡單的方法（千分位與貨幣）">
+<meta property="og:url" content="https://israynotarray.com/javascript/20250918/1019906872/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="最近剛好有一個需求要把數字格式化成千分位或貨幣格式，剛好就寫一下這一篇該如何實現這個需求。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fjavascript%2Fjavascript-number-format%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8818%E6%97%A5%20%E4%B8%8A%E5%8D%8810_49_23.png?alt=media&token=69691c1e-a975-49a0-9778-7babb9ddce8d">
+<meta property="article:published_time" content="2025-09-18T01:50:30.000Z">
+<meta property="article:modified_time" content="2025-09-18T01:50:30.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="千分位">
+<meta property="article:tag" content="貨幣">
+<meta property="article:tag" content="Intl.NumberFormat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fjavascript%2Fjavascript-number-format%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8818%E6%97%A5%20%E4%B8%8A%E5%8D%8810_49_23.png?alt=media&token=69691c1e-a975-49a0-9778-7babb9ddce8d">
+
+
+<link rel="canonical" href="https://israynotarray.com/javascript/20250918/1019906872/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/javascript/20250918/1019906872/","path":"javascript/20250918/1019906872/","title":"JavaScript 數字格式化：最簡單的方法（千分位與貨幣）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JavaScript 數字格式化：最簡單的方法（千分位與貨幣） | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%83%E5%88%86%E4%BD%8D%E6%A0%BC%E5%BC%8F%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">千分位格式化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Intl-NumberFormat"><span class="nav-number">3.</span> <span class="nav-text">Intl.NumberFormat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#options"><span class="nav-number">3.1.</span> <span class="nav-text">options</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B"><span class="nav-number">3.2.</span> <span class="nav-text">範例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#style"><span class="nav-number">3.2.1.</span> <span class="nav-text">style</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#currency"><span class="nav-number">3.2.2.</span> <span class="nav-text">currency</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#currencyDisplay"><span class="nav-number">3.2.3.</span> <span class="nav-text">currencyDisplay</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#minimumIntegerDigits"><span class="nav-number">3.2.4.</span> <span class="nav-text">minimumIntegerDigits</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#minimumFractionDigits"><span class="nav-number">3.2.5.</span> <span class="nav-text">minimumFractionDigits</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#maximumFractionDigits"><span class="nav-number">3.2.6.</span> <span class="nav-text">maximumFractionDigits</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#minimumSignificantDigits"><span class="nav-number">3.2.7.</span> <span class="nav-text">minimumSignificantDigits</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#maximumSignificantDigits"><span class="nav-number">3.2.8.</span> <span class="nav-text">maximumSignificantDigits</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">978</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">840</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/javascript/20250918/1019906872/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="JavaScript 數字格式化：最簡單的方法（千分位與貨幣） | 是 Ray 不是 Array">
+      <meta itemprop="description" content="最近剛好有一個需求要把數字格式化成千分位或貨幣格式，剛好就寫一下這一篇該如何實現這個需求。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript 數字格式化：最簡單的方法（千分位與貨幣）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-18 09:50:30" itemprop="dateCreated datePublished" datetime="2025-09-18T09:50:30+08:00">2025-09-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/javascript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">最近剛好有一個需求要把數字格式化成千分位或貨幣格式，剛好就寫一下這一篇該如何實現這個需求。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fjavascript%2Fjavascript-number-format%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8818%E6%97%A5%20%E4%B8%8A%E5%8D%8810_49_23.png?alt=media&token=69691c1e-a975-49a0-9778-7babb9ddce8d" alt="JavaScript 數字格式化：最簡單的方法（千分位與貨幣）"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近剛好有一個需求要把數字格式化成千分位或貨幣格式，剛好就寫一下這一篇該如何實現這個需求。</p>
+<h2 id="千分位格式化"><a href="#千分位格式化" class="headerlink" title="千分位格式化"></a>千分位格式化</h2><p>通常我們在做一些金流或報表時，會需要將數字格式化成千分位，而方式有很多種：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> number = <span class="number">1234567.89</span>;</span><br><span class="line"><span class="keyword">const</span> formattedNumber = number.<span class="title function_">toLocaleString</span>(<span class="string">&#x27;en-US&#x27;</span>); <span class="comment">// &quot;1,234,567.89&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(formattedNumber); <span class="comment">// &quot;1,234,567.89&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>這個方法會根據指定的地區格式化數字，<code>&#39;en-US&#39;</code> 代表美國格式，會使用逗號作為千分位分隔符。</p>
+<p>但如果你想要自訂分隔符號，可以使用正則表達式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">formatNumberWithCommas</span>(<span class="params">number</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> number.<span class="title function_">toString</span>().<span class="title function_">replace</span>(<span class="regexp">/\B(?=(\d&#123;3&#125;)+(?!\d))/g</span>, <span class="string">&quot;.&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> number = <span class="number">1234567.89</span>;</span><br><span class="line"><span class="keyword">const</span> formattedNumber = <span class="title function_">formatNumberWithCommas</span>(number); <span class="comment">// &quot;1.234.567.89&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(formattedNumber); <span class="comment">// &quot;1.234.567.89&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>這個函式會將數字轉換成字串，然後使用正則表達式在每三位數前插入指定的分隔符號（這裡用的是 <code>.</code>）。</p>
+<p>但如果今天想要在數字前面加上貨幣符號，可以這樣做：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">formatCurrency</span>(<span class="params">number, currencySymbol = <span class="string">&#x27;$&#x27;</span></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> currencySymbol + number.<span class="title function_">toString</span>().<span class="title function_">replace</span>(<span class="regexp">/\B(?=(\d&#123;3&#125;)+(?!\d))/g</span>, <span class="string">&quot;,&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> number = <span class="number">1234567.89</span>;</span><br><span class="line"><span class="keyword">const</span> formattedCurrency = <span class="title function_">formatCurrency</span>(number, <span class="string">&#x27;NT$&#x27;</span>); <span class="comment">// &quot;NT$1,234,567.89&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(formattedCurrency); <span class="comment">// &quot;NT$1,234,567.89&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>其實可以發現不管是千分位或貨幣格式化，都是利用正則表達式來達成的。</p>
+<p>如果不使用上述的方法，則是可能會改用 <a target="_blank" rel="noopener" href="https://www.npmjs.com/package/numeral">numeral</a> 這個套件來處理，但…這個套件已經沒有在維護且較老舊，許多人會乾脆自己寫。</p>
+<h2 id="Intl-NumberFormat"><a href="#Intl-NumberFormat" class="headerlink" title="Intl.NumberFormat"></a>Intl.NumberFormat</h2><p>傳統方法雖然可行，但不夠直覺與易維護，那…到底有沒有更符合現代 JavaScript 的寫法呢？答案是有的，那就是使用 <code>Intl.NumberFormat</code>。</p>
+<p>現代開發更推薦用內建的 <code>Intl.NumberFormat</code>，因為效能好又免安裝，下面是它的基本用法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> formatter = <span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(locales, options);</span><br><span class="line">formatter.<span class="title function_">format</span>(number);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><code>locales</code>：</strong> 用來指定地區，例如 <code>&#39;en-US&#39;</code>、<code>&#39;zh-TW&#39;</code> 等等。</li>
+<li><strong><code>options</code>：</strong> 用來指定格式化選項，例如 <code>style</code>、<code>currency</code>、<code>minimumFractionDigits</code> 等等。</li>
+</ul>
+<p><code>Intl.NumberFormat</code> 是一個專門用來格式化數字的 JavaScript 內建物件，可以非常方便地處理各種數字格式化需求，底下是一個範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> number = <span class="number">1234567.89</span>;</span><br><span class="line"><span class="keyword">const</span> formatter = <span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;en-US&#x27;</span>, &#123;</span><br><span class="line">  <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>,</span><br><span class="line">  <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> formattedCurrency = formatter.<span class="title function_">format</span>(number); <span class="comment">// &quot;$1,234,567.89&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(formattedCurrency); <span class="comment">// &quot;$1,234,567.89&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>你可以看到這個方法不僅可以處理千分位，還可以直接處理貨幣符號，不用再自己去寫正規表達式，而且可以根據不同的地區自動調整格式，非常方便。</p>
+<p>如果你想要格式化成其他貨幣，只需要更改 <code>currency</code> 的值即可，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> number = <span class="number">1234567.89</span>;</span><br><span class="line"><span class="keyword">const</span> formatter = <span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;ja-JP&#x27;</span>, &#123;</span><br><span class="line">  <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>,</span><br><span class="line">  <span class="attr">currency</span>: <span class="string">&#x27;JPY&#x27;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> formattedCurrency = formatter.<span class="title function_">format</span>(number); <span class="comment">// &quot;￥1,234,568&quot;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(formattedCurrency); <span class="comment">// &quot;￥1,234,568&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>這樣就可以輕鬆地將數字格式化成日圓的格式。</p>
+<h3 id="options"><a href="#options" class="headerlink" title="options"></a>options</h3><p><code>options</code> 本身還有很多其他的選項可以使用，以下是一些常用的選項：</p>
+<ul>
+<li><strong>style：</strong> 指定格式化的樣式<ul>
+<li><code>&#39;decimal&#39;</code>： 十進位格式（預設值）</li>
+<li><code>&#39;currency&#39;</code>：貨幣格式</li>
+<li><code>&#39;percent&#39;</code>：百分比格式</li>
+</ul>
+</li>
+<li><strong>currency：</strong> 指定貨幣的類型（例如 <code>&#39;USD&#39;</code>、<code>&#39;EUR&#39;</code>、<code>&#39;JPY&#39;</code> 等等），這個選項只有在 <code>style</code> 設為 <code>&#39;currency&#39;</code> 時才需要設定。</li>
+<li><strong>currencyDisplay：</strong> 指定貨幣符號的顯示方式<ul>
+<li><code>&#39;symbol&#39;</code>：顯示貨幣符號（例如 <code>$</code>、<code>€</code>、<code>¥</code> 等等）</li>
+<li><code>&#39;code&#39;</code>：顯示貨幣代碼（例如 <code>USD</code>、<code>EUR</code>、<code>JPY</code> 等等）</li>
+<li><code>&#39;name&#39;</code>：顯示貨幣名稱（例如 <code>US Dollar</code>、<code>Euro</code>、<code>Japanese Yen</code> 等等）</li>
+</ul>
+</li>
+<li><strong>minimumIntegerDigits：</strong> 指定整數部分的最小位數，如果不足會在前面補零。</li>
+<li><strong>minimumFractionDigits：</strong> 指定小數部分的最小位數，如果不足會在後面補零。</li>
+<li><strong>maximumFractionDigits：</strong> 指定小數部分的最大位數，如果超過會進行四捨五入。</li>
+<li><strong>minimumSignificantDigits：</strong> 指定有效數字的最小位數。</li>
+<li><strong>maximumSignificantDigits：</strong> 指定有效數字的最大位數。</li>
+</ul>
+<h3 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h3><p>接下來底下我也條列一下每一個選項的範例：</p>
+<h4 id="style"><a href="#style" class="headerlink" title="style"></a>style</h4><p>要把數字用什麼來格式化：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// decimal (預設)</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;decimal&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234567.89</span>);</span><br><span class="line"><span class="comment">// &quot;1,234,567.89&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// currency</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;TWD&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234567.89</span>);</span><br><span class="line"><span class="comment">// &quot;$1,234,567.89&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// percent</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;percent&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">0.123</span>);</span><br><span class="line"><span class="comment">// &quot;12%&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="currency"><a href="#currency" class="headerlink" title="currency"></a>currency</h4><p>當 <code>style: &#39;currency&#39;</code> 時，指定是哪一種貨幣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234.5</span>);</span><br><span class="line"><span class="comment">// &quot;US$1,234.50&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;JPY&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234.5</span>);</span><br><span class="line"><span class="comment">// &quot;¥1,235&quot;  （沒有小數，因為日圓沒有小數位）</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;EUR&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234.5</span>);</span><br><span class="line"><span class="comment">// &quot;€1,234.50&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="currencyDisplay"><a href="#currencyDisplay" class="headerlink" title="currencyDisplay"></a>currencyDisplay</h4><p>決定貨幣怎麼顯示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// symbol (預設)</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span>, <span class="attr">currencyDisplay</span>: <span class="string">&#x27;symbol&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234</span>);</span><br><span class="line"><span class="comment">// &quot;US$1,234.00&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// code</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span>, <span class="attr">currencyDisplay</span>: <span class="string">&#x27;code&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234</span>);</span><br><span class="line"><span class="comment">// &quot;USD 1,234.00&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// name</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span>, <span class="attr">currencyDisplay</span>: <span class="string">&#x27;name&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234</span>);</span><br><span class="line"><span class="comment">// &quot;1,234.00 美元&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// narrowSymbol (某些幣種會省略國碼)</span></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">style</span>: <span class="string">&#x27;currency&#x27;</span>, <span class="attr">currency</span>: <span class="string">&#x27;USD&#x27;</span>, <span class="attr">currencyDisplay</span>: <span class="string">&#x27;narrowSymbol&#x27;</span> &#125;).<span class="title function_">format</span>(<span class="number">1234</span>);</span><br><span class="line"><span class="comment">// &quot;$1,234.00&quot;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>不同瀏覽器 &#x2F; Node.js 版本 &#x2F; ICU 資料 會影響結果。如果想要保證輸出 NT$，可以額外指定 currencyDisplay: ‘narrowSymbol’ 或手動處理。</p>
+</blockquote>
+<h4 id="minimumIntegerDigits"><a href="#minimumIntegerDigits" class="headerlink" title="minimumIntegerDigits"></a>minimumIntegerDigits</h4><p>設定整數部分至少幾位，不足補 0：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumIntegerDigits</span>: <span class="number">3</span> &#125;).<span class="title function_">format</span>(<span class="number">7</span>);</span><br><span class="line"><span class="comment">// &quot;007&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumIntegerDigits</span>: <span class="number">5</span> &#125;).<span class="title function_">format</span>(<span class="number">123</span>);</span><br><span class="line"><span class="comment">// &quot;00123&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="minimumFractionDigits"><a href="#minimumFractionDigits" class="headerlink" title="minimumFractionDigits"></a>minimumFractionDigits</h4><p>小數部分最少顯示幾位：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumFractionDigits</span>: <span class="number">2</span> &#125;).<span class="title function_">format</span>(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// &quot;5.00&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumFractionDigits</span>: <span class="number">4</span> &#125;).<span class="title function_">format</span>(<span class="number">5.1</span>);</span><br><span class="line"><span class="comment">// &quot;5.1000&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="maximumFractionDigits"><a href="#maximumFractionDigits" class="headerlink" title="maximumFractionDigits"></a>maximumFractionDigits</h4><p>小數部分最多顯示幾位（多的會四捨五入）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">maximumFractionDigits</span>: <span class="number">2</span> &#125;).<span class="title function_">format</span>(<span class="number">5.6789</span>);</span><br><span class="line"><span class="comment">// &quot;5.68&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">maximumFractionDigits</span>: <span class="number">0</span> &#125;).<span class="title function_">format</span>(<span class="number">5.9</span>);</span><br><span class="line"><span class="comment">// &quot;6&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="minimumSignificantDigits"><a href="#minimumSignificantDigits" class="headerlink" title="minimumSignificantDigits"></a>minimumSignificantDigits</h4><p>有效數字最少幾位，不足補 0：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumSignificantDigits</span>: <span class="number">3</span> &#125;).<span class="title function_">format</span>(<span class="number">7</span>);</span><br><span class="line"><span class="comment">// &quot;7.00&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">minimumSignificantDigits</span>: <span class="number">5</span> &#125;).<span class="title function_">format</span>(<span class="number">123</span>);</span><br><span class="line"><span class="comment">// &quot;123.00&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="maximumSignificantDigits"><a href="#maximumSignificantDigits" class="headerlink" title="maximumSignificantDigits"></a>maximumSignificantDigits</h4><p>有效數字最多多少位，多的會四捨五入。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">maximumSignificantDigits</span>: <span class="number">3</span> &#125;).<span class="title function_">format</span>(<span class="number">12345</span>);</span><br><span class="line"><span class="comment">// &quot;12300&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Intl</span>.<span class="title class_">NumberFormat</span>(<span class="string">&#x27;zh-TW&#x27;</span>, &#123; <span class="attr">maximumSignificantDigits</span>: <span class="number">4</span> &#125;).<span class="title function_">format</span>(<span class="number">0.0012345</span>);</span><br><span class="line"><span class="comment">// &quot;0.001235&quot;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/%E5%8D%83%E5%88%86%E4%BD%8D/" rel="tag"># 千分位</a>
+              <a href="/tags/%E8%B2%A8%E5%B9%A3/" rel="tag"># 貨幣</a>
+              <a href="/tags/Intl-NumberFormat/" rel="tag"># Intl.NumberFormat</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250918/2508084667/" rel="prev" title="【Day 18】A 原來是 65？我終於搞懂 ASCII 跟 bit 是什麼了！">
+                  <i class="fa fa-angle-left"></i> 【Day 18】A 原來是 65？我終於搞懂 ASCII 跟 bit 是什麼了！
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250919/1115708242/" rel="next" title="【Day 19】從 ASCII 到 Unicode——文字編碼全面升級">
+                  【Day 19】從 ASCII 到 Unicode——文字編碼全面升級 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

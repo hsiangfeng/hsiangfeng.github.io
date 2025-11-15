@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/favicon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.css" integrity="sha256-vQkngPS8jiHHH0I6ABTZroZk8NPZ7b+MUReOFE9UsXQ=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"israynotarray.com","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":800},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"${hits} 找到 ${time} 個結果","hits":"找到 ${hits} 個結果"},"algolia":{"appID":"MU7N4K4R36","apiKey":"110ed15d0a4842310bafc6fdfda119c4","indexName":"blog","hits":{"per_page":10}}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="JS 的參考像安全剪刀，C 的指標是武士刀！用幾個超短範例看懂位址、取址、解參考與型別不相容，避免一招砍爆程式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Day 22】C 語言直接讓我放棄的記憶體指標">
+<meta property="og:url" content="https://israynotarray.com/learnexp/20250922/1627669152/index.html">
+<meta property="og:site_name" content="是 Ray 不是 Array">
+<meta property="og:description" content="JS 的參考像安全剪刀，C 的指標是武士刀！用幾個超短範例看懂位址、取址、解參考與型別不相容，避免一招砍爆程式。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday21%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_32_23.png?alt=media&token=c0cf1d58-27ec-4b09-88e8-a8c53355f5a9">
+<meta property="og:image" content="https://media.tenor.com/yMQCwh-hwwkAAAAM/%E8%9B%A4.gif">
+<meta property="article:published_time" content="2025-09-21T16:00:01.000Z">
+<meta property="article:modified_time" content="2025-09-21T16:00:01.000Z">
+<meta property="article:author" content="Ray">
+<meta property="article:tag" content="Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路">
+<meta property="article:tag" content="C 語言指標教學">
+<meta property="article:tag" content="記憶體位址操作">
+<meta property="article:tag" content="程式設計學習困難">
+<meta property="article:tag" content="期中考程式題目">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday21%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_32_23.png?alt=media&token=c0cf1d58-27ec-4b09-88e8-a8c53355f5a9">
+
+
+<link rel="canonical" href="https://israynotarray.com/learnexp/20250922/1627669152/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://israynotarray.com/learnexp/20250922/1627669152/","path":"learnexp/20250922/1627669152/","title":"【Day 22】C 語言直接讓我放棄的記憶體指標"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【Day 22】C 語言直接讓我放棄的記憶體指標 | 是 Ray 不是 Array</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-FC8R6QFRC3","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "h46z900dov");
+</script>
+
+
+
+<style>
+  .message-block {
+    color: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      const ads = document.querySelector('ins.adsbygoogle');
+      if(!ads.getAttribute('data-adsbygoogle-status')) {
+        console.clear();
+        console.log(`
+        ██████╗██╗  ██╗    ███╗   ██╗██████╗     ██╗
+        ██╔═══████║  ██║    ████╗  ████╔═══██╗    ██║
+        ██║   █████████║    ██╔██╗ ████║   ██║    ██║
+        ██║   ████╔══██║    ██║╚██╗████║   ██║    ╚═╝
+        ╚██████╔██║  ██║    ██║ ╚████╚██████╔╝    ██╗
+        ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═══╝╚═════╝     ╚═╝
+        `);
+        console.warn('RRRRヽ(*・ω・)ﾉ 廣告被阻擋了');
+        console.warn('你都能發現這個彩蛋了，求你關閉 Adblock (廣告阻擋器) 支持我 ┭┮﹏┭┮')
+        document.querySelector('.message-block').style.display = 'flex';
+      } else {
+        console.clear();
+        console.info('你發現了這個毫無意義的彩蛋！但是我非常感謝你關閉 Adblock (廣告阻擋器) ㄟ(≧◇≦)ㄏ');
+        console.info('因為你關閉 Adblock 也代表你支持我 (((o(*ﾟ▽ﾟ*)o)))')
+        console.info('底下我也給你佛祖保佑的圖片，祝你開發順利 (๑•̀ㅂ•́)و✧')
+        console.info(`
+                             _oo0oo_
+                            o8888888o
+                            88" . "88
+                            (| -_- |)
+                            0\  =  /0
+                          ___/'---'\___
+                        .' \||     ||/ '.
+                        / \||||  :  ||||/ |
+                      | _||||| -:- |||||- |
+                      |   | \|\  -  /|/ |   |
+                      | \_|  ''\---/''  |_/ |
+                      |  .-\__  '-'  ___/-. |
+                    ___'. .'  /--.--\  '. .'___
+                ."" '<  '.___\_<|>_/___.' >' "".
+                | | :  '- \'.;'\ _ /';.'/ - ' : | |
+                |  | '_.   \_ __\ /__ _/   .-' |  |
+            ====='-.____'.___ \_____/___.-'___.-'=====
+                              '=---='
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+                          佛祖保佑，永無 BUG
+                          薪水增多，財富自由
+        `)
+      }
+
+      function unregister() {
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (let registration of registrations) {
+                      registration.unregister();
+                  }
+              });
+          }
+      }
+
+      unregister();
+    }, 5000)
+    
+  }
+</script>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">是 Ray 不是 Array</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome.Web.World <br/> 歡迎來到網路世界</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a></li><li class="menu-item menu-item-更多"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>更多</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container">
+  <div class="algolia-stats"><hr></div>
+  <div class="algolia-hits"></div>
+  <div class="algolia-pagination"></div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%93%E6%88%91%E6%94%BE%E6%A3%84%E7%9A%84%E8%A8%98%E6%86%B6%E9%AB%94%E6%8C%87%E6%A8%99"><span class="nav-number">1.</span> <span class="nav-text">讓我放棄的記憶體指標</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94%E6%8C%87%E6%A8%99%E8%88%87%E4%BD%8D%E5%9D%80"><span class="nav-number">2.</span> <span class="nav-text">記憶體指標與位址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">3.</span> <span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0"><span class="nav-number">4.</span> <span class="nav-text">同步更新</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Ray"
+      src="/images/octocat.jpg">
+  <p class="site-author-name" itemprop="name">Ray</p>
+  <div class="site-description" itemprop="description">👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">978</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">840</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.buymeacoffee.com/israynotarray" title="BuyCoffee → https:&#x2F;&#x2F;www.buymeacoffee.com&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fa-solid fa-money-bill fa-fw"></i>BuyCoffee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://portaly.cc/israynotarray" title="Portaly → https:&#x2F;&#x2F;portaly.cc&#x2F;israynotarray" rel="noopener me" target="_blank"><i class="fas fa-link fa-fw"></i>Portaly</a>
+      </span>
+  </div>
+<div style="color: var(--text-color); width: 100%;">
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 300px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_slider -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="8042789820"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://israynotarray.com/learnexp/20250922/1627669152/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/octocat.jpg">
+      <meta itemprop="name" content="Ray">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="是 Ray 不是 Array">
+      <meta itemprop="description" content="👨‍💻F2E-Front End Engineer <br/> 歡迎來到網頁世界">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【Day 22】C 語言直接讓我放棄的記憶體指標 | 是 Ray 不是 Array">
+      <meta itemprop="description" content="JS 的參考像安全剪刀，C 的指標是武士刀！用幾個超短範例看懂位址、取址、解參考與型別不相容，避免一招砍爆程式。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Day 22】C 語言直接讓我放棄的記憶體指標
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2025-09-22 00:00:01" itemprop="dateCreated datePublished" datetime="2025-09-22T00:00:01+08:00">2025-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/learnexp/" itemprop="url" rel="index"><span itemprop="name">學習經驗</span></a>
+        </span>
+    </span>
+
+  
+
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_postheader -->
+    <ins
+      class="adsbygoogle"
+      style="display:block; height: 90px; width: 100%;font-size: 1rem;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="2208469553"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+            <div class="post-description">JS 的參考像安全剪刀，C 的指標是武士刀！用幾個超短範例看懂位址、取址、解參考與型別不相容，避免一招砍爆程式。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Flearnexp%2Fithelp-2025%2Fday21%2FChatGPT%20Image%202025%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8809_32_23.png?alt=media&token=c0cf1d58-27ec-4b09-88e8-a8c53355f5a9" alt="C 語言直接讓我放棄的記憶體指標"></p>
+<h2 id="讓我放棄的記憶體指標"><a href="#讓我放棄的記憶體指標" class="headerlink" title="讓我放棄的記憶體指標"></a>讓我放棄的記憶體指標</h2><p>在學習 C 語言的過程中， <code>if</code>、<code>for</code>、<code>while</code> 這些流程控制語法對我來說不算難，因為曾經寫過遊戲腳本，邏輯其實很接近。原以為自己算是挺聰明的，沒想到一個指標就讓我瞬間從天堂墜落，還沒真正起飛就直接殞落。</p>
+<p>「前面的各種流程判斷，大家應該都沒問題吧？」老師環顧教室，語氣平淡地問。</p>
+<p>教室裡一片寂靜，只有鍵盤敲擊聲零星響起。這種場景在電腦課上很常見，因為大多數人其實都在偷偷打自己的遊戲。</p>
+<p>「期中考的時候，會有幾題是關於指標的題目喔！」老師接著補了一句。</p>
+<p>「蛤？？？」我心裡只冒出這一個字，毫無懸念。</p>
+<p><img src="https://media.tenor.com/yMQCwh-hwwkAAAAM/%E8%9B%A4.gif" alt="蛤（圖源 tenor）"></p>
+<p>「說明指標之前，我們先來複習一下上週的變數內容，因為變數和指標有一定的關聯……」老師站在講台上開始解說。</p>
+<p>聽到「期中考會考指標」這句話，我整個人瞬間慌了，心裡只冒出一句：</p>
+<p>「糟了，這下電腦課會不會被當啊？」</p>
+<p>我完全搞不懂指標到底是什麼，只好偷偷戳一下旁邊那個跟我一起打《魔獸爭霸》的同學。</p>
+<p>他頭也不抬，還在操作英雄放技能，淡淡回一句：「怕屁，不會啦，繼續打《信長》啦！」</p>
+<p>我愣了三秒，覺得這傢伙比城牆還穩。</p>
+<p>結果……我就真的放下焦慮，繼續操滑鼠跟著衝鋒陷陣，彷彿期中考根本不存在。</p>
+<p>但你各位知道嗎？</p>
+<p>讀書時期總有一種人特別討厭 —— 每次都嘴上說不會讀、不會看，結果一到考試就穩穩拿下班上前三名。</p>
+<p>同學（攤手）：「啊～這次我都沒看啦，一定會考爛。」<br>我（心想）：「呵，這次總算有機會贏他了！」</p>
+<p>考卷發下來 ——<br>同學：✨滿分✨<br>我：……</p>
+<p>老師（盯著我）：「你，下課後記得來補考。」<br>我：Σ(°△°|||)</p>
+<p>同學：😎「早就說不會啊。」<br>我：Orz</p>
+<h2 id="記憶體指標與位址"><a href="#記憶體指標與位址" class="headerlink" title="記憶體指標與位址"></a>記憶體指標與位址</h2><p>在電腦世界中，不管你宣告的是函式、變數，還是陣列，它們最後都會被存放在記憶體裡，而每一個存放的位置都有一個唯一的「位址」，C 語言中的指標，正是用來存取和操作這些位址的工具。</p>
+<p>那麼，該怎麼查看變數的位址呢？其實非常簡單 —— 只要在變數前加上 <code>&amp;</code> 符號即可，這個稱之為<strong>取址運算子（Address-of Operator）</strong>，透過它，我們就能直接取得變數在記憶體中的位址。</p>
+<p>底下就讓我們看一個非常簡單的範例，來認識一下指標的基本概念：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>; <span class="comment">// 宣告一個整數變數 a 並賦值為 10</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出 a 的值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;a 的位址是: %p\n&quot;</span>, &amp;a); <span class="comment">// 輸出 a 的位址</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br><code>%p</code> 用來印出記憶體位址，通常會顯示成十六進位數字。<br>最嚴謹的寫法是 <code>(void*)&amp;a</code><br><code>printf(&quot;a 的位址是: %p\n&quot;, (void*)&amp;a);</code><br>不過大部分情況下 <code>&amp;a</code> 也能正常印出。</p>
+</blockquote>
+<p>執行之後，你可能會看到以下訊息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a 的值是: 10</span><br><span class="line">a 的位址是: 0x16dd6eac8</span><br></pre></td></tr></table></figure>
+
+<p>這裡的 <code>0x16dd6eac8</code> 就是變數 <code>a</code> 在記憶體中的位址，順帶一提，你看到的位址不一定跟我一樣，因為每次程式跑的時候，記憶體分配都可能不一樣喔！</p>
+<p>對前面讀過二進位或十六進位的朋友來說， <code>0x16dd6eac8</code> 應該不陌生，需要注意的是，這並不是說記憶體真的用十六進位存，而是因為<strong>位址本質上是一個數字</strong>，只是用十六進位表示會比較精簡，因此通常會以十六進位來顯示。</p>
+<p>那麼為什麼要理解指標呢？</p>
+<p>因為指標可以讓我們直接操作記憶體中的位址，舉例來講，我們可以將 <code>a</code> 的位址存放到一個指標變數中，這樣我們就可以透過這個指標來存取 <code>a</code> 的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>; <span class="comment">// 宣告一個整數變數 a 並賦值為 10</span></span><br><span class="line">    <span class="type">int</span> *p = &amp;a; <span class="comment">// 宣告一個指標變數 p，並將 a 的位址存放到 p 中</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出 a 的值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;a 的位址是: %p\n&quot;</span>, &amp;a); <span class="comment">// 輸出 a 的位址</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;p 指向的位址是: %p\n&quot;</span>, p); <span class="comment">// 輸出 p 指向的位址</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;p 指向的值是: %d\n&quot;</span>, *p); <span class="comment">// 使用解引用運算子 (*) 取得 p 指向的值</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>執行之後，你可能會看到以下訊息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a 的值是: 10</span><br><span class="line">a 的位址是: 0x16f0c6ac8</span><br><span class="line">p 指向的位址是: 0x16f0c6ac8</span><br><span class="line">p 指向的值是: 10</span><br></pre></td></tr></table></figure>
+
+<p>這代表什麼意思呢？我們可以直接修改 <code>p</code> 指向的值，這樣就可以間接地修改 <code>a</code> 的值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>; <span class="comment">// 宣告一個整數變數 a 並賦值為 10</span></span><br><span class="line">    <span class="type">int</span> *p = &amp;a; <span class="comment">// 宣告一個指標變數 p，並將 a 的位址存放到 p 中</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;修改前 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改前 a 的值</span></span><br><span class="line">    *p = <span class="number">20</span>; <span class="comment">// 使用解引用運算子修改 p 指向的值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;修改後 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改後 a 的值</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接著執行之後，你就會看到以下訊息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">修改前 a 的值是: 10</span><br><span class="line">修改後 a 的值是: 20</span><br></pre></td></tr></table></figure>
+
+<p>這樣我們就成功地透過指標修改了 <code>a</code> 的值。</p>
+<p>如果你是 JavaScript 開發者，應該會覺得「欸，這不就跟物件、陣列的參考差不多嗎？」沒錯，概念上有點像。</p>
+<p>差別在於 —— JS 的參考就像小朋友用安全剪刀，最多剪不直；但 C 的指標是直接給你一把武士刀，你一不小心就可能把程式砍爆，所以阿，指標很強大，但用起來真的要非常小心。</p>
+<p>這裡要特別注意一點，在 C 語言中，如果要作為指標使用，必須要先宣告一個指標變數，並且使用 <code>*</code> 符號來表示這是一個指標類型的變數，這也是前面尚未提到的重要部分。</p>
+<p>接著你可能會好奇：</p>
+<p>「如果我沒有使用 <code>*</code> 與 <code>&amp;</code> 符號，會發生什麼事情呢？」</p>
+<p>很好的問題，我們不如來實驗看看比較快：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>; <span class="comment">// 宣告一個整數變數 a 並賦值為 10</span></span><br><span class="line">    <span class="type">int</span> p = a; <span class="comment">// 宣告一個整數變數 p，並將 a 的值賦給 p</span></span><br><span class="line"></span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">&quot;修改前 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改前 a 的值</span></span><br><span class="line">    p = <span class="number">20</span>; <span class="comment">// 嘗試修改 p 的值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;修改後 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改後 a 的值</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基本上你會看到以下訊息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">修改前 a 的值是: 10</span><br><span class="line">修改後 a 的值是: 10</span><br></pre></td></tr></table></figure>
+
+<p>因為我們是將 <code>a</code> 的值也就是 <code>10</code> 賦值給 <code>p</code>，所以當我們修改 <code>p</code> 的值時，並不會影響到 <code>a</code> 的值。</p>
+<p>那如果將 <code>a</code> 的位址賦值給 <code>p</code>，然後再修改 <code>p</code> 的值，會發生什麼事情呢？我們來試試看：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">10</span>; <span class="comment">// 宣告一個整數變數 a 並賦值為 10</span></span><br><span class="line">    <span class="type">int</span> p = &amp;a; <span class="comment">// 宣告一個整數變數 p，並將 a 的位址賦給 p</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;修改前 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改前 a 的值</span></span><br><span class="line">    p = <span class="number">20</span>; <span class="comment">// 嘗試修改 p 的值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;修改後 a 的值是: %d\n&quot;</span>, a); <span class="comment">// 輸出修改後 a 的值</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不出意外的話，現在就會看到錯誤訊息了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">main.c:4:9: error: incompatible pointer to integer conversion initializing &#x27;int&#x27; with an expression of type &#x27;int *&#x27;; remove &amp; [-Wint-conversion]</span><br><span class="line">    4 |     int p = &amp;a; // 宣告一個整數變數 p，並將 a 的位址賦給 p</span><br><span class="line">      |         ^   ~~</span><br><span class="line">1 error generated.</span><br></pre></td></tr></table></figure>
+
+<p>這是因為位址必須要使用指標類型的變數來存放，而我們在這裡使用了 <code>int</code> 類型的變數 <code>p</code>，因為指標是一種特殊的型別，不同於整數，所以必須用 <code>int *p</code> 來宣告。</p>
+<p>是不是感覺滿有趣的（並沒有）？</p>
+<p>指標對我來說，就像 C 語言裡的 Final Boss。<br>問題是……我還沒練滿等級，連裝備都沒齊，就直接衝進去挑戰，結果當然是被一招秒殺。<br>那一刻我只能心裡默念：「Game Over… QQ」</p>
+<p>由此可知，沒天分沒關係，上課還是要認真聽課，打不贏魔王沒差，至少別被路邊的史萊姆打爆。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>不知道大家以前在學時期有沒有那種不讀書也能考高分的同學？</p>
+<p>還是說你就是那個同學呢？</p>
+<h2 id="同步更新"><a href="#同步更新" class="headerlink" title="同步更新"></a>同步更新</h2><p>本文將同步更新至以下網站：</p>
+<ul>
+<li><a href="https://israynotarray.com/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/">是 Ray 不是 Array</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/users/20119486/ironman/8232">Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路（佛心分享-IT 人自學之術）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.threads.com/@isray_notarray">Threads - 時常會聊軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.facebook.com/israynotarray">Facebook - 搞怪迷因分享</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.instagram.com/israynotarray/">Instagram - 搞怪迷因分享 + 軟實力</a></li>
+<li><a target="_blank" rel="noopener" href="https://portaly.cc/israynotarray">Portaly - 入口主頁</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div style="color: var(--text-color);">
+  <h4>
+    <i class="fas fa-heart"></i>
+    請我喝一杯咖啡
+  </h4>
+  <div style="color: var(--text-color); border: 5px var(--text-color) dashed;padding: 20px;font-size: 14px;">
+    這篇筆記文章如果對你有幫助，
+    <br />
+    你可以也可以請我「喝一杯咖啡(Donate)」。
+    <br /><br />
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+      </a>
+      ｜
+      <a href="https://portaly.cc/israynotarray/support" target="_blank" style="text-decoration: none !important;border: 0px !important;">
+        <img src="/images/logo.b91a6dbf.webp" alt="Buy Me A Coffee" style="height: 50px !important;background: #fff !important;border-radius: 5px !important;padding: 10px !important;" >
+      </a>
+    </div>
+  </div>
+</div>
+<div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; width: 100%; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color); font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_post_end -->
+    <ins
+      class="adsbygoogle"
+      style="display:block;height: 90px; width: 100%;"
+      data-ad-client="ca-pub-4319471747130190"
+      data-ad-slot="3804716479"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Code-Review-%E6%88%91%E7%9A%84%E9%9D%92%E6%98%A5%EF%BC%9A%E5%BE%9E%E3%80%8E%E5%97%B6%E3%80%8F%E8%81%B2%E9%96%8B%E5%95%9F%E6%88%91%E7%9A%84%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB%E4%B9%8B%E8%B7%AF/" rel="tag"># Code Review 我的青春：從『嗶』聲開啟我的軟體工程師之路</a>
+              <a href="/tags/C-%E8%AA%9E%E8%A8%80%E6%8C%87%E6%A8%99%E6%95%99%E5%AD%B8/" rel="tag"># C 語言指標教學</a>
+              <a href="/tags/%E8%A8%98%E6%86%B6%E9%AB%94%E4%BD%8D%E5%9D%80%E6%93%8D%E4%BD%9C/" rel="tag"># 記憶體位址操作</a>
+              <a href="/tags/%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%E5%AD%B8%E7%BF%92%E5%9B%B0%E9%9B%A3/" rel="tag"># 程式設計學習困難</a>
+              <a href="/tags/%E6%9C%9F%E4%B8%AD%E8%80%83%E7%A8%8B%E5%BC%8F%E9%A1%8C%E7%9B%AE/" rel="tag"># 期中考程式題目</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/learnexp/20250921/4248331961/" rel="prev" title="【Day 21】我的第一個 C 語言體驗之旅">
+                  <i class="fa fa-angle-left"></i> 【Day 21】我的第一個 C 語言體驗之旅
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/learnexp/20250923/2062222122/" rel="next" title="【Day 23】PHP？蛤？一隻大象？">
+                  【Day 23】PHP？蛤？一隻大象？ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ray - 轉載文章時請附上作者(Ray)及原文連結(Url)。</span>
+  </div><div style="color: var(--text-color); width: 100%;">
+  <div>
+    <h4>
+      <i class="fab fa-google"></i>
+      Google AD
+    </h4>
+  </div>
+  <div
+    style="height: 90px; border: 5px var(--text-color) dashed;">
+    <div class="message-block">
+      <p style="color: var(--text-color);  font-size: 0.75rem;margin: 0;">
+        撰寫一篇文章其實真的很花時間，如果你願意<strong>「關閉 Adblock (廣告阻擋器)」</strong>來支持我的話，我會非常感謝你 ヽ(・∀・)ﾉ
+      </p>
+    </div>
+    <!-- hsiangfeng_bodyend -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-4319471747130190"
+        data-ad-slot="5395046960"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="israynotarray" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/hsiangfeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.24/fancybox/fancybox.umd.js" integrity="sha256-oyhjPiYRWGXaAt+ny/mTMWOnN1GBoZDUQnzzgC7FRI4=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/algoliasearch/4.20.0/algoliasearch-lite.umd.js" integrity="sha256-DABVk+hYj0mdUzo+7ViJC6cwLahQIejFvC+my2M/wfM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/instantsearch.js/4.57.0/instantsearch.production.min.js" integrity="sha256-foJtB+Wd0wvvK+VU3KO0/H6CjwSwJfB1RnWlgx0Ov9U=" crossorigin="anonymous"></script><script src="/js/third-party/search/algolia-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"hsiangfeng/hsiangfeng.github.io","issue_term":"pathname","theme":"github-dark"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>
