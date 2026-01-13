@@ -1,0 +1,1329 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/other/20250513/3343643828/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定">
+  <meta property="og:url" content="https://israynotarray.com/other/20250513/3343643828/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&amp;token=5443e485-61da-4d65-9c8e-ef21aaa4cdca">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2025-05-13T13:47:04.000Z">
+    
+      <meta property="article:modified_time" content="2025-05-13T13:47:04.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="雜談">
+      
+    
+    
+      
+        <meta property="article:tag" content="API">
+      
+        <meta property="article:tag" content="Postman">
+      
+        <meta property="article:tag" content="curl">
+      
+        <meta property="article:tag" content="測試">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定">
+  <meta name="twitter:description" content="有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&amp;token=5443e485-61da-4d65-9c8e-ef21aaa4cdca">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定","url":"https://israynotarray.com/other/20250513/3343643828/","datePublished":"2025-05-13T13:47:04.000Z","dateModified":"2025-05-13T13:47:04.000Z","description":"有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 curl 來測試 API。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&token=5443e485-61da-4d65-9c8e-ef21aaa4cdca","articleSection":["雜談"],"keywords":"API, Postman, curl, 測試"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"雜談","item":"https://israynotarray.com/categories/other/"},{"@type":"ListItem","position":3,"name":"不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定","item":"https://israynotarray.com/other/20250513/3343643828/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C3b4V56V.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <!-- data-cfasync="false" prevents Cloudflare Rocket Loader from interfering -->
+    <script async data-cfasync="false" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        <div class="flex flex-col items-center lg:items-start space-y-8">
+  <!-- Avatar -->
+  <div class="relative group">
+    <a href="/">
+      <img src="/images/octocat.webp" alt="Ray" class="w-32 h-32 rounded-full border-4 border-primary-100 dark:border-primary-900 shadow-md object-cover transition-all duration-300 group-hover:shadow-xl group-hover:scale-105">
+    </a>
+  </div>
+
+  <!-- Bio -->
+  <div class="text-center lg:text-left w-full space-y-4">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white leading-tight">是 Ray 不是 Array</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">I'm a Software Engineer, and blogger.</p>
+    
+    <!-- Personal Tags -->
+    
+      <div class="flex flex-wrap justify-center lg:justify-start gap-2 pt-2">
+        
+        
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+            <i class="bi bi-code-slash mr-1.5"></i> F2E Engineer
+          </span>
+        
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+            <i class="bi bi-cup-hot-fill mr-1.5"></i> Coffee Powered
+          </span>
+        
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
+            <i class="bi bi-bug-fill mr-1.5"></i> Bug Hunter
+          </span>
+        
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+            <i class="bi bi-pen-fill mr-1.5"></i> 900+ Articles
+          </span>
+        
+      </div>
+    
+
+    <!-- Random Quote -->
+    <div class="mt-6 p-4 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+      <p id="random-quote" class="text-xs leading-loose text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 2;">
+        Loading...
+      </p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="w-full pt-4">
+    <ul class="space-y-1">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-house-fill w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-tags-fill w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-grid-fill w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-archive-fill w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-rss-fill w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+            <i class="bi bi-link-45deg w-6 text-center mr-3 text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+            <span class="font-medium">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Social Links -->
+  <div class="w-full pt-4 space-y-1">
+    
+      
+      
+      <a href="https://www.buymeacoffee.com/israynotarray" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         class="flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <i class="bi bi-cash-coin w-6 text-center text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium">Buy Me a Coffee</div>
+            
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">給 Ray 一杯咖啡 ☕</div>
+            
+          </div>
+        </div>
+        <i class="bi bi-box-arrow-up-right text-xs text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
+      </a>
+    
+      
+      
+      <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         class="flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <i class="bi bi-line w-6 text-center text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium">LINE 貼圖</div>
+            
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">我的 LINE 貼圖 🧩</div>
+            
+          </div>
+        </div>
+        <i class="bi bi-box-arrow-up-right text-xs text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
+      </a>
+    
+      
+      
+      <a href="https://portaly.cc/israynotarray" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         class="flex items-center justify-between px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <i class="bi bi-link-45deg w-6 text-center text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium">Portaly</div>
+            
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">更多關於我的連結 🔗</div>
+            
+          </div>
+        </div>
+        <i class="bi bi-box-arrow-up-right text-xs text-gray-400 dark:text-gray-500 flex-shrink-0"></i>
+      </a>
+    
+  </div>
+
+  <!-- Dark Mode Toggle -->
+  <button id="theme-toggle" class="mt-4 flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 w-full transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-3">
+      <i class="bi bi-moon-stars-fill text-gray-600 dark:text-gray-400 transition-colors"></i>
+      <span class="font-medium text-gray-700 dark:text-gray-300">Dark Mode</span>
+    </div>
+    
+    <!-- Switch Toggle (Visual Indicator Only) -->
+    <span class="theme-switch pointer-events-none">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<script>
+  {
+    // Random Quote System - Load from theme configuration
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+    
+    // Use quotes from theme config, fallback to default if not available
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'Software and cathedrals are much the same — first we build them, then we pray.',
+      'Experience is the name everyone gives to their mistakes.',
+      'In order to understand recursion, one must first understand recursion.'
+    ];
+
+    // Get random quote
+    const quoteElement = document.getElementById('random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = randomQuote;
+    }
+  }
+</script>
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script data-cfasync="false">
+             (function() {
+               function initAd() {
+                 try {
+                   var adContainer = document.currentScript.parentElement.querySelector('.adsbygoogle');
+                   if (adContainer && adContainer.offsetWidth > 0) {
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                   }
+                 } catch (e) {}
+               }
+               if (document.readyState === 'loading') {
+                 document.addEventListener('DOMContentLoaded', initAd);
+               } else {
+                 initAd();
+               }
+             })();
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2025-05-13
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/other/" class="hover:text-primary-500 transition-colors">雜談</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/API/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #API
+            </a>
+          
+            <a href="/tags/Postman/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Postman
+            </a>
+          
+            <a href="/tags/curl/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #curl
+            </a>
+          
+            <a href="/tags/%E6%B8%AC%E8%A9%A6/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #測試
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2FChatGPT%20Image%202025%E5%B9%B45%E6%9C%8814%E6%97%A5%20%E4%B8%8B%E5%8D%8811_01_19.png?alt=media&token=5443e485-61da-4d65-9c8e-ef21aaa4cdca" alt="curl"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有時候我們開發上並不方便使用 Postman 來測試 API，但也不方便安裝其他工具，可能就剛好在伺服器上（伺服器基本上都是沒有 GUI 的），那這時候就可以使用 <code>curl</code> 來測試 API。</p>
+<h2 id="什麼是-curl"><a href="#什麼是-curl" class="headerlink" title="什麼是 curl"></a>什麼是 curl</h2><p>curl 全名為 <code>Client URL</code>，這是一套網路協定工具，支援非常多種形式，舉凡…FTP、FTPS、HTTP、HTTPS 等等，幾乎所有的網路協定都可以使用 curl 來進行測試。</p>
+<blockquote>
+<p><strong>Note</strong><br>有的人會說 <code>curl</code> 或者是 <code>cURL</code>，本篇統一稱為 <code>curl</code>。</p>
+</blockquote>
+<p>許多的工具其實都可以看到它的身影，這邊舉例六角學院所提供的 <a target="_blank" rel="noopener" href="https://hexschool.github.io/ec-courses-api-swaggerDoc/#/">Swagger API 文件</a></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214238.png?alt=media&token=bab1ed74-f4f3-4a0f-a345-d1e9a2b4032a" alt="Swagger API 測試工具"></p>
+<p>底下可以看到有一段：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X <span class="hljs-string">&#x27;POST&#x27;</span> \<br>  <span class="hljs-string">&#x27;https://ec-course-api.hexschool.io/v2/admin/signin&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;accept: application/json&#x27;</span> \<br>  -H <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;username&quot;: &quot;example@test.com&quot;,</span><br><span class="hljs-string">  &quot;password&quot;: &quot;example&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>這段可以直接複製貼上到終端機使用</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214527.png?alt=media&token=35567200-58f3-4c4b-8cd3-449ac548930c" alt="終端機"></p>
+<p>還有哪些地方可以看到它的身影呢？像是 <a href="https://israynotarray.com/other/20211207/427026/">Postman</a> 這個 API 測試工具，當你在 Postman 測試完 API 後，點擊 <code>Code</code> 按鈕，就可以看到 curl 的語法了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514214815.png?alt=media&token=177a1f18-8a6d-4832-966c-42c0085cf346" alt="Postman"></p>
+<p>所以接下來我們就來認識一下 curl 該如何使用吧！</p>
+<h2 id="curl-語法"><a href="#curl-語法" class="headerlink" title="curl 語法"></a>curl 語法</h2><p>curl 的語法非常的簡單，如果你只是測試 GET API 的話，基本上只要這一行就可以了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl [URL]<br></code></pre></td></tr></table></figure>
+
+<p>但實際上使用我們會需要傳遞一些參數，像是：</p>
+<ul>
+<li>Post、Get、Put、Delete 等等的 HTTP 方法</li>
+<li>Header 參數</li>
+<li>Body 參數</li>
+<li>其他的參數</li>
+</ul>
+<p>所以通常 <code>curl</code> 的語法會是這樣的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl [options] [URL]<br></code></pre></td></tr></table></figure>
+
+<p>這邊的 <code>options</code> 就是我們要傳遞的參數，<code>URL</code> 就是我們要測試的網址，參數部分不用擔心，我們後面會用 CRUD 來介紹一輪。</p>
+<p>那我這邊將會使用六角學院所提供的課程練習用 TodoList API 作為範例，API Path 是 <code>https://todolist-api.hexschool.io/</code>，這邊的 API 文件可以參考 <a target="_blank" rel="noopener" href="https://todolist-api.hexschool.io/doc/">這裡</a>。</p>
+<blockquote>
+<p><strong>Note</strong><br>由於這是課程練習用，所以資料會在每日凌晨 1:15 清除。</p>
+</blockquote>
+<h3 id="註冊帳號（POST-users-sign-up）"><a href="#註冊帳號（POST-users-sign-up）" class="headerlink" title="註冊帳號（POST &#x2F;users&#x2F;sign_up）"></a>註冊帳號（POST &#x2F;users&#x2F;sign_up）</h3><p>這邊我們會需要先註冊一個帳號，透過 API 文件我們可以知道註冊帳號需要傳遞那些參數</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example@gmail.com&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;password&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;nickname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>接著呢？我們該如何使用 curl 來呼叫這個 API 呢？</p>
+<p>我們這邊將會使用一個 <code>-X</code> 參數來指定 HTTP 方法，這邊的 <code>-X</code> 參數後面接著我們要使用的 HTTP 方法，這邊我們要使用 <code>POST</code> 方法，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X POST https://todolist-api.hexschool.io/users/sign_up<br></code></pre></td></tr></table></figure>
+
+<p>但這樣寫肯定太長，所以你可以把 <code>-X POST</code> 簡寫成 <code>-XPOST</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/users/sign_up<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請注意，必須要為大寫的 <code>X</code>，小寫的 <code>x</code> 會變成另一種模式，也就是 Proxy 模式。</p>
+</blockquote>
+<p>接著我們要告訴 Server 我們要傳遞的格式是一個 JSON 格式，這邊就要使用 <code>-H</code> 參數，這邊的 <code>-H</code> 參數後面接著我們要傳遞的 Header 參數，這邊我們要傳遞的 Header 參數是 <code>Content-Type: application/json</code>，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/users/sign_up -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>接著資料該如何傳遞呢？這邊我們可以使用 <code>-d</code> 參數來傳遞資料，這邊的 <code>-d</code> 參數後面接著我們要傳遞的資料，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/users/sign_up -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;email&quot;: &quot;example@gmail.com&quot;,</span><br><span class="hljs-string">  &quot;password&quot;: &quot;example&quot;,</span><br><span class="hljs-string">  &quot;nickname&quot;: &quot;example&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>接著你貼到終端機就會發現這個帳號註冊成功了</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220226.png?alt=media&token=1ff7156e-83c3-4e6c-8529-aa4ca059f8f8" alt="註冊成功"></p>
+<p>這邊也出個小功課，登入其實也是一樣的做法，但我這邊就不贅述了，登入的 API 是 <code>POST /users/sign_in</code>，傳遞的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example@gmail.com&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;password&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>登入成功的話，它會回傳一個 <code>token</code>，這個 <code>token</code> 是用來驗證你是否有權限使用這個 API 的，這邊讓你自己去試試看吧！</p>
+<details>
+<summary>點我看解答(請認真思考後再看解答)</summary>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/users/sign_in -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;email&quot;: &quot;example@gmail.com&quot;,</span><br><span class="hljs-string">  &quot;password&quot;: &quot;example&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+<h3 id="驗證-Token（GET-users-checkout）"><a href="#驗證-Token（GET-users-checkout）" class="headerlink" title="驗證 Token（GET &#x2F;users&#x2F;checkout）"></a>驗證 Token（GET &#x2F;users&#x2F;checkout）</h3><p>這隻 API 相對單純，因為只是一個 GET API，通常我們 GET API 並不會帶上資料，以文件來講，你要將登入之後回傳的 Token 放在 Header 裡面，然後名稱是 <code>Authorization</code>，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XGET https://todolist-api.hexschool.io/users/checkout -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> <span class="hljs-comment"># ← 請將 &#123;&#123; token &#125;&#125; 替換為實際取得的 JWT Token</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514220849.png?alt=media&token=7135ff13-53c1-4ad6-ba42-dcdc18ed7771" alt="驗證 Token"></p>
+<p>這邊的 <code>[Token]</code> 就是你登入成功後回傳的 Token，這邊你可以直接將它複製貼上到終端機上使用。</p>
+<p>這邊的 <code>-X</code> 其實是可以省略的，因為 <code>GET</code> 是預設的 HTTP 方法，所以我們可以這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://todolist-api.hexschool.io/users/checkout -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514221056.png?alt=media&token=06da7e46-a56b-4b5e-96d5-51bfdd7e8a47" alt="驗證 Token"></p>
+<p>這邊也額外補充一下，其實就連 <code>-XPOST</code> 也可以省略，因為 <code>curl</code> 如果偵測到有 <code>-d</code> 參數的話，會自動將 HTTP 方法改為 POST，所以我們可以這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://todolist-api.hexschool.io/todos -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;content&quot;: &quot;買晚餐&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="取得所有待辦事項（GET-todos）"><a href="#取得所有待辦事項（GET-todos）" class="headerlink" title="取得所有待辦事項（GET &#x2F;todos）"></a>取得所有待辦事項（GET &#x2F;todos）</h3><p>這邊我們要取得所有的待辦事項，這邊的 API 是 <code>GET /todos</code>，這邊的做法跟驗證 Token 一樣，我們只要將 Token 放在 Header 裡面就可以了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://todolist-api.hexschool.io/todos -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>是不是超簡單的呢？</p>
+<h3 id="新增待辦事項（POST-todos）"><a href="#新增待辦事項（POST-todos）" class="headerlink" title="新增待辦事項（POST &#x2F;todos）"></a>新增待辦事項（POST &#x2F;todos）</h3><p>這邊我們要新增一個待辦事項，這邊的 API 是 <code>POST /todos</code>，這邊的做法跟註冊帳號一樣，我們要將資料放在 <code>-d</code> 參數裡面，這邊的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;買晚餐&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/todos -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;content&quot;: &quot;買晚餐&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>這時候你應該會發現 <code>curl</code> 的長度變得很長，很難閱讀，這邊我們可以使用 <code>\</code> 來換行，這樣就會變得比較好閱讀了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPOST https://todolist-api.hexschool.io/todos \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;content&quot;: &quot;買晚餐&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>\</code> 這個符號代表著換行的意思，這樣就可以讓我們的程式碼變得比較好閱讀了。</p>
+<p>寫到現在你應該會開始疑惑為什麼 <code>-H</code> 參數要寫兩次，因為 HTTP 協定規定每個 Header 是獨立的一行，curl 沒有提供將多個 Header 寫成單行的能力，每個都要各自 <code>-H</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">Content-Type: application/json<br>Authorization: &#123;&#123; token &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>所以才會需要兩次 <code>-H</code> 參數。</p>
+<p>如果把這邊套用到 <code>Fetch</code> 語法上，你或許會比較容易懂，因為也很相似：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;https://todolist-api.hexschool.io/todos&quot;</span>, &#123;<br>  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,<br>  <span class="hljs-attr">headers</span>: &#123;<br>    <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span>,<br>    <span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">&quot;xxxxxx&quot;</span><br>  &#125;,<br>  <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;買晚餐&quot;</span> &#125;)<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>本質上就是一個 Key-Value 的概念。</p>
+<h3 id="修改待辦事項（PUT-todos-id）"><a href="#修改待辦事項（PUT-todos-id）" class="headerlink" title="修改待辦事項（PUT &#x2F;todos&#x2F;:id）"></a>修改待辦事項（PUT &#x2F;todos&#x2F;:id）</h3><p>這個相信對你來講非常簡單了，我就不多做解釋，直接給答案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPUT https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_ \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;content&quot;: &quot;改買早餐&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊的 <code>&#123;&#123; id &#125;&#125;</code> 就是你要修改的待辦事項的 ID，這邊你可以從 <code>GET /todos</code> 的 API 取得。</p>
+<h3 id="刪除待辦事項（DELETE-todos-id）"><a href="#刪除待辦事項（DELETE-todos-id）" class="headerlink" title="刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）"></a>刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）</h3><p>邏輯其實與修改待辦事項一樣，只是這邊的 HTTP 方法是 <code>DELETE</code>，所以我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XDELETE https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_ \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="切換代辦狀態（PATCH-todos-id-toggle）"><a href="#切換代辦狀態（PATCH-todos-id-toggle）" class="headerlink" title="切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）"></a>切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）</h3><p>這邊我們要切換代辦事項的狀態，這邊的 API 是 <code>PATCH /todos/:id/toggle</code>，這邊的做法跟修改待辦事項一樣，我們要將資料放在 <code>-d</code> 參數裡面，這邊的資料是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;completed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -XPATCH https://todolist-api.hexschool.io/todos/-OQEAOBZbuXr4dUYXJc_/toggle \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -H <span class="hljs-string">&quot;Authorization: &#123;&#123; token &#125;&#125;&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">  &quot;completed&quot;: true</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>到這邊為止很簡單吧？</p>
+<h2 id="顯示連線資訊"><a href="#顯示連線資訊" class="headerlink" title="顯示連線資訊"></a>顯示連線資訊</h2><p>curl 有一個很強大的功能，你可以針對你所發送的請求，顯示出詳細的連線資訊，這邊我們可以使用 <code>-v</code> 參數來顯示詳細的連線資訊，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -v https://google.com<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fother%2Fcurl%2F20250514222800.png?alt=media&token=9d9a3243-db39-45b4-96bc-a70678685043" alt="顯示連線資訊"></p>
+<p><code>-v</code> 除了顯示 <code>request/response</code> 之外，還會顯示 DNS、TCP 握手、TLS 握手等過程，這些都是有助於 Debug 的（內容太多所以可以自己試試看）。</p>
+<h2 id="將回應內容寫入檔案"><a href="#將回應內容寫入檔案" class="headerlink" title="將回應內容寫入檔案"></a>將回應內容寫入檔案</h2><p>如果回傳的內容比較多時，你可以使用 <code>-o</code> 將回應的內容寫入檔案，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -o google.html https://google.com<br></code></pre></td></tr></table></figure>
+
+<p><code>-o</code> 參數後面接著你要寫入的檔案名稱，這邊我們就將回應的內容寫入 <code>google.html</code> 檔案裡面，這樣就可以將回應的內容寫入檔案了。</p>
+<h2 id="指定-User-Agent"><a href="#指定-User-Agent" class="headerlink" title="指定 User-Agent"></a>指定 User-Agent</h2><p>那麼可不可以指定 User-Agent（告訴 Server 我是誰、我使用什麼瀏覽器）呢？當然可以，這邊我們可以使用 <code>-A</code> 參數來指定 User-Agent，這邊我們就這樣寫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -A <span class="hljs-string">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3&quot;</span> https://google.com<br></code></pre></td></tr></table></figure>
+
+<p>這邊的 <code>-A</code> 參數後面接著你要指定的 User-Agent，這樣就可以指定 User-Agent 了。</p>
+<p>為什麼會特別提到 <code>-A</code> 呢？因為有些網站會針對無法辨識的 User-Agent 做一些限制，所以就會特別補上 User-Agent 的部分。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>最後這邊我也整理一下表格，整理一下本篇文章有介紹到的參數哩～</p>
+<table>
+<thead>
+<tr>
+<th>參數</th>
+<th>功能說明</th>
+<th>實際範例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-X</code></td>
+<td>指定 HTTP 方法（例如：POST、PUT、DELETE）</td>
+<td><code>curl -XPOST https://api.example.com/items</code></td>
+</tr>
+<tr>
+<td><code>-H</code></td>
+<td>傳送 Header（每個 Header 一個 <code>-H</code>）</td>
+<td><code>curl -H &quot;Authorization: Bearer YOUR_TOKEN&quot;</code></td>
+</tr>
+<tr>
+<td><code>-d</code></td>
+<td>傳送資料（Request Body，常用於 POST&#x2F;PUT）</td>
+<td><code>curl -d &#39;&#123;&quot;content&quot;:&quot;買晚餐&quot;&#125;&#39; -H &quot;Content-Type: application/json&quot; https://api.example.com/todos</code></td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>顯示詳細連線資訊（包含 request&#x2F;response headers）</td>
+<td><code>curl -v https://example.com</code></td>
+</tr>
+<tr>
+<td><code>-o</code></td>
+<td>將回應輸出到檔案</td>
+<td><code>curl -o result.html https://example.com</code></td>
+</tr>
+<tr>
+<td><code>-A</code></td>
+<td>指定 User-Agent（模擬瀏覽器或裝置）</td>
+<td><code>curl -A &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64)&quot; https://example.com</code></td>
+</tr>
+<tr>
+<td><code>\</code>（反斜線）</td>
+<td>換行指令，讓多行 curl 比較好閱讀</td>
+<td><code>curl -XPOST https://api.example.com \  -H &quot;Authorization: Bearer ...&quot; \  -d &#39;&#123;&quot;key&quot;:&quot;value&quot;&#125;&#39;</code></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script data-cfasync="false">
+               (function() {
+                 function initAd() {
+                   try {
+                     var adContainer = document.currentScript.parentElement.querySelector('.adsbygoogle');
+                     if (adContainer && adContainer.offsetWidth > 0) {
+                       (adsbygoogle = window.adsbygoogle || []).push({});
+                     }
+                   } catch (e) {}
+                 }
+                 if (document.readyState === 'loading') {
+                   document.addEventListener('DOMContentLoaded', initAd);
+                 } else {
+                   initAd();
+                 }
+               })();
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/ai/20250502/2743392124/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            架設自己的 AI 語言模型實驗室不求人之 LM Studio
+          </span>
+        </a>
+      
+
+      
+        <a href="/other/20250521/617540884/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Google Domains 停止後怎麼辦？用 Cloudflare 建立網域、部署網站完整圖文教學
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/learnexp/20250225/3903283315/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                買彩券也能理解 API！從生活案例帶你一次搞懂 RESTful API
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-02-25
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20221210/1224824056/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-10
+              </p>
+            </div>
+          </a>
+        
+          <a href="/other/20220211/2705866340/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Google Apps Script 搭配 Google 試算表開一個 API
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-02-11
+              </p>
+            </div>
+          </a>
+        
+          <a href="/other/20211207/427026/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                跟著我一起快速入門 Postman 吧！
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2021-12-07
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/other/20250513/3343643828/" data-title="不！沒有 Postman 我該怎麼測 API，別怕 curl 幫你搞定" data-hashtags="API,Postman,curl,測試" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/other/20250513/3343643828/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/other/20250513/3343643828/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/other/20250513/3343643828/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-curl"><span class="toc-text">什麼是 curl</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#curl-%E8%AA%9E%E6%B3%95"><span class="toc-text">curl 語法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%BB%E5%86%8A%E5%B8%B3%E8%99%9F%EF%BC%88POST-users-sign-up%EF%BC%89"><span class="toc-text">註冊帳號（POST &#x2F;users&#x2F;sign_up）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A9%97%E8%AD%89-Token%EF%BC%88GET-users-checkout%EF%BC%89"><span class="toc-text">驗證 Token（GET &#x2F;users&#x2F;checkout）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%96%E5%BE%97%E6%89%80%E6%9C%89%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88GET-todos%EF%BC%89"><span class="toc-text">取得所有待辦事項（GET &#x2F;todos）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88POST-todos%EF%BC%89"><span class="toc-text">新增待辦事項（POST &#x2F;todos）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88PUT-todos-id%EF%BC%89"><span class="toc-text">修改待辦事項（PUT &#x2F;todos&#x2F;:id）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%AA%E9%99%A4%E5%BE%85%E8%BE%A6%E4%BA%8B%E9%A0%85%EF%BC%88DELETE-todos-id%EF%BC%89"><span class="toc-text">刪除待辦事項（DELETE &#x2F;todos&#x2F;:id）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%87%E6%8F%9B%E4%BB%A3%E8%BE%A6%E7%8B%80%E6%85%8B%EF%BC%88PATCH-todos-id-toggle%EF%BC%89"><span class="toc-text">切換代辦狀態（PATCH &#x2F;todos&#x2F;:id&#x2F;toggle）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%AF%E7%A4%BA%E9%80%A3%E7%B7%9A%E8%B3%87%E8%A8%8A"><span class="toc-text">顯示連線資訊</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%87%E5%9B%9E%E6%87%89%E5%85%A7%E5%AE%B9%E5%AF%AB%E5%85%A5%E6%AA%94%E6%A1%88"><span class="toc-text">將回應內容寫入檔案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A-User-Agent"><span class="toc-text">指定 User-Agent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-text">結論</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script data-cfasync="false">
+             (function() {
+               function initAd() {
+                 try {
+                   var adContainer = document.currentScript.parentElement.querySelector('.adsbygoogle');
+                   if (adContainer && adContainer.offsetWidth > 0) {
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                   }
+                 } catch (e) {}
+               }
+               if (document.readyState === 'loading') {
+                 document.addEventListener('DOMContentLoaded', initAd);
+               } else {
+                 initAd();
+               }
+             })();
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/nodejs/20260113/3115395907/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            真是受夠開多個終端機執行多個指令了！來用 concurrently 吧
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/13
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/javascript/20251208/3781527973/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            一個時代的王者 jQuery，為什麼沒落了？
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              12/08
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              20 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/javascript/20251205/3653220664/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            什麼是 JavaScript 的 Generator Functions (function*)？
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              12/05
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              15 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/vue/20251204/754692240/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            思考 Vue/Nuxt 專案架構：如何選擇適合團隊的目錄結構？
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              12/04
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              34 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20251202/797714546/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            淺談 AI Vibe Coding 當今主流的 BDD 與 SDD
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              12/02
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              28 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>
