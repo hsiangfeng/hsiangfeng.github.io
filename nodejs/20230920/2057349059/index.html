@@ -1,0 +1,1182 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day6 - 建立 HTTP API | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20230920/2057349059/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="接下來這一篇我們將會來嘗試用純 Node.js 建立 HTTP API，基本上會使用到前面的知識點，所以前面的許多知識點都非常的重要唷～">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Day6 - 建立 HTTP API">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20230920/2057349059/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="接下來這一篇我們將會來嘗試用純 Node.js 建立 HTTP API，基本上會使用到前面的知識點，所以前面的許多知識點都非常的重要唷～">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_network_http_api_c703ff9c-f80c-4471-b040-325633797827.png?alt=media&amp;token=8494d456-2f29-42bd-b68b-3bd0a422addd">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2023-09-19T16:00:01.000Z">
+    
+      <meta property="article:modified_time" content="2023-09-19T16:00:01.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day6 - 建立 HTTP API">
+  <meta name="twitter:description" content="接下來這一篇我們將會來嘗試用純 Node.js 建立 HTTP API，基本上會使用到前面的知識點，所以前面的許多知識點都非常的重要唷～">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_network_http_api_c703ff9c-f80c-4471-b040-325633797827.png?alt=media&amp;token=8494d456-2f29-42bd-b68b-3bd0a422addd">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"Day6 - 建立 HTTP API","url":"https://israynotarray.com/nodejs/20230920/2057349059/","datePublished":"2023-09-19T16:00:01.000Z","dateModified":"2023-09-19T16:00:01.000Z","description":"接下來這一篇我們將會來嘗試用純 Node.js 建立 HTTP API，基本上會使用到前面的知識點，所以前面的許多知識點都非常的重要唷～","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_network_http_api_c703ff9c-f80c-4471-b040-325633797827.png?alt=media&token=8494d456-2f29-42bd-b68b-3bd0a422addd","articleSection":["Nodejs"],"keywords":"Node.js, 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"Day6 - 建立 HTTP API","item":"https://israynotarray.com/nodejs/20230920/2057349059/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C7w1NhyW.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      Loading...
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[250px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[230px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2023-09-20
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Day6 - 建立 HTTP API
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_network_http_api_c703ff9c-f80c-4471-b040-325633797827.png?alt=media&token=8494d456-2f29-42bd-b68b-3bd0a422addd" alt="HTTP API"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來這一篇我們將會來嘗試用純 Node.js 建立 HTTP API，基本上會使用到前面的知識點，所以前面的許多知識點都非常的重要唷～</p>
+<h2 id="建立-HTTP-API"><a href="#建立-HTTP-API" class="headerlink" title="建立 HTTP API"></a>建立 HTTP API</h2><p>開始之前你可以會想說什麼是 API(Application Programming Interface，應用程式介面)，API 就是…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1691043680520.png?alt=media&token=4cffc4f1-02b7-4edb-8bd8-56c88c1cc696" alt="被打"></p>
+<p>由於這個解釋下去可能會花太多時間，所以我想提供我之前寫的文章讓你自行去閱讀：</p>
+<ul>
+<li><a href="https://israynotarray.com/other/20211125/356203095/">淺談 API 與 RESTful API</a></li>
+</ul>
+<p>因為這一篇我比較想要偏實作方面，因此就不花太多時間解釋了，接下來就讓我們準備一步步來建立 HTTP API 吧！</p>
+<h3 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h3><p>首先請你打開終端機並輸入以下指令建立一個新專案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> http-api-example<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> http-api-example<br></code></pre></td></tr></table></figure>
+
+<p>接下來請記住一個流程，只要你開始一個新的專案的時候，起手式必定會有以下流程：</p>
+<ul>
+<li>初始化 git</li>
+<li>初始化 npm</li>
+</ul>
+<p>那麼接下來就讓我們來執行這兩個流程吧！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git init<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm init -y<br></code></pre></td></tr></table></figure>
+
+<p>接下來我們就可以準備開始撰寫我們的程式碼囉。</p>
+<blockquote>
+<p><strong>Note</strong><br><code>git init</code> 的資料夾 <code>.git</code> 預設是隱藏的，如果你想要看到的話可以在終端機輸入 <code>ls -a</code>，這個指令可以顯示所有的檔案，包含隱藏的檔案。</p>
+</blockquote>
+<p>那麼由於我這是一個示範範例，所以不會針對 http-api-example 資料夾做 <code>git init</code> 初始化，因此你在練習的時候要多加注意一下，如果你有使用 <code>git init</code> 初始化的話，那麼請記得建立 <code>.gitignore</code> 檔案，並且將 <code>node_modules</code> 加入忽略清單，這樣才不會將 <code>node_modules</code> 加入到 git 版本控制中。</p>
+<blockquote>
+<p><strong>Note</strong><br>別忘了在 <code>package.json</code> 中的 <code>scripts</code> 屬性增加 <code>&quot;start&quot;: &quot;node src/main.js&quot;</code> 指令，這樣才能夠透過 <code>npm start</code> 來執行程式碼；運作 <code>npm start</code> 請記得務必執行 <code>npm install</code> 安裝相關套件。</p>
+</blockquote>
+<h3 id="撰寫程式碼"><a href="#撰寫程式碼" class="headerlink" title="撰寫程式碼"></a>撰寫程式碼</h3><p>接下來請你輸入以下指令建立相關資料夾</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> src<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">touch</span> src/main.js<br></code></pre></td></tr></table></figure>
+
+<p>接下來呢？很簡單，我們將前面我們所撰寫的範例程式碼貼到 <code>src/main.js</code> 中：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;text/plain&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">&#x27;Hello, World!\n&#x27;</span>);<br>&#125;);<br><br>server.<span class="hljs-title function_">listen</span>(port, hostname, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running at http://<span class="hljs-subst">$&#123;hostname&#125;</span>:<span class="hljs-subst">$&#123;port&#125;</span>/`</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>接下來我們要利用這一份範例程式碼來建立我們的 HTTP API，我們主要會需要 Get、Post、Put、Delete 四種方法，因此我們就來一個一個實作吧！</p>
+<h4 id="Get"><a href="#Get" class="headerlink" title="Get"></a>Get</h4><p>首先我們先來實作 Get 方法，我們先來看一下 Get 方法的範例程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;GET&#x27;</span>) &#123;<br>    res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>    res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>    res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello, World!&#x27;</span> &#125;));<br>  &#125;<br>&#125;);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>我想你應該已經很熟悉了，所以我就不多說明了，接下來你就可以使用 Postman 來測試一下了，你可以使用以下網址來測試</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你不熟悉 Postman 的話，可以參考我先前寫的「<a href="https://israynotarray.com/other/20211207/427026/">跟著我一起快速入門 Postman 吧！</a>」，這篇文章會教你如何使用 Postman 來測試 API，實戰上也會很常使用到 Postman。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">http://localhost:3000<br></code></pre></td></tr></table></figure>
+
+<p>不出意外的話，你會得到以下結果</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Hello, World!&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>這樣子你就成功了。</p>
+<p>那麼我們做了什麼事情呢？我們前面有解釋到 <code>req</code> 與 <code>res</code> 個別代表著「請求（Request）」與「回應（Response）」，而 <code>req.method</code> 就是代表著使用者請求的 HTTP 方法，因此這一段的程式碼白話文就是…</p>
+<p>「使用者發出請求，如果請求的方法是 Get 的話，就回應一個狀態碼 200，並且回應一個 JSON 物件，裡面有一個 message 屬性，值為 <code>Hello, World!</code>」</p>
+<p>接著這裡有幾個核心重點，你會看到原本的 <code>res.setHeader</code> 被改成了 <code>res.setHeader(&#39;Content-Type&#39;, &#39;application/json&#39;)</code>，這是因為我們要回應的是 JSON 物件，因此我們要告訴瀏覽器這是一個 JSON 物件，這樣瀏覽器才會正確的解析。</p>
+<p>接著你會看到 <code>res.end(JSON.stringify({ message: &#39;Hello, World!&#39; }))</code>，雖然我們前面有告知瀏覽器我們即將回傳一個 <code>application/json</code> 的格式，但也不代表我們可以直接將 JavaScript 物件直接傳遞給 <code>res.end</code>，JavaScript 的物件並不是一個字串，因此我們必須透過 <code>JSON.stringify</code> 來將 JavaScript 物件轉換成字串，這樣才能夠正確的回傳給瀏覽器。</p>
+<h2 id="Post"><a href="#Post" class="headerlink" title="Post"></a>Post</h2><p>基本上 Post 就是 Get 的延伸，因此我們只需要將 Get 的程式碼稍微修改一下就可以了，但通常 Post 我們會需要接收資料，通常可能會這樣傳送…</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>因此範例程式碼會稍微有一點不一樣</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;GET&#x27;</span>) &#123;<br>    res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>    res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>    res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Hello, World!&#x27;</span> &#125;));<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;POST&#x27;</span>) &#123;<br>    <span class="hljs-keyword">let</span> body = <span class="hljs-string">&#x27;&#x27;</span>;<br><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =&gt;</span> &#123;<br>      body += chunk.<span class="hljs-title function_">toString</span>();<br>    &#125;);<br><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>      res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>      res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>      res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">`新增成功, <span class="hljs-subst">$&#123;<span class="hljs-built_in">JSON</span>.parse(body).data&#125;</span>!`</span> &#125;));<br>    &#125;);<br>  &#125;<br>&#125;);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>接下來，你一樣可以透過 Postman 嘗試戳看看，我這邊就不特別示範並截圖了，基本上如果你傳送的資料是以下的話</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>那麼你就會得到以下結果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Hello, Ray!&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>req.method</code> 這邊基本上就不用花太多時間解釋了，我相信聰明伶俐的你一定已經懂了！</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1691165625021.png?alt=media&token=02744832-0d47-4ae3-bb83-af5b3c2cf37a" alt="聰明的你"></p>
+<p>所以我只會針對 <code>req.on(&#39;data&#39;, (chunk) =&gt; {...})</code> 與 <code>req.on(&#39;end&#39;, () =&gt; {...})</code> 這兩個部分來做解釋。</p>
+<p>首先 <code>req.on</code> 是什麼呢？簡單來講就是監聽事件，這邊我們監聽了 <code>data</code> 與 <code>end</code> 兩個事件，當 <code>data</code> 事件被觸發時，就會執行 <code>req.on(&#39;data&#39;, (chunk) =&gt; {...})</code> 中的程式碼，而 <code>end</code> 事件被觸發時，就會執行 <code>req.on(&#39;end&#39;, () =&gt; {...})</code> 中的程式碼。</p>
+<p>你可以把它看成前端開發上的 DOM 事件監聽</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> button = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;button&#x27;</span>);<br><br>button.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-comment">// ...</span><br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>當使用者點擊按鈕時，就會執行 <code>button.addEventListener(&#39;click&#39;, () =&gt; {...})</code> 中的程式碼，這樣的概念。</p>
+<p>那麼 <code>req.on(&#39;data&#39;, (chunk) =&gt; {...})</code> 是在幹嘛呢？由於我們的使用者會傳送資料過來，因此我們要去監聽「請求數據流」的事件。當有資料傳送過來時，就會執行 <code>req.on(&#39;data&#39;, (chunk) =&gt; {...})</code> 中的程式碼，而 <code>chunk</code> 就是傳送過來的資料片段，但是這邊有一個問題，因為資料可能會很大，因此可能會分成好幾個 <code>chunk</code> 傳送過來，因此我們要將這些 <code>chunk</code> 串接起來，這樣才能夠正確的解析資料，因此我們使用了 <code>body += chunk.toString()</code> 來串接資料。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你嘗試直接將 <code>chunk</code> 輸出的話，你會發現它是一個 Buffer，可能會長這樣子 <code>&lt;Buffer 7b 0a 20 20 20 20 22 64 61 74 61 22 3a 20 22 48 65 6c 6c 6f 22 0a 7d&gt;</code>，因此我們才會需要透過 <code>chunk.toString()</code> 將它轉換成字串。</p>
+</blockquote>
+<p>最後當所有數據處理完畢時，就會觸發結束事件（<code>end</code>），這時候我們就可以將結果回傳給使用者了，就是這麼的簡單（？）</p>
+<blockquote>
+<p><strong>Note</strong><br><code>Buffer</code> 是 Node.js 用來處理二進位（<code>0</code> 跟 <code>1</code>）的資料類別，在瀏覽器則是 <code>ArrayBuffer</code>。</p>
+</blockquote>
+<h3 id="Put-Delete"><a href="#Put-Delete" class="headerlink" title="Put &amp; Delete"></a>Put &amp; Delete</h3><p>基本上你掌握了 Post 的話，Put 與 Delete 就不會覺得很難了，因為是大同小異的，所以這邊我就直接提供 Put 與 Delete 的範例程式碼讓你參考</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;GET&#x27;</span>) &#123;<br>    <span class="hljs-comment">// ...省略其他程式碼</span><br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;POST&#x27;</span>) &#123;<br>    <span class="hljs-comment">// ...省略其他程式碼</span><br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;PUT&#x27;</span>) &#123;<br>    <span class="hljs-keyword">let</span> body = <span class="hljs-string">&#x27;&#x27;</span>;<br><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =&gt;</span> &#123;<br>      body += chunk.<span class="hljs-title function_">toString</span>();<br>    &#125;);<br><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>      res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>      res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>      res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">`更新成功, <span class="hljs-subst">$&#123;<span class="hljs-built_in">JSON</span>.parse(body).data&#125;</span>!`</span> &#125;));<br>    &#125;);<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">method</span> === <span class="hljs-string">&#x27;DELETE&#x27;</span>) &#123;<br>    res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>    res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>    res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;刪除成功&#x27;</span> &#125;));<br>  &#125;<br>&#125;);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>恭喜，基本上你已經完成了一個簡單的 HTTP API 了，雖然只是一個簡單的示範範例，但也足夠讓你了解到 HTTP API 的運作方式了。</p>
+<blockquote>
+<p><strong>Note</strong><br>請記得，修改程式碼後都要中斷程式碼，並重新執行 <code>npm start</code> 才能夠看到修改後的結果。</p>
+</blockquote>
+<p>那麼你可能會想說…</p>
+<p>「實戰呢？難道後端開發 API 都是這樣子嗎？」</p>
+<p>當然不是，這邊我只是想要讓你了解到 HTTP API 的運作方式，因此才會使用純 Node.js 來實作，但實際上我們在開發後端 API 時，通常都會使用框架來開發，例如：Express、Koa、Fastify 等等，這些框架都會幫我們處理很多事情，例如：路由、錯誤處理、資料驗證等等，因此我們可以專注在開發業務邏輯上，而不用花太多時間在處理這些事情上。</p>
+<h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><p>前面我們可以發現，我們在打 Postman 的時候都是打 <code>http://localhost:3000</code>，但我們實際在開發時，往往其實不會只有這樣子，而是會有很多不同的路由，例如：<code>http://localhost:3000/users</code>、<code>http://localhost:3000/users/1</code>、<code>http://localhost:3000/users/1/posts</code> 等等，這些都是不同的路由，因此接下來我們就要來實作路由囉～</p>
+<p>首先這邊的範例我們將會以 TodoList 作為示範，因此我們會有以下幾個路由</p>
+<ul>
+<li><code>GET /todos</code>：取得所有的 Todo</li>
+<li><code>POST /todos</code>：新增一個 Todo</li>
+<li><code>PUT /todos/:id</code>：更新特定的 Todo</li>
+<li><code>DELETE /todos/:id</code>：刪除特定的 Todo</li>
+</ul>
+<p>那麼我並不會全部都介紹完畢，因為部分的觀念其實都是一樣的，因此我只會針對 <code>GET /todos</code> 與 <code>POST /todos</code> 這兩個路由做介紹，其他的路由你可以嘗試自己實作看看，也算是我留給你的小功課。</p>
+<p>而這邊的範例將會把資料暫存在記憶體中，因此當你關閉伺服器時，資料就會消失，這邊我們只是想要讓你了解到路由的運作方式，因此就不會使用資料庫了。</p>
+<blockquote>
+<p><strong>Note</strong><br>什麼是記憶體呢？你可以把記憶體想像成你把東西寫在紙上，當你把電腦關閉時，你就等於把紙丟進垃圾桶內，因此你的資料就會消失，如果你把紙收藏到抽屜內，那麼你的資料就會永久保存，這就是記憶體與資料庫的簡單比喻。</p>
+</blockquote>
+<p>在前面的時候我們都是使用 <code>req.method</code> 來判斷使用者的 HTTP 方法，但如果要做到路由判斷的話，那麼我們就必須要搭配 <code>req.url</code> 來使用。</p>
+<p>那麼我們就先來看一下如果我們今天打 <code>Get http://localhost:3000/todos</code> 的話，會發生什麼事情</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(req.<span class="hljs-property">method</span>, req.<span class="hljs-property">url</span>);<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;text/plain&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">&#x27;Hello, World!\n&#x27;</span>);<br>&#125;);<br><br>server.<span class="hljs-title function_">listen</span>(port, hostname, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running at http://<span class="hljs-subst">$&#123;hostname&#125;</span>:<span class="hljs-subst">$&#123;port&#125;</span>/`</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>不出意外的話，你應該是可以得到 <code>POST /todo</code> 這樣子的訊息</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnode_req_url_method.png?alt=media&token=47dc2d08-b39c-41b1-ab78-75dfc5268085" alt="API"></p>
+<p>因此我們可以知道 <code>req.url</code> 會回傳 <code>/todos</code>，因此我們就可以透過 <code>req.url</code> 來判斷路由了。</p>
+<p>首先我們要先宣告一個 <code>data</code> 變數作為一個暫存區，當使用者新增一個 Todo 時，我們就會將資料存入 <code>data</code> 變數中，當使用者取得所有 Todo 時，我們就會將 <code>data</code> 變數中的資料回傳給使用者，這樣就可以達到暫存資料的目的了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">let</span> data = [];<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>接下來就稍微特別一點了，我們會宣告一個 <code>routers</code> 物件，這個物件會與我們定義的路由相對應，當使用者發出請求時，我們就會去 <code>routers</code> 物件中尋找對應的路由，如果有找到的話，就會執行對應的程式碼，如果沒有找到的話，就會回傳 404 狀態碼給使用者。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">let</span> data = [];<br><br><span class="hljs-keyword">const</span> routers = &#123;&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>接下來該怎麼寫呢？其實很簡單，就只需要 <code>routers</code> + <code>[HTTP 方法]</code> + <code>[路由]</code> 就可以了，例如：<code>routers[&#39;GET/todos&#39;]</code>，這樣就可以了，這邊我先示範寫一個簡單的 <code>GET /todos</code> 路由</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br>routers[<span class="hljs-string">&#x27;GET/todos&#x27;</span>] = <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>接下來 <code>http.createServer</code> 的部分就會變成這樣子</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br>routers[<span class="hljs-string">&#x27;GET/todos&#x27;</span>] = <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));<br>&#125;;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">const</span> handler = routers[<span class="hljs-string">`<span class="hljs-subst">$&#123;req.method&#125;</span><span class="hljs-subst">$&#123;req.url&#125;</span>`</span>] || (<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">404</span>;<br>    res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>    res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Not Found&#x27;</span> &#125;));<br>  &#125;);<br><br>  <span class="hljs-title function_">handler</span>(req, res);<br>&#125;);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>我們可以看到我們宣告了一個 <code>handler</code> 函式，這個函式會去 <code>routers</code> 物件中尋找對應的路由，如果有找到的話，就會執行對應的程式碼，如果沒有找到的話，就會回傳 404 狀態碼給使用者。</p>
+<p>如果你嘗試戳 <code>http://localhost:3000/todos</code> 的話，你應該會得到以下結果</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br></code></pre></td></tr></table></figure>
+
+<p>如果戳 <code>http://localhost:3000/todo</code> 的話，你應該會得到以下結果</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Not Found&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>超簡單的對吧？那麼 Post 也是依樣畫葫蘆，我們可以拿前面所寫的範本直接改一下就可以了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br><br>routers[<span class="hljs-string">&#x27;GET/todos&#x27;</span>] = <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));<br>&#125;;<br><br>routers[<span class="hljs-string">&#x27;POST/todos&#x27;</span>] = <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">let</span> body = <span class="hljs-string">&#x27;&#x27;</span>;<br><br>  req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =&gt;</span> &#123;<br>    body += chunk.<span class="hljs-title function_">toString</span>();<br>  &#125;);<br><br>  req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-keyword">const</span> cacheBody = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(body);<br>    data.<span class="hljs-title function_">push</span>(&#123;<br>      <span class="hljs-attr">id</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">getTime</span>(),<br>      <span class="hljs-attr">title</span>: cacheBody.<span class="hljs-property">title</span>,<br>      <span class="hljs-attr">completed</span>: cacheBody.<span class="hljs-property">completed</span>,<br>    &#125;);<br>    res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>    res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>);<br>    res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;新增成功&#x27;</span> &#125;));<br>  &#125;);<br>&#125;;<br><br><span class="hljs-comment">// ...省略其他程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>這樣子就完成了，你可以嘗試戳 <code>Post http://localhost:3000/todos</code> 新增之後，接著你就可以戳 <code>Get http://localhost:3000/todos</code> 來取得所有的 Todo 了。</p>
+<p>而後面的 Put 與 Delete 也是類似的，我這邊就不額外示範了，就當作留給你的一個小功課吧！</p>
+<p>這一篇也差不多了，我們下一篇見囉～</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你修改過程都要一直重新啟動伺服器太麻煩的話，可以考慮使用 <code>nodemon</code> 來幫你自動重新啟動伺服器，使用後請記得將 <code>package.json</code> 中的 <code>scripts</code> 屬性改成 <code>&quot;start&quot;: &quot;nodemon src/main.js&quot;</code>。</p>
+</blockquote>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>本來碎碎念想寫點什麼，但突然想想還是不要寫好了，可是當我要寫的時候，又覺得還是算了，所以今天就先這樣吧。</p>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/nodejs/20230919/1426601281/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Day5 - Node.js Modules
+          </span>
+        </a>
+      
+
+      
+        <a href="/nodejs/20230921/766511846/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Day7 - Web Framework to Express.js
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20231015/3466588754/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day31 - 目錄與補充資源
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-15
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231014/27552363/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day30-旅途告一個段落
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-14
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231013/3280561145/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day29-關於 JWT 驗證
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-13
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231012/3543796485/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day28-Google Extension 與 Google Apps Script 蹦再一起
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-12
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20230920/2057349059/" data-title="Day6 - 建立 HTTP API" data-hashtags="Node.js,《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20230920/2057349059/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20230920/2057349059/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20230920/2057349059/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-HTTP-API"><span class="toc-text">建立 HTTP API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E5%B0%88%E6%A1%88"><span class="toc-text">建立專案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">撰寫程式碼</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Post"><span class="toc-text">Post</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Put-Delete"><span class="toc-text">Put &amp; Delete</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1"><span class="toc-text">路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="toc-text">碎碎念</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/git/20260122/21277993/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git init 出現 master 分支提示？教你設定預設分支為 main
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260122/2316436852/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Dev Containers 打造 AI 自動化開發的安全隔離環境
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              14 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/git/20260121/2025687513/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git Worktree 是什麼？一個專案同時跑多個 AI Agent 的秘訣
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/other/20260121/695717014/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260120/4189755271/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/20
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              35 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>

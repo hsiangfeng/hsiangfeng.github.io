@@ -1,0 +1,1252 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/ai/20251112/978259833/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="現在的各種 AI 應用，基本上都跟 Prompt Engineering （提示工程）以及 Context Engineering （上下文工程）息息相關，那這兩者有何者差異以及關係呢？這一篇就來了解這兩個概念有多影響 AI Agent 的運作。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering">
+  <meta property="og:url" content="https://israynotarray.com/ai/20251112/978259833/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="現在的各種 AI 應用，基本上都跟 Prompt Engineering （提示工程）以及 Context Engineering （上下文工程）息息相關，那這兩者有何者差異以及關係呢？這一篇就來了解這兩個概念有多影響 AI Agent 的運作。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2FChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png?alt=media&amp;token=96b06b44-9dc2-4207-882e-29ed9169f076">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2025-11-11T16:51:29.000Z">
+    
+      <meta property="article:modified_time" content="2025-11-11T16:51:29.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="生成式 AI">
+      
+        <meta property="article:tag" content="李宏毅">
+      
+        <meta property="article:tag" content="大語言模型">
+      
+        <meta property="article:tag" content="ChatGPT 原理">
+      
+        <meta property="article:tag" content="LLM 教學">
+      
+        <meta property="article:tag" content="AI 幻覺">
+      
+        <meta property="article:tag" content="Context Engineering">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering">
+  <meta name="twitter:description" content="現在的各種 AI 應用，基本上都跟 Prompt Engineering （提示工程）以及 Context Engineering （上下文工程）息息相關，那這兩者有何者差異以及關係呢？這一篇就來了解這兩個概念有多影響 AI Agent 的運作。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2FChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png?alt=media&amp;token=96b06b44-9dc2-4207-882e-29ed9169f076">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering","url":"https://israynotarray.com/ai/20251112/978259833/","datePublished":"2025-11-11T16:51:29.000Z","dateModified":"2025-11-11T16:51:29.000Z","description":"現在的各種 AI 應用，基本上都跟 Prompt Engineering （提示工程）以及 Context Engineering （上下文工程）息息相關，那這兩者有何者差異以及關係呢？這一篇就來了解這兩個概念有多影響 AI Agent 的運作。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2FChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png?alt=media&token=96b06b44-9dc2-4207-882e-29ed9169f076","articleSection":["AI"],"keywords":"生成式 AI, 李宏毅, 大語言模型, ChatGPT 原理, LLM 教學, AI 幻覺, Context Engineering"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering","item":"https://israynotarray.com/ai/20251112/978259833/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C7w1NhyW.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      Loading...
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[250px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[230px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2025-11-12
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/%E7%94%9F%E6%88%90%E5%BC%8F-AI/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #生成式 AI
+            </a>
+          
+            <a href="/tags/%E6%9D%8E%E5%AE%8F%E6%AF%85/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #李宏毅
+            </a>
+          
+            <a href="/tags/%E5%A4%A7%E8%AA%9E%E8%A8%80%E6%A8%A1%E5%9E%8B/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #大語言模型
+            </a>
+          
+            <a href="/tags/ChatGPT-%E5%8E%9F%E7%90%86/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #ChatGPT 原理
+            </a>
+          
+            <a href="/tags/LLM-%E6%95%99%E5%AD%B8/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #LLM 教學
+            </a>
+          
+            <a href="/tags/AI-%E5%B9%BB%E8%A6%BA/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #AI 幻覺
+            </a>
+          
+            <a href="/tags/Context-Engineering/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Context Engineering
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2FChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png?alt=media&token=96b06b44-9dc2-4207-882e-29ed9169f076" alt="生成式人工智慧與機器學習導論"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>現在的各種 AI 應用，基本上都跟 Prompt Engineering （提示工程）以及 Context Engineering （上下文工程）息息相關，那這兩者有何者差異以及關係呢？這一篇就來了解這兩個概念有多影響 AI Agent 的運作。</p>
+<h2 id="什麼是-Context-Engineering-（上下文工程）？"><a href="#什麼是-Context-Engineering-（上下文工程）？" class="headerlink" title="什麼是 Context Engineering （上下文工程）？"></a>什麼是 Context Engineering （上下文工程）？</h2><p>前一篇「<a href="https://israynotarray.com/ai/20251102/2069630219/">生成式人工智慧與機器學習導論（1） - 其實都是文字接龍</a>」文章一直在強調一件事情</p>
+<p>『語言模型本身就是一個「文字接龍」的系統』</p>
+<p>透過我們輸入的 Prompt （提示詞），語言模型會根據這些文字來預測下一個字，然後不斷重複這個過程直到完成整個回應。</p>
+<p>讓我們回頭複習一下公式：</p>
+<p>$f(x)&#x3D;ax+b$</p>
+<ul>
+<li><code>x</code>：輸入的提示詞（Prompt）</li>
+<li><code>f</code>：語言模型</li>
+<li><code>a</code>、<code>b</code>：語言模型內部的參數</li>
+<li><code>f(x)</code>：語言模型的輸出（Output）</li>
+</ul>
+<p>當我們輸入一個提示詞 <code>x</code>，語言模型 <code>f</code> 會根據內部的參數 <code>a</code> 和 <code>b</code>，計算出對應的輸出 <code>f(x)</code>，但是當我們輸出的結果 <code>f(x)</code> 不如預期的時候，我們只能去調整 <code>x</code>（提示詞） 或者 <code>f</code>（語言模型本身）。</p>
+<p>如果你是調整語言模型的話，那麼這件事情就稱為「訓練（Training）」，如果你是改變語言模型裡面的 <code>a</code> 和 <code>b</code> 參數，那麼這件事情就稱為「學習（Learning）」。</p>
+<p>但我們通常是不會去特別調整語言模型的參數，所以通常我們會專注於「調整提示詞（Prompt Engineering）」這件事情，也就是說我們會想辦法設計出一個更好的提示詞 <code>x</code>，來讓語言模型 <code>f</code> 輸出我們想要的結果 <code>f(x)</code>，大多時候我們是無法調整與修改語言模型的，以 ChatGPT 為例，我們只能使用 OpenAI 提供的 API 或是介面來與它互動，而無法直接修改它的內部參數，畢竟它是一個線上又封閉的語言模型，就算有問題你也改不了。</p>
+<h2 id="Prompt-Engineering-（提示工程）-vs-Context-Engineering-（上下文工程）"><a href="#Prompt-Engineering-（提示工程）-vs-Context-Engineering-（上下文工程）" class="headerlink" title="Prompt Engineering （提示工程） vs Context Engineering （上下文工程）"></a>Prompt Engineering （提示工程） vs Context Engineering （上下文工程）</h2><p>那麼我們前面有提到，我們大多都是透過修改 Prompt 來達到我們想要的結果，這件事情就稱為「Prompt Engineering （提示工程）」，也就是說我們會想辦法設計出一個更好的提示詞 <code>x</code>，來讓語言模型 <code>f</code> 輸出我們想要的結果 <code>f(x)</code>。</p>
+<p>那麼「Context Engineering （上下文工程）」又是什麼呢？</p>
+<p>其實課程上老師有說明，其實本質上差異並不大，只是換一個比較「炫炮」的名稱而已。</p>
+<p>但真的是這樣嗎？兩者其實還是有一定的差異，雖然概念都是差不多，但是關注的點不同，以 Prompt Engineering 來說，重點在於「如何設計一個好的提示詞」甚至是宛如「魔法一般」的提示詞，來引導語言模型產生我們想要的結果。</p>
+<p>例如：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">你必須提供給我 JSON Format 的回應，並且包含以下欄位：<br><br>- name: 使用者名...<br></code></pre></td></tr></table></figure>
+
+<p>這樣的提示詞就是一個典型的 Prompt Engineering，因為它直接告訴語言模型我們想要什麼樣的回應格式，隨著時代進步，AI 也越來越聰明，基本上人類看得懂的提示詞，AI 也都能理解，所以我們可以透過設計更複雜的提示詞來達到我們想要的結果。</p>
+<p>以早期來講 GPT-3 這種早期的模型，其實真的滿垃圾的，如果你沒有特別針對 Prompt 下功夫的話，基本上它給你的回應通常都不太理想，所以當時 Prompt Engineering 就變得非常重要，這個過程中，你也會發現一些神奇的咒語（提示詞），像是你叫他「每次回覆我都必須要長達 3000 字」，此時 AI 的回覆反而精準度會高上許多。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251112212652.png?alt=media&token=2c6fe225-c974-40de-a40c-22a7525d1528" alt="神奇的咒語"></p>
+<p>後來也有各種神奇咒語都可以讓模型輸出更符合我們需求的結果，例如：深呼吸三次、扮演某個角色，甚至是情緒勒索模型都可以大幅度提升模型的回應品質跟答案。</p>
+<p>在 <a target="_blank" rel="noopener" href="https://minimaxir.com/2024/02/chatgpt-tips-analysis/">https://minimaxir.com/2024/02/chatgpt-tips-analysis/</a> 有實驗提供給語言模型四個選項，告訴 ChatGPT 如果你答對了，就給你其中一個，像是…泰勒絲門票、世界和平、給小費、得到愛，結果 ChatGPT 最在意世界和平。</p>
+<p>隨著時代進步，這些神奇咒語也開始慢慢的變得不神奇了，這些都是歸功於模型越來越強大。</p>
+<p>隨著神奇咒語慢慢的不神奇了，所以就隨之飄出了一個新的東西，也就是「Context Engineering （上下文工程）」，而 Context Engineering 的重點在於自動化管理「上下文資訊（Context Information）」，也就是說我們不再只是單純的設計一個提示詞，而是要去管理整個對話的上下文資訊，讓模型能夠更好地理解我們的需求。</p>
+<h3 id="User-Prompt：給前提"><a href="#User-Prompt：給前提" class="headerlink" title="User Prompt：給前提"></a>User Prompt：給前提</h3><p>那 Context Engineering 應該包含那些資訊呢？基本上就是 Prompt Engineering 裡面會用到的所有資訊，例如：</p>
+<ol>
+<li>任務說明：寫一個 TodoList Web Application 的程式碼。</li>
+<li>詳細指引（options）：使用 Vue + Vite 以及 Bootstrap 來開發，必須將資料暫存到 LocalStorage 中，以便下次開啟網頁時可以讀取。</li>
+<li>額外條件：輸入欄位必須有表單驗證功能，並且可以刪除已完成的待辦事項。</li>
+<li>輸出風格：請以清晰易懂的程式碼風格來撰寫，並且加入適當的註解說明每個功能的實現方式。</li>
+</ol>
+<p>講的越清楚越好，因為語言模型並不會讀心術，甚至通靈，語言模型是依照你給它的資訊來進行回應跟產生內容的。</p>
+<p>舉例來講，當你在 ChatGPT 裡詢問：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">什麼是「載具」？<br></code></pre></td></tr></table></figure>
+
+<p>這時候 ChatGPT 就根本不知道你到底在問什麼，自然而然就會這樣回覆</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251112215502.png?alt=media&token=a414aa64-33d0-4d8b-904a-8838d3395a87" alt="ChatGPT"></p>
+<p>這就是一個很標準的，沒有給一個明確「前提」的例子，中文博大精深，一個字可能有非常多種解釋方式，像是「載具」這個詞彙，在不同的情境下可能代表不同的意思，因此如果你講更清楚一點的話：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">我在統一便利商店結帳時，店員詢問我是否要使用「載具」，請問這裡的「載具」是指什麼意思？<br></code></pre></td></tr></table></figure>
+
+<p>你會發現 ChatGPT 的回答突然就會變的很精準：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251112215745.png?alt=media&token=9b8f647c-7371-40fd-be67-71ebc09041c8" alt="ChatGPT"></p>
+<p>把「大前提」講清楚，對於語言模型來講，是非常有幫助的，這也是 Context Engineering 的一個重要概念。</p>
+<h3 id="User-Prompt：給參考"><a href="#User-Prompt：給參考" class="headerlink" title="User Prompt：給參考"></a>User Prompt：給參考</h3><p>除了給予明確的前提之外，如果你可以給它一個明確的範例參考，是非常有助於產出結果的，例如：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">請你將以下內文改成火星文：<br><br>你好，我是一名部落客，叫做 Ray，我超級愛寫技術文章的！<br></code></pre></td></tr></table></figure>
+
+<p>這時候你應該會發現 ChatGPT 給你的回應可能不如你預期：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251112220127.png?alt=media&token=4de5198e-85c6-4287-986f-9d3dd78c6c70" alt="ChatGPT"></p>
+<p>這是因為「火星文」這個詞彙本身就沒有一個明確的定義，導致語言模型無法理解你到底想要什麼樣的結果。<br>如果你可以給它一個範例參考的話，像是：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs txt">請你將以下內文改成火星文，火星文的範例如下：<br><br>- 的 =&gt; 我ㄉ<br>- 是 =&gt; 4<br>- 愛 =&gt; Love<br>- 我 =&gt; 偶<br><br>接著請將以下內文改成火星文：<br>你好，我是一名部落客，叫做 Ray，我超級愛寫技術文章的！<br></code></pre></td></tr></table></figure>
+
+<p>你會發現符合我們預期的火星文就很容易產生了：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251112220700.png?alt=media&token=04804988-fdc7-44e6-a940-eb28b7dd8f82" alt="ChatGPT"></p>
+<p>而透過提供範例參考，這件事情又稱之為「範例學習（In-Context Learning）」，請注意這邊的 Learning 並沒有改變語言模型的參數，而是讓模型透過我們所提供的上下文資訊來進行學習。</p>
+<p>課程有提到一個很有趣的案例，也就是「卡拉蒙語」，據說只有幾千人使用，甚至連網路都沒有相關資料（搜尋一下，確實沒有相關資訊），所以語言模型根本沒有辦法學習到這個語言的任何資訊，因此就無法產生相關的回應，那該怎麼做呢？那就是將卡拉蒙語的相關資料提供給模型（如：教科書、文獻）等，這時候就可以發現語言模型也能夠產生卡拉蒙語的相關回應了。</p>
+<p>而這就是一個經典的「範例學習（In-Context Learning）」案例。</p>
+<p>那…所以語言模型式如何學習的呢？這邊要提一下，這邊所指的學習並不是去改變模型的參數，而是讓模型透過我們所提供的上下文資訊來進行學習。</p>
+<p>而讓這個語言模型具有翻譯「卡拉蒙語」的能力關鍵點在於這些教科書與文獻中的「例句」，真正對於語言模型有幫助的是「例句」，而文法什麼的，其實對於語言模型來講並沒有太大的幫助，因為語言模型本質上就是一個「文字接龍」的系統，它是透過大量的文字資料來學習如何預測下一個字，因此只要給它足夠的例句，它就能夠學會如何翻譯卡拉蒙語了。</p>
+<h3 id="System-Prompt-到底是什麼"><a href="#System-Prompt-到底是什麼" class="headerlink" title="System Prompt 到底是什麼"></a>System Prompt 到底是什麼</h3><p>前面我們一直在講 User Prompt（使用者提示詞），那麼 System Prompt（系統提示詞）又是什麼呢？</p>
+<p>簡單來講就是開發語言模型的人員，會在系統層級設定一些規則，來引導語言模型的行為，其中我們可以來看看 Claude 所公開的 <a target="_blank" rel="noopener" href="https://docs.claude.com/en/release-notes/system-prompts">System Prompt</a>，這邊讓我挑選 Claude Sonnet 4.5 並展示給大家看：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;behavior_instructions&gt; &lt;general_claude_info&gt; The assistant is Claude, created by Anthropic.<br>The current date is &#123;&#123;currentDateTime&#125;&#125;.<br><br>Here is some information about Claude and Anthropic’s products in case the person asks:<br>This iteration of Claude is Claude Sonnet 4.5 from the Claude 4 model family. The Claude 4 family currently consists of Claude Opus 4.1, 4 and Claude Sonnet 4.5 and 4. Claude Sonnet 4.5 is the smartest model and is efficient for everyday use.<br>If the person asks, Claude can tell them about the following products which allow them to access Claude. Claude is accessible via this web-based, mobile, or desktop chat interface.<br>...<br></code></pre></td></tr></table></figure>
+
+<p>老實講非常的長，所以這邊我只貼上部分，為了方便閱讀，這邊我也翻譯成中文：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;behavior_instructions&gt; &lt;general_claude_info&gt;  <br>助手是由 Anthropic 創建的 Claude。  <br>目前日期為 &#123;&#123;currentDateTime&#125;&#125;。<br><br>以下是一些關於 Claude 和 Anthropic 產品的資訊（以備使用者詢問）：  <br>本版本的 Claude 屬於 Claude 4 模型家族中的 Claude Sonnet 4.5。Claude 4 系列目前包含 Claude Opus 4.1、4，以及 Claude Sonnet 4.5 和 4。Claude Sonnet 4.5 是最聰明的模型，並且在日常使用上具備高效能。  <br>如果使用者詢問，Claude 可以告知他們以下能夠使用 Claude 的產品：Claude 可以透過網頁版、行動版或桌面版的聊天介面進行存取。<br></code></pre></td></tr></table></figure>
+
+<p>第一句其實就已經再告知語言模型它是誰，接著告訴它今天的日期是什麼，這就是為什麼明明語言模型是關在一個封閉的系統裡面，但它還是可以知道今天日期的原因，因為系統提示詞已經告訴它今天日期是什麼了，基本上好的模型 System Prompt 會非常的長，裡面會包含非常多的規則，來引導語言模型的行為。</p>
+<p>System Prompt 通常是不會被使用者看到的，那麼以 Claude 的 System Prompt 為例，裡面包含了以下幾個重點：</p>
+<ul>
+<li>基本身分與產品資訊：The assistant is Claude, created by Anthropic.（助理名為 Claude，由 Anthropic 創建）</li>
+<li>使用說明與限制：If asked about the Anthropic APl, point to <a target="_blank" rel="noopener" href="https://docs.anthropic.com(如果被問到/">https://docs.anthropic.com（如果被問到</a> Anthropic API，請指向 <a target="_blank" rel="noopener" href="https://docs.anthropic.com)/">https://docs.anthropic.com）</a></li>
+<li>互動態度與使用者回饋：If user is unhappy, suggest pressing the thumbs down button（如果使用者感到不滿意，建議他按下倒大拇指按鈕）</li>
+<li>安全與禁止事項：Claude does not provide info to make chemical or nuclear weapons（Claude 不會提供用於製造化學或核子武器的相關資訊）</li>
+<li>回應風格與格式：Claude never starts its response with “good question”（Claude 回覆時絕不會以「good question」作為開頭）</li>
+<li>知識與事實性：Claude’s knowledge cutoff is Jan 2025（Claude 的知識截斷時間為 2025 年 1 月）</li>
+<li>自我定位與哲學原則：Claude does not claim to be human or conscious（Claude 不會聲稱自己是人類，亦不會聲稱具有意識）</li>
+<li>錯誤處理與互動細節：If corrected, Claude first thinks carefully before acknowledging（若被指正錯誤，Claude 會先仔細思考後才承認並回應）</li>
+</ul>
+<p>透過上面我們可以知道，一個好的 System Prompt 是非常的長的，裡面會包含非常多的規則，來引導語言模型的行為，而這些規則會直接影響語言模型的回應品質與風格。</p>
+<h2 id="Dialogue-History-（短期記憶）"><a href="#Dialogue-History-（短期記憶）" class="headerlink" title="Dialogue History （短期記憶）"></a>Dialogue History （短期記憶）</h2><p>基本上我們用 ChatGPT 時，當下所使用的對話視窗，都是一個「短期記憶」。</p>
+<p>恩？什麼是短期記憶呢？你可以試著在 A 對話視窗說：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251114001344.png?alt=media&token=853a0f3c-aa62-4aa3-beb9-13aeeb679358" alt="ChatGPT"></p>
+<p>接著我們再開一個 B 對話視窗，然後在 B 視窗說：</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251114001417.png?alt=media&token=0bd8592f-df59-4dc8-88c3-5c0f2df1acd9" alt="ChatGPT"></p>
+<p>你會發現 ChatGPT 突然就忘記了你在 A 視窗說的話，這就是因為 ChatGPT 的對話視窗本身就是一個「短期記憶」，它只能記住當下這個視窗的對話內容，當你開啟一個新的視窗時，它就會忘記之前的對話內容。</p>
+<p>那麼上方圖片中有一段 ChatGPT 回覆的內容提到：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">如果你要我長期記住「小王是傳說中的法老王」，我現在其實做不到——你需要先到 設定 &gt; 個人化 &gt; 記憶 裡把記憶功能打開。<br><br>在目前這個對話中，我當然可以照你的說法，把「小王 = 傳說中的法老王」當作上下文背景，但這個不會自動保存到未來的對話中。<br></code></pre></td></tr></table></figure>
+
+<p>其實在新版的 ChatGPT 有提供一個方式讓你可以「跨對話視窗」記住一些資訊，這個功能就稱為「記憶（Memory）」，你可以在設定中開啟這個功能，這樣 ChatGPT 就能夠跨對話視窗記住一些資訊了。</p>
+<h2 id="Long-Term-Memory-（長期記憶）"><a href="#Long-Term-Memory-（長期記憶）" class="headerlink" title="Long-Term Memory （長期記憶）"></a>Long-Term Memory （長期記憶）</h2><p>那…ChatGPT 的長期記憶是怎麼做到的呢？</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251114001730.png?alt=media&token=87c50cd6-80ba-49c9-a2d5-ff5b69790b53" alt="ChatGPT"></p>
+<p><del>當然是到個人化設定中開啟「記憶（Memory）」功能啊！</del></p>
+<p>只要你將「記憶」的功能開啟後，每一次你跟 ChatGPT 進行新的對話時，其實在你的對話之前，ChatGPT 都會先去讀取你之前所儲存的「記憶」，然後將這些記憶當作上下文資訊的一部分，來進行回應，形似類似：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">[System Prompt]<br><br>[Long-Term Memory]<br><br>[User Prompt]<br></code></pre></td></tr></table></figure>
+
+<p>ChatGPT 會先將模型開發者所設定的 System Prompt 讀取進來，接著會將你的 Long-Term Memory 讀取進來，最後才是你所輸入的 User Prompt，這樣一來 ChatGPT 就能夠在回應時，考慮到你之前所儲存的記憶資訊了。</p>
+<h2 id="其他來源參考"><a href="#其他來源參考" class="headerlink" title="其他來源參考"></a>其他來源參考</h2><p>接下來當然要聊一下模型是如何處理過時的資訊，相信大家再使用 AI 的時候，應該都有體驗過一種狀況，也就是 AI 所提供的回覆是過時的，例如…AI 總是給 Vue2 的相關寫法跟資訊，但現在明明已經是 Vue3 的時代了，這時候該怎麼辦呢？</p>
+<p>最常用的方式就是透過「搜尋引擎」，沒錯就是讓語言模型去上網搜尋最新的資訊，然後將這些資訊當作上下文資訊的一部分，來進行回應，這樣一來語言模型就能夠提供最新的資訊了。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251114002621.png?alt=media&token=c67e5f5f-d372-4a05-ae4b-30df83a4c906" alt="Web Fetch"></p>
+<p>所以你再請語言模型做某些事情之前，你可以請語言模型先上網搜尋相關資訊再來回覆 or 產生內容，當然你也可以提供你的資料庫給語言模型。</p>
+<p>而這個其實是有一個專業名稱的，他就叫做：</p>
+<p>「Retrieval Augmented Generation (RAG，檢索增強生成)」</p>
+<p>儘管現在已經有了 RAG 強化語言模型的知識，但還是不能保證語言模型產出的正確性，因為語言模型終究還是再做「文字接龍」，所以我們還是需要對語言模型的回覆進行審核與驗證，確保它所提供的資訊是正確的。</p>
+<h2 id="Tool-Use（工具使用）"><a href="#Tool-Use（工具使用）" class="headerlink" title="Tool Use（工具使用）"></a>Tool Use（工具使用）</h2><p>這邊也要來提一件事情，使用搜尋引擎也算是工具的一種（Tool Use），其中 Gemini 就可以幫你撈，甚至是改你的 Gmail、Google Calendar。</p>
+<p>模型是如何做到使用工具這件事情呢？其實就是在 Context 中，告知模型它可以使用哪些工具，然後當模型需要使用這些工具時，它就會根據 Context 中的指示來使用這些工具，並將結果回傳給使用者。</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs txt">如果你遇到你無法解決的問題，那你可以使用工具<br>把要使用工具的指令放在 `&lt;tool&gt;` 和 `&lt;/tool&gt;` 標籤中，使用完畢之後，請把結果放在 `&lt;output&gt;` 和 `&lt;/output&gt;` 標籤中間。<br></code></pre></td></tr></table></figure>
+
+<p>接著你就要告訴模型該怎麼使用工具：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">你可以使用這些工具：<br><br>- 搜尋引擎：用來搜尋最新的資訊，使用方式：`WebSearch(value)`，使用範例：`WebSearch(&quot;2025 年最新的 AI 技術&quot;)`<br>- 計算機：用來進行數學計算，使用方式：`Calculator(value)`，使用範例：`Calculator(&quot;12345 * 6789&quot;)`<br></code></pre></td></tr></table></figure>
+
+<p>因此當你在給予模型 User Prompt 時，就會像這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">請幫我搜尋「2025 年最新的 AI 技術」，並且告訴我有哪些重點。<br></code></pre></td></tr></table></figure>
+
+<p>模型就會根據 Context 中的指示來使用搜尋引擎工具</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>WebSearch(&quot;2025 年最新的 AI 技術&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>但這邊有件事情要特別講一下，語言模型並不是真的去使用這個工具，因為這一串只是一個單純的「文字」，並沒有辦法真的可以讓你使用，所以你會需要透過一個小程式幫你將這一串文字轉換成真正的工具使用行為，這個小程式通常稱為「中介者（Mediator）」。</p>
+<p>所以假設來講，當模型產生了這一串文字：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>WebSearch(&quot;2025 年最新的 AI 技術&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>接下來就會把語言模型的結果，丟給中介者，他的程式碼可能長這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">performWebSearch</span>(<span class="hljs-params">query</span>) &#123;<br>  <span class="hljs-comment">// 這邊是你實際執行搜尋的程式碼</span><br>  <span class="hljs-comment">// 假設我們使用某個搜尋 API 來取得結果</span><br>  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`https://api.example.com/search?q=<span class="hljs-subst">$&#123;<span class="hljs-built_in">encodeURIComponent</span>(query)&#125;</span>`</span>);<br>  <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();<br>  <span class="hljs-keyword">return</span> data.<span class="hljs-property">results</span>; <span class="hljs-comment">// 假設回傳搜尋結果</span><br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">mediator</span>(<span class="hljs-params">modelOutput</span>) &#123;<br>  <span class="hljs-keyword">const</span> toolRegex = <span class="hljs-regexp">/&lt;tool&gt;([\s\S]*?)&lt;\/tool&gt;/</span>;<br>  <span class="hljs-keyword">const</span> match = modelOutput.<span class="hljs-title function_">match</span>(toolRegex);<br>  <span class="hljs-keyword">if</span> (match) &#123;<br>    <span class="hljs-keyword">const</span> toolCommand = match[<span class="hljs-number">1</span>].<span class="hljs-title function_">trim</span>();<br>    <span class="hljs-keyword">if</span> (toolCommand.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;WebSearch&quot;</span>)) &#123;<br>      <span class="hljs-keyword">const</span> query = toolCommand.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/WebSearch\(&quot;([\s\S]*?)&quot;\)/</span>)[<span class="hljs-number">1</span>];<br>      <span class="hljs-keyword">const</span> searchResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">performWebSearch</span>(query); <span class="hljs-comment">// 假設這是一個執行搜尋的函式</span><br>      <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;output&gt;<span class="hljs-subst">$&#123;searchResults&#125;</span>&lt;/output&gt;`</span>;<br>    &#125;<br>    <span class="hljs-comment">// 可以擴展其他工具的使用</span><br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Tool-Use：Computer-Use"><a href="#Tool-Use：Computer-Use" class="headerlink" title="Tool Use：Computer Use"></a>Tool Use：Computer Use</h3><p>在所有的工具中，其實有一個最強大最通用的工具，也就是我們的電腦，這邊就稱為 「Computer Use」，也就是讓模型能夠使用電腦來進行各種操作，例如：讀取檔案、寫入檔案、執行程式碼等。</p>
+<p>以 ChatGPT 為例，它有提供一個功能叫做「AI Agent(代理程式)」，這個功能可以讓模型使用電腦來進行各種操作，像是讀取檔案、寫入檔案、執行程式碼等，甚至你可以要求 ChatGPT 幫你訂票、寄信、整理資料等，這些都是透過讓模型使用電腦來達成的。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251114102649.png?alt=media&token=fe19ff4a-c098-4d63-9af1-8b2b6ad900c1" alt="ChatGPT"></p>
+<p>那回頭聊一下語言模型到底是怎麼做到這些事情的，其實概念與前面講的「Tool Use」是一樣的，基本上就是在 Context 中，告知模型它可以使用哪些工具，然後當模型需要使用這些工具時，它就會根據 Context 中的指示來使用這些工具，並將結果回傳給使用者。</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">你可以使用這些工具：<br><br>- 滑鼠：用來點擊、拖曳、滾動以及移動到指定位置，使用方式：`Mouse(action, x, y)`，使用範例：`Mouse(&quot;click&quot;, 100, 200)`<br>- 鍵盤：用來輸入文字、按下按鍵，使用方式：`Keyboard(action, key)`，使用範例：`Keyboard(&quot;type&quot;, &quot;Hello World&quot;)`<br>- 檔案系統：用來讀取、寫入檔案，使用方式：`FileSystem(action, path, content)`，使用範例：`FileSystem(&quot;write&quot;, &quot;/path/to/file.txt&quot;, &quot;Hello World&quot;)`<br>- 網路請求：用來發送 HTTP 請求，使用方式：`NetworkRequest(method, url, data)`，使用範例：`NetworkRequest(&quot;GET&quot;, &quot;https://api.example.com/data&quot;)`<br></code></pre></td></tr></table></figure>
+
+<p>因此當你在給予模型 User Prompt 時，就會像這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">請幫我打開瀏覽器，然後搜尋「2025 年最新的 AI 技術」，接著將搜尋結果存到桌面的 search_results.txt 檔案<br></code></pre></td></tr></table></figure>
+
+<p>接著語言模型就會根據 Context 中的指示來使用這些工具</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>Mouse(&quot;click&quot;, 100, 200)  // 假設這是點擊瀏覽器的搜尋欄位<br>Keyboard(&quot;type&quot;, &quot;2025 年最新的 AI 技術&quot;)<br>Keyboard(&quot;type&quot;, &quot;Enter&quot;)  // 假設這是按下 Enter<br>FileSystem(&quot;write&quot;, &quot;/Users/username/Desktop/search_results.txt&quot;, &quot;搜尋結果內容&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>然後同樣的，這邊也需要透過一個中介者（Mediator）來將這些指令轉換成真正的電腦操作行為。</p>
+<h2 id="Reasoning-（推理能力）"><a href="#Reasoning-（推理能力）" class="headerlink" title="Reasoning （推理能力）"></a>Reasoning （推理能力）</h2><p>接下來要來講講所謂的「Reasoning （推理能力）」，許多模型都號稱自己有「深度思考」能力，例如：DeepSeek 系列、Gemini 系列以及 ChatGPT 都有特定模型號稱自己有「深度思考」能力，那這些模型到底是怎麼做到的呢？</p>
+<p>通常語言模型在接收到你的 User Prompt 後，會直接根據上下文資訊來產生回應，但所謂的深度思考也就是「它先不回答你，先進行一場腦內小劇場」，然後各種解決方式題出來自己驗證，例如…</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;reasoning&gt;<br>1. 方法一：A 解法驗證一下...不對<br>2. 方法二：B 解法驗證一下...看來可以<br>3. 方法三：C 解法驗證一下...感覺不太 ok<br>&lt;/reasoning&gt;<br></code></pre></td></tr></table></figure>
+
+<p>接著再依照「方法二」來產生最終的回應，並給你最終的答案。</p>
+<p>許多模型都不會讓你看到這些語言模型推理的過程，大多都只有部分的摘要，而這部份驗證的過程也是屬於 context 的一部分，只是這個 context 並不是來自於使用者，而是來自於模型本身的自己加入進去的。</p>
+<h2 id="所以到底什麼是-Context？"><a href="#所以到底什麼是-Context？" class="headerlink" title="所以到底什麼是 Context？"></a>所以到底什麼是 Context？</h2><p>前面介紹了許多知識，其實這些知識都是屬於 Context 的一部分，裡面包含了…</p>
+<ul>
+<li>System Prompt（系統提示詞）</li>
+<li>User Prompt（使用者提示詞）</li>
+<li>Dialogue History（對話歷史）</li>
+<li>Memory（記憶）</li>
+<li>Relevant Information from Other Sources（來自其他來源的相關資訊）</li>
+<li>Tool Use（工具使用）</li>
+<li>Reasoning（推理能力）</li>
+</ul>
+<p>超級無敵多吧？所以你可以知道 Context 非常的長，因此 Context Engineering （上下文工程）的核心經隨就是</p>
+<p>「避免 Context Too Long(上下文過長)」</p>
+<p>當 Context 爆掉的時候，就很容易發生語言模型忘記前面的相關設定、資訊等，導致模型無法正確的回應使用者的需求。</p>
+<h2 id="為什麼-AI-Agent-的時代，會需要-Context-Engineering"><a href="#為什麼-AI-Agent-的時代，會需要-Context-Engineering" class="headerlink" title="為什麼 AI Agent 的時代，會需要 Context Engineering"></a>為什麼 AI Agent 的時代，會需要 Context Engineering</h2><p>這邊通常我們有三種使用 AI 的方式：</p>
+<ul>
+<li>普通使用 AI 方式：一問一答，讓 AI 幫你產生內容。</li>
+<li>Agentic Workflow：讓 AI 幫你完成一個工作流程，所以你會定義出一個工作流程，然後讓 AI 幫你完成這個工作流程，這個流程會是固定的流程。</li>
+<li>AI Agent：相較於上面固定的 SOP，AI Agent 則是讓 AI 自己決定要怎麼完成這個工作流程，甚至是決定要使用哪些工具來完成這個工作流程，舉例來講，像是告知語言模型幫我訂一張從台北到高雄的火車票，然後讓語言模型自己決定要使用什麼工具來完成這個任務，甚至是決定要不要先查詢一下火車時刻表等，核心重點在於「沒有一個固定的流程」，而是讓 AI 自己決定要怎麼完成這個任務。</li>
+</ul>
+<p>AI Agent 基本上就像是一個循環、迴圈一樣，它會不斷的根據上下文資訊來決定下一步要做什麼事情，然後再根據新的上下文資訊來決定下一步要做什麼事情，直到完成整個任務為止。</p>
+<p>AI Agent 的每次迭代主要包含兩個階段：</p>
+<ul>
+<li>Observation（觀察）：指的是 Agent 在執行上一個 Action 後所取得的結果，例如：工具回傳內容、API 回應、錯誤訊息、或使用者的新指令。</li>
+<li>Action（行動）：指的是 Agent 根據當前的 Observation 及整體上下文所決定要採取的下一個行動，例如：呼叫工具、查詢資訊、更新計畫、或直接回覆結果。</li>
+</ul>
+<p>這邊也提一下，我們會將任務目標稱為「Goal」。</p>
+<blockquote>
+<p><strong>Note</strong><br>使用 AI Agent 的時候，務必要注意它的操作流程，確保它不會做出危害系統或使用者的行為，例如：刪除不該刪除的檔案、發送垃圾郵件等。</p>
+</blockquote>
+<h2 id="從-LLM-的角度來看-AI-Agent-到底想解決什麼問題"><a href="#從-LLM-的角度來看-AI-Agent-到底想解決什麼問題" class="headerlink" title="從 LLM 的角度來看 AI Agent 到底想解決什麼問題"></a>從 LLM 的角度來看 AI Agent 到底想解決什麼問題</h2><p>這邊不管怎樣，都要記得一件事情，語言模型從頭到尾都只是再做「文字接龍」的遊戲而已，而 AI Agent 只是基於現有 LLM 的接龍能力，透過不斷的迭代來完成一個複雜的任務而已，所以並不算是什麼很特別的技術。</p>
+<p>而 AI Agent 最大的挑戰就是 Context Too Long（上下文過長）問題，因為 AI Agent 需要不斷的將新的 Observation 加入到 Context 中，這樣一來 Context 就會越來越長，最終就會超過模型的最大 Context 長度，導致模型無法正確的回應使用者的需求。</p>
+<p>儘管我們會看到許多語言模型號稱他們的 Context Windows Size 有多長，但實際上能夠使用的 Context 長度通常都比官方宣稱的還要少，這是因為模型在處理 Context 時，會有一些額外的開銷，例如：System Prompt、Tool Use、Reasoning 等，這些都會佔用掉一部分的 Context 長度。</p>
+<p>許多語言模型在到達特定上限之前，都會 Auto Summarize（自動摘要）之前的 Context，將較長的 Context 壓縮成較短的摘要，這樣一來就能夠節省掉一些 Context 長度，但往往就很容易發生資訊遺失的問題，導致模型無法正確的回應使用者的需求，因為你根本不知道模型會摘要記錄哪些資訊，哪些資訊會被遺失。</p>
+<p>這邊也要提醒一件事情，能夠輸入上百萬個內容，也不代表語言模型可以理解你提供給他的內容，概念就跟叫你讀完一本厚厚的書籍一樣，你不見得能夠理解書中的內容也很難知道哪些內容是重點，所以有很多實驗結果都是「給的資料越多，模型的表現反而越差」，這就是因為模型無法理解你提供給他的內容，導致模型無法正確的回應使用者的需求。</p>
+<p>一開始或許給一定數量的資料語言模型是可以理解的，但當資料量越來越多的時候，語言模型就會開始不理解甚至混亂，許多時間上都有說明語言模型大多都只記得「開頭」跟「結尾」的內容，這也是為什麼我們在設計 Context 時，通常會將最重要的資訊放在開頭跟結尾，這樣一來語言模型就比較容易記住這些重要的資訊了。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251115024502.png?alt=media&token=8642d853-5cf5-4623-9b2c-4dcfb2eb042e" alt="Context Too Long"></p>
+<p>其實你會發現語言模型跟人類的記憶模式很相似，大多都是只記得開頭跟結尾，比較難以記得中間的過程。</p>
+<h2 id="Context-Engineering-的基本概念"><a href="#Context-Engineering-的基本概念" class="headerlink" title="Context Engineering 的基本概念"></a>Context Engineering 的基本概念</h2><p>透過前面這些案例說明，我們可以知道 Context Engineering 最核心的重點一句話就是：</p>
+<p>「把你的 Context 管理好。」</p>
+<p>把重要的 Context 放進去，把不重要的 Context 刪掉，確保 Context 不會過長，這樣一來語言模型就能夠正確的回應使用者的需求了。</p>
+<p>接下來就來聊聊 Context Engineering 常見的三種招式。</p>
+<h3 id="Select（選擇）"><a href="#Select（選擇）" class="headerlink" title="Select（選擇）"></a>Select（選擇）</h3><p>要選擇你真正需要給模型的 Context 資訊，而不是把一推無關或者所有的資訊都給它，這樣反而會讓模型無法正確的回應使用者的需求。</p>
+<p>舉例來講，你透過 RAG 取得了一推網路上的相關資訊，但你只需要將其中他真正需要閱讀的內容與資訊給他，而不是整份文件都給他，如同前面所講，就連人類都只記得開頭跟結尾的內容，模型也是一樣的道理。</p>
+<p>以我最近最經典的案例，我花了一個月重頭觀看了火影忍者（全 700 話），你問我中間演了什麼我也無法告知你，我只能跟你說開頭跟片尾，甚至片段重點的資訊，像是鳴人是個孤兒，肚子裡面有一隻九尾妖狐，然後他有一個師父叫做自來也，跟佐助是青梅竹馬，然後最後佐助變壞了，鳴人就跟他打架，最後佐助被鳴人感化了，然後大家就和平相處了。</p>
+<p>那…把這些語言模型不需要的內容去除是讓人類來做嗎？不對，也是讓語言模型去做，而不是人工處理。</p>
+<p>因此核心重點在於「只挑選、只放入語言模型真正需要的 Context 資訊」，這樣可以避免 Context 爆掉的問題，就連提供 Tools 也是一樣，不要 100 個工具都給它，挑選幾個真正需要的工具給它就好。</p>
+<p>這邊也要提醒一件事情，當語言模型回覆發生錯誤時，千萬不要急著叫他修這些錯誤，有些時候這些錯誤經驗反而會導致語言模型表現更差，就像是你現在不准想大象，但腦海中卻一直浮現大象的畫面一樣。</p>
+<p>那麼該怎麼樣讓 AI 不再犯一樣的錯誤，那麼就需要我們透過一些技巧與手法來達到，例如：給予正確的示例、提供更明確的指示等，接著將這些正確的經驗放入 Context 中，讓語言模型能夠學習到正確的行為模式，這樣一來就能夠避免語言模型犯同樣的錯誤了。</p>
+<h3 id="Compress（壓縮）"><a href="#Compress（壓縮）" class="headerlink" title="Compress（壓縮）"></a>Compress（壓縮）</h3><p>壓縮這件事情做主要發生在 Context 太長的時候，那…所以是我們幫語言模型進行壓縮嗎？不對，也是要讓語言模型自己來做。</p>
+<p>例如，你可以要求語言模型這個 Context Windows 到達 90% 就叫他摘要總結前面的內容壓縮一次，又或者當每互動 100 次就叫他摘要總結前面的內容壓縮一次，接著再依照這些壓縮的內容來進行後續的回應，這樣也可以避免 Context Too Long 的問題。</p>
+<p>所以每次壓縮之後，這些壓縮的內容就會包含前一次壓縮的內容</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fintro-to-genai-ml%2Fday2%2F20251115224632.png?alt=media&token=e9120b22-4e12-4c03-8713-3cdc9d526f27" alt="Compress"></p>
+<p>因此越是遙遠的內容，語言模型就越是無法記得細節。</p>
+<p>以實際開發來講，我們最常見的技巧就是將這些資料記錄在 Markdown 檔案中，然後讓語言模型去讀取這些 Markdown 檔案，接著再將這些 Markdown 檔案的內容進行壓縮，最後再將這些壓縮的內容放入 Context 以此類推。</p>
+<p>當然，如果你有一部分很重要的內容不希望因為壓縮而消失，那麼你可以試著把這些內容放到可以長期儲存的空間，再透過 RAG 的方式將這些重要內容拉回來，這樣一來就能夠確保這些重要內容不會因為壓縮而消失了。</p>
+<h3 id="Multi-Agent（多代理）"><a href="#Multi-Agent（多代理）" class="headerlink" title="Multi-Agent（多代理）"></a>Multi-Agent（多代理）</h3><p>Multi-Agent 的概念就是…</p>
+<p>我們建立了一個各種擅長不同領域的 AI 代理人（Agent），然後讓這些代理人彼此合作來完成一個複雜的任務，例如…CEO Agent、CTO Agent、Project Manager Agent、Developer Agent、Designer Agent 等等，這些代理人各自負責不同的工作內容，然後彼此合作來完成一個複雜的任務。</p>
+<p>而 Multi-Agent 其實就是很有效管理 Context 的一種方式，因為每個代理人只需要關注自己負責的工作內容而不會被其他不相關的內容干擾。</p>
+<p>舉例來講，如果你沒用善加利用 Multi-Agent 的話，當你要開發一個網站時，你可能會需要將所有的需求、設計、開發、測試等內容都放入同一個 Context 中，概念就跟找了一個人同時負責設計、前端、後端、測試等工作一樣，這個就稱為 Single-Agent。</p>
+<p>因為 Multi-Agent 就是透過有一位 Lead 角色（例如：Project Manager Agent）來協調各個代理人之間的合作，當我提出一個需求時 Lead 會開始分析這個需求，然後決定應該要交給哪一個代理人來處理這個需求，接著這個代理人就會根據自己的專業知識來完成這個需求，最後再將結果回傳給 Lead，然後 Lead 再將結果回傳給使用者。</p>
+<p>概念就像是這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">我想要一個網站，這個網站需要有會員系統、商品展示、購物車、訂單管理等功能。<br></code></pre></td></tr></table></figure>
+
+<p>接著第一個接收到的人就會是 Lead 角色（Project Manager Agent） 的 Agent：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">使用者說想要做一個網站，這個網站需要有會員系統、商品展示、購物車、訂單管理等功能。<br><br>但我需要先了解這個網站的各項細項，所以這邊需要呼叫 Product Manager Agent 來協助跟使用者進行需求訪談。<br></code></pre></td></tr></table></figure>
+
+<p>因此，整個過程的概念就像是這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">使用者 → Lead Agent → Product Manager Agent → Lead Agent → Designer Agent → Lead Agent → Developer Agent → Lead Agent → 使用者<br></code></pre></td></tr></table></figure>
+
+<p>所以你會發現這樣的方式，對於 Context 的內容是可以非常有效管理的。</p>
+<p>因此當任務比較單純時，就很適合 Single-Agent 的方式來處理，但當任務比較複雜時，就很適合 Multi-Agent 的方式來處理，這樣一來就能夠有效管理 Context 的內容。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://speech.ee.ntu.edu.tw/~hylee/GenAI-ML/2025-fall.php">從語言模型到AI Agent</a></li>
+</ul>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/vue/20251106/1172686218/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 &lt;spec lang="md"&gt; 標籤在 Vue 中舒服的使用 SFC 搭配 AI 開發
+          </span>
+        </a>
+      
+
+      
+        <a href="/SCSS/20251123/3919803484/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            SCSS 棄用 @import？！
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/ai/20251102/2069630219/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                生成式人工智慧與機器學習導論（1） - 其實都是文字接龍
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-11-02
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/ai/20251112/978259833/" data-title="生成式人工智慧與機器學習導論（2） - AI Agent 背後的關鍵技術 Context Engineering" data-hashtags="生成式 AI,李宏毅,大語言模型,ChatGPT 原理,LLM 教學,AI 幻覺,Context Engineering" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/ai/20251112/978259833/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/ai/20251112/978259833/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/ai/20251112/978259833/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Context-Engineering-%EF%BC%88%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B%EF%BC%89%EF%BC%9F"><span class="toc-text">什麼是 Context Engineering （上下文工程）？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prompt-Engineering-%EF%BC%88%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%89-vs-Context-Engineering-%EF%BC%88%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B%EF%BC%89"><span class="toc-text">Prompt Engineering （提示工程） vs Context Engineering （上下文工程）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Prompt%EF%BC%9A%E7%B5%A6%E5%89%8D%E6%8F%90"><span class="toc-text">User Prompt：給前提</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Prompt%EF%BC%9A%E7%B5%A6%E5%8F%83%E8%80%83"><span class="toc-text">User Prompt：給參考</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#System-Prompt-%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E9%BA%BC"><span class="toc-text">System Prompt 到底是什麼</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dialogue-History-%EF%BC%88%E7%9F%AD%E6%9C%9F%E8%A8%98%E6%86%B6%EF%BC%89"><span class="toc-text">Dialogue History （短期記憶）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Long-Term-Memory-%EF%BC%88%E9%95%B7%E6%9C%9F%E8%A8%98%E6%86%B6%EF%BC%89"><span class="toc-text">Long-Term Memory （長期記憶）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E4%BE%86%E6%BA%90%E5%8F%83%E8%80%83"><span class="toc-text">其他來源參考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tool-Use%EF%BC%88%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%EF%BC%89"><span class="toc-text">Tool Use（工具使用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tool-Use%EF%BC%9AComputer-Use"><span class="toc-text">Tool Use：Computer Use</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reasoning-%EF%BC%88%E6%8E%A8%E7%90%86%E8%83%BD%E5%8A%9B%EF%BC%89"><span class="toc-text">Reasoning （推理能力）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%80%E4%BB%A5%E5%88%B0%E5%BA%95%E4%BB%80%E9%BA%BC%E6%98%AF-Context%EF%BC%9F"><span class="toc-text">所以到底什麼是 Context？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC-AI-Agent-%E7%9A%84%E6%99%82%E4%BB%A3%EF%BC%8C%E6%9C%83%E9%9C%80%E8%A6%81-Context-Engineering"><span class="toc-text">為什麼 AI Agent 的時代，會需要 Context Engineering</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%9E-LLM-%E7%9A%84%E8%A7%92%E5%BA%A6%E4%BE%86%E7%9C%8B-AI-Agent-%E5%88%B0%E5%BA%95%E6%83%B3%E8%A7%A3%E6%B1%BA%E4%BB%80%E9%BA%BC%E5%95%8F%E9%A1%8C"><span class="toc-text">從 LLM 的角度來看 AI Agent 到底想解決什麼問題</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Context-Engineering-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-text">Context Engineering 的基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Select%EF%BC%88%E9%81%B8%E6%93%87%EF%BC%89"><span class="toc-text">Select（選擇）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compress%EF%BC%88%E5%A3%93%E7%B8%AE%EF%BC%89"><span class="toc-text">Compress（壓縮）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Multi-Agent%EF%BC%88%E5%A4%9A%E4%BB%A3%E7%90%86%EF%BC%89"><span class="toc-text">Multi-Agent（多代理）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/git/20260122/21277993/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git init 出現 master 分支提示？教你設定預設分支為 main
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260122/2316436852/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Dev Containers 打造 AI 自動化開發的安全隔離環境
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              14 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/git/20260121/2025687513/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git Worktree 是什麼？一個專案同時跑多個 AI Agent 的秘訣
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/other/20260121/695717014/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260120/4189755271/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/20
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              35 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>

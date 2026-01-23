@@ -1,0 +1,1170 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token 放 localStorage？sessionStorage？還是 Cookie？ | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/information-security/20230516/18406287/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="這一篇文章來分享與記錄一下關於 JWT Token 的一些事情，以及為什麼不要把 JWT Token 放在 localStorage。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Token 放 localStorage？sessionStorage？還是 Cookie？">
+  <meta property="og:url" content="https://israynotarray.com/information-security/20230516/18406287/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這一篇文章來分享與記錄一下關於 JWT Token 的一些事情，以及為什麼不要把 JWT Token 放在 localStorage。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://i.imgur.com/YRLvwMA.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2023-05-16T08:54:38.000Z">
+    
+      <meta property="article:modified_time" content="2023-05-16T08:54:38.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="資安">
+      
+    
+    
+      
+        <meta property="article:tag" content="localStorage">
+      
+        <meta property="article:tag" content="XSS">
+      
+        <meta property="article:tag" content="資安">
+      
+        <meta property="article:tag" content="JWT">
+      
+        <meta property="article:tag" content="Cookie">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Token 放 localStorage？sessionStorage？還是 Cookie？">
+  <meta name="twitter:description" content="這一篇文章來分享與記錄一下關於 JWT Token 的一些事情，以及為什麼不要把 JWT Token 放在 localStorage。">
+  
+    <meta name="twitter:image" content="https://i.imgur.com/YRLvwMA.png">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"Token 放 localStorage？sessionStorage？還是 Cookie？","url":"https://israynotarray.com/information-security/20230516/18406287/","datePublished":"2023-05-16T08:54:38.000Z","dateModified":"2023-05-16T08:54:38.000Z","description":"這一篇文章來分享與記錄一下關於 JWT Token 的一些事情，以及為什麼不要把 JWT Token 放在 localStorage。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://i.imgur.com/YRLvwMA.png","articleSection":["資安"],"keywords":"localStorage, XSS, 資安, JWT, Cookie"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"資安","item":"https://israynotarray.com/categories/information-security/"},{"@type":"ListItem","position":3,"name":"Token 放 localStorage？sessionStorage？還是 Cookie？","item":"https://israynotarray.com/information-security/20230516/18406287/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C7w1NhyW.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      Loading...
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[250px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[230px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2023-05-16
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/information-security/" class="hover:text-primary-500 transition-colors">資安</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Token 放 localStorage？sessionStorage？還是 Cookie？
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/localStorage/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #localStorage
+            </a>
+          
+            <a href="/tags/XSS/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #XSS
+            </a>
+          
+            <a href="/tags/%E8%B3%87%E5%AE%89/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #資安
+            </a>
+          
+            <a href="/tags/JWT/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #JWT
+            </a>
+          
+            <a href="/tags/Cookie/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Cookie
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://i.imgur.com/YRLvwMA.png" alt="不要再把 JWT Token 放在 localStorage 了"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇文章來分享與記錄一下關於 JWT Token 的一些事情，以及為什麼不要把 JWT Token 放在 localStorage。</p>
+<h2 id="JSON-Web-Token-JWT"><a href="#JSON-Web-Token-JWT" class="headerlink" title="JSON Web Token(JWT)"></a>JSON Web Token(JWT)</h2><p>那麼這邊也簡單描述一下什麼是 JSON Web Token(JWT) 呢？基本上 JWT 是一個基於 JSON 標準的格式，那…它常見在哪些場景呢？</p>
+<p>基本上需要授權的地方都可以使用 JWT，例如…</p>
+<ul>
+<li>登入</li>
+<li>重設密碼</li>
+<li>修改個人資料</li>
+</ul>
+<p>等等。</p>
+<p>因此當使用者登入的時候，你就會得到一組 JWT Token</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F202305161720.jpg?alt=media&token=090eb5f8-d5e1-489f-b4b0-0c50ad0a08e5" alt="Token"></p>
+<p>而這一組 Token 就會是你未來跟伺服器溝通的識別碼，而伺服器也會透過這一組 Token 來驗證你的身份。</p>
+<h3 id="JWT-Token-的組成"><a href="#JWT-Token-的組成" class="headerlink" title="JWT Token 的組成"></a>JWT Token 的組成</h3><p>接下來我們來快速聊一下關於 JWT 的組成，底下是 JWT 官方網站所提供的範例 Token</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c<br></code></pre></td></tr></table></figure>
+
+<p>JWT Token 基本上是由三個部分組合而成，分別是…</p>
+<ul>
+<li>HEADER（標頭）：ALGORITHM &amp; TOKEN TYPE<ul>
+<li>用來說明這一組 Token 是用什麼演算法加密的，以及 Token 的類型</li>
+</ul>
+</li>
+<li>PAYLOAD（負載）：DATA<ul>
+<li>主要是用來存放一些資料，例如使用者的 ID、名字等等</li>
+</ul>
+</li>
+<li>VERIFY SIGNATURE（驗證簽名）<ul>
+<li>這一部分是用來驗證 Token 是否為正確的 Token</li>
+</ul>
+</li>
+</ul>
+<p>那麼我們該如何看出 HEADER、PAYLOAD 與 VERIFY SIGNATURE 呢？基本上 JWT Token 是使用 <code>.</code> 來分隔的，因此我們可以透過 <code>.</code> 來切割 Token，拆成以下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. # HEADER<br>eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ. # PAYLOAD<br>SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c # VERIFY SIGNATURE<br></code></pre></td></tr></table></figure>
+
+<p>到目前為此，應該已經對於 JWT Token 的組成有一定的概念了，所以接下來就來快速聊一下瀏覽器的儲存空間吧。</p>
+<h2 id="localStorage？sessionStorage？cookie？"><a href="#localStorage？sessionStorage？cookie？" class="headerlink" title="localStorage？sessionStorage？cookie？"></a>localStorage？sessionStorage？cookie？</h2><p>當我們登入之後會取得一組 JWT Token 作為與後端伺服器溝通的識別碼，那麼再往下介紹之前，我想先快速重溫一下關於瀏覽器儲存資料的地方。</p>
+<p>底下我列出幾個常見的地方：</p>
+<ul>
+<li><code>localStorage</code></li>
+<li><code>sessionStorage</code></li>
+<li><code>cookie</code></li>
+</ul>
+<p>接下來我們先來認識一下 <code>localStorage</code> 與 <code>sessionStorage</code>，這兩個都是 HTML5 所提供的 Web Storage API，而這兩個的差別在於 <code>localStorage</code> 的資料會<strong>永久（或半永久，因為如果使用者刪除的話）儲存</strong>在瀏覽器中，而 <code>sessionStorage</code> 的資料只會存在於當前的瀏覽器分頁中。</p>
+<p>接著我們來看一下 <code>localStorage</code> 的基本用法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> data = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">url</span>: <span class="hljs-string">&#x27;https://israynotarray.com/&#x27;</span>,<br>&#125;;<br><br><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));<br></code></pre></td></tr></table></figure>
+
+<p>透過上面程式碼，我們可以將資料儲存到瀏覽器的儲存空間內，因此你可以在開發者工具中找到它</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F202305161736.jpg?alt=media&token=80045446-cb1b-4fcb-a414-fb951e7ef0d0" alt="localStorage"></p>
+<p>那麼 <code>sessionStorage</code> 的用法也是類似的，只是將 <code>localStorage</code> 改成 <code>sessionStorage</code> 即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> data = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">url</span>: <span class="hljs-string">&#x27;https://israynotarray.com/&#x27;</span>,<br>&#125;;<br><br><span class="hljs-variable language_">sessionStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));<br></code></pre></td></tr></table></figure>
+
+<p>而且它也可以在開發者工具中找到，只是位置就不會在 <code>localStorage</code> 的位置，而是瀏覽階段儲存空間中</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F202305161740.jpg?alt=media&token=2e0c3edc-adcf-4f77-9a56-95d1ed7c597a" alt="sessionStorage"></p>
+<p>那麼 <code>sessionStorage</code> 與 <code>localStorage</code> 最大不同的地方在於，當你的瀏覽器分頁關閉之後 <code>sessionStorage</code> 的資料就會被清除，而 <code>localStorage</code> 的資料則會一直存在於瀏覽器中。</p>
+<p>接下來我們接著看 Cookie 的寫法，Cookie 也是拿來儲存一些資料的，而儲存方式主要是採用 <code>key=value</code> 的方式，並使用 <code>;</code> 來分隔不同的資料，例如</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">name=Ray;<br></code></pre></td></tr></table></figure>
+
+<p>因此寫入時，就可以這樣寫入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">cookie</span> = <span class="hljs-string">&#x27;name=Ray&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F202305161748.jpg?alt=media&token=50aa5c30-2d2d-40e7-95f8-8ac7f86f9fee" alt="Cookie"></p>
+<p>那麼上面就是我們最基本的 <code>localStorage</code>、<code>sessionStorage</code> 與 <code>cookie</code> 的用法。</p>
+<p>（當然上面還有很多細節沒提到，為了讓我可以後面有東西講，所以我特別簡化了。）</p>
+<h2 id="JWT-Token-該放…？"><a href="#JWT-Token-該放…？" class="headerlink" title="JWT Token 該放…？"></a>JWT Token 該放…？</h2><p>那麼所以該把 JWT Token 放在哪裡呢？透過前面的範例講解之後，其實我們可以知道 JWT Token 是一個非常重要的識別碼，我們要跟後端拿任何資料都會需要它，因此這一組 Token 是不可以隨意外流的，如果被不法之徒拿到的話，就有可能造成資料外洩的問題。</p>
+<p>但是你知道嗎？看似加密的 JWT Token 其實是可以反向解析的，也就是說<strong>如果有人拿到了 JWT Token 就可以透過解析的方式來看到&#x2F;取得裡面的資料。</strong></p>
+<p>舉例來講，以官方所提供的 JWT Token 為例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c<br></code></pre></td></tr></table></figure>
+
+<p>你是可以在官方網站上面直接解析，而且它還會告訴你這個 JWT Token 的加密方式是什麼，以及裡面的資料是什麼</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F%E6%88%AA%E5%9C%96%202023-05-16%2017.55.08.png?alt=media&token=0d253714-02a9-40fa-b5a1-9916e6edc612" alt="Decoded JWT"></p>
+<p>你可以看到 PAYLOAD 直接顯示著以下資料</p>
+<ul>
+<li><code>sub</code>：代表著 Subject，也就是使用者的 ID</li>
+<li><code>name</code>：代表著使用者的名字</li>
+<li><code>iat</code>：代表著 Issued At，也就是這個 JWT Token 的發行時間</li>
+</ul>
+<p>當然 PAYLOAD 的內容是可以由後端開發者決定的，因此你可以在裡面放任何資料，例如你為了方便前端呈現使用者的 Email 或是使用者的姓名等等。</p>
+<p>那麼這邊就簡單示範一下，底下我寫了一個簡單的 Express+JWT 範例給予參考</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> jwt = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;jsonwebtoken&#x27;</span>);<br><br><span class="hljs-comment">// ...略過一些程式碼</span><br><br>router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/login&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, next</span>) &#123;<br>  <span class="hljs-keyword">const</span> &#123; username, password &#125; = req.<span class="hljs-property">body</span>;<br>  <span class="hljs-keyword">if</span> (username === <span class="hljs-string">&#x27;admin&#x27;</span> &amp;&amp; password === <span class="hljs-string">&#x27;123456&#x27;</span>) &#123;<br>    <span class="hljs-keyword">const</span> token = jwt.<span class="hljs-title function_">sign</span>(&#123;<br>      username,<br>      <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;example.com&#x27;</span>,<br>    &#125;, <span class="hljs-string">&#x27;privateKeyTest&#x27;</span>, &#123; <span class="hljs-attr">expiresIn</span>: <span class="hljs-number">60</span> &#125;);<br><br>    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">send</span>(&#123;<br>      token,<br>      <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;登入成功&#x27;</span><br>    &#125;);<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">401</span>).<span class="hljs-title function_">send</span>(&#123;<br>    <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;登入失敗&#x27;</span>,<br>    <span class="hljs-attr">status</span>: <span class="hljs-literal">false</span>,<br>  &#125;);<br>&#125;);<br><br><span class="hljs-comment">// ...略過一些程式碼</span><br></code></pre></td></tr></table></figure>
+
+<p>當我們輸入正確的帳號密碼之後，就會拿到一組 JWT Token，而這組 JWT Token 的內容就會是以下這樣</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;token&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOiJleGFtcGxlLmNvbSIsImlhdCI6MTY4NDIzNzAzNSwiZXhwIjoxNjg0MjM3MDk1fQ.y0KIWSmTSb4Mtwc6jbi0kejuka8B68p34zzNDz3YdVE&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;登入成功&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>接著你再拿這一組 Token 去解析，就可以得到以下結果</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Finformation-security%2F%E6%88%AA%E5%9C%96%202023-05-16%2019.39.09.png?alt=media&token=ad64ffec-f21e-45cb-86e1-81a85fc29204" alt="decoded"></p>
+<p>而你可能就會將這一組 Token 儲存到 <code>localStorage</code> 裡面，並且在每次發送請求的時候都帶上這一組 Token，讓後端可以透過這一組 Token 來判斷你的身份，這樣就可以達到驗證的效果，到目前為止這邊都看似沒有什麼太大的問題。</p>
+<p>以我個人立場來講，我認為…</p>
+<p>「將 Token 儲存在 <code>localStorage</code> 中並不是一件好事。」</p>
+<p>為什麼呢？假設駭客可以在你的網站在執行 JavaScript，那麼也就代表著駭客可以透過 JavaScript 來取得你的 <code>localStorage</code> 裡面的資料，那麼這樣就會有可能造成資料外洩的問題。</p>
+<p>底下這邊我寫了一個範例：</p>
+<iframe height="300" style="width: 100%;" scrolling="no" title="setToken" src="https://codepen.io/hsiangfeng/embed/poxOPoW?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng/pen/poxOPoW">
+  setToken</a> by Ray (<a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng">@hsiangfeng</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
+</iframe>
+
+<p>你可以看到上面的範例中，我在 CodePen 額外注入了一個 CodePen iFrame，然後直接透過 JavaScript 輕輕鬆鬆地取得 <code>localStorage</code> 的資料。</p>
+<p>雖然 <code>localStorage</code> 會依據網域來做區分，但是如果你的網站有 XSS 的漏洞，那麼駭客就可以透過 XSS 的漏洞來取得你的 <code>localStorage</code> 裡面的資料並傳送給自己，那 <code>sessionStorage</code> 呢？其實它的狀況跟 <code>localStorage</code> 是差不多的，所以就不額外示範了。</p>
+<p>那麼 <code>localStorage</code> 跟 <code>sessionStorage</code> 都會有這樣的問題，所以使用 Cookie 就可以解決嗎？</p>
+<p>答案是不行，因為 Cookie 也有可能會被 XSS 的攻擊給竊取</p>
+<iframe height="300" style="width: 100%;" scrolling="no" title="setToken" src="https://codepen.io/hsiangfeng/embed/WNagjRE?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng/pen/WNagjRE">
+  setToken</a> by Ray (<a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng">@hsiangfeng</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
+</iframe>
+
+<p>講那麼多好像不論放 localStorage、sessionStorage 或是 Cookie 好像都會有被竊取的問題？所以接下來這邊我會講四個結論，來盡可能避免這些狀況的發生。</p>
+<h3 id="第一個結論：小心第三方資源的引用"><a href="#第一個結論：小心第三方資源的引用" class="headerlink" title="第一個結論：小心第三方資源的引用"></a>第一個結論：小心第三方資源的引用</h3><p>基本上只要你的網站上可以執行第三方的 JavaScript，那麼你的資料就有可能會被竊取，這也是為什麼我們會盡可能避免使用 CDN 的原因之一，因為你無法確定 CDN 的資源是否安全，所以不論第三方的東西是否安全，只是出現第三方的東西，那麼就有可能會發生資料外洩的問題。</p>
+<p>更不用說如果 CDN 突然掛掉、更新版本等問題。</p>
+<h3 id="第二個結論：遵守原則"><a href="#第二個結論：遵守原則" class="headerlink" title="第二個結論：遵守原則"></a>第二個結論：遵守原則</h3><p>正常來講是可以使用 HTTP Only 的 Cookie 來解決，只要有被設置成 HTTP Only 的 Cookie，那麼就不會被 JavaScript 給取得，但是由於現今開發都是採用前後端分離的架構，而 HTTP Only 又必須透過後端來設定，因此就會無法設定 HTTP Only 的 Cookie。</p>
+<p>（如果沒有前後端分離的話，那麼也可以透過後端來設定 HTTP Only 的 Cookie 的。）</p>
+<p>所以如果想要解決無法設置 HTTP Only 的問題的話，就會建議遵守以下原則</p>
+<ul>
+<li>不將敏感資訊放進 JWT 中，如：密碼、信用卡號等</li>
+<li>使用 HTTPS 傳輸協議</li>
+<li>使用短期 Token</li>
+<li>設置 CORS 的白名單，只允許特定的網域來存取 API</li>
+<li>使用 CSRF Token 來防止 CSRF 攻擊</li>
+<li>使用一些語法時，要注意 XSS 的問題，如：<code>innerHTML</code>、<code>eval</code> 等</li>
+</ul>
+<p>基本上遵守以上原則就可以避免大部分的問題。</p>
+<h3 id="第三個結論：使用-Cookie"><a href="#第三個結論：使用-Cookie" class="headerlink" title="第三個結論：使用 Cookie"></a>第三個結論：使用 Cookie</h3><p>為什麼不建議將 Token 放置在 <code>localStorage</code> 裡面呢？因為 <code>localStorage</code> 是屬於<strong>半永久</strong>的儲存空間所以並不會隨著時間到期而消失，因此如果你的 Token 不會過期的話，那麼隨著時間拉長，那麼就會有隱藏的風險存在，更不用說你可能在裡面存放一些敏感資料的問題。</p>
+<p>雖然 <code>localStorage</code> 在設計上是非常方便的，但是跟 Cookie 相比，反而會建議使用 Cookie，因為 Cookie 有額外提供一些選項可以讓你設定 Cookie 的有效期限，因此你可以透過這個有效期限來讓 Cookie 在一定時間之後就會消失，這樣也不用擔心 Token 會永遠存在的問題。</p>
+<p>當然你也可以刻意與後端設置不同過期時間，例如：後端 Token 設置 7 天的有效期限，那麼你就可以設置 Cookie 的有效期限比後端更短，例如設置 3 天，這也是一種解決方案，而且你也可以設置該 Cookie 只能在特定的網域下才能存取，當然也可以增加 Refresh Token 機制。</p>
+<p>只是這邊要注意 <code>localStorage</code> 的儲存空間大小為 5MB，而 Cookie 的儲存空間大小為 4KB，因此如果你的 Token 過大的話，那麼就會無法使用 Cookie 來儲存，屆時就只能使用 <code>localStorage</code> 來儲存，只是就必須多加注意 <code>localStorage</code> 的安全性問題</p>
+<h3 id="第四個結論：使用者的操作"><a href="#第四個結論：使用者的操作" class="headerlink" title="第四個結論：使用者的操作"></a>第四個結論：使用者的操作</h3><p>基本上如果都已經盡可能遵守以上，並且系統也有做好安全性更新檢查的話，剩下的部分就會跟使用者比較有關，如果是因為使用者的操作不慎而導致資料外洩的話，那麼就只能說是使用者的問題了，這就不會是開發者的問題。</p>
+<p>例如：使用者在公共場所登入，但是沒有登出或是使用者在公共場所登入，但是沒有關閉瀏覽器等等，這些都是屬於使用者本身的問題，這種就比較難以解決，雖然我們可以設計自動登出的功能，但是百密一疏，還是有可能會因為使用者操作不當而外洩 Token。</p>
+<h2 id="結尾"><a href="#結尾" class="headerlink" title="結尾"></a>結尾</h2><p>雖然使用 <code>localStorage</code> 很方便，但是考慮到一些可能的安全性問題，因此建議還是使用 Cookie 來儲存 Token，並且設置有效期限，這樣就可以盡可能的去避免一些可能的資安問題，所以我將瀏覽器所提供的那幾個儲存空間定義如下</p>
+<ul>
+<li><code>localStorage</code>：半永久的儲存空間，適合儲存一些不會過期的資料，空間雖然有 5MB，但是要注意安全性的問題以及小心 XSS 的問題</li>
+<li><code>sessionStorage</code>：短暫的儲存空間，適合儲存一些不重要，頁面關閉就會消失的資料，同上</li>
+<li>Cookie：短暫的儲存空間，適合儲存一些會過期的資料，例如：Token 等敏感資訊，但要注意空間僅有 4KB 的問題，以及小心 CSRF 的問題</li>
+</ul>
+<p>所以其實不論是那一種儲存空間，都有其適合的使用場景，只是要注意安全性的問題，並且遵守一些原則，這樣就可以盡可能的避免一些可能的資安問題哩</p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/devpoint/3272823">避免将 JWT 存储在 localStorage 中</a></li>
+<li><a target="_blank" rel="noopener" href="https://jwt.io/">https://jwt.io/</a></li>
+<li><a target="_blank" rel="noopener" href="https://5xruby.tw/posts/what-is-jwt">是誰在敲打我窗？什麼是 JWT ？</a></li>
+</ul>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/javascript/20230516/1249700747/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            讓同事進入混亂貓咪的假 jQuery 技巧
+          </span>
+        </a>
+      
+
+      
+        <a href="/other/20230518/2131851751/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/vue/20231205/2797313606/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Vue3 中使用 DOMPurify 避免 XSS 攻擊
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-12-05
+              </p>
+            </div>
+          </a>
+        
+          <a href="/javascript/20231021/985189338/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                關於封裝 localStorage 的小技巧
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-21
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/information-security/20230516/18406287/" data-title="Token 放 localStorage？sessionStorage？還是 Cookie？" data-hashtags="localStorage,XSS,資安,JWT,Cookie" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/information-security/20230516/18406287/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/information-security/20230516/18406287/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/information-security/20230516/18406287/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSON-Web-Token-JWT"><span class="toc-text">JSON Web Token(JWT)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JWT-Token-%E7%9A%84%E7%B5%84%E6%88%90"><span class="toc-text">JWT Token 的組成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#localStorage%EF%BC%9FsessionStorage%EF%BC%9Fcookie%EF%BC%9F"><span class="toc-text">localStorage？sessionStorage？cookie？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JWT-Token-%E8%A9%B2%E6%94%BE%E2%80%A6%EF%BC%9F"><span class="toc-text">JWT Token 該放…？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%80%8B%E7%B5%90%E8%AB%96%EF%BC%9A%E5%B0%8F%E5%BF%83%E7%AC%AC%E4%B8%89%E6%96%B9%E8%B3%87%E6%BA%90%E7%9A%84%E5%BC%95%E7%94%A8"><span class="toc-text">第一個結論：小心第三方資源的引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%80%8B%E7%B5%90%E8%AB%96%EF%BC%9A%E9%81%B5%E5%AE%88%E5%8E%9F%E5%89%87"><span class="toc-text">第二個結論：遵守原則</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E5%80%8B%E7%B5%90%E8%AB%96%EF%BC%9A%E4%BD%BF%E7%94%A8-Cookie"><span class="toc-text">第三個結論：使用 Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E5%80%8B%E7%B5%90%E8%AB%96%EF%BC%9A%E4%BD%BF%E7%94%A8%E8%80%85%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">第四個結論：使用者的操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E5%B0%BE"><span class="toc-text">結尾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="toc-text">參考文獻</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/git/20260122/21277993/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git init 出現 master 分支提示？教你設定預設分支為 main
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260122/2316436852/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Dev Containers 打造 AI 自動化開發的安全隔離環境
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              14 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/git/20260121/2025687513/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git Worktree 是什麼？一個專案同時跑多個 AI Agent 的秘訣
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/other/20260121/695717014/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260120/4189755271/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/20
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              35 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1291 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>或許你該懂一下 CI/CD？用 CD 部署到 Render.com | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/other/20230520/2118016719/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="身為一名工程師來講，其實稍微懂一點 CI/CD 是滿有幫助的，畢竟如果想要做一點小專案之類的，那麼 CI/CD 是可以派上一些用場，就算你只是一名前端工程師，也可以善加利用 CI/CD 來做一些事情。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="或許你該懂一下 CI/CD？用 CD 部署到 Render.com">
+  <meta property="og:url" content="https://israynotarray.com/other/20230520/2118016719/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="身為一名工程師來講，其實稍微懂一點 CI/CD 是滿有幫助的，畢竟如果想要做一點小專案之類的，那麼 CI/CD 是可以派上一些用場，就算你只是一名前端工程師，也可以善加利用 CI/CD 來做一些事情。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Factions-workflow.svg?alt=media&amp;token=3e012e52-5742-4743-9a7e-c43bc9be4262">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2023-05-20T14:28:04.000Z">
+    
+      <meta property="article:modified_time" content="2023-05-20T14:28:04.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="雜談">
+      
+    
+    
+      
+        <meta property="article:tag" content="ESLint">
+      
+        <meta property="article:tag" content="Express">
+      
+        <meta property="article:tag" content="Jest">
+      
+        <meta property="article:tag" content="GitHub Actions">
+      
+        <meta property="article:tag" content="CI/CD">
+      
+        <meta property="article:tag" content="Render.com">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="或許你該懂一下 CI/CD？用 CD 部署到 Render.com">
+  <meta name="twitter:description" content="身為一名工程師來講，其實稍微懂一點 CI/CD 是滿有幫助的，畢竟如果想要做一點小專案之類的，那麼 CI/CD 是可以派上一些用場，就算你只是一名前端工程師，也可以善加利用 CI/CD 來做一些事情。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Factions-workflow.svg?alt=media&amp;token=3e012e52-5742-4743-9a7e-c43bc9be4262">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"或許你該懂一下 CI/CD？用 CD 部署到 Render.com","url":"https://israynotarray.com/other/20230520/2118016719/","datePublished":"2023-05-20T14:28:04.000Z","dateModified":"2023-05-20T14:28:04.000Z","description":"身為一名工程師來講，其實稍微懂一點 CI/CD 是滿有幫助的，畢竟如果想要做一點小專案之類的，那麼 CI/CD 是可以派上一些用場，就算你只是一名前端工程師，也可以善加利用 CI/CD 來做一些事情。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Factions-workflow.svg?alt=media&token=3e012e52-5742-4743-9a7e-c43bc9be4262","articleSection":["雜談"],"keywords":"ESLint, Express, Jest, GitHub Actions, CI/CD, Render.com"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"雜談","item":"https://israynotarray.com/categories/other/"},{"@type":"ListItem","position":3,"name":"或許你該懂一下 CI/CD？用 CD 部署到 Render.com","item":"https://israynotarray.com/other/20230520/2118016719/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C7w1NhyW.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      Loading...
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[250px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[230px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2023-05-20
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/other/" class="hover:text-primary-500 transition-colors">雜談</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        或許你該懂一下 CI/CD？用 CD 部署到 Render.com
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/ESLint/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #ESLint
+            </a>
+          
+            <a href="/tags/Express/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Express
+            </a>
+          
+            <a href="/tags/Jest/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Jest
+            </a>
+          
+            <a href="/tags/GitHub-Actions/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #GitHub Actions
+            </a>
+          
+            <a href="/tags/CI-CD/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #CI/CD
+            </a>
+          
+            <a href="/tags/Render-com/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Render.com
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Factions-workflow.svg?alt=media&token=3e012e52-5742-4743-9a7e-c43bc9be4262" alt="CI&#x2F;CD"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>身為一名工程師來講，其實稍微懂一點 CI&#x2F;CD 是滿有幫助的，畢竟如果想要做一點小專案之類的，那麼 CI&#x2F;CD 是可以派上一些用場，就算你只是一名前端工程師，也可以善加利用 CI&#x2F;CD 來做一些事情。</p>
+<h2 id="CI-CD-是什麼？"><a href="#CI-CD-是什麼？" class="headerlink" title="CI&#x2F;CD 是什麼？"></a>CI&#x2F;CD 是什麼？</h2><p>首先我們要先認識一下什麼是 CI 與 CD，CI 其實是 Continuous integration 的縮寫，而中文是<strong>持續整合</strong>，當然也有可能看到<strong>持續集成</strong>，而 CD 則是 Continuous deployment 的縮寫，中文是持續部署。</p>
+<p>ok，如果不出意外的話，現在已經出意外了，因為你應該感覺到滿頭問號中，你應該想著…</p>
+<p>「到底持續整合跟持續部署是在持續什麼東西呢？」</p>
+<p>所以這邊我們先進入一段想像畫面…</p>
+<p>當我們想要將專案給部署到正式開發環境時，通常會先輸入一些指令，例如 <code>npm run test</code> 先跑一下測試在執行打包指令 <code>npm run build</code>，然後再將打包好的檔案給部署到正式環境，這樣的流程就是一般的開發流程。</p>
+<p>雖然看是沒有什麼太大問題，但是身為人類的我們，總是會有一些疏忽，例如忘記跑測試、忘記打包等等，尤其是忘記跑測試這件事情是非常嚴重的，輕則上線後立刻修正，重則上線後立刻爆炸 on call 修正。</p>
+<p>而這一段就是 CI 要幫我們做的事情，他會自動幫我們持續的去整合這些我們應該本身要做的事情，例如測試、打包等等。</p>
+<p>CD 呢？其實 CD 就跟部署有關了，簡單來講 CD 就是幫我們自動部署，這樣的好處就是我們可以省下一些時間，而且也可以避免一些人為的疏忽。</p>
+<p>講了那麼多 CI&#x2F;CD 的基本概念後，接下來就準備要來使用 CI&#x2F;CD 了，但是我們要用哪一套了？市面上的 CI&#x2F;CD 工具我大概列下有以下</p>
+<ul>
+<li>Travis CI</li>
+<li>Circle CI</li>
+<li>Jenkins</li>
+<li>GitLab CI</li>
+<li>GitHub Actions</li>
+</ul>
+<p>以上是我大概知道的 CI&#x2F;CD 工具，但這一篇我會以 GitHub Actions 作為教學範例，畢竟 GitHub 是我們常用的平台，而且 GitHub Actions 也是 GitHub 官方提供的，所以我們就以 GitHub Actions 來做教學哩~</p>
+<h2 id="YAML-語法"><a href="#YAML-語法" class="headerlink" title="YAML 語法"></a>YAML 語法</h2><p>開始玩 GitHub Actions 之前，我們必須先學習一個東西，也就是 .yml 檔，這個檔案是 GitHub Actions 的設定檔，我們可以在這邊設定我們要做什麼事情，例如測試、打包、部署等等之類，另一種檔案格式是 .yaml，其實 .yml 跟 .yaml 是一樣的，只是副檔名不同而已。</p>
+<p>那麼 .yml 該怎麼寫呢？基本上 .yml 有以下幾個特性</p>
+<ul>
+<li>以縮排來區分層級</li>
+<li><code>#</code> 代表註解</li>
+<li>主要是以 <code>key: value</code> 的方式來寫</li>
+<li>用 <code>-</code> 區分多個值，也可以用 <code>[]</code> 來區分多個值，其實 <code>-</code> 跟 <code>[]</code> 是一樣的，只是 <code>[]</code> 可以讓你的 .yml 檔案看起來比較整齊而已，就是類似陣列一種，如果是物件的話也是使用 <code>key: value</code> 的方式來寫</li>
+<li><code>|</code> 與 <code>&gt;</code> 代表多行文字，但是前者會保留換行，後者則會將換行去除</li>
+<li><code>&#123;&#123; &#125;&#125;</code> 代表變數，可以用來取代一些值，例如 <code>&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;</code>，這邊的 <code>secrets.GITHUB_TOKEN</code> 是 GitHub Actions 提供的一個變數，可以用來取得 GitHub 的 token，這邊的 <code>secrets</code> 是一個物件，而 <code>GITHUB_TOKEN</code> 則是物件的 key，所以我們可以這樣取得 <code>secrets.GITHUB_TOKEN</code> 的值</li>
+</ul>
+<p>本質上來講 .yml 其實是 JSON 的一種格式，所以如果你有 JSON 的基礎，那麼 .yml 應該不難理解，底下我也寫一下 .yml 跟 JSON 的對照表</p>
+<h3 id="註解"><a href="#註解" class="headerlink" title="註解"></a>註解</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-comment"># 註解</span><br><span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;Ray&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="key-value"><a href="#key-value" class="headerlink" title="key: value"></a>key: value</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;Ray&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="多行文字"><a href="#多行文字" class="headerlink" title="多行文字"></a>多行文字</h3><p>第一種寫法（保留換行）：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">|</span><br><span class="hljs-string">  Ray</span><br><span class="hljs-string">  IsRayNotArray</span><br><span class="hljs-string">  Hello</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray\nIsRayNotArray\nHello&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>第二種寫法（去除換行）：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">&gt;</span><br><span class="hljs-string">  Ray</span><br><span class="hljs-string">  IsRayNotArray</span><br><span class="hljs-string">  Hello</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray IsRayNotArray Hello&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="陣列"><a href="#陣列" class="headerlink" title="陣列"></a>陣列</h3><p>第一種寫法：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Ray</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">IsRayNotArray</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Hello</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ray&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;IsRayNotArray&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Hello&quot;</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>第二種寫法：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> [<span class="hljs-string">Ray</span>, <span class="hljs-string">IsRayNotArray</span>, <span class="hljs-string">Hello</span>]<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ray&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;IsRayNotArray&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Hello&quot;</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="變數"><a href="#變數" class="headerlink" title="變數"></a>變數</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">secrets.GITHUB_TOKEN</span> &#125;&#125; <span class="hljs-comment"># 自動取得 GitHub 的 token 並注入</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1234567890&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="物件"><a href="#物件" class="headerlink" title="物件"></a>物件</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span><br>  <span class="hljs-attr">firstName:</span> <span class="hljs-string">Ray</span><br>  <span class="hljs-attr">lastName:</span> <span class="hljs-string">IsRayNotArray</span><br>  <span class="hljs-attr">age:</span> <span class="hljs-number">18</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;firstName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;lastName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;IsRayNotArray&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;age&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">18</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>陣列物件：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">firstName:</span> <span class="hljs-string">Ray</span><br>    <span class="hljs-attr">lastName:</span> <span class="hljs-string">IsRayNotArray</span><br>    <span class="hljs-attr">age:</span> <span class="hljs-number">18</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">firstName:</span> <span class="hljs-string">Ray</span><br>    <span class="hljs-attr">lastName:</span> <span class="hljs-string">IsRayNotArray</span><br>    <span class="hljs-attr">age:</span> <span class="hljs-number">18</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>    <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;firstName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;lastName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;IsRayNotArray&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;age&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">18</span><br>    <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;firstName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ray&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;lastName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;IsRayNotArray&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;age&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">18</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>以上差不多就是 .yml 的基本概念。</p>
+<h2 id="GitHub-Actions-基礎"><a href="#GitHub-Actions-基礎" class="headerlink" title="GitHub Actions 基礎"></a>GitHub Actions 基礎</h2><p>前面認識了基本的 YAML 之後就可以準備來玩 GitHub Actions 囉！</p>
+<p>那麼 GitHub Actions 會有介面可以直接設定嗎？不，沒有，主要你必須使用 .yml 設定，這個檔案又稱為 workflow，而 workflow 會放在 <code>.github/workflows</code> 資料夾下，在官方文件上有提供一張圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Foverview-actions-simple.webp?alt=media&token=41ac279d-7d18-468b-8cc5-087b72f9742d" alt="workflow"></p>
+<p>在這張圖我們可以看到以下東西</p>
+<ul>
+<li>Event</li>
+<li>Runner 1<ul>
+<li>Job 1<ul>
+<li>Step 1: Run action</li>
+<li>Step 2: Run action</li>
+<li>Step 3: Run action</li>
+<li>Step 4: Run action</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Runner 2<ul>
+<li>Job 2<ul>
+<li>Step 1: Run action</li>
+<li>Step 2: Run action</li>
+<li>Step 3: Run action</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>基本上所有的 workflow 檔案必定會有 Event（事件），而 Event 會觸發 Runner，而 Runner 會執行 Job，而 Job 會依照 Step 順序執行。</p>
+<p>在這邊官方有提供一個範例，我們先來看一下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">learn-github-actions</span><br><span class="hljs-attr">run-name:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.actor</span> <span class="hljs-string">&#125;&#125;</span> <span class="hljs-string">is</span> <span class="hljs-string">learning</span> <span class="hljs-string">GitHub</span> <span class="hljs-string">Actions</span><br><span class="hljs-attr">on:</span> [<span class="hljs-string">push</span>]<br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">check-bats-version:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;14&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span> <span class="hljs-string">-g</span> <span class="hljs-string">bats</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">bats</span> <span class="hljs-string">-v</span><br></code></pre></td></tr></table></figure>
+
+<p>不用太緊張，這邊我會逐行去解釋。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">learn-github-actions</span><br><span class="hljs-attr">run-name:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.actor</span> <span class="hljs-string">&#125;&#125;</span> <span class="hljs-string">is</span> <span class="hljs-string">learning</span> <span class="hljs-string">GitHub</span> <span class="hljs-string">Actions</span><br></code></pre></td></tr></table></figure>
+
+<p>首先第一行 <code>name: learn-github-actions</code> 代表著這個 workflow 的名稱，而這會影響到 GitHub Actions 呈現的名稱，接著是 <code>run-name: $&#123;&#123; github.actor &#125;&#125; is learning GitHub Actions</code>，這個是 workflow 的描述，而這邊的 <code>github.actor</code> 是一個變數，代表著 GitHub 的使用者名稱，所以這邊的意思就是說「使用者名稱正在學習 GitHub Actions」。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">on:</span> [<span class="hljs-string">push</span>]<br></code></pre></td></tr></table></figure>
+
+<p>接著比較核心重點在於 <code>on: [push]</code>，這一行主要是告知 GitHub Actions 這個 workflow 是要在什麼時候觸發，而這邊的 <code>push</code> 代表著當你將程式碼推到 GitHub 時就會觸發這個 workflow。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">check-bats-version:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;14&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span> <span class="hljs-string">-g</span> <span class="hljs-string">bats</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">bats</span> <span class="hljs-string">-v</span><br></code></pre></td></tr></table></figure>
+
+<p>最後就是 <code>jobs</code>，這邊主要是描述了當我們觸發這個事件後要做的哪些任務行為，接下來你會看到 <code>check-bats-version</code> 這個屬性，這個屬性是在描述這個任務的名稱，然後 <code>runs-on: ubuntu-latest</code> 是在描述我們要在什麼樣的環境下執行這個任務，接著 <code>steps</code> 就是這個任務有哪些步驟。</p>
+<p>接下來的 <code>- uses:</code> 有一點特別了，相信應該是滿多人會感到混亂的地方，因為後面寫著 <code>actions/checkout@v3</code>，那麼這是什麼意思呢？而且這又是哪裡來的東西呢？</p>
+<p>首先其實 <code>actions/checkout@v3</code> 跟下一行的 <code>actions/setup-node@v3</code> 都是來自 GitHub Actions 的官方庫，在 GitHub 官方有一個組織叫做 <a target="_blank" rel="noopener" href="https://github.com/actions">Actions</a></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2015.27.28.png?alt=media&token=eaa2a666-526e-42a3-91eb-6358a35ebc09" alt="actions"></p>
+<p>所以其實這一段的白話文意思是這樣的</p>
+<p>「我要使用 actions 組織下的 checkout 儲存庫，並且版本是 v3 版本」</p>
+<p>那 <code>checkout</code> 這個儲存庫用途是幹嘛的呢？簡單來講就是讓你的 Workflow 可以取得你的程式碼，而 <code>setup-node</code> 則是讓你可以設定 Node.js 的版本，這邊的 <code>v3</code> 則是版本號。</p>
+<p>相信應該滿多人對於 <code>uses: actions/checkout@v3</code>、<code>actions/setup-node@v3</code> 這兩個東西終於有點概念了。</p>
+<p>而後面 <code>actions/setup-node@v3</code> 有一個 <code>with</code> 屬性，這個屬性是用來設定一些值，例如設定 <code>node-version: &#39;14&#39;</code>，這邊的 <code>node-version</code> 就是設定 Node.js 的版本，而 <code>14</code> 則是版本號，當然 <code>setup-node</code> 它不只有這個屬性，只是大多都只需要設定版本就可以了，如果你想了解更多可以點擊 <a target="_blank" rel="noopener" href="https://github.com/actions/setup-node">setup-node</a> 這個儲存庫來觀看。</p>
+<p>最後就是 <code>- run: npm install -g bats</code>、<code>- run: bats -v</code>，這兩個非常簡單，就是你本地電腦執行 <code>npm install -g bats</code>、<code>bats -v</code> 的意思，這邊的 <code>- run:</code> 代表著執行指令。</p>
+<p>最後來看一下 GitHub Actions 文件所提供的可視化圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2Foverview-actions-event.webp?alt=media&token=43d8628e-40ba-4d5a-90b7-c64aac238536" alt="GitHub Action"></p>
+<p>相信你應該有一些概念了，那麼以上就是官方 GitHub Actions 的範例解釋哩~</p>
+<h2 id="GitHub-Actions-實戰"><a href="#GitHub-Actions-實戰" class="headerlink" title="GitHub Actions 實戰"></a>GitHub Actions 實戰</h2><p>前面學了很多基本觀念，如 YAML 語法、GitHub Actions 基礎，所以接下來就準備來寫一下自己的 GitHub Actions 囉~</p>
+<p>首先一開始我們先使用 Express 建立一個初始化專案，這邊我會使用我先前準備好的空白專案</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/2022-express-example">Express</a></p>
+<p>可以先 Fork 並 Clone 下來準備練習。</p>
+<p>以上準備好後，就打開這個專案，然後在根目錄下面建立一個 <code>.github/workflows</code> 資料夾，因為 GitHub Actions 的設定檔案必須放在這個資料夾下，接著在這個資料夾下建立一個 <code>main.yml</code> 檔案，這個檔案就是我們的 workflow 檔案，所以目前你的結構應該會長這樣</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2016.11.23.png?alt=media&token=9f6aee58-1f15-4a91-ad2d-8c86baa4bb40" alt="結構"></p>
+<p>那麼底下的 .yml 檔案名稱沒有特別限制一定要怎樣，只是為了方便管理，所以我們就以 <code>main.yml</code> 來命名（後續這邊我更改成 <code>main-pr.yml</code>，所以你也可以直接使用 <code>main-pr.yml</code> 來命名）。</p>
+<p>接下來我們要來做一些事情，首先我們會期望原本我們常常在做的幾個行為自動化</p>
+<ul>
+<li>ESLint 掃描</li>
+<li>測試</li>
+<li>打包</li>
+<li>部署</li>
+</ul>
+<p>那麼前三者基本上都是在發起 Pull Requests 之後就會自動執行，而部署則是在合併到主要分支後才會自動執行，所以我們就會來撰寫兩個 workflow 檔案，一個是在發起 Pull Requests 後就會自動執行的，另一個則是在合併到主要分支後才會自動執行的。</p>
+<p>因此這邊基本上我會建立兩個檔案，分別是</p>
+<ul>
+<li><code>.github/workflows/main-pr.yml</code></li>
+<li><code>.github/workflows/main-deploy.yml</code></li>
+</ul>
+<h3 id="Pull-Requests"><a href="#Pull-Requests" class="headerlink" title="Pull Requests"></a>Pull Requests</h3><p>首先先打開 <code>.github/workflows/main-pr.yml</code> 檔案，接著我們這邊會需要監聽 <code>pull_request</code> 事件，所以我們就會在 <code>on</code> 屬性下面加入 <code>pull_request</code>，代表著當有人發起 Pull Requests 時就會觸發這個 workflow</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br></code></pre></td></tr></table></figure>
+
+<p>那麼 <code>pull_request</code> 你會發現我是用物件形式撰寫，代表著它底下其實有超多屬性可以使用，詳細你可以觀看「<a target="_blank" rel="noopener" href="https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request">pull_request</a>」這邊的官方文件，所以這邊我只會示範一個最常用的屬性，也就是 <code>branches</code>，意旨當有人發起 Pull Requests 時，我們會監聽哪些分支，這邊我們會監聽 <code>main</code> 分支，所以我們就會這樣寫</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br></code></pre></td></tr></table></figure>
+
+<p>代表著只要有人發起 Pull Requests 到 <code>main</code> 分支時就會觸發這個 workflow。</p>
+<p>如果你覺得這樣寫很難懂，你也可以改成陣列的寫法</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]<br></code></pre></td></tr></table></figure>
+
+<p>當然也有萬用的寫法，就是 <code>*</code>，代表著監聽特定名稱的分支，例如 Git Flow 的 <code>feature/*</code>、<code>release/*</code>、<code>hotfix/*</code> 等等</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span> [<span class="hljs-string">feature/*</span>]<br></code></pre></td></tr></table></figure>
+
+<p>但這邊我們只需要監聽 <code>main</code> 分支就好。</p>
+<p>接著呢？接著我們已經撰寫了 Event 事件後就是要寫 Job 了，這邊我們會寫一個 Job，而這個 Job 會有三個步驟，分別是剛剛所提到的 ESLint 掃描、測試、打包，那麼如果要能夠掃描 ESLint 跟測試的話，專案就必須要有相對應的套件，所以我們先來安裝一下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm i -D eslint jest<br></code></pre></td></tr></table></figure>
+
+<p>接下來你可以替這個專案初始化 ESLint 跟撰寫一點基本的測試檔案，我這邊就不額外說明與介紹這一塊了，只是由於我們需要讓 GitHub Actions 可以執行 ESLint 跟測試，所以我們就需要在 <code>package.json</code> 裡面加入一些指令</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2022-express-example&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.0.0&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;start&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node ./bin/www&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-comment">// 加入這兩行</span><br>    <span class="hljs-attr">&quot;lint&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;eslint . --ext .js&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;test&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jest&quot;</span><br>  <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;cookie-parser&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~1.4.4&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;debug&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~2.6.9&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;express&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~4.16.1&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;http-errors&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~1.6.3&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;jade&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~1.11.0&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;morgan&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~1.9.1&quot;</span><br>  <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;eslint&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.41.0&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;eslint-config-airbnb-base&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^15.0.0&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;eslint-plugin-import&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^2.27.5&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;jest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^29.5.0&quot;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊我們加入了 <code>lint</code> 跟 <code>test</code> 兩個指令，分別是執行 ESLint 跟測試，以上準備好之後，就可以繼續回來寫 Job 了囉。</p>
+<p>一開始我們會針對 ESLint 跑一下掃描，所以 Job 就會這樣寫</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br></code></pre></td></tr></table></figure>
+
+<p>到目前為止來講，你只要 ESLint 有發生錯誤，那麼這個 Job 就會失敗，而且會顯示在 GitHub Actions 上面，如下圖</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2016.57.20.png?alt=media&token=e1271a2a-35c1-441a-a7cd-17d0151dcbbb" alt="lint"></p>
+<p>只有你修正了該 ESLint 錯誤才能夠繼續往下執行</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2016.59.58.png?alt=media&token=7540c831-cc94-4820-aaef-b9f09f49bcf8" alt="通過"></p>
+<p>測試跟打包呢？其實測試跟打包都是一樣差不多的行為，只是因為我們是 Express 專案並不需要打包的行為，所以我底下程式碼會忽略掉打包的行為</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br>  <span class="hljs-attr">test:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">test</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊你會發現一件很有趣的事情，也就是類似的行為 <code>runs-on: ubuntu-latest</code>、<code>uses: actions/checkout@v3</code> 跟 <code>uses: actions/setup-node@v3</code> 這些行為都是重複的，為什麼呢？因為每個 Job 都是獨立的，所以每個 Job 都必須要有這些行為，這邊你可以想像成每個 Job 都是一個獨立的 Container，所以每個 Job 都必須要有這些行為，這樣才能夠執行哩。</p>
+<p>那麼這邊有一件事情很特別，因為 GitHub Actions 在執行 Job 時的順序是不固定的，所以有可能是 ESLint 先跑完又或者是測試先跑完，那麼如果你期望順序是先跑完 ESLint 再跑測試，那麼你就必須要使用 <code>needs</code> 這個屬性，這個屬性可以讓你指定 Job 的執行順序，所以這邊我們就會這樣寫</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Pull</span> <span class="hljs-string">Requests</span> <span class="hljs-string">Check</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">pull_request:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br>  <span class="hljs-attr">test:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">test</span><br></code></pre></td></tr></table></figure>
+
+<p>否則的話你應該會在 GitHub Actions 的可視化圖形長這樣子</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2017.10.29.png?alt=media&token=c5eb50b3-5d78-4077-82f4-559d7af57211" alt="可視化圖形"></p>
+<p>當你使用了 <code>needs</code> 這個屬性後，你會發現可視化圖形會變成這樣</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2017.12.17.png?alt=media&token=aa5a8bce-a660-4dac-ab09-39f0d110d2bc" alt="可視化圖形"></p>
+<blockquote>
+<p><strong>Note</strong><br>可視化圖形觀看位置位於專案的 Actions 頁面。</p>
+</blockquote>
+<p>到目前為止我們的 PR workflow 就完成了，接下來就是要來寫部署的 workflow 囉~</p>
+<h3 id="Deploy"><a href="#Deploy" class="headerlink" title="Deploy"></a>Deploy</h3><p>接下來打開 <code>.github/workflows/main-deploy.yml</code> 檔案，這邊我們會監聽 <code>push</code> 事件，所以我們就會在 <code>on</code> 屬性下面加入 <code>push</code>，代表 Pull Requests 合併到主要分支後就會觸發這個 workflow，並且我們只監聽 <code>main</code> 這個分支</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Deploy</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">push:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br></code></pre></td></tr></table></figure>
+
+<p>只需要做到這樣子，你就可以監聽並執行部屬行為了，很簡單吧？</p>
+<h3 id="Deploy-to-Render-com"><a href="#Deploy-to-Render-com" class="headerlink" title="Deploy to Render.com"></a>Deploy to Render.com</h3><p>那麼我們要部署到哪裡呢？這邊我會示範部署到 Render.com，在 Render.com 的官方文件中，有一個 <a target="_blank" rel="noopener" href="https://render.com/docs/deploy-hooks">Deploy Hook</a> 可以使用。</p>
+<p>那你可能會想說為什麼還要自己用 CD 部署？不是可以直接自己監聽 Branch 分支，當有新的分支讓 Render.com 自己部署就好了嗎？但是實際上來講，我們有些時候會遇到一些特殊的狀況是必須要先跑完自己的 CI&#x2F;CD 之後才能部署的，所以這邊才會額外介紹如何用 CI&#x2F;CD 自己部署到 Render.com，而不是直接讓 Render.com 自己監聽 Branch 分支。</p>
+<p>但是是如果要做到這個需求的話，是必須要做一些前置動作的，所以接下來就跟著我一起來設定吧！</p>
+<p>首先在你建立好 Render 專案時，你要記得把 Auth Deploy 給關閉，否則你會發現 CI&#x2F;CD 還沒跑完，專案就已經被部署到 Render 上面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2017.17.51.png?alt=media&token=a2da8353-0c41-428a-a7ae-103d443ba9bb" alt="Auto Deploy"></p>
+<p>如果是已經建立好的專案，那麼你可以到專案的設定頁面關閉 Auth Deploy</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2017.21.36.png?alt=media&token=610afc8a-9a02-4291-a317-affa56c02efa" alt="Auto Deploy"></p>
+<p>那麼剛好你也會看到 <code>Deploy Hook</code> 的欄位，請把這個網址複製起來，因為我們會使用這個網址來部署，請小心不要把這個網址外流出去，因為這個網址可以讓任何人都可以部署你的專案，所以請小心保管。</p>
+<p>接下來我們必須要到個人設定中取得 API Key，請你點一下自己頭像找到「Account Setting」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2022.43.36.png?alt=media&token=366cfca0-d7c1-478d-b3d7-2fedd0148fba" alt="Account Setting"></p>
+<p>接著找到 API Keys，並點一下「Create API Key」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2022.44.40.png?alt=media&token=0507f1a0-d346-4f3a-b8bd-4825d255ac59" alt="Create API Key"></p>
+<p>名稱基本上隨便你取，我這邊是取名為 Example，按下「Create API Key」之後，你會取得一組 Key，請把那一組 Key 保存下來，因為我們會使用到這一組 Key</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2022.46.52.png?alt=media&token=9a1c9f10-f835-405e-b33b-4e0d1fcee75b" alt="Key"></p>
+<p>接下來讓我們回到 Job 的部分，那麼部署之前你可能會想說，雖然 Pull Requests 已經通過了，但是我還是想要再跑一次 ESLint 跟測試，這樣才能夠確保我們的專案是沒有問題的，所以可能就會這樣寫</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Deploy</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">push:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br>  <span class="hljs-attr">test:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">test</span><br></code></pre></td></tr></table></figure>
+
+<p>(其實就只是把 Pull Requests 的 workflow 複製過來而已)</p>
+<p>再來就是要來撰寫部署了，在部署之前我們會先把剛剛複製的 Deploy Hook 跟 API Key 貼到 GitHub 的 Secrets 裡面，位置會在該儲存庫的 Setting 可以找到</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2017.27.33.png?alt=media&token=f19cb991-a1b7-434c-803a-32e91256aa59" alt="Secrets"></p>
+<p>接著點一下「new repository secret」，然後輸入 <code>RENDER_DEPLOY_HOOK</code> 跟 <code>RENDER_TOKEN</code> 並貼入相對應的值，最後點一下「Add secret」就完成了~</p>
+<p>都完成以上後回來到 main-deploy.yml 繼續撰寫部署的部分，基本上都跟剛剛差不多，只是我們必須跑完 ESLint 跟測試後才能夠部署，所以我們就會使用 <code>needs</code> 這個屬性，這邊我們就會這樣寫</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Deploy</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">push:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br>  <span class="hljs-attr">test:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">test</span><br>  <span class="hljs-attr">deploy:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">test</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br></code></pre></td></tr></table></figure>
+
+<p>接下來呢？接下來這邊稍微有一點特別了，如果要部署到 Render.com 的話將會使用到 curl 的方式，因此就會變成以下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Main</span> <span class="hljs-string">Deploy</span><br><span class="hljs-attr">on:</span><br>  <span class="hljs-attr">push:</span><br>    <span class="hljs-attr">branches:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">main</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">lint:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span><br>  <span class="hljs-attr">test:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v3</span><br>        <span class="hljs-attr">with:</span><br>          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;16&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">install</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">test</span><br>  <span class="hljs-attr">deploy:</span><br>    <span class="hljs-attr">needs:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">lint</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">test</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">steps:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span><br>        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span><br><span class="hljs-string">          curl -X POST -H &quot;Authorization: Bearer $&#123;&#123; secrets.RENDER_TOKEN &#125;&#125;&quot; \</span><br><span class="hljs-string">          -H &quot;Content-Type: application/json&quot; \</span><br><span class="hljs-string">          -d &#x27;&#123;&#125;&#x27; \</span><br><span class="hljs-string">          $&#123;&#123; secrets.RENDER_DEPLOY_HOOK &#125;&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>接下來你就可以試著發起 PR 並且合併到 <code>main</code> 分支，你會發現 GitHub Actions 會自動執行，並且會自動部署到 Render.com 上面囉~</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2021.30.44.png?alt=media&token=0b98d0a8-6c30-424f-9e0e-9d8175b2acb5" alt="部署中"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2021.31.54.png?alt=media&token=40969a16-63f7-40e9-80fc-8f29e7ad6065" alt="部署完成"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Fci-cd%2F%E6%88%AA%E5%9C%96%202023-05-20%2022.51.21.png?alt=media&token=d39485e6-6a03-4bff-b0bd-85f81ece5491" alt="部署完成"></p>
+<p>最後這邊我也附上我寫完的範本給予參考哩</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/express-actions-example">express-actions-example</a></li>
+</ul>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://render.com/docs/api#getting-started">Render API</a></li>
+<li><a target="_blank" rel="noopener" href="https://render.com/docs/api#making-an-api-request">Making an API Reques</a></li>
+<li><a target="_blank" rel="noopener" href="https://render.com/docs/deploy-hooks">Deploy Hooks</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/zh/actions">GitHub Actions</a></li>
+</ul>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/other/20230518/2131851751/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Demo 的時候機子睡著好尷尬怎麼辦？用 UptimeRobot 或 cron-job.org 來幫你吧！
+          </span>
+        </a>
+      
+
+      
+        <a href="/html/20230526/2927853444/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            淺談 HTML 究竟是不是程式語言？
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20240101/268408973/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                六角旅館 API 系統（freyja）之後端完整部署教學
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2024-01-01
+              </p>
+            </div>
+          </a>
+        
+          <a href="/javascript/20231031/1586150719/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                你終究要用 Prettier，為什麼不一開始就用「Prettier」呢？
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-31
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230504/3177278058/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Express 建立一個簡易 WebSocket 聊天室
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-05-04
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230425/1940966356/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Express 部署到 Vercel
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-04-25
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/other/20230520/2118016719/" data-title="或許你該懂一下 CI/CD？用 CD 部署到 Render.com" data-hashtags="ESLint,Express,Jest,GitHub Actions,CI/CD,Render.com" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/other/20230520/2118016719/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/other/20230520/2118016719/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/other/20230520/2118016719/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CI-CD-%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="toc-text">CI&#x2F;CD 是什麼？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YAML-%E8%AA%9E%E6%B3%95"><span class="toc-text">YAML 語法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%BB%E8%A7%A3"><span class="toc-text">註解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#key-value"><span class="toc-text">key: value</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E8%A1%8C%E6%96%87%E5%AD%97"><span class="toc-text">多行文字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%A3%E5%88%97"><span class="toc-text">陣列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%8A%E6%95%B8"><span class="toc-text">變數</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%A9%E4%BB%B6"><span class="toc-text">物件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Actions-%E5%9F%BA%E7%A4%8E"><span class="toc-text">GitHub Actions 基礎</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Actions-%E5%AF%A6%E6%88%B0"><span class="toc-text">GitHub Actions 實戰</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Pull-Requests"><span class="toc-text">Pull Requests</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy"><span class="toc-text">Deploy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy-to-Render-com"><span class="toc-text">Deploy to Render.com</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="toc-text">參考文獻</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/git/20260122/21277993/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git init 出現 master 分支提示？教你設定預設分支為 main
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260122/2316436852/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Dev Containers 打造 AI 自動化開發的安全隔離環境
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              14 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/git/20260121/2025687513/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git Worktree 是什麼？一個專案同時跑多個 AI Agent 的秘訣
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/other/20260121/695717014/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260120/4189755271/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/20
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              35 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1232 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js 應用篇 - 使用 Nodemailer 來發送 Email | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20230722/1626712457/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="這一篇我將會記錄一下如何用 Nodemailer 來發送 Email，而這一篇將會記錄使用 Gmail 以及 OAuth2 跟帳號密碼（應用程式密碼）的兩種方式來發送 Email。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Node.js 應用篇 - 使用 Nodemailer 來發送 Email">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20230722/1626712457/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這一篇我將會記錄一下如何用 Nodemailer 來發送 Email，而這一篇將會記錄使用 Gmail 以及 OAuth2 跟帳號密碼（應用程式密碼）的兩種方式來發送 Email。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F0_1.png?alt=media&amp;token=5ceef9cb-0c31-44ed-8cdd-b302aa191a77">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2023-07-22T01:56:44.000Z">
+    
+      <meta property="article:modified_time" content="2023-10-20T06:45:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Nodejs">
+      
+        <meta property="article:tag" content="Nodemailer">
+      
+        <meta property="article:tag" content="Gmail">
+      
+        <meta property="article:tag" content="OAuth2">
+      
+        <meta property="article:tag" content="Email">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Node.js 應用篇 - 使用 Nodemailer 來發送 Email">
+  <meta name="twitter:description" content="這一篇我將會記錄一下如何用 Nodemailer 來發送 Email，而這一篇將會記錄使用 Gmail 以及 OAuth2 跟帳號密碼（應用程式密碼）的兩種方式來發送 Email。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F0_1.png?alt=media&amp;token=5ceef9cb-0c31-44ed-8cdd-b302aa191a77">
+  
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  
+  [{"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}},{"@context":"https://schema.org","@type":"BlogPosting","headline":"Node.js 應用篇 - 使用 Nodemailer 來發送 Email","url":"https://israynotarray.com/nodejs/20230722/1626712457/","datePublished":"2023-07-22T01:56:44.000Z","dateModified":"2023-10-20T06:45:00.000Z","description":"這一篇我將會記錄一下如何用 Nodemailer 來發送 Email，而這一篇將會記錄使用 Gmail 以及 OAuth2 跟帳號密碼（應用程式密碼）的兩種方式來發送 Email。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":"https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F0_1.png?alt=media&token=5ceef9cb-0c31-44ed-8cdd-b302aa191a77","articleSection":["Nodejs"],"keywords":"Nodejs, Nodemailer, Gmail, OAuth2, Email"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"Node.js 應用篇 - 使用 Nodemailer 來發送 Email","item":"https://israynotarray.com/nodejs/20230722/1626712457/"}]}]
+  </script>
+  
+  <!-- Google Fonts (Non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"></noscript>
+  
+  <!-- Bootstrap Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-C7w1NhyW.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  
+<script src="/js/main-B2zwayVG.js"></script>
+
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      Loading...
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[250px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[230px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  
+  <!-- Post Header Ad Slot (In Article Ad) -->
+  
+    <div class="w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center border-b border-gray-100 dark:border-gray-700 overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <span class="flex items-center">
+          <i class="bi bi-calendar3 mr-2"></i>
+          2023-07-22
+        </span>
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Node.js 應用篇 - 使用 Nodemailer 來發送 Email
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Nodejs/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Nodejs
+            </a>
+          
+            <a href="/tags/Nodemailer/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Nodemailer
+            </a>
+          
+            <a href="/tags/Gmail/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Gmail
+            </a>
+          
+            <a href="/tags/OAuth2/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #OAuth2
+            </a>
+          
+            <a href="/tags/Email/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Email
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F0_1.png?alt=media&token=5ceef9cb-0c31-44ed-8cdd-b302aa191a77" alt="Web"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇我將會記錄一下如何用 Nodemailer 來發送 Email，而這一篇將會記錄使用 Gmail 以及 OAuth2 跟帳號密碼（應用程式密碼）的兩種方式來發送 Email。</p>
+<h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><p>首先這邊我會先提供事前的準備環境，你可以透過以下連結取用</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/node-nodemailer-init">node-nodemailer-init</a></li>
+</ul>
+<p>這個環境相對單純一點，我只有安裝 <code>nodemailer</code>、<code>googleapis</code>、<code>dotenv</code> 套件，其餘都是 Express 產生器的東西。</p>
+<p>如果你不想使用這個初始範本，你可以自己建立一個 Express 專案，然後安裝 <code>nodemailer</code>、<code>googleapis</code>、<code>dotenv</code> 套件即可。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install nodemailer googleapis dotenv<br></code></pre></td></tr></table></figure>
+
+<h2 id="Nodemailer"><a href="#Nodemailer" class="headerlink" title="Nodemailer"></a>Nodemailer</h2><p>雖然早期我有寫過關於 <a href="/nodejs/20191228/1009061739/">全端勇士之路 Node.js-OAuth 2.0 &amp; nodemailer &amp; Gmail</a>，但我認為這一篇有點過於老舊，所以我決定重新寫一篇。</p>
+<p>那麼 Nodemailer 是什麼神奇的東西呢？簡單來講它是一個 Node.js 的套件，可以讓我們在 Node.js 環境下發送 Email，而這個功能對於一個網站來說是非常重要的，因為我們可以透過 Email 來發送驗證碼、通知信、訂閱信等等，所以在實戰上可以說是非常常見的。</p>
+<p>以官方文件來講底下就有提供一個算是滿完整的 Example：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-meta">&quot;use strict&quot;</span>;<br><span class="hljs-keyword">const</span> nodemailer = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;nodemailer&quot;</span>);<br><br><span class="hljs-keyword">const</span> transporter = nodemailer.<span class="hljs-title function_">createTransport</span>(&#123;<br>  <span class="hljs-attr">host</span>: <span class="hljs-string">&quot;smtp.forwardemail.net&quot;</span>,<br>  <span class="hljs-attr">port</span>: <span class="hljs-number">465</span>,<br>  <span class="hljs-attr">secure</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">auth</span>: &#123;<br>    <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> replace `user` and `pass` values from &lt;https://forwardemail.net&gt;</span><br>    <span class="hljs-attr">user</span>: <span class="hljs-string">&#x27;REPLACE-WITH-YOUR-ALIAS@YOURDOMAIN.COM&#x27;</span>,<br>    <span class="hljs-attr">pass</span>: <span class="hljs-string">&#x27;REPLACE-WITH-YOUR-GENERATED-PASSWORD&#x27;</span><br>  &#125;<br>&#125;);<br><br><span class="hljs-comment">// async..await is not allowed in global scope, must use a wrapper</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// send mail with defined transport object</span><br>  <span class="hljs-keyword">const</span> info = <span class="hljs-keyword">await</span> transporter.<span class="hljs-title function_">sendMail</span>(&#123;<br>    <span class="hljs-attr">from</span>: <span class="hljs-string">&#x27;&quot;Fred Foo 👻&quot; &lt;foo@example.com&gt;&#x27;</span>, <span class="hljs-comment">// sender address</span><br>    <span class="hljs-attr">to</span>: <span class="hljs-string">&quot;bar@example.com, baz@example.com&quot;</span>, <span class="hljs-comment">// list of receivers</span><br>    <span class="hljs-attr">subject</span>: <span class="hljs-string">&quot;Hello ✔&quot;</span>, <span class="hljs-comment">// Subject line</span><br>    <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Hello world?&quot;</span>, <span class="hljs-comment">// plain text body</span><br>    <span class="hljs-attr">html</span>: <span class="hljs-string">&quot;&lt;b&gt;Hello world?&lt;/b&gt;&quot;</span>, <span class="hljs-comment">// html body</span><br>  &#125;);<br><br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Message sent: %s&quot;</span>, info.<span class="hljs-property">messageId</span>);<br>  <span class="hljs-comment">// Message sent: &lt;b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com&gt;</span><br><br>  <span class="hljs-comment">//</span><br>  <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> You can go to https://forwardemail.net/my-account/emails to see your email delivery status and preview</span><br>  <span class="hljs-comment">//       Or you can use the &quot;preview-email&quot; npm package to preview emails locally in browsers and iOS Simulator</span><br>  <span class="hljs-comment">//       &lt;https://github.com/forwardemail/preview-email&gt;</span><br>  <span class="hljs-comment">//</span><br>&#125;<br><br><span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);<br></code></pre></td></tr></table></figure>
+
+<p>但是今天我們的目標是要使用 Gmail 來發送 Email，並且是搭配 OAuth2 的方式來發送，所以我們就來看看怎麼做吧。</p>
+<p>所以我們必須要先了解 Gmail 的限制，那麼有哪些限制呢？這邊我就只列出比較需要注意的限制：</p>
+<ul>
+<li>每日發送限制：500 封</li>
+<li>單一電子郵件收件者超過 500 封</li>
+<li>每封電子郵件大小上限：25 MB</li>
+</ul>
+<p>其他部分舉凡…濫發垃圾郵件、濫發廣告郵件、濫發病毒郵件等等，都是不被允許的，如果被 Google 發現，你的帳號可能會被鎖定，所以請務必注意哩。</p>
+<h2 id="使用-OAuth-2-0-寄信"><a href="#使用-OAuth-2-0-寄信" class="headerlink" title="使用 OAuth 2.0 寄信"></a>使用 OAuth 2.0 寄信</h2><p>早期許多 Nodemailer 文章教學都是介紹使用帳號密碼的方式來介紹，但是後來 Google 開始限制使用這種方式，因為使用傳統帳號密碼來發送信件的方式並不是很安全，所以 Google 開始推出 OAuth2 的方式來取代傳統帳號密碼的方式，但這種方式其實比較複雜，因為你必須要先取得授權，所以前面一開始我也會先介紹比較複雜的部分。</p>
+<h3 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h3><p>首先這邊我們要先到 「<a target="_blank" rel="noopener" href="https://console.cloud.google.com/">Google Cloud Platform</a>」建立一個新專案，當然你也可以使用舊專案，但是我建議你還是建立一個新專案，因為這樣比較不會搞混。</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211027.jpg?alt=media&token=001723af-ec44-43e9-8891-83ab76339577" alt="建立專案"></p>
+<p>專案名稱你可以自己取，這邊我取名為「nodemailer-example」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2010.29.36.png?alt=media&token=c057f2c8-ce9a-487c-b8c3-646ca09f0900" alt="新增專案"></p>
+<p>建立過程中稍微等它一下下…</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2010.32.12.png?alt=media&token=6320dc13-4b2c-49ce-83af-893286d19349" alt="建立中..."></p>
+<p>建立成功後，你可以在通知或是剛剛選取專案的地方找到剛剛建立的專案，然後點選進去</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2010.32.52.png?alt=media&token=4bb66e97-b044-49d9-aec6-387543e41692" alt="專案"></p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2010.32.57.png?alt=media&token=56b2fdce-c60e-422c-8a19-80d27b62923f" alt="專案"></p>
+<h3 id="啟用-API-和服務"><a href="#啟用-API-和服務" class="headerlink" title="啟用 API 和服務"></a>啟用 API 和服務</h3><p>接著請你點一下左邊漢堡選單，然後點選「已啟用的 API 和服務」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211035.jpg?alt=media&token=cc93b9b8-bdca-443e-b72c-6fc633010a68" alt="已啟用的 API 和服務"></p>
+<p>接著點一下上方「啟用 API 和服務」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211102.jpg?alt=media&token=950d63e4-21d1-47ee-bcbe-6c2efd02893c" alt="啟用 API 和服務"></p>
+<p>接著搜尋「Gmail API」，然後點選「Gmail API」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211103.jpg?alt=media&token=86cae0d7-9a59-4808-bdde-59dcb6d0abf1" alt="Gmail API"></p>
+<p>接著點一下「啟用」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211105.jpg?alt=media&token=3bc21c43-029e-41a1-9871-344d04f035a9" alt="Gmail API"></p>
+<h3 id="設定-OAuth-同意畫面"><a href="#設定-OAuth-同意畫面" class="headerlink" title="設定 OAuth 同意畫面"></a>設定 OAuth 同意畫面</h3><p>接著回到「API 和服務」，然後點選「憑證」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211111.jpg?alt=media&token=adff4903-03c7-4d15-af48-3c3722311d97" alt="憑證"></p>
+<p>要「建立憑證」之前，如果你跟我一樣是第一次設定的話，你會看到一個提示，提示你要先設定 OAuth 同意畫面，所以請你點選「設定同意畫面」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211115.jpg?alt=media&token=bd347292-b2e3-4742-ad32-f5d79f420a97" alt="設定同意畫面"></p>
+<p>接著請你選擇「外部」，然後點選「建立」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2011.18.55.png?alt=media&token=bba222db-5ba3-4430-a62b-83be313dbc80" alt="同意畫面"></p>
+<p>接下來會進入「編輯應用程式註冊申請」畫面，這邊要填寫一些資料，除了底下這幾個欄位是必填的，其餘都是選填的：</p>
+<ul>
+<li>應用程式名稱：你可以自己取名，這邊我取名為「nodemailer-example」</li>
+<li>使用者支援電子郵件：選你自己 Email</li>
+<li>開發人員聯絡資訊：填寫你自己 Email</li>
+</ul>
+<p>如果不確定，你可以依照我圖片這樣填寫就好</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211128.jpg?alt=media&token=1d9d9299-1844-4066-8cdd-ad38620e2ada" alt="編輯應用程式註冊申請"></p>
+<p>接下來會到達「範圍」的設定頁面，這邊直接繼續就好</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2011.32.39.png?alt=media&token=a732d607-c93c-416d-8eaa-b88cae83c51f" alt="範圍"></p>
+<p>接下來要設定「測試使用者」，基本上如果你這個應用程式發布狀態是「測試中」的話，你就必須設定一些可以使用這個應用程式的測試使用者，這邊你可以點一下 「Add Users」並輸入自己 Google 帳號，如果是正式環境的話則不用，那我這邊就先不設定直接點選「儲存並繼續」。</p>
+<p>基本上你到達「摘要」時，就完成了「OAuth 同意畫面」的設定囉</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-21%2011.37.52.png?alt=media&token=8cd3a3f6-419d-4e92-b678-6caea0c5c5ab" alt="摘要"></p>
+<h3 id="建立憑證"><a href="#建立憑證" class="headerlink" title="建立憑證"></a>建立憑證</h3><p>接下來你就可以回到「憑證」的頁面，然後點選「建立憑證」，接著點選「OAuth 用戶端 ID」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2FNodejs%2F202104060914.png?alt=media&token=39874960-e1b7-4a72-8be3-78228cfda98f" alt="OAuth 用戶端 ID"></p>
+<p>接著在應用程式類型欄位選擇「網路應用程式」，然後輸入以下欄位：</p>
+<ul>
+<li>名稱：你可以自己取名，這邊我取名為「nodemailer-example-web」</li>
+<li>已授權的重新導向 URI：請輸入 <code>http://localhost:3000/auth/google/callback</code></li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211438.jpg?alt=media&token=16303604-deea-4ea7-a391-3cba0399b30c" alt="憑證"></p>
+<blockquote>
+<p><strong>Note</strong><br>在我先前的文章中，我有提到過這個欄位要填寫「<a target="_blank" rel="noopener" href="https://developers.google.com/oauthplayground/">https://developers.google.com/oauthplayground/</a>」的網址，但這邊我們要換另一種方式。</p>
+</blockquote>
+<p>接下來按下「建立」後就可以取得 Client ID 與 Client Secret，這兩個請不要外流，因為這兩個是用來驗證你的身份的，如果被人拿去亂用，你的帳號可能會被 Google 鎖定（你也可以直接下載 JSON 檔案，裡面就有這兩個資訊）</p>
+<p>到這邊為止，我們的 Gmail OAuth 相關前置動作就終於準備好了，接下來就可以開始撰寫程式碼囉～</p>
+<h3 id="撰寫-Gmail-OAuth-程式碼"><a href="#撰寫-Gmail-OAuth-程式碼" class="headerlink" title="撰寫 Gmail OAuth  程式碼"></a>撰寫 Gmail OAuth  程式碼</h3><p>那麼前面我已經有先提供基本的環境，所以我們就可以直接開始撰寫程式碼了。</p>
+<blockquote>
+<p><strong>Note</strong><br>請務必確定你的專案內有無安裝 <code>nodemailer</code>、<code>googleapis</code>、<code>dotenv</code> 這幾個套件，否則稍後可能會出現錯誤無法往下練習。</p>
+</blockquote>
+<h3 id="建立-Env"><a href="#建立-Env" class="headerlink" title="建立 Env"></a>建立 Env</h3><p>首先這邊請你在專案底下建立一個 .env 檔案，內容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs env">CLIENT_ID=你的 Client ID<br>CLIENT_SECRET=你的 Client Secret<br>REDIRECT_URI=http://localhost:3000/auth/google/callback<br></code></pre></td></tr></table></figure>
+
+<p>這幾個資訊都可以在剛剛建立憑證時取得，如果你有下載 JSON 檔案的話，你可以直接打開 JSON 檔案，裡面就有這些資訊</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307211456.jpg?alt=media&token=0fd01b91-2e07-4f2b-8ba9-6c871435a753" alt="JSON"></p>
+<h3 id="建立-Google-OAuth2-Client"><a href="#建立-Google-OAuth2-Client" class="headerlink" title="建立 Google OAuth2 Client"></a>建立 Google OAuth2 Client</h3><p>接下來請你在根目錄下建立一個資料夾，名稱為 <code>config</code>，然後在裡面建立一個檔案，名稱為 <code>googleOAuth2Client.js</code>，內容如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><br><span class="hljs-keyword">const</span> &#123; google &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;googleapis&#x27;</span>);<br><br><span class="hljs-keyword">const</span> googleOAuth2Client = <span class="hljs-keyword">new</span> google.<span class="hljs-property">auth</span>.<span class="hljs-title class_">OAuth2</span>(<br>  process.<span class="hljs-property">env</span>.<span class="hljs-property">CLIENT_ID</span>,<br>  process.<span class="hljs-property">env</span>.<span class="hljs-property">CLIENT_SECRET</span>,<br>  process.<span class="hljs-property">env</span>.<span class="hljs-property">REDIRECT_URI</span><br>);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = googleOAuth2Client;<br></code></pre></td></tr></table></figure>
+
+<p>這邊我們使用 <code>googleapis</code> 套件來建立 Google OAuth2 Client，這邊我們使用 <code>google.auth.OAuth2</code> 來建立，並且傳入三個參數：</p>
+<ul>
+<li>CLIENT_ID：你的 Client ID</li>
+<li>CLIENT_SECRET：你的 Client Secret</li>
+<li>REDIRECT_URI：你的 Redirect URI</li>
+</ul>
+<h3 id="建立-Google-OAuth2-URL"><a href="#建立-Google-OAuth2-URL" class="headerlink" title="建立 Google OAuth2 URL"></a>建立 Google OAuth2 URL</h3><p>接下來請你在根目錄下建立一個資料夾，名稱為 <code>routes</code>，然後在裡面建立一個檔案，名稱為 <code>auth.js</code>，內容如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);<br><span class="hljs-keyword">var</span> router = express.<span class="hljs-title class_">Router</span>();<br><br><span class="hljs-keyword">const</span> googleOAuth2Client = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../config/googleOAuth2Client&#x27;</span>);<br><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SCOPES</span> = [<br>  <span class="hljs-string">&#x27;https://mail.google.com/&#x27;</span>,<br>];<br><br>router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/login&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">const</span> authUrl = googleOAuth2Client.<span class="hljs-title function_">generateAuthUrl</span>(&#123;<br>    <span class="hljs-attr">access_type</span>: <span class="hljs-string">&#x27;offline&#x27;</span>,<br>    <span class="hljs-attr">scope</span>: <span class="hljs-variable constant_">SCOPES</span>,<br>  &#125;);<br>  res.<span class="hljs-title function_">redirect</span>(authUrl);<br>&#125;);<br><br>router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/google/callback&#x27;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; &#123;<br>  <span class="hljs-keyword">const</span> code = req.<span class="hljs-property">query</span>.<span class="hljs-property">code</span>;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> &#123; tokens &#125; = <span class="hljs-keyword">await</span> googleOAuth2Client.<span class="hljs-title function_">getToken</span>(code)<br><br>    googleOAuth2Client.<span class="hljs-title function_">setCredentials</span>(tokens);<br>    req.<span class="hljs-property">session</span>.<span class="hljs-property">tokens</span> = tokens;<br><br>    res.<span class="hljs-title function_">redirect</span>(<span class="hljs-string">&#x27;/email/user&#x27;</span>);<br>  &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Error authenticating with Google:&#x27;</span>, err);<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Error authenticating with Google&#x27;</span>);<br>  &#125;<br>&#125;);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = router;<br></code></pre></td></tr></table></figure>
+
+<p>接著到 app.js 加入以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> authRouter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./routes/auth&#x27;</span>);<br><br><span class="hljs-comment">// ... 略過大量程式碼</span><br><br>app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/auth&#x27;</span>, authRouter);<br></code></pre></td></tr></table></figure>
+
+<p>接下來你就可以透過網址 <code>http://localhost:3000/auth/login</code> 來取得 Google OAuth2 URL，這時候你會被導向到 Google 登入頁面</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307212044.jpg?alt=media&token=dff238b0-9224-4003-ba3b-dbffbb1f7c15" alt="Google 登入頁面"></p>
+<p>點選你要登入的帳號，接下來會出現一個警告畫面，這邊不用太擔心畢竟是你的應用程式，只需要點開「進階」，然後點選「前往 nodemailer-example（不安全）」即可</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307212040.jpg?alt=media&token=d20075c2-40ff-4558-849a-71d5c1c8524e" alt="不安全的應用程式"></p>
+<p>接下來這邊按下「允許」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307212041.jpg?alt=media&token=498575c3-3756-4cc7-b978-977466d75133" alt="允許"></p>
+<p>完成後就會重新導向回 <code>http://localhost:3000/auth/google/callback</code> 這個網址，並且取得 <code>code</code>，這個 <code>code</code> 就是用來取得 <code>tokens</code> 的，而 <code>tokens</code> 就是用來驗證你的身份的。</p>
+<p>而這邊我們也將 <code>tokens</code> 儲存在 <code>session</code> 中，這樣我們就可以在後續的程式碼中使用 <code>tokens</code> 來驗證身份。</p>
+<p>但是這邊你應該會發生一個錯，也就是以下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">Error authenticating with Google: TypeError: Cannot <span class="hljs-built_in">set</span> properties of undefined (setting <span class="hljs-string">&#x27;tokens&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>這個原因是預設 Express 產生器並沒有啟用 <code>session</code> 功能，所以我們必須要自己啟用 <code>session</code> 功能，這邊我們使用 <code>express-session</code> 來啟用 <code>session</code> 功能，所以請你在根目錄下執行以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install express-session<br></code></pre></td></tr></table></figure>
+
+<p>接著到 app.js 加入以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> session = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express-session&#x27;</span>);<br><br><span class="hljs-comment">// ... 略過大量程式碼</span><br><br>app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">session</span>(&#123;<br>  <span class="hljs-attr">secret</span>: <span class="hljs-string">&#x27;keyboard cat&#x27;</span>,<br>  <span class="hljs-attr">resave</span>: <span class="hljs-literal">false</span>,<br>  <span class="hljs-attr">saveUninitialized</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">cookie</span>: &#123; <span class="hljs-attr">secure</span>: <span class="hljs-literal">false</span> &#125;<br>&#125;))<br></code></pre></td></tr></table></figure>
+
+<p>這樣你才不會發生「<code>TypeError: Cannot set properties of undefined</code>」的錯誤唷。</p>
+<blockquote>
+<p><strong>Note</strong><br><code>express-session</code> 有一個小雷點要注意一下，官方所提供的範例 <code>secure</code> 屬性是 <code>true</code>，這就代表著你本地開發時，你的 session 會沒有辦法儲存下來，只要一換頁面就會被清除，所以這邊我將 <code>secure</code> 屬性改為 <code>false</code>，這樣你就可以在本地開發時使用 <code>session</code> 功能了。</p>
+</blockquote>
+<h3 id="建立-Nodemailer-OAuth2"><a href="#建立-Nodemailer-OAuth2" class="headerlink" title="建立 Nodemailer OAuth2"></a>建立 Nodemailer OAuth2</h3><p>接下來請你到 <code>routes</code> 資料夾的 <code>index.js</code>，我們要在這邊建立 Nodemailer，內容如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/user/send&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">const</span> &#123;<br>    refresh_token,<br>    access_token,<br>  &#125; = req.<span class="hljs-property">session</span>.<span class="hljs-property">tokens</span>;<br> <br><br>  <span class="hljs-keyword">const</span> transporter = nodemailer.<span class="hljs-title function_">createTransport</span>(&#123;<br>    <span class="hljs-attr">service</span>: <span class="hljs-string">&#x27;gmail&#x27;</span>,<br>    <span class="hljs-attr">auth</span>: &#123;<br>      <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;OAuth2&#x27;</span>,<br>      <span class="hljs-attr">user</span>: <span class="hljs-string">&#x27;你要用來發送信件的 Gmail&#x27;</span>,<br>      <span class="hljs-attr">clientId</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLIENT_ID</span>,<br>      <span class="hljs-attr">clientSecret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLIENT_SECRET</span>,<br>      <span class="hljs-attr">refreshToken</span>: refresh_token,<br>      <span class="hljs-attr">accessToken</span>: access_token,<br>    &#125;,<br>  &#125;);<br><br>  <span class="hljs-keyword">const</span> mailOptions = &#123;<br>    <span class="hljs-attr">from</span>: <span class="hljs-string">&#x27;你要用來發送信件的 Gmail&#x27;</span>,<br>    <span class="hljs-attr">to</span>: <span class="hljs-string">&#x27;你要發送的對象&#x27;</span>,<br>    <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;這是信件的主旨&#x27;</span>,<br>    <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;‘這是信件的內容&#x27;</span>,<br>  &#125;;<br><br>  transporter.<span class="hljs-title function_">sendMail</span>(mailOptions, <span class="hljs-function">(<span class="hljs-params">err, info</span>) =&gt;</span> &#123;<br>    <span class="hljs-keyword">if</span> (err) &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>      res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Error sending email&#x27;</span>);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(info);<br>      res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Email sent&#x27;</span>);<br>    &#125;<br>  &#125;);<br>&#125;);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = router;<br></code></pre></td></tr></table></figure>
+
+<p>基本上到這邊為止，你就完成了 Nodemailer 的設定，接下來你可以透過網頁來發送出信件囉~</p>
+<h2 id="使用帳號密碼（應用程式密碼）來發送-Email"><a href="#使用帳號密碼（應用程式密碼）來發送-Email" class="headerlink" title="使用帳號密碼（應用程式密碼）來發送 Email"></a>使用帳號密碼（應用程式密碼）來發送 Email</h2><p>接下來我想介紹另一種方式發送信箱，為什麼呢？</p>
+<p>因為前面的做法是使用了 OAuth 的方式來發送信件，那麼使用 OAuth 的問題在於，如果我今天登入的使用者不是 A 而是 B 的話，那麼就無法寄出，因為我們使用的 Token 與 Refresh Token 都是 A 的，所以這邊我想介紹另一種方式，那就是使用帳號密碼直接寫死並登入，這樣就不會有上述的問題了。</p>
+<p>那麼這邊有些人應該有嘗試過使用帳號密碼方式寄送 Gmail，應該大多都有遇過以下錯誤訊息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">Error: Invalid login: 535-5.7.8 Username and Password not accepted. Learn more at 535 5.7.8  https://support.google.com/mail/?p=BadCredentials k17-20020aa78211000000b00682562bf477sm3695625pfi.82 - gsmtp<br></code></pre></td></tr></table></figure>
+
+<p>這個錯誤訊息是因為 Google 開始限制使用帳號密碼的方式來寄送信件，早期我們可以到 Google 設定中開啟「低安全性應用程式存取權」，這樣就可以使用帳號密碼的方式來寄送信件，但是後來 Google 也開始限制這個功能，所以我們就無法使用這個方式來寄送信件了。</p>
+<p>所以這邊我要教另一種方式哩~</p>
+<h3 id="撰寫-Env"><a href="#撰寫-Env" class="headerlink" title="撰寫 Env"></a>撰寫 Env</h3><p>接下來請你在原本的 <code>.env</code> 補充以下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs env">GMAIL_USER=你要用來發送信件的 Gmail<br>GMAIL_PASS=你要用來發送信件的 Gmail 密碼<br></code></pre></td></tr></table></figure>
+
+<p>接下來準備來也是要去設定一下 Google 的部分，但不會像剛剛那樣複雜。</p>
+<h3 id="啟用-Google-設定"><a href="#啟用-Google-設定" class="headerlink" title="啟用 Google 設定"></a>啟用 Google 設定</h3><p>首先請你到 Google 設定中心，然後點選「安全性」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.19.15.png?alt=media&token=5d31780f-8cc3-4c01-b09c-a6514424b8ee" alt="安全性"></p>
+<p>如果你沒有啟用二次驗證的話，這邊會建議你啟用後再繼續，避免你無法往後操作唷</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.43.25.png?alt=media&token=ae991a9b-64c4-437e-976d-f0d1da32e98b" alt="二次驗證"></p>
+<blockquote>
+<p><strong>Note</strong><br>後來我建立新帳號實測，Google 是強制你一定要開啟二次驗證的唷。</p>
+</blockquote>
+<p>如果你本身已經有啟用的話，那麼你就可以點一下兩步驟驗證，然後輸入密碼後滾到最下方找到「應用程式密碼」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.48.40.png?alt=media&token=e3759b0c-d785-46d0-bae8-cecd37d8554d" alt="應用程式密碼"></p>
+<p>點進去後，你選擇一下應用程式和裝置</p>
+<ul>
+<li>應用程式：選擇「郵件」</li>
+<li>裝置：選擇「其他（自訂名稱）」</li>
+</ul>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.49.34.png?alt=media&token=a46921fa-fb20-4fcf-8cd0-e64df8f5a333" alt="應用程式"></p>
+<p>接著會跳出要你命名，你可以依照自己需求命名，所以你可以命名為「nodemailer-example」，然後點選「產生」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.51.21.png?alt=media&token=dff32003-6253-43db-bea5-162561edbafc" alt="應用程式命名"></p>
+<p>點下產生後，你就會取得一組 16 字元的密碼，請好好保存不要外流，這會是我們後續使用的密碼</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F202307221252.jpg?alt=media&token=ec0a3ca3-81e4-4dd9-945b-ced415f23b25" alt="系統產生的應用程式密碼"></p>
+<blockquote>
+<p><strong>Note</strong><br>Google 幾乎時常在更新這個介面，所以我往往文章會來不及更新，若又更新的話再麻煩告知我一聲，我會再更新文章內容。</p>
+</blockquote>
+<p>底下是 2023 年 10 月 20 日補上的畫面，如果你發現你找不到「應用程式密碼」的話也不用擔心，你可以在上方搜尋搜尋「應用程式密碼」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F%E6%88%AA%E5%9C%96%202023-10-20%2014.05.41.png?alt=media&token=001676d6-cd2f-439b-a787-a95f52d9d5f7&_gl=1*1horus5*_ga*ODk0ODUxNTk2LjE2NDM0MjM0ODI.*_ga_CW55HF8NVT*MTY5Nzc4NDAxMi4xNDEuMS4xNjk3Nzg0MDY2LjYuMC4w" alt="應用程式密碼"></p>
+<p>接著你就可以在下方 App Name 輸入「nodemail」，然後點選「建立」</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F%E6%88%AA%E5%9C%96%202023-10-20%2014.06.18.png?alt=media&token=6c252367-9d20-4c38-bb12-2ea9a91d215e&_gl=1*n7xw3w*_ga*ODk0ODUxNTk2LjE2NDM0MjM0ODI.*_ga_CW55HF8NVT*MTY5Nzc4NDAxMi4xNDEuMS4xNjk3Nzg0MTU0LjUzLjAuMA.." alt="App name"></p>
+<p>建立後，你就會跳出一組類似亂碼的密碼，這就是我們要使用的密碼，請好好保存不要外流唷～</p>
+<p><img src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F%E6%88%AA%E5%9C%96_2023-10-20_14_06_26.jpg?alt=media&token=93ae0591-1e80-45c3-b4db-1a8e537e5a7d&_gl=1*1qo8d57*_ga*ODk0ODUxNTk2LjE2NDM0MjM0ODI.*_ga_CW55HF8NVT*MTY5Nzc4NDAxMi4xNDEuMS4xNjk3Nzg0MjYyLjE5LjAuMA.." alt="應用程式密碼"></p>
+<h3 id="撰寫程式碼"><a href="#撰寫程式碼" class="headerlink" title="撰寫程式碼"></a>撰寫程式碼</h3><p>接下來就是撰寫程式碼了，你只需要將你要用來發信的 Email 帳號跟剛剛生成的應用程式密碼填入到 Env</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs env">GMAIL_USER=example@gmail.com # 不用擔心這是假的<br>GMAIL_PASS=d81ydvsldqiwdhnc # 不用擔心這是假的<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>系統產生的應用程式密碼看起來會有空格，請去除不要複製空格；<code>GMAIL_USER</code> 就是你的 Gmail 帳號，而 <code>GMAIL_PASS</code> 就是你的應用程式密碼。</p>
+</blockquote>
+<p>接下來請你到 <code>routes</code> 資料夾的 <code>email.js</code>，貼入以下內容</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/server/send&#x27;</span>, <span class="hljs-title function_">async</span> (req, res, next)=&gt; &#123;<br>    <span class="hljs-keyword">const</span> transporter = nodemailer.<span class="hljs-title function_">createTransport</span>(&#123;<br>      <span class="hljs-attr">service</span>: <span class="hljs-string">&#x27;gmail&#x27;</span>,<br>      <span class="hljs-attr">auth</span>: &#123;<br>        <span class="hljs-attr">user</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">GMAIL_USER</span>,<br>        <span class="hljs-attr">pass</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">GMAIL_PASS</span>,<br>      &#125;,<br>    &#125;);<br><br>    <span class="hljs-keyword">await</span> transporter.<span class="hljs-title function_">verify</span>();<br><br>    <span class="hljs-keyword">const</span> mailOptions = &#123;<br>      <span class="hljs-attr">from</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">GMAIL_USER</span>,<br>      <span class="hljs-attr">to</span>: <span class="hljs-string">&#x27;你要發送的對象信箱&#x27;</span>,<br>      <span class="hljs-attr">subject</span>: <span class="hljs-string">&#x27;這是信件的主旨&#x27;</span>,<br>      <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;這是信件的內容&#x27;</span>,<br>    &#125;;<br><br>    transporter.<span class="hljs-title function_">sendMail</span>(mailOptions, <span class="hljs-function">(<span class="hljs-params">err, info</span>) =&gt;</span> &#123;<br>      <span class="hljs-keyword">if</span> (err) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>        res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Error sending email&#x27;</span>);<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(info);<br>        res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Email sent&#x27;</span>);<br>      &#125;<br>    &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>恭喜你，到這邊為止你就可以正常發信了，而且不是透過 OAuth2 的方式，而是透過帳號密碼的方式，這樣就不會有上述的問題了~</p>
+<h2 id="完整範例程式碼"><a href="#完整範例程式碼" class="headerlink" title="完整範例程式碼"></a>完整範例程式碼</h2><p>最後這邊我也附上完整的程式碼，你可以參考一下</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/node-nodemailer-finish">node-nodemailer-finish</a></li>
+</ul>
+<p>這一份程式碼你可以直接在畫面上點擊按鈕觸發發送信件的，當然，如果你要作為實戰使用還是需要做調整一下哩。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>不得不說這一塊真的是有點複雜且混亂，而且目前網路上的資源滿零散的，自己 Try 了不少次才弄出來，所以這邊我就整理一下，希望對你有幫助。</p>
+
+    </div>
+
+    <!-- Post Footer Ad Slot -->
+    
+      <div class="mt-12 w-full min-h-[300px] bg-gray-50 dark:bg-gray-900 p-4 text-center rounded-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full min-h-[280px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <!-- ArrayException_Post_Footer -->
+          <ins class="adsbygoogle"
+               style="display:block;min-width:300px;width:100%;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="5156296783"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    
+    
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-heart-fill text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </h4>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <h4 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <i class="bi bi-terminal-fill text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </h4>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/vue/20230711/2687889198/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            關於在 Vue 的 Single-File Components 上使用 HOF 分析
+          </span>
+        </a>
+      
+
+      
+        <a href="/nuxt/20230808/2129825058/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Nuxt3 使用 Nitro Proxy 解決跨域問題
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+</article>
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20250313/3008873732/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                六角專題班學習組電商 API 之完整教學
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-03-13
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230407/1216067379/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Vite 中使用 Proxy 解決 CORS 問題
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-04-07
+              </p>
+            </div>
+          </a>
+        
+          <a href="/other/20230202/1147060549/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                你意想不到的 Gmail 隱藏小技巧
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-02-02
+              </p>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20221215/2411869749/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 OpenAI GPT-3 建立一個 Discord 聊天機器人
+              </h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-15
+              </p>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20230722/1626712457/" data-title="Node.js 應用篇 - 使用 Nodemailer 來發送 Email" data-hashtags="Nodejs,Nodemailer,Gmail,OAuth2,Email" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20230722/1626712457/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20230722/1626712457/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20230722/1626712457/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">事前準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nodemailer"><span class="toc-text">Nodemailer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-OAuth-2-0-%E5%AF%84%E4%BF%A1"><span class="toc-text">使用 OAuth 2.0 寄信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E5%B0%88%E6%A1%88"><span class="toc-text">建立專案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%95%9F%E7%94%A8-API-%E5%92%8C%E6%9C%8D%E5%8B%99"><span class="toc-text">啟用 API 和服務</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A-OAuth-%E5%90%8C%E6%84%8F%E7%95%AB%E9%9D%A2"><span class="toc-text">設定 OAuth 同意畫面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E6%86%91%E8%AD%89"><span class="toc-text">建立憑證</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB-Gmail-OAuth-%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">撰寫 Gmail OAuth  程式碼</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Env"><span class="toc-text">建立 Env</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Google-OAuth2-Client"><span class="toc-text">建立 Google OAuth2 Client</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Google-OAuth2-URL"><span class="toc-text">建立 Google OAuth2 URL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Nodemailer-OAuth2"><span class="toc-text">建立 Nodemailer OAuth2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%B8%B3%E8%99%9F%E5%AF%86%E7%A2%BC%EF%BC%88%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F%E5%AF%86%E7%A2%BC%EF%BC%89%E4%BE%86%E7%99%BC%E9%80%81-Email"><span class="toc-text">使用帳號密碼（應用程式密碼）來發送 Email</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB-Env"><span class="toc-text">撰寫 Env</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%95%9F%E7%94%A8-Google-%E8%A8%AD%E5%AE%9A"><span class="toc-text">啟用 Google 設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">撰寫程式碼</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E7%AF%84%E4%BE%8B%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">完整範例程式碼</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AA%9E"><span class="toc-text">結語</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 min-h-[300px] overflow-hidden relative">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full min-h-[280px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/git/20260122/21277993/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git init 出現 master 分支提示？教你設定預設分支為 main
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260122/2316436852/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Dev Containers 打造 AI 自動化開發的安全隔離環境
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/22
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              14 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/git/20260121/2025687513/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Git Worktree 是什麼？一個專案同時跑多個 AI Agent 的秘訣
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/other/20260121/695717014/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/21
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260120/4189755271/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <i class="bi bi-calendar3 text-[10px]"></i>
+              01/20
+            </span>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              35 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  
+<script src="/js/search-BWjLIi5W.js"></script>
+
+  
+
+</body>
+</html>
