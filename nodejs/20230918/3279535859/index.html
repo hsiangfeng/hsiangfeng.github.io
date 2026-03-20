@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day4 - Node.js 內置模組 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20230918/3279535859/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Day4 - Node.js 內置模組">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20230918/3279535859/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&amp;token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2023-09-17T16:00:01.000Z">
+    
+      <meta property="article:modified_time" content="2023-09-17T16:00:01.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day4 - Node.js 內置模組">
+  <meta name="twitter:description" content="上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&amp;token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/nodejs/20230918/3279535859/"},"headline":"Day4 - Node.js 內置模組 | 是 Ray 不是 Array","url":"https://israynotarray.com/nodejs/20230918/3279535859/","datePublished":"2023-09-17T16:00:01.000Z","dateModified":"2023-09-17T16:00:01.000Z","description":"上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24"],"articleSection":["Nodejs"],"keywords":"Node.js, 《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"Day4 - Node.js 內置模組 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"Day4 - Node.js 內置模組"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      // Default to dark if no preference is saved (isDark = true)
+      // Only switch to light if explicitly saved as 'light'
+      const isLight = savedTheme === 'light';
+      
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f9fafb'; // gray-50
+      } else {
+        // Already has 'dark' class from HTML tag
+        document.documentElement.classList.add('dark'); // Ensure it's there
+        document.documentElement.style.backgroundColor = '#111827'; // gray-900
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-34aqv-Dm.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-BSubqRGQ.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2023-09-18" title="發布日期: 2023-09-18" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2023-09-18
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Day4 - Node.js 內置模組
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/%E3%80%8ANode-js-%E4%B8%8D%E8%B2%A0%E8%B2%AC%E7%B3%BB%E5%88%97%EF%BC%9A%E6%8A%8A%E5%89%8D%E7%AB%AF%E4%BA%BA%E5%93%A1%E7%95%B6%E4%BD%9C%E5%BE%8C%E7%AB%AF%E4%BE%86%E7%94%A8%EF%BC%8C%E5%B0%B1%E7%AE%97%E6%98%AF%E5%89%8D%E7%AB%AF%E4%B9%9F%E8%83%BD%E5%98%97%E8%A9%A6%E5%AF%AB%E7%9A%84%E5%BE%8C%E7%AB%AF%EF%BD%9E%E5%8E%9F%E4%BE%86-Node-js-%E5%8F%AF%E4%BB%A5%E5%81%9A%E9%80%99%E9%BA%BC%E5%A4%9A%E4%BA%8B%EF%BD%9E%E3%80%8B/" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white transition-colors">
+              #《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24" data-fancybox="gallery" data-caption="內置模組"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fisray_notarray_hinking_Man_Computer_e4d5d726-a2ca-461f-9f41-576c824b857a.png?alt=media&token=9c8bd2b4-2825-45c5-9f9b-53c3c820fa24" alt="內置模組"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">內置模組</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇我們講了一大推東西，終於撰寫了第一個簡單的 Node.js 專案（雖然範例是透過 Node.js 官方提供的），接下來我們會針對 Node.js 的內置模組來做一些介紹。</p>
+<h2 id="Node-js-內置模組"><a href="#Node-js-內置模組" class="headerlink" title="Node.js 內置模組"></a>Node.js 內置模組</h2><p>首先我們在前面寫了一點小範例（也不算寫，根本是把官方文件範例拿來用）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;text/plain&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">&#x27;Hello, World!\n&#x27;</span>);<br>&#125;);<br><br>server.<span class="hljs-title function_">listen</span>(port, hostname, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running at http://<span class="hljs-subst">$&#123;hostname&#125;</span>:<span class="hljs-subst">$&#123;port&#125;</span>/`</span>);<br>&#125;); <br></code></pre></td></tr></table></figure>
+
+<p>在前面的範例中，我們並沒有很深刻的去認識它，剛好這一篇我們要來認識一下 Node.js 中的內置模組，所以就順便來解釋一下這個範例。</p>
+<p>首先什麼是內置模組？簡單來說就是 Node.js 中內建的模組，也就是說你不需要額外安裝任何東西，就可以直接使用的模組，而這些模組都是由 Node.js 官方所提供的，因此我們可以直接使用，這就是「內置模組」的意思。</p>
+<p>在上面的範例中，我們就使用到了 Node.js 的內置模組，也就是 <code>http</code> 模組，透過這個模組我們可以很快速的建立一個簡單的伺服器，而這個模組就是 Node.js 官方所提供的，因此我們可以直接使用。</p>
+<p>通常內置模組大多都是這樣寫 <code>require(&#39;node:&lt;模組名稱&gt;&#39;)</code>。</p>
+<p>有個大概簡單觀念之後，我們就來逐行解釋一下前面的範例吧！</p>
+<ul>
+<li>第一行：<code>const http = require(&#39;node:http&#39;);</code><ul>
+<li>使用 <code>require</code> 語法來引入 <code>http</code> 模組，並且將它指派給 <code>http</code> 這個常數，這樣我們就可以透過 <code>http</code> 來使用 <code>http</code> 模組了。</li>
+</ul>
+</li>
+<li>第二行：<code>const hostname = &#39;127.0.0.1&#39;;</code><ul>
+<li>定義了一個 <code>hostname</code> 常數，並且將 <code>&#39;127.0.0.1&#39;</code> 指派給它，後面我們會使用到。</li>
+</ul>
+</li>
+<li>第三行：<code>const port = 3000;</code><ul>
+<li>定義了一個 <code>port</code> 常數，並且將 <code>3000</code> 指派給它，也是後面會使用到。</li>
+</ul>
+</li>
+<li>第五行：<code>const server = http.createServer((req, res) =&gt; { ... }</code><ul>
+<li>我們使用 <code>http</code> 模組中的 <code>createServer</code> 方法，並且將一個函式作為參數傳入，這樣就做好一個簡單的伺服器，但是此時還沒有啟動。</li>
+</ul>
+</li>
+<li>第六行：<code>res.statusCode = 200;</code><ul>
+<li>我們將 <code>res</code> 物件中的 <code>statusCode</code> 屬性指派為 <code>200</code>，這樣就可以讓瀏覽器知道這個請求是成功的。</li>
+</ul>
+</li>
+<li>第七行：<code>res.setHeader(&#39;Content-Type&#39;, &#39;text/plain&#39;);</code><ul>
+<li>用了 <code>res</code> 物件中的 <code>setHeader</code> 方法，將 <code>Content-Type</code> 設定為 <code>text/plain</code>，這樣瀏覽器就會知道我們接下來的回應會是一個純文字。</li>
+</ul>
+</li>
+<li>第八行：<code>res.end(&#39;Hello, World!\n&#39;);</code><ul>
+<li>使用 <code>res</code> 物件中的 <code>end</code> 方法，並且將 <code>Hello, World!\n</code> 作為回應的內容，這樣瀏覽器就會看到 <code>Hello, World!</code> 這個字串。</li>
+</ul>
+</li>
+<li>第十行：<code>server.listen(port, hostname, () =&gt; { ... }</code><ul>
+<li>最後 <code>server</code> 中有一個 <code>listen</code> 方法，我們可以透過這個方法來啟動伺服器，並且指定 <code>port</code> 與 <code>hostname</code>，這樣瀏覽器才能夠連線到伺服器。</li>
+</ul>
+</li>
+</ul>
+<p>透過上面的程式碼，我們就可以建立一個簡單的伺服器，只需要在專案啟動後，就可以在瀏覽器中輸入 <code>http://127.0.0.1:3000/</code> 來看到 <code>Hello, World!</code> 這個字串。</p>
+<p>這邊也額外補充一下 <code>res</code> 代表著回應（Response），而 <code>req</code> 代表著請求（Request），這兩個物件都是由 <code>http</code> 模組所提供的，我們可以透過這兩個物件來操作請求與回應；由於當使用者請求時，我們必須回應給使用者我們即將回傳的格式，因此我們使用 <code>res.setHeader(&#39;Content-Type&#39;, &#39;text/plain&#39;);</code> 來告訴瀏覽器我們即將回傳的格式是 <code>text/plain</code>，這樣瀏覽器就會知道我們接下來的回應會是一個純文字。</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1690870679477.png?alt=media&token=0bd865e0-ab17-461d-b967-105cee53027c" data-fancybox="gallery" data-caption="偷懶"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2F1690870679477.png?alt=media&token=0bd865e0-ab17-461d-b967-105cee53027c" alt="偷懶"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">偷懶</figcaption></figure>
+<p>（可惡，我以為把前面範例講完就好了）</p>
+<p>你以為 Node.js 的內置模組只能用來架設一個簡單的伺服器嗎？</p>
+<p>錯！Node.js 的內置模組還有很多很多，這邊我也列出一些內置模組：</p>
+<ul>
+<li><code>http</code>：用於建立 HTTP 伺服器。</li>
+<li><code>https</code>：用於建立 HTTPS 伺服器。</li>
+<li><code>fs</code>：用於操作檔案，例如：讀取檔案、寫入檔案、刪除檔案等等。</li>
+<li><code>path</code>：處理檔案路徑的工具。</li>
+<li><code>os</code>：用於操作作業系統的工具。</li>
+<li><code>crypto</code>：提供加密和解密功能的模組。</li>
+<li><code>zlib</code>：提供壓縮和解壓縮功能的模組。</li>
+<li><code>util</code>：提供一些實用工具的模組。</li>
+<li><code>stream</code>：用於處理 Stream 的模組，可以處理大型檔案或資料的讀取和寫入。</li>
+<li><code>querystring</code>：用於處理 URL 查詢字串的模組。</li>
+</ul>
+<p>那麼由於內置模組並不會每一個都介紹到，因為篇幅實在太多了，因此這邊我只會拉幾個比較常見的來介紹，那麼前面已經有介紹過 <code>http</code> 模組了，所以就不會再額外說明 <code>http</code> 模組囉。</p>
+<p>往下閱讀之前，我想先再一次重複，基本上你只要看到 <code>require(&#39;node:&lt;模組名稱&gt;&#39;)</code>，就代表著它是使用 Node.js 的內置模組，因此你不需要額外安裝，什麼是額外安裝呢？也就是你不用再額外輸入 <code>npm install &lt;模組名稱&gt;</code> 來安裝，因為 Node.js 官方已經幫你準備好了。</p>
+<h3 id="fs-模組"><a href="#fs-模組" class="headerlink" title="fs 模組"></a>fs 模組</h3><p><code>fs</code> 完整名稱是 <code>File system</code> 的縮寫，也就是<strong>檔案系統</strong>的意思，這個模組可以讓我們操作作業系統的檔案，例如：讀取檔案、寫入檔案、刪除檔案等等。</p>
+<p>首先先請你依照以下指令建立一個檔案以及資料夾</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> fs-example<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">touch</span> fs-example/text.txt<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Hello, World&quot;</span> &gt; fs-example/text.txt<br></code></pre></td></tr></table></figure>
+
+<p>接下來請你建立一個 index.js 檔案，然後我們就要來認識最基本的 <code>fs</code> 模組了，底下是一個簡單的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:fs&#x27;</span>);<br><br><br>fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;./text.txt&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> &#123;<br>  <span class="hljs-keyword">if</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br><br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請不要忘記輸入 <code>npm init -y</code> 來初始化專案，這樣才能夠使用 <code>npm install</code> 來安裝套件以及增加 <code>&quot;start&quot;: &quot;node index.js&quot;</code> 指令唷。</p>
+</blockquote>
+<p>在上面的程式碼中，我們使用了 <code>fs</code> 模組中的 <code>readFile</code> 方法，這個方法可以讀取特定檔案，並且將檔案內容回傳給我們，這邊我們將 <code>text.txt</code> 這個檔案讀取出來，並且將內容回傳給我們，這樣我們就可以在終端機中看到 <code>Hello, World</code> 這個字串</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnode_fs_readfile.png?alt=media&token=571b74d2-2838-4ecd-9df0-79dfc42733ca" data-fancybox="gallery" data-caption="readFile"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fnode_fs_readfile.png?alt=media&token=571b74d2-2838-4ecd-9df0-79dfc42733ca" alt="readFile"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">readFile</figcaption></figure>
+<p>有讀取檔案的語法，當然就會有新增、刪除跟寫入的語法啦~</p>
+<p>但是因為 JavaScript 本身在檔案處理這一塊是屬於非同步的，因此我們必須使用 <code>callback</code> 來處理，但是使用 <code>callback</code> 的方式就會發生所謂的「<strong>Callback Hell</strong>」問題發生</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fcallback_hell.jpg?alt=media&token=d48c5e9b-b32b-4891-bb06-f0bc3aed9a14" data-fancybox="gallery" data-caption="callback hell"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fcallback_hell.jpg?alt=media&token=d48c5e9b-b32b-4891-bb06-f0bc3aed9a14" alt="callback hell"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">callback hell</figcaption></figure>
+<p>那麼 <code>Callback Hell</code> 會導致程式碼過於巢狀，讓程式碼變得難以閱讀，因此 Node.js 在 10.0.0 版本之後，提供了 <code>node:fs/promises</code> 模組可以使用，因此以剛剛的讀取檔案範例來講，我們可以改成這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:fs/promises&#x27;</span>);<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">readFile</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;./text.txt&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);<br>  &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>  &#125;<br>&#125;;<br><br><span class="hljs-title function_">readFile</span>();<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>Callback 的概念就是將函式做為另一個函式的參數傳入並呼叫，也就是當某件事情完成後，我們才會去執行這個函式，這個函式就是 callback，而 Callback Hell 就是 Callback 的巢狀結構，這個巢狀結構會讓程式碼變得難以閱讀。</p>
+</blockquote>
+<p>那麼往下介紹之前，如果你對於 Promise 沒有概念或者不熟悉的話，我會推薦你閱讀我先前寫文章</p>
+<ul>
+<li><a href="https://israynotarray.com/javascript/20211128/2950137358/">JavaScript 中的 Promise 是什麼？以及為什麼你要懂 Promise</a></li>
+</ul>
+<p>如果沒有任何問題的話，這邊我就即將繼續介紹其他檔案操作的方法囉~</p>
+<p>有讀取語法，當然就會有寫入語法，而寫入的語法就是 <code>fs.writeFile</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:fs/promises&#x27;</span>);<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">updateFile</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params"></span>) =&gt;&#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">writeFile</span>(<span class="hljs-string">&#x27;./text.txt&#x27;</span>, <span class="hljs-string">&#x27;這是更新後的檔案內容。&#x27;</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;檔案編輯成功！&#x27;</span>);<br>  &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;無法編輯檔案 ：&#x27;</span>, err);<br>  &#125;<br>&#125;<br><br><span class="hljs-title function_">updateFile</span>();<br></code></pre></td></tr></table></figure>
+
+<p>這時候你應該會發現一個問題，原本我們在前面是使用 <code>echo &quot;Hello, World&quot; &gt; fs-example/text.txt</code> 這個指令來新增檔案的內容，但是使用 <code>fs.writeFile</code> 這個方法之後，卻沒有新增檔案內容，而是直接覆蓋掉原本的檔案內容，變成了 <code>&#39;這是更新後的檔案內容。&#39;</code>，如果這是你預期的結果那麼就沒問題，但如果不是的話，那麼我們就需要使用 <code>fs.appendFile</code> 這個方法來新增檔案內容才對：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:fs/promises&#x27;</span>);<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">appendUpdateFile</span>= <span class="hljs-keyword">async</span> (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">appendFile</span>(<span class="hljs-string">&#x27;./text.txt&#x27;</span>, <span class="hljs-string">&#x27;這是新增的內容。&#x27;</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;檔案編輯成功！&#x27;</span>);<br>  &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;無法編輯檔案 ：&#x27;</span>, err);<br>  &#125;<br>&#125;<br><br><span class="hljs-title function_">appendUpdateFile</span>();<br></code></pre></td></tr></table></figure>
+
+<p><code>fs.appendFile</code> 會直接在原本的檔案內容後面新增內容，而不是覆蓋掉原本的檔案內容，這樣就不會發生覆蓋掉原本檔案內容的問題了。</p>
+<blockquote>
+<p><strong>Note</strong><br>你會發現 <code>fs.appendFile</code> 會是在最後一行的字去新增，如果你是希望新增時同時換行的話，可以在字串前後加上 <code>\n</code>，這樣就可以換行了，ex：<code>await fs.appendFile(&#39;./text.txt&#39;, &#39;\n這是新增的內容。\n&#39;);</code>。</p>
+</blockquote>
+<p>接下來就是刪除檔案的語法，刪除檔案的語法就是 <code>fs.unlink</code> 格外簡單許多：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:fs/promises&#x27;</span>);<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">deleteFile</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">unlink</span>(<span class="hljs-string">&#x27;./text.txt&#x27;</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;檔案刪除成功！&#x27;</span>);<br>  &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;無法刪除檔案 ：&#x27;</span>, err);<br>  &#125;<br>&#125;<br><br><span class="hljs-title function_">deleteFile</span>();<br></code></pre></td></tr></table></figure>
+
+<p>基本上我們已經認識了幾個語法</p>
+<ul>
+<li><code>fs.readFile</code>：讀取檔案</li>
+<li><code>fs.writeFile</code>：寫入檔案（我認為應該叫覆蓋檔案比較好）</li>
+<li><code>fs.appendFile</code>：新增檔案內容</li>
+<li><code>fs.unlink</code>：刪除檔案</li>
+</ul>
+<p>當然 <code>fs</code> 底下還有很多功能可以使用，如果一一介紹的話，我看這一篇除了直接爆掉之外，腦袋應該也會爆掉吧？</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fexploding-boom.gif?alt=media&token=542e4b11-291c-43f5-a988-5b004b60df11" data-fancybox="gallery" data-caption="BOOM"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fithelp-nodejs-2023%2Fexploding-boom.gif?alt=media&token=542e4b11-291c-43f5-a988-5b004b60df11" alt="BOOM"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">BOOM</figcaption></figure>
+<h3 id="path-模組"><a href="#path-模組" class="headerlink" title="path 模組"></a>path 模組</h3><p><code>path</code> 是一個專門處理檔案路徑的模組，很有趣吧？竟然還有一個專門處理檔案路徑的模組，路徑不是就 <code>../</code> or <code>./</code> 嗎？為什麼還需要一個專門處理檔案路徑的模組呢？</p>
+<p>其實原因是出在不同的操作系統上，路徑的表示方式是不同的，例如：在 Windows 上路徑是這樣的 <code>C:\Users\user\Desktop\test.txt</code>，而在 Mac 上路徑是這樣的 <code>/Users/user/Desktop/test.txt</code>，因此我們需要一個專門處理檔案路徑的模組，這樣我們才能夠確保在不同的操作系統上都能夠正確的處理檔案路徑。</p>
+<p>那麼我們就來看看 <code>path</code> 模組的使用方式？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:path&#x27;</span>);<br><br><span class="hljs-keyword">const</span> filePath = path.<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">&#x27;text.txt&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(filePath);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請記得在專案中建立一個 <code>text.txt</code> 檔案，並且在檔案中輸入任意內容。</p>
+</blockquote>
+<p>有沒有很簡單呢？上面我們使用了 <code>path</code> 模組中的 <code>join</code> 方法，這個方法可以將多個路徑組合起來，並且回傳一個組合後的路徑，這邊我們將 <code>__dirname</code> 與 <code>text.txt</code> 組合起來，這樣就可以得到一個完整的路徑了。</p>
+<p>那麼這邊有趣的事情來了 <code>__dirname</code> 是什麼東西？當你直接輸出 <code>__dirname</code> 你會得到當前檔案的路徑，例如：<code>/Users/user/Desktop/fs-example</code>，所以你應該是想著…</p>
+<p>「<code>__dirname</code> 是哪裡來的？你又沒有宣告這個變數？為什麼他能夠取得當前專案的目錄？」</p>
+<p>在 Node.js 中有一個叫做 <code>global</code> 的物件，這個物件可以讓我們在任何地方都可以使用，而 <code>__dirname</code> 就是 <code>global</code> 物件中的一個屬性，這個屬性可以讓我們取得當前檔案的路徑，因此我們可以透過 <code>__dirname</code> 來取得當前檔案的路徑。</p>
+<blockquote>
+<p><strong>Note</strong><br>Node.js 的全域物件是叫 <code>global</code>，而瀏覽器則是 <code>window</code>，這兩個物件都是可以在任何地方使用的，但是在 Node.js 中，我們不需要使用 <code>global</code> 來取得全域物件，因為 Node.js 預設就會將 <code>global</code> 設定為全域物件，因此我們可以直接使用 <code>__dirname</code> 來取得當前檔案的路徑；你可以將 <code>global</code> 當作是瀏覽器的 <code>window</code> 概念。</p>
+</blockquote>
+<p>那麼只有這樣嗎？不，其實你可以透過 path 取得檔案的檔名或副檔名，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:path&#x27;</span>);<br><br><span class="hljs-keyword">const</span> filePath = path.<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">&#x27;text.txt&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(path.<span class="hljs-title function_">basename</span>(filePath));<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(path.<span class="hljs-title function_">extname</span>(filePath));<br></code></pre></td></tr></table></figure>
+
+<p>透過 <code>path.basename</code> 我們可以取得檔案的檔名，透過 <code>path.extname</code> 我們可以取得檔案的副檔名，這樣就可以讓我們更方便的取得檔案的檔名或副檔名了。</p>
+<h3 id="os-模組"><a href="#os-模組" class="headerlink" title="os 模組"></a>os 模組</h3><p><code>os</code> 模組全名是 <code>Operating System</code> 的縮寫，也就是作業系統的意思，這個模組可以讓我們取得作業系統的資訊，例如：作業系統的名稱、作業系統的版本、作業系統的記憶體等等。</p>
+<p>我目前是使用 Mac，因此我們就來看看 <code>os</code> 模組可以取得哪些資訊～</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:os&#x27;</span>);<br><br><span class="hljs-keyword">const</span> osName = os.<span class="hljs-title function_">platform</span>();<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;操作系統名稱：&#x27;</span>, osName);<br><br><span class="hljs-keyword">const</span> osVersion = os.<span class="hljs-title function_">release</span>();<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;操作系統版本：&#x27;</span>, osVersion);<br><br><span class="hljs-keyword">const</span> cpuInfo = os.<span class="hljs-title function_">cpus</span>();<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;CPU 資訊：&#x27;</span>, cpuInfo);<br><br><span class="hljs-keyword">const</span> networkInterfaces = os.<span class="hljs-title function_">networkInterfaces</span>();<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;網路介面資訊：&#x27;</span>, networkInterfaces);<br><br><span class="hljs-keyword">const</span> totalMemory = os.<span class="hljs-title function_">totalmem</span>();<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;總內存量：&#x27;</span>, totalMemory);<br></code></pre></td></tr></table></figure>
+
+<p>基本上你應該輸入完畢後，並執行是可以在終端機看到相關資訊的，而我這邊就不額外提供了，那麼因為 <code>os</code> 模組的相關操作非常多，所以我這邊就不一一介紹了。</p>
+<blockquote>
+<p><strong>Note</strong><br>Mac 的作業系統名稱是 <code>darwin</code>，而 Windows 的作業系統名稱是 <code>win32</code>。</p>
+</blockquote>
+<h3 id="crypto-模組"><a href="#crypto-模組" class="headerlink" title="crypto 模組"></a>crypto 模組</h3><p><code>crypto</code> 主要跟加解密有關，比較常見的場景就是在使用者註冊時，我們會將使用者的密碼進行加密，這樣就可以確保使用者的密碼不會被外洩，而當使用者登入時，我們就會將使用者輸入的密碼進行加密，然後再與資料庫中的密碼進行比對，這樣就可以確保使用者輸入的密碼是正確的。</p>
+<p>而 <code>crypto</code> 也提供相當多的方式，例如：sha256、sha512、md5 等等，這邊我們就來看個簡易的範例吧！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:crypto&#x27;</span>);<br><br><span class="hljs-keyword">const</span> password = <span class="hljs-string">&#x27;123456&#x27;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">hashPassword</span> = (<span class="hljs-params">data</span>) =&gt; &#123;<br>  <span class="hljs-keyword">const</span> hash = crypto.<span class="hljs-title function_">createHash</span>(<span class="hljs-string">&#x27;sha256&#x27;</span>);<br>  hash.<span class="hljs-title function_">update</span>(data);<br>  <span class="hljs-keyword">return</span> hash.<span class="hljs-title function_">digest</span>(<span class="hljs-string">&#x27;hex&#x27;</span>);<br>&#125;;<br><br><span class="hljs-keyword">const</span> hashedPassword = <span class="hljs-title function_">hashPassword</span>(password);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(hashedPassword);<br></code></pre></td></tr></table></figure>
+
+<p>簡單來講，我們使用了一個 sha256 進行雜湊，將使用者的密碼變成一串亂碼，這樣子就可以確保使用者的密碼不會被外洩，什麼意思呢？我們在開發系統時總是會需要記錄使用者的帳號及密碼，但為了資安上的考量，我們並不會將使用者的密碼以明碼的方式儲存，而是會將密碼進行雜湊，這樣就可以確保使用者的密碼不會被外洩，因為即使是系統管理員也無法知道使用者的密碼是什麼。</p>
+<blockquote>
+<p><strong>Note</strong><br>明碼的意思就是沒有做任何處理的密碼，例如密碼是 <code>12345678</code> 儲存時也就是 <code>12345678</code>，這樣就是明碼。</p>
+</blockquote>
+<p>但使用 sha256 只是一個基本的方式，通常還會搭配 Salt（加鹽）的方式，只是這就不是這篇的重點了，因此我就不多做介紹了。</p>
+<p>回頭來講 sha256 的部分，當我們使用了 sha256 進行雜湊後，我們該如何在使用者登入時比對呢？基本上只要使用者輸入的密碼進行雜湊，然後再與資料庫中的雜湊後的密碼進行比對就可以囉</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:crypto&#x27;</span>);<br><br><span class="hljs-keyword">const</span> password = <span class="hljs-string">&#x27;123456&#x27;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">hashPassword</span> = (<span class="hljs-params">data</span>) =&gt; &#123;<br>  <span class="hljs-keyword">const</span> hash = crypto.<span class="hljs-title function_">createHash</span>(<span class="hljs-string">&#x27;sha256&#x27;</span>);<br>  hash.<span class="hljs-title function_">update</span>(data);<br>  <span class="hljs-keyword">return</span> hash.<span class="hljs-title function_">digest</span>(<span class="hljs-string">&#x27;hex&#x27;</span>);<br>&#125;;<br><br><span class="hljs-keyword">const</span> hashedPassword = <span class="hljs-title function_">hashPassword</span>(password);<br><br><span class="hljs-comment">// 假設這是資料庫中存儲的使用者密碼雜湊值</span><br><span class="hljs-keyword">const</span> storedHashedPassword = hashedPassword;<br><br><span class="hljs-comment">// 使用者輸入的密碼</span><br><span class="hljs-keyword">const</span> userInputPassword = <span class="hljs-string">&#x27;123456&#x27;</span>;<br><br><span class="hljs-keyword">const</span> hashedInputPassword = <span class="hljs-title function_">hashPassword</span>(userInputPassword);<br><br><span class="hljs-comment">// 將雜湊後的使用者輸入密碼與資料庫中存儲的密碼雜湊值進行比較</span><br><span class="hljs-keyword">if</span> (hashedInputPassword === storedHashedPassword) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;密碼正確，驗證成功！&#x27;</span>);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;密碼錯誤，驗證失敗！&#x27;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>很簡單吧？但這只是簡單的範例，實際上我們還需要搭配 Salt（加鹽）的方式，這樣才能夠更加確保使用者的密碼不會被外洩唷（很重要）。</p>
+<p>那麼這一篇我想要先來做個結尾了，因為 Node.js 內建模組實在有點多，如果每個都介紹的話，量其實有點大 QQ</p>
+<p>因此這一篇我主要介紹的還是以那幾個比較常見的為主，其餘的部分可以依照自己開發需求來使用哩～</p>
+<p>我們下一篇見囉～</p>
+<h2 id="關於-node-後續補充"><a href="#關於-node-後續補充" class="headerlink" title="關於 node: 後續補充"></a>關於 <code>node:</code> 後續補充</h2><p>剛好有人提問了以下…</p>
+<p>「請問範例中 <code>node:</code> 這個前綴好像有加沒加都可以正常運作？那這樣這有什麼差嗎？」</p>
+<p>這個問題問得很好，確實以我們前面的範例來講：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node:http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;text/plain&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">&#x27;Hello, World!\n&#x27;</span>);<br>&#125;);<br><br>server.<span class="hljs-title function_">listen</span>(port, hostname, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running at http://<span class="hljs-subst">$&#123;hostname&#125;</span>:<span class="hljs-subst">$&#123;port&#125;</span>/`</span>);<br>&#125;); <br></code></pre></td></tr></table></figure>
+
+<p>就算改成了以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);<br><br><span class="hljs-keyword">const</span> hostname = <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>;<br><span class="hljs-keyword">const</span> port = <span class="hljs-number">3000</span>;<br><br><span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  res.<span class="hljs-property">statusCode</span> = <span class="hljs-number">200</span>;<br>  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>, <span class="hljs-string">&#x27;text/plain&#x27;</span>);<br>  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">&#x27;Hello, World!\n&#x27;</span>);<br>&#125;);<br><br>server.<span class="hljs-title function_">listen</span>(port, hostname, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running at http://<span class="hljs-subst">$&#123;hostname&#125;</span>:<span class="hljs-subst">$&#123;port&#125;</span>/`</span>);<br>&#125;); <br></code></pre></td></tr></table></figure>
+
+<p>這件事情需要先提到一個東西，也就是 Node.js 的 <code>require</code> 緩存機制，基本上模組在引入時都會被緩存起來（放在 <code>require.cache</code> 中），這樣就可以避免重複引入模組，因此當我們在引入模組時，Node.js 會先檢查模組是否已經被緩存，如果有的話就會直接使用緩存的模組，如果沒有的話就會重新載入模組，這樣除了可以大大的提高效能之外，也可以避免重複引入模組，並共用某些狀態。</p>
+<p>而這個 <code>node:</code> 前綴詞是大約在 Node.js 14 左右引入的（吧？），基本上當你使用 <code>node:</code> 前綴詞時，Node.js 將會繞過 <code>require</code> 的快取機制，什麼意思呢？就算 <code>require.cache</code> 中有這個模組，也依然會被忽略掉，直接返回並重新載入模組，這樣就可以確保你使用的是最新的模組，而不是快取的模組。</p>
+<p>因此，使用 <code>node:</code> 就是在跟 Node.js 講說…</p>
+<p>「嘿！你給我直接去找 <code>node:</code> 後面的模組，不要去找快取的模組！」</p>
+<p>這也是為什麼有無使用 <code>node:</code> 前綴詞都可以正常運作的原因哩~</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>最近發生了一點事情，差點鐵人賽文章就沒辦法寫下去了，還好用肝的把它給肝出來了！</p>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+    
+    <!-- Support Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+          你的支持會直接轉換成更多技術筆記
+        </div>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+            如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+          </p>
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            
+            
+            
+              
+              
+                <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://line.me/S/shop/sticker/author/5311475/top?lang=zh-Hant&amp;utm_source=gnsh_staut" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+                </a>
+                
+                  <span class="text-gray-300 dark:text-gray-600">|</span>
+                
+              
+            
+              
+              
+                <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+                  <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+                </a>
+                
+              
+            
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      
+        <a href="/nodejs/20230917/3753839802/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Day3 - 第一個 Node.js 專案
+          </span>
+        </a>
+      
+
+      
+        <a href="/nodejs/20230919/1426601281/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Day5 - Node.js Modules
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20231015/3466588754/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day31 - 目錄與補充資源
+              </h4>
+              <time datetime="2023-10-15" title="發布日期: 2023-10-15" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-15
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231014/27552363/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day30-旅途告一個段落
+              </h4>
+              <time datetime="2023-10-14" title="發布日期: 2023-10-14" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-14
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231013/3280561145/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day29-關於 JWT 驗證
+              </h4>
+              <time datetime="2023-10-13" title="發布日期: 2023-10-13" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-13
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20231012/3543796485/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Day28-Google Extension 與 Google Apps Script 蹦再一起
+              </h4>
+              <time datetime="2023-10-12" title="發布日期: 2023-10-12" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-10-12
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20230918/3279535859/" data-title="Day4 - Node.js 內置模組" data-hashtags="Node.js,《Node.js 不負責系列：把前端人員當作後端來用，就算是前端也能嘗試寫的後端～原來 Node.js 可以做這麼多事～》" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20230918/3279535859/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20230918/3279535859/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20230918/3279535859/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-js-%E5%85%A7%E7%BD%AE%E6%A8%A1%E7%B5%84"><span class="toc-text">Node.js 內置模組</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#fs-%E6%A8%A1%E7%B5%84"><span class="toc-text">fs 模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#path-%E6%A8%A1%E7%B5%84"><span class="toc-text">path 模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#os-%E6%A8%A1%E7%B5%84"><span class="toc-text">os 模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#crypto-%E6%A8%A1%E7%B5%84"><span class="toc-text">crypto 模組</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%9C%E6%96%BC-node-%E5%BE%8C%E7%BA%8C%E8%A3%9C%E5%85%85"><span class="toc-text">關於 node: 後續補充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="toc-text">碎碎念</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260320/2827818448/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            不想用龍蝦（OpenClaw）？來試試看 Claude Code channels 吧！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-20" title="發布日期: 2026-03-20" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/20
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              9 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260319/738324368/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Cowork Dispatch 與 Remote Control - 用手機遠端控制你的 AI Agent
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-19" title="發布日期: 2026-03-19" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/19
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              12 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260310/3737444063/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            CLAUDE.md 與 Rules for AI 撰寫技巧：讓 AI 更懂你的專案
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-10" title="發布日期: 2026-03-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              12 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/javascript/20260310/2118283166/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            前端加密不求人！Web Crypto API 完整教學：雜湊、AES 加解密、HMAC 簽章
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-10" title="發布日期: 2026-03-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              10 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260306/1831816539/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            優化 Claude Code 沒方向？超簡單指令給你方向！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-06" title="發布日期: 2026-03-06" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/06
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              3 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>
