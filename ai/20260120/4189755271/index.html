@@ -1,0 +1,1372 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/ai/20260120/4189755271/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="只要你使用過 Claude Code、Gemini、Codex 這些 AI 開發工具的話，那相信你肯定有用過 MCP（Model Context Protocol，模型上下文協定），但本身這些 AI 工具有所謂的 Context 上限，只要使用了 MCP 後，就很容易超出 Context 上限，導致模型無法正常運作，所以這一篇就來聊一下同樣為 Anthropic 所釋出的 Agent Skills，並且用 Claude Code 示範如何使用。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範">
+  <meta property="og:url" content="https://israynotarray.com/ai/20260120/4189755271/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="只要你使用過 Claude Code、Gemini、Codex 這些 AI 開發工具的話，那相信你肯定有用過 MCP（Model Context Protocol，模型上下文協定），但本身這些 AI 工具有所謂的 Context 上限，只要使用了 MCP 後，就很容易超出 Context 上限，導致模型無法正常運作，所以這一篇就來聊一下同樣為 Anthropic 所釋出的 Agent Skills，並且用 Claude Code 示範如何使用。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2FGemini_Generated_Image_txjnhitxjnhitxjn.png?alt=media&amp;token=83deea7c-5f52-478a-a34a-ae585746ab22">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2026-01-20T06:16:49.000Z">
+    
+      <meta property="article:modified_time" content="2026-01-20T06:16:49.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="Claude Code">
+      
+        <meta property="article:tag" content="MCP">
+      
+        <meta property="article:tag" content="Agent Skills">
+      
+        <meta property="article:tag" content="Skills">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範">
+  <meta name="twitter:description" content="只要你使用過 Claude Code、Gemini、Codex 這些 AI 開發工具的話，那相信你肯定有用過 MCP（Model Context Protocol，模型上下文協定），但本身這些 AI 工具有所謂的 Context 上限，只要使用了 MCP 後，就很容易超出 Context 上限，導致模型無法正常運作，所以這一篇就來聊一下同樣為 Anthropic 所釋出的 Agent Skills，並且用 Claude Code 示範如何使用。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2FGemini_Generated_Image_txjnhitxjnhitxjn.png?alt=media&amp;token=83deea7c-5f52-478a-a34a-ae585746ab22">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/ai/20260120/4189755271/"},"headline":"比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範 | 是 Ray 不是 Array","url":"https://israynotarray.com/ai/20260120/4189755271/","datePublished":"2026-01-20T06:16:49.000Z","dateModified":"2026-01-20T06:16:49.000Z","description":"只要你使用過 Claude Code、Gemini、Codex 這些 AI 開發工具的話，那相信你肯定有用過 MCP（Model Context Protocol，模型上下文協定），但本身這些 AI 工具有所謂的 Context 上限，只要使用了 MCP 後，就很容易超出 Context 上限，導致模型無法正常運作，所以這一篇就來聊一下同樣為 Anthropic 所釋出的 Agent Skills，並且用 Claude Code 示範如何使用。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2FGemini_Generated_Image_txjnhitxjnhitxjn.png?alt=media&token=83deea7c-5f52-478a-a34a-ae585746ab22"],"articleSection":["AI"],"keywords":"AI, Claude Code, MCP, Agent Skills, Skills"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode & Color Palette Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-OzTITT57.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-Bs_9ZI5Y.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Color Palette Selector (精簡版) -->
+  <div class="palette-selector relative w-full">
+    <button data-palette-select class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox">
+      <div class="flex items-center gap-2">
+        <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: rgb(var(--color-primary-500))"></span>
+        <span class="palette-label text-sm text-gray-600 dark:text-gray-400">Theme</span>
+      </div>
+      <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+    </button>
+    <div class="palette-dropdown hidden absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+      <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+      </button>
+      <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-01-20" title="發布日期: 2026-01-20" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-01-20
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/Claude-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code
+            </a>
+          
+            <a href="/tags/MCP/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #MCP
+            </a>
+          
+            <a href="/tags/Agent-Skills/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Agent Skills
+            </a>
+          
+            <a href="/tags/Skills/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Skills
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2FGemini_Generated_Image_txjnhitxjnhitxjn.png?alt=media&token=83deea7c-5f52-478a-a34a-ae585746ab22" data-fancybox="gallery" data-caption="取代 MCP 的 Agent Skills？！用 Claude Code 示範"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2FGemini_Generated_Image_txjnhitxjnhitxjn.png?alt=media&token=83deea7c-5f52-478a-a34a-ae585746ab22" alt="取代 MCP 的 Agent Skills？！用 Claude Code 示範"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">取代 MCP 的 Agent Skills？！用 Claude Code 示範</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>只要你使用過 Claude Code、Gemini、Codex 這些 AI 開發工具的話，那相信你肯定有用過 MCP（Model Context Protocol，模型上下文協定），但本身這些 AI 工具有所謂的 Context 上限，只要使用了 MCP 後，就很容易超出 Context 上限，導致模型無法正常運作，所以這一篇就來聊一下同樣為 Anthropic 所釋出的 Agent Skills，並且用 Claude Code 示範如何使用。</p>
+<h2 id="什麼是-Agent-Skills？"><a href="#什麼是-Agent-Skills？" class="headerlink" title="什麼是 Agent Skills？"></a>什麼是 Agent Skills？</h2><p>在深入 Agent Skills 之前，我們得先釐清 MCP 的運作邏輯，否則你怎麼會知道為什麼要用 Agent Skills 呢？</p>
+<p>過去我們常遇到 AI 模型「資訊落後」或「看不見私有資料」的問題。MCP 的出現提供了一套標準化協定，讓模型能直接與外部工具（如資料庫、本地檔案、搜尋引擎）串接，即時抓取最新資訊。</p>
+<p>然而，MCP 的運作方式本質上是 <strong>「資料搬運」</strong> 。當你呼叫一個 MCP 工具時，它通常會將抓取到的原始資料（Raw Data）直接塞進對話紀錄中。這會產生兩個主要痛點：</p>
+<ul>
+<li>大量 Token 稅：大量的 Log、JSON 都會被迅速佔滿模型 Token。</li>
+<li>雜訊干擾：由於資料太龐大，導致你原本前面下的 Prompt 反而被淹沒，模型無法聚焦在重點上，進而導致「回答」品質低落。</li>
+</ul>
+<p>這也是為什麼 MCP 雖然能解決資訊落後的問題，但卻無法有效提升模型的「理解力」與「推理力」。</p>
+<p>為了解決這個問題，Anthropic 推出了 Agent Skills。</p>
+<p>Agent Skills 的設計理念是 <strong>「知識搬運」</strong> ，而非「資料搬運」。</p>
+<blockquote>
+<p><strong>Note</strong><br>Agent Skills 本質上並不是取代 MCP，而是建立在 MCP 之上，兩者可以互相搭配使用。許多系統還是需要依賴 MCP 來提供給 AI 讀取。</p>
+</blockquote>
+<p>那麼知識搬運跟資料搬運差異在哪呢？簡單來講，就是只給 AI 模型「重點」而非「全部」。這樣的好處可以避免 Token 的浪費以及雜訊的干擾，讓模型能更專注在核心資訊上。</p>
+<h2 id="用-Claude-Code-示範-Agent-Skills"><a href="#用-Claude-Code-示範-Agent-Skills" class="headerlink" title="用 Claude Code 示範 Agent Skills"></a>用 Claude Code 示範 Agent Skills</h2><p>不論是 Gemini 還是 Claude Code 都有支援 Agent Skills 的功能，但這邊會著重於使用 Claude Code 來示範。</p>
+<p>首先 Skills 並不是什麼新技術也不是什麼新格式，而是一個單純的 Markdown 檔案，但裡面有一些撰寫規範以及放置方式：</p>
+<h3 id="放置方式"><a href="#放置方式" class="headerlink" title="放置方式"></a>放置方式</h3><p>首先我們先來聊一下放置方式，Claude Code 有兩種放置方式，分別為：</p>
+<ul>
+<li>專案類型： <code>&lt;專案根目錄&gt;/.claude/skills/</code></li>
+<li>全域類型： <code>~/.claude/skills/</code>（macOS&#x2F;Linux）</li>
+</ul>
+<p>這邊要注意，當同名的 Skill 存在於多個位置時，優先順序為：全域 &gt; 專案。也就是說，全域的 Skill 會覆蓋專案的同名 Skill。</p>
+<blockquote>
+<p><strong>Note</strong><br>優先順序其實還有 Managed 跟 Plugin，如果加入這兩個的話，那麼優先順序就會是 Managed &gt; Personal &gt; Project &gt; Plugin，但普通開發者通常不太會接觸到 Managed 跟 Plugin，所以這邊就不多做說明。</p>
+</blockquote>
+<h4 id="Monorepo-巢狀目錄"><a href="#Monorepo-巢狀目錄" class="headerlink" title="Monorepo 巢狀目錄"></a>Monorepo 巢狀目錄</h4><p>如果你的專案是 Monorepo 架構，Claude Code 會<strong>尋找巢狀目錄中的 Skills</strong>。</p>
+<p>舉例來說，當你正在編輯 <code>packages/frontend/src/App.vue</code> 時，Claude Code 除了會搜尋根目錄的 <code>.claude/skills/</code> 之外，也會自動搜尋 <code>packages/frontend/.claude/skills/</code> 目錄中的 Skills。</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs txt">monorepo-project/<br>├── .claude/<br>│   └── skills/<br>│       └── shared-skill/        # 全專案共用<br>│           └── SKILL.md<br>└── packages/<br>    ├── frontend/<br>    │   ├── .claude/<br>    │   │   └── skills/<br>    │   │       └── react-skill/ # 僅 frontend 使用<br>    │   │           └── SKILL.md<br>    │   └── src/<br>    │       └── App.vue<br>    └── backend/<br>        ├── .claude/<br>        │   └── skills/<br>        │       └── api-skill/   # 僅 backend 使用<br>        │           └── SKILL.md<br>        └── src/<br>            └── index.ts<br></code></pre></td></tr></table></figure>
+
+<p>這對於 Monorepo 專案非常實用，可以讓各個子專案擁有自己專屬的 Skills，而不會互相干擾。</p>
+<p>不論是哪一種放置方式，Skills 都必須放在 <code>.claude/skills/</code> 資料夾底下，然後有一些規範要注意：</p>
+<ul>
+<li>每個 Skill 都是一個獨立資料夾（如：<code>.claude/skills/custom-name-skill/</code>）</li>
+<li>每個 Skill 資料夾裡面至少要有一個 <code>SKILL.md</code> 檔案（大寫且固定名稱）</li>
+</ul>
+<p>因此標準的結構就會長這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">project-root/<br>└── .claude/<br>    └── skills/<br>        └── custom-name-skill/<br>            └── SKILL.md<br></code></pre></td></tr></table></figure>
+
+<p>而 skill 資料夾裡面可以再放置其他的檔案</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs txt">.claude/<br>└── skills/<br>    └──custom-name-skill/<br>        ├── SKILL.md （必要檔案 - 固定檔名）<br>        ├── reference.md (API 詳細文件 - 載入時使用)<br>        ├── examples.md (使用範例 - 載入時使用)<br>        └── scripts/<br>            └── helper.py (輔助腳本 - 執行時使用)<br></code></pre></td></tr></table></figure>
+
+<p>當然，如果你的結構比較複雜的話，甚至可以拆成多個子資料夾來管理，像是這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs txt">.claude/<br>└── skills/<br>    └──custom-name-skill/<br>        ├── SKILL.md （必要檔案 - 固定檔名）<br>        ├── reference/<br>        │   ├── api.md (API 詳細文件 - 載入時使用)<br>        │   └── data-model.md (資料模型說明 - 載入時使用)<br>        ├── examples/<br>        │   ├── example-1.md (使用範例 1 - 載入時使用)<br>        │   └── example-2.md (使用範例 2 - 載入時使用)<br>        └── scripts/<br>            ├── helper.py (輔助腳本 - 執行時使用)<br>            └── data_fetcher.py (資料抓取腳本 - 執行時使用)<br></code></pre></td></tr></table></figure>
+
+<p>不論是哪一種結構，核心重點還是在於 <code>SKILL.md</code> 檔案，因為 Claude Code 會讀取這個檔案來了解這個 Skill 的功能與用途。</p>
+<h3 id="撰寫規範"><a href="#撰寫規範" class="headerlink" title="撰寫規範"></a>撰寫規範</h3><p>那麼接下來講一下 SKILL.md 的撰寫規範，主要是使用 YAML Front Matter 來定義 Skill 的基本資訊，像是這樣：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name:<br><span class="hljs-section">description: </span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<p>但欄位並不是只有這兩個，底下這邊我也提供完整的欄位說明。</p>
+<ul>
+<li><code>name</code>（必填）：必須是小寫字母、數字、連字號，不能有空格或大寫</li>
+<li><code>description</code>（必填）：最重要的欄位，因為 Claude Code 會用它來決定這個 Skill 適合用在什麼樣的情境。</li>
+<li><code>allowed-tools</code>（可選）： 限制這個 Skill 執行時可以使用的工具。</li>
+<li><code>model</code>（可選）：指定執行這個 Skill 時要使用的模型（預設使用對話中的模型）。</li>
+<li><code>context</code>（可選）：設定這個 Skill 的運作上下文。</li>
+<li><code>agent</code> （可選）：指定這個 Skill 適用的 Agent 類型。</li>
+<li><code>hooks</code>（可選）：定義這個 Skill 的生命週期事件。</li>
+<li><code>user-invocable</code>（可選）：設定這個 Skill 是否可以被使用者直接呼叫。</li>
+<li><code>disable-model-invocation</code>（可選）：僅允許手動觸發，禁止 AI 主動呼叫。</li>
+</ul>
+<p>接下來我將會針對 <code>name</code> 與 <code>description</code> 以外的欄位做說明。</p>
+<h4 id="可選欄位-allowed-tools"><a href="#可選欄位-allowed-tools" class="headerlink" title="可選欄位(allowed-tools)"></a>可選欄位(<code>allowed-tools</code>)</h4><p>簡單來講就是限制這個 Skill 執行時 Claude 只能使用指定的工具，且使用這些工具時不需要詢問使用者許可。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: example-skills<br>description:  This is an example skill for demonstration.<br>allowed-tools: <br><span class="hljs-bullet">  -</span> Read<br><span class="hljs-bullet">  -</span> Grep<br><span class="hljs-section">  - Glob</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="可選欄位-model"><a href="#可選欄位-model" class="headerlink" title="可選欄位(model)"></a>可選欄位(<code>model</code>)</h4><p>你可以指定這個 Skill 適用的模型，而模型你可以透過 Anthropic 提供的 <a target="_blank" rel="noopener" href="https://platform.claude.com/docs/en/about-claude/models/overview">模型清單</a> 來做選擇。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: example-skills<br>description:  This is an example skill for demonstration.<br><span class="hljs-section">model: claude-haiku-4-5-20251001</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="可選欄位-context"><a href="#可選欄位-context" class="headerlink" title="可選欄位(context)"></a>可選欄位(<code>context</code>)</h4><p>將這個 Skill 執行在獨立的 sub-agent 環境，擁有獨立的對話歷史，執行完畢後只回傳結果給主對話，避免中間過程污染主對話的 context。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: example-skills<br>description:  This is an example skill for demonstration.<br><span class="hljs-section">context: fork</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="可選欄位-agent"><a href="#可選欄位-agent" class="headerlink" title="可選欄位(agent)"></a>可選欄位(<code>agent</code>)</h4><p>這個欄位<strong>必須搭配 <code>context: fork</code> 一起使用</strong>，用來指定這個 Skill 要在哪種 Agent 環境下執行。</p>
+<p>Claude Code 內建了三種 Agent 類型：</p>
+<table>
+<thead>
+<tr>
+<th>Agent 類型</th>
+<th>用途說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Explore</code></td>
+<td>適合搜尋檔案、理解架構等任務</td>
+</tr>
+<tr>
+<td><code>Plan</code></td>
+<td>適合設計方案、分析需求等任務</td>
+</tr>
+<tr>
+<td><code>general-purpose</code></td>
+<td>通用型 Agent，適合各種綜合性任務（預設值）</td>
+</tr>
+</tbody></table>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: code-analysis<br>description: Analyze code quality and generate detailed reports.<br>context: fork<br><span class="hljs-section">agent: Explore</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<p>除了內建的 Agent 類型之外，你也可以指定<strong>自訂 Agent</strong> 的名稱。自訂 Agent 需要放在 <code>.claude/agents/</code> 資料夾底下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">.claude/<br>├── agents/<br>│   └── security-reviewer.md  # 自訂 Agent<br>└── skills/<br>    └── security-check/<br>        └── SKILL.md<br></code></pre></td></tr></table></figure>
+
+<p>然後在 Skill 中引用：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: security-check<br>description: Perform security analysis on the codebase.<br>context: fork<br><span class="hljs-section">agent: security-reviewer</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>當你使用 <code>context: fork</code> 時，Skill 會在獨立的 sub-agent 環境中執行，擁有獨立的對話歷史。執行完畢後只會將結果回傳給主對話，避免中間過程污染主對話的 context。這對於需要大量搜尋或分析的任務特別有用。</p>
+</blockquote>
+<h4 id="可選欄位-hooks"><a href="#可選欄位-hooks" class="headerlink" title="可選欄位(hooks)"></a>可選欄位(<code>hooks</code>)</h4><p>沒錯，你可以替這個 Skill 定義生命週期，例如在載入前或執行後要做什麼事情。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: secure-operations<br>description: Perform operations with additional security checks<br>hooks:<br>  PreToolUse:<br><span class="hljs-bullet">    -</span> matcher: &quot;Bash&quot;<br><span class="hljs-code">      hooks:</span><br><span class="hljs-code">        - type: command</span><br><span class="hljs-code">          command: &quot;./scripts/security-check.sh $TOOL_INPUT&quot;</span><br><span class="hljs-code">          once: true</span><br><span class="hljs-code">---</span><br></code></pre></td></tr></table></figure>
+
+<p>而這些 Hooks 都可以在 <a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/hooks">Hooks 文件</a> 裡面找到詳細的說明。</p>
+<h4 id="可選欄位-user-invocable"><a href="#可選欄位-user-invocable" class="headerlink" title="可選欄位(user-invocable)"></a>可選欄位(<code>user-invocable</code>)</h4><p>這個欄位可以設定這個 Skill 是否可以被使用者直接呼叫，什麼叫做可以直接呼叫呢？也就是你可以透過 <code>/</code> 指令來呼叫這個 Skill。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: example-skills<br>description:  This is an example skill for demonstration.<br><span class="hljs-section">user-invocable: true</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="可選欄位-disable-model-invocation"><a href="#可選欄位-disable-model-invocation" class="headerlink" title="可選欄位(disable-model-invocation)"></a>可選欄位(<code>disable-model-invocation</code>)</h4><p>這個欄位用來<strong>禁止 AI 主動呼叫</strong>這個 Skill。設為 <code>true</code> 後，這個 Skill 只能透過使用者手動輸入 <code>/skill-name</code> 來觸發，Claude 不會自動判斷並呼叫它。例如：你希望某個 Skill 只在使用者明確要求時才執行，而不是讓 Claude 自動判斷。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: dangerous-operation<br>description: Perform a dangerous operation that requires explicit user consent.<br>user-invocable: true<br><span class="hljs-section">disable-model-invocation: true</span><br><span class="hljs-section">---</span><br></code></pre></td></tr></table></figure>
+
+<p>為了讓你更好理解 <code>user-invocable</code> 和 <code>disable-model-invocation</code> 的差異，這邊整理一個對照表：</p>
+<table>
+<thead>
+<tr>
+<th>設定</th>
+<th>斜線選單 <code>/</code></th>
+<th>Claude 自動呼叫</th>
+<th>適用情境</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>預設值</td>
+<td>可見</td>
+<td>允許</td>
+<td>一般用途</td>
+</tr>
+<tr>
+<td><code>user-invocable: false</code></td>
+<td>隱藏</td>
+<td>允許</td>
+<td>Claude 可用，但不想讓使用者手動呼叫</td>
+</tr>
+<tr>
+<td><code>disable-model-invocation: true</code></td>
+<td>可見</td>
+<td>禁止</td>
+<td>使用者可呼叫，但不想讓 Claude 自動判斷</td>
+</tr>
+</tbody></table>
+<h3 id="字串替換功能"><a href="#字串替換功能" class="headerlink" title="字串替換功能"></a>字串替換功能</h3><p>在 SKILL.md 的內容中，你可以使用<strong>字串替換</strong>來動態插入資訊：</p>
+<table>
+<thead>
+<tr>
+<th>變數</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$ARGUMENTS</code></td>
+<td>呼叫 Skill 時傳入的所有參數</td>
+</tr>
+<tr>
+<td><code>${CLAUDE_SESSION_ID}</code></td>
+<td>當前 Session 的唯一識別碼</td>
+</tr>
+</tbody></table>
+<p>這個功能在需要記錄或追蹤的場景特別有用：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: session-logger<br><span class="hljs-section">description: Log activity for the current session.</span><br><span class="hljs-section">---</span><br><br>Please log the following content to <span class="hljs-code">`logs/$&#123;CLAUDE_SESSION_ID&#125;.log`</span>:<br><br>$ARGUMENTS<br></code></pre></td></tr></table></figure>
+
+<p>當使用者執行 <code>/session-logger 今天完成了登入功能</code> 時，<code>$ARGUMENTS</code> 會被替換成「今天完成了登入功能」，而 <code>${CLAUDE_SESSION_ID}</code> 會被替換成當前的 Session ID。</p>
+<h2 id="範例-Skills"><a href="#範例-Skills" class="headerlink" title="範例 Skills"></a>範例 Skills</h2><p>接下來我們來寫一點點 Skills 的範例，這邊我會示範一個 Code Review 的 Skill，而這個 Skill 擅長 JavaScript 的程式碼審查，為了方便理解，所以 <code>description</code> 我會使用中文撰寫（實際開發上會建議使用英文）。</p>
+<p>建立 Skills 方式也很簡單，打開你的專案輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p .claude/skills/code-review <span class="hljs-comment"># 建立資料夾</span><br><span class="hljs-built_in">touch</span> .claude/skills/code-review/SKILL.md <span class="hljs-comment"># 建立 SKILL.md 檔案</span><br></code></pre></td></tr></table></figure>
+
+<p>接著把底下貼到 <code>.claude/skills/code-review/SKILL.md</code> 裡面：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>name: code-review<br><span class="hljs-section">description: 當使用者要求進行 JavaScript 或 TypeScript 程式碼審查時使用。適用於「幫我 review」、「檢查這段程式碼」、「有什麼問題」等請求。</span><br><span class="hljs-section">---</span><br><br><span class="hljs-section"># JavaScript Code Review</span><br><br>當進行程式碼審查時，請依照以下步驟進行：<br><br><span class="hljs-section">## 審查重點</span><br><br><span class="hljs-bullet">1.</span> <span class="hljs-strong">**命名規範**</span>：變數、函式命名是否清晰且符合 camelCase<br><span class="hljs-bullet">2.</span> <span class="hljs-strong">**錯誤處理**</span>：是否有適當的 try-catch 或錯誤邊界處理<br><span class="hljs-bullet">3.</span> <span class="hljs-strong">**效能問題**</span>：是否有不必要的迴圈、重複渲染或記憶體洩漏風險<br><span class="hljs-bullet">4.</span> <span class="hljs-strong">**安全性**</span>：是否有 XSS、注入攻擊等潛在風險<br><span class="hljs-bullet">5.</span> <span class="hljs-strong">**可讀性**</span>：程式碼是否易於理解，是否需要重構<br><br><span class="hljs-section">## 輸出格式</span><br><br>請使用以下格式回覆：<br><br><span class="hljs-section">### 🔴 必須修正</span><br><span class="hljs-bullet">-</span> [問題描述] → [建議做法]<br><br><span class="hljs-section">### 🟡 建議改善</span><br><span class="hljs-bullet">-</span> [問題描述] → [建議做法]<br><br><span class="hljs-section">### 🟢 優點</span><br><span class="hljs-bullet">-</span> [值得肯定的地方]<br></code></pre></td></tr></table></figure>
+
+<p>完成後你的資料夾結構就會長這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">project-root/<br>└── .claude/<br>    └── skills/<br>        └── code-review/<br>            └── SKILL.md<br></code></pre></td></tr></table></figure>
+
+<p>接著底下這邊是一個不良的 JavaScript 程式碼範例，請你放到專案裡面（如： <code>/bad-code.js</code> ），然後使用 Claude Code 來進行程式碼審查：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">f</span>(<span class="hljs-params">d</span>) &#123;<br>  <span class="hljs-keyword">var</span> x = [];<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; d.<span class="hljs-property">length</span>; i++) &#123;<br>    <span class="hljs-keyword">var</span> item = d[i];<br>    <span class="hljs-keyword">if</span> (item.<span class="hljs-property">n</span> != <span class="hljs-literal">null</span> &amp;&amp; item.<span class="hljs-property">n</span> != <span class="hljs-literal">undefined</span> &amp;&amp; item.<span class="hljs-property">n</span> != <span class="hljs-string">&#x27;&#x27;</span>) &#123;<br>      <span class="hljs-keyword">var</span> el = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;list&#x27;</span>);<br>      el.<span class="hljs-property">innerHTML</span> = el.<span class="hljs-property">innerHTML</span> + <span class="hljs-string">&#x27;&lt;li onclick=&quot;handle(\&#x27;&#x27;</span> + item.<span class="hljs-property">n</span> + <span class="hljs-string">&#x27;\&#x27;)&quot;&gt;&#x27;</span> + item.<span class="hljs-property">n</span> + <span class="hljs-string">&#x27;&lt;/li&gt;&#x27;</span>;<br>      x.<span class="hljs-title function_">push</span>(item.<span class="hljs-property">n</span>);<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> x;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">handle</span>(<span class="hljs-params">n</span>) &#123;<br>  <span class="hljs-built_in">eval</span>(<span class="hljs-string">&#x27;alert(&quot;Hello, &#x27;</span> + n + <span class="hljs-string">&#x27;&quot;)&#x27;</span>);<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getData</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/data&#x27;</span>);<br>  <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();<br>  <span class="hljs-keyword">return</span> data;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>而這一段程式碼目前有幾個明顯的問題點：</p>
+<table>
+<thead>
+<tr>
+<th>類型</th>
+<th>問題</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>命名</td>
+<td><code>f</code>、<code>d</code>、<code>x</code>、<code>n</code> 完全看不出用途</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td><code>innerHTML</code> 直接拼接字串 → XSS 風險</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td><code>eval()</code> 是超級危險的函式</td>
+</tr>
+<tr>
+<td>錯誤處理</td>
+<td><code>fetch</code> 沒有 try-catch，也沒檢查 <code>response.ok</code></td>
+</tr>
+<tr>
+<td>效能</td>
+<td>迴圈內重複 <code>getElementById</code> 和修改 DOM</td>
+</tr>
+<tr>
+<td>語法</td>
+<td>使用 <code>var</code> 而非 <code>const</code>&#x2F;<code>let</code></td>
+</tr>
+<tr>
+<td>比較</td>
+<td><code>!= null &amp;&amp; != undefined &amp;&amp; != &#39;&#39;</code> 可以簡化</td>
+</tr>
+</tbody></table>
+<p>接著請你打開 Claude Code（我示範的是 VSCode Plugin），然後在對話框輸入以下 Prompt：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">請你幫我檢查一下 @bad-code.js<br></code></pre></td></tr></table></figure>
+
+<p>接著你會看到 Claude Code 詢問你 <code>Do you want to proceed with Skill?</code>，按下「Yes」就對了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2F20260120154414.png?alt=media&token=4e91eb95-2ea8-4fb9-8797-7447c5eb06b5" data-fancybox="gallery" data-caption="Do you want to proceed with Skill?"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2F20260120154414.png?alt=media&token=4e91eb95-2ea8-4fb9-8797-7447c5eb06b5" alt="Do you want to proceed with Skill?"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Do you want to proceed with Skill?</figcaption></figure>
+<p>接著你就會看到 Claude Code 使用我們剛剛建立的 <code>code-review</code> Skill 來進行程式碼審查，並且回傳以下結果：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2F20260120154500.png?alt=media&token=ac0d41be-939e-45c9-aac4-cdcfe1f15080" data-fancybox="gallery" data-caption="Code Review"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fai%2Fagent-skill-claude-code%2F20260120154500.png?alt=media&token=ac0d41be-939e-45c9-aac4-cdcfe1f15080" alt="Code Review"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Code Review</figcaption></figure>
+<p>如果你也自己試試看，你也可以下載這個範例專案：<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/skills-example">GitHub Repository</a></p>
+<h2 id="撰寫最佳實踐"><a href="#撰寫最佳實踐" class="headerlink" title="撰寫最佳實踐"></a>撰寫最佳實踐</h2><p>在撰寫 Skills 時，有一些最佳實踐可以讓你的 Skill 更有效率：</p>
+<h3 id="SKILL-md-檔案大小"><a href="#SKILL-md-檔案大小" class="headerlink" title="SKILL.md 檔案大小"></a>SKILL.md 檔案大小</h3><p>官方建議 SKILL.md 檔案應該保持在 <strong>500 行以內</strong>，這樣可以確保載入效能。如果你的 Skill 需要大量的參考文件，建議使用外部檔案引用的方式：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">.claude/skills/my-skill/<br>├── SKILL.md          # 保持精簡，500 行以內<br>├── reference.md      # 詳細的 API 文件<br>└── examples.md       # 使用範例<br></code></pre></td></tr></table></figure>
+
+<h3 id="引用層級"><a href="#引用層級" class="headerlink" title="引用層級"></a>引用層級</h3><p>使用<strong>單層引用</strong>（SKILL.md → reference.md），避免多層巢狀引用（SKILL.md → reference.md → other.md → more.md），這樣可以減少載入時間和複雜程度。</p>
+<h3 id="善用腳本"><a href="#善用腳本" class="headerlink" title="善用腳本"></a>善用腳本</h3><p>如果你的 Skill 需要執行複雜的邏輯，可以將這些邏輯放在腳本中執行。腳本的<strong>執行結果</strong>會被傳回給 Claude，但腳本的<strong>原始碼不會被載入到 Context 中</strong>，這樣可以節省 Token：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">.claude/skills/data-processor/<br>├── SKILL.md<br>└── scripts/<br>    └── process.py    # 複雜的資料處理邏輯<br></code></pre></td></tr></table></figure>
+
+<h2 id="疑難排解"><a href="#疑難排解" class="headerlink" title="疑難排解"></a>疑難排解</h2><h3 id="Skill-沒有被觸發？"><a href="#Skill-沒有被觸發？" class="headerlink" title="Skill 沒有被觸發？"></a>Skill 沒有被觸發？</h3><p>最常見的原因是 <strong><code>description</code> 寫得太模糊</strong>。一個好的 description 應該要回答以下兩個問題：</p>
+<ol>
+<li><strong>這個 Skill 做什麼？</strong> - 列出具體的功能</li>
+<li><strong>什麼時候應該使用它？</strong> - 包含使用者可能會說的觸發詞</li>
+</ol>
+<p><strong>不好的寫法：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">description:</span> <span class="hljs-string">Helps</span> <span class="hljs-string">with</span> <span class="hljs-string">documents</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>好的寫法：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">description:</span> <span class="hljs-string">Extract</span> <span class="hljs-string">text</span> <span class="hljs-string">and</span> <span class="hljs-string">tables</span> <span class="hljs-string">from</span> <span class="hljs-string">PDF</span> <span class="hljs-string">files,</span> <span class="hljs-string">fill</span> <span class="hljs-string">forms,</span> <span class="hljs-string">merge</span> <span class="hljs-string">PDFs.</span> <span class="hljs-string">Use</span> <span class="hljs-string">when</span> <span class="hljs-string">working</span> <span class="hljs-string">with</span> <span class="hljs-string">PDF</span> <span class="hljs-string">files</span> <span class="hljs-string">or</span> <span class="hljs-string">when</span> <span class="hljs-string">the</span> <span class="hljs-string">user</span> <span class="hljs-string">mentions</span> <span class="hljs-string">PDFs,</span> <span class="hljs-string">forms,</span> <span class="hljs-string">or</span> <span class="hljs-string">document</span> <span class="hljs-string">extraction.</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>看到這邊應該滿多人第一直覺就是「這個 Code Review Skill 有必要寫嗎？直接叫 AI 幫我 review 不就好了？」。</p>
+<p>這個疑慮是正常的，但是透過 Skills 概念等於你是在打包一個「專業知識」給 AI，就像公司本身都會有屬於自己的技術風格、規範一樣，透過 Skills 你可以把這些「專業知識」打包起來，讓 AI 在執行任務時能夠更符合你的需求。</p>
+<p>所以在前面我也是寫了 <code>輸出格式</code> 而非叫 AI 自由發揮，這樣才能確保 AI 回傳的結果是你想要的。</p>
+<p>因此把 Skills 想像成一個團隊、一個技能包我認為都是正確的，而這也能夠讓 AI 模型更聚焦於你想要的知識上面，而非被大量的 Raw Data 干擾。</p>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+
+    <!-- Support Section -->
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/nodejs/20260113/3115395907/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            真是受夠開多個終端機執行多個指令了！來用 concurrently 吧
+          </span>
+        </a>
+      
+
+      
+        <a href="/other/20260121/695717014/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Chrome 一直快取（Cache）資料？教你三招快速清除！
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/ai/20260128/374686091/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                想用 Claude Code 開發？這篇帶你從入門到進階
+              </h4>
+              <time datetime="2026-01-28" title="發布日期: 2026-01-28" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-01-28
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260326/1431610072/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Status Line 設定教學：在終端機即時監控 Context 用量與 Rate Limit
+              </h4>
+              <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-26
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260326/73911729/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                2026 年 AI Coding 工具怎麼選？GitHub Copilot、Cursor、Claude Code、Kiro 與 Antigravity 完整比較
+              </h4>
+              <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-26
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260320/2827818448/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                不想用龍蝦（OpenClaw）？來試試看 Claude Code channels 吧！
+              </h4>
+              <time datetime="2026-03-20" title="發布日期: 2026-03-20" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-20
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/ai/20260120/4189755271/" data-title="比 MCP 更省 Token 的 Agent Skills - 用 Claude Code 示範" data-hashtags="AI,Claude Code,MCP,Agent Skills,Skills" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/ai/20260120/4189755271/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/ai/20260120/4189755271/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/ai/20260120/4189755271/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Agent-Skills%EF%BC%9F"><span class="toc-text">什麼是 Agent Skills？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8-Claude-Code-%E7%A4%BA%E7%AF%84-Agent-Skills"><span class="toc-text">用 Claude Code 示範 Agent Skills</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BE%E7%BD%AE%E6%96%B9%E5%BC%8F"><span class="toc-text">放置方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB%E8%A6%8F%E7%AF%84"><span class="toc-text">撰寫規範</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E4%B8%B2%E6%9B%BF%E6%8F%9B%E5%8A%9F%E8%83%BD"><span class="toc-text">字串替換功能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AF%84%E4%BE%8B-Skills"><span class="toc-text">範例 Skills</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB%E6%9C%80%E4%BD%B3%E5%AF%A6%E8%B8%90"><span class="toc-text">撰寫最佳實踐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SKILL-md-%E6%AA%94%E6%A1%88%E5%A4%A7%E5%B0%8F"><span class="toc-text">SKILL.md 檔案大小</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E5%B1%A4%E7%B4%9A"><span class="toc-text">引用層級</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%96%84%E7%94%A8%E8%85%B3%E6%9C%AC"><span class="toc-text">善用腳本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%96%91%E9%9B%A3%E6%8E%92%E8%A7%A3"><span class="toc-text">疑難排解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Skill-%E6%B2%92%E6%9C%89%E8%A2%AB%E8%A7%B8%E7%99%BC%EF%BC%9F"><span class="toc-text">Skill 沒有被觸發？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AA%9E"><span class="toc-text">結語</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260326/1431610072/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code Status Line 設定教學：在終端機即時監控 Context 用量與 Rate Limit
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/26
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              16 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260326/73911729/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            2026 年 AI Coding 工具怎麼選？GitHub Copilot、Cursor、Claude Code、Kiro 與 Antigravity 完整比較
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/26
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260320/2827818448/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            不想用龍蝦（OpenClaw）？來試試看 Claude Code channels 吧！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-20" title="發布日期: 2026-03-20" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/20
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              9 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260319/738324368/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Cowork Dispatch 與 Remote Control - 用手機遠端控制你的 AI Agent
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-19" title="發布日期: 2026-03-19" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/19
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              12 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260310/3737444063/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            CLAUDE.md 與 Rules for AI 撰寫技巧：讓 AI 更懂你的專案
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-10" title="發布日期: 2026-03-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              12 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>
