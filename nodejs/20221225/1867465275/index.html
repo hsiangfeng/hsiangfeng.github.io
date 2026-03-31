@@ -1,0 +1,1348 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一步一步帶你用 Node.js 上傳檔案到 Firebase Storage | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20221225/1867465275/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="之前有分享過「超完整 Express Imgur 套件上傳教學」，所以這一篇就改來介紹 Firebase Storage 的上傳教學，而這一篇會盡可能流程步驟都說明清楚，因為這一塊也是稍微有一點複雜。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="一步一步帶你用 Node.js 上傳檔案到 Firebase Storage">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20221225/1867465275/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="之前有分享過「超完整 Express Imgur 套件上傳教學」，所以這一篇就改來介紹 Firebase Storage 的上傳教學，而這一篇會盡可能流程步驟都說明清楚，因為這一塊也是稍微有一點複雜。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://i.imgur.com/mJkWN51.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2022-12-25T09:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2023-02-13T07:30:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="Firebase">
+      
+        <meta property="article:tag" content="Express">
+      
+        <meta property="article:tag" content="Firebase Storage">
+      
+        <meta property="article:tag" content="Storage">
+      
+        <meta property="article:tag" content="multer">
+      
+        <meta property="article:tag" content="TinyPNG">
+      
+        <meta property="article:tag" content="Imgur">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="一步一步帶你用 Node.js 上傳檔案到 Firebase Storage">
+  <meta name="twitter:description" content="之前有分享過「超完整 Express Imgur 套件上傳教學」，所以這一篇就改來介紹 Firebase Storage 的上傳教學，而這一篇會盡可能流程步驟都說明清楚，因為這一塊也是稍微有一點複雜。">
+  
+    <meta name="twitter:image" content="https://i.imgur.com/mJkWN51.png">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/nodejs/20221225/1867465275/"},"headline":"一步一步帶你用 Node.js 上傳檔案到 Firebase Storage | 是 Ray 不是 Array","url":"https://israynotarray.com/nodejs/20221225/1867465275/","datePublished":"2022-12-25T09:00:00.000Z","dateModified":"2023-02-13T07:30:00.000Z","description":"之前有分享過「超完整 Express Imgur 套件上傳教學」，所以這一篇就改來介紹 Firebase Storage 的上傳教學，而這一篇會盡可能流程步驟都說明清楚，因為這一塊也是稍微有一點複雜。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://i.imgur.com/mJkWN51.png"],"articleSection":["Nodejs"],"keywords":"Node.js, Firebase, Express, Firebase Storage, Storage, multer, TinyPNG, Imgur"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"一步一步帶你用 Node.js 上傳檔案到 Firebase Storage | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"一步一步帶你用 Node.js 上傳檔案到 Firebase Storage"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode & Color Palette Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-OzTITT57.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-Bs_9ZI5Y.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Color Palette Selector (精簡版) -->
+  <div class="palette-selector relative w-full">
+    <button data-palette-select class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox">
+      <div class="flex items-center gap-2">
+        <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: rgb(var(--color-primary-500))"></span>
+        <span class="palette-label text-sm text-gray-600 dark:text-gray-400">Theme</span>
+      </div>
+      <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+    </button>
+    <div class="palette-dropdown hidden absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+      <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+      </button>
+      <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2022-12-25" title="發布日期: 2022-12-25" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2022-12-25
+        </time>
+        
+          <time datetime="2023-02-13" title="更新日期: 2023-02-13" class="flex items-center">
+            <i class="bi bi-arrow-repeat w-4 text-center mr-2"></i>
+            2023-02-13
+          </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        一步一步帶你用 Node.js 上傳檔案到 Firebase Storage
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/Firebase/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Firebase
+            </a>
+          
+            <a href="/tags/Express/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Express
+            </a>
+          
+            <a href="/tags/Firebase-Storage/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Firebase Storage
+            </a>
+          
+            <a href="/tags/Storage/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Storage
+            </a>
+          
+            <a href="/tags/multer/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #multer
+            </a>
+          
+            <a href="/tags/TinyPNG/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #TinyPNG
+            </a>
+          
+            <a href="/tags/Imgur/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Imgur
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/mJkWN51.png" data-fancybox="gallery" data-caption="Firebase Storage"><img class="cursor-zoom-in !mb-0" fetchpriority="high" src="https://i.imgur.com/mJkWN51.png" alt="Firebase Storage"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Firebase Storage</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前有分享過「<a href="/nodejs/20220517/432259079/#Express-Imgur">超完整 Express Imgur 套件上傳教學</a>」，所以這一篇就改來介紹 Firebase Storage 的上傳教學，而這一篇會盡可能流程步驟都說明清楚，因為這一塊也是稍微有一點複雜。</p>
+<blockquote>
+<p><strong>Note</strong><br>畫面可能會隨著 Firebase 的更新而有所不同，但是大致上的流程應該是一樣的。</p>
+</blockquote>
+<h2 id="Firebase-事前準備"><a href="#Firebase-事前準備" class="headerlink" title="Firebase 事前準備"></a>Firebase 事前準備</h2><p>不管怎麼樣，有一些流程還是必須先做好才能進入開發，所以前面就會先帶一下 Firebase 的事前準備。</p>
+<h3 id="建立-Firebase-專案"><a href="#建立-Firebase-專案" class="headerlink" title="建立 Firebase 專案"></a>建立 Firebase 專案</h3><p>首先開啟 <a target="_blank" rel="noopener" href="https://firebase.google.com/">Firebase</a>，並且點選右上角的「轉到控制台」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.34.31.png?alt=media&token=e4b53259-8a28-4062-a4c8-db33056e052d" data-fancybox="gallery" data-caption="轉到控制台"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.34.31.png?alt=media&token=e4b53259-8a28-4062-a4c8-db33056e052d" alt="轉到控制台"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">轉到控制台</figcaption></figure>
+<p>接著點「新增專案」、「建立專案」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212232237.jpg?alt=media&token=46e28e0c-f00d-40c4-a747-c7d56bd182fd" data-fancybox="gallery" data-caption="新增專案"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212232237.jpg?alt=media&token=46e28e0c-f00d-40c4-a747-c7d56bd182fd" alt="新增專案"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">新增專案</figcaption></figure>
+<p>當你點了「建立專案」後，就會跳出一個滿版的視窗，這邊就是你要輸入專案名稱的地方，基本上你可以隨便取，但是我這邊就取「Firebase-Express」，接著按下「繼續」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.44.13.png?alt=media&token=8f380d4c-20ab-4f82-972b-923d5d29f96c" data-fancybox="gallery" data-caption="專案名稱"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.44.13.png?alt=media&token=8f380d4c-20ab-4f82-972b-923d5d29f96c" alt="專案名稱"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">專案名稱</figcaption></figure>
+<p>第二步驟是 Firebase 問你要不要開啟 Google Analytics(分析)，但這邊我們並不需要，所以就「關閉」並按下「建立專案」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.48.20.png?alt=media&token=d8e5f50d-0a39-411a-8987-e97f121b07b4" data-fancybox="gallery" data-caption="Google Analytics(分析)"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.48.20.png?alt=media&token=d8e5f50d-0a39-411a-8987-e97f121b07b4" alt="Google Analytics(分析)"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Google Analytics(分析)</figcaption></figure>
+<p>建立過程會稍微等一下，你去上個廁所就好了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.19.png?alt=media&token=6d613fff-ebd2-4fd4-9f5e-74bb0180b8e5" data-fancybox="gallery" data-caption="建立中"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.19.png?alt=media&token=6d613fff-ebd2-4fd4-9f5e-74bb0180b8e5" alt="建立中"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">建立中</figcaption></figure>
+<p>準備好後，就按一下「繼續」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.55.png?alt=media&token=5f3f97a1-6cbe-44d0-856a-599c1c562da5" data-fancybox="gallery" data-caption="新專案已準備就緒"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.49.55.png?alt=media&token=5f3f97a1-6cbe-44d0-856a-599c1c562da5" alt="新專案已準備就緒"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">新專案已準備就緒</figcaption></figure>
+<p>這時候你應該會直接進入到你的專案控制台，到這邊為止你的 Firebase 專案就準備完成了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.50.39.png?alt=media&token=b2e18403-c7ea-4a9a-a6b3-00796973187f" data-fancybox="gallery" data-caption="完成"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2022.50.39.png?alt=media&token=b2e18403-c7ea-4a9a-a6b3-00796973187f" alt="完成"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">完成</figcaption></figure>
+<h3 id="設定-Firebase-Storage"><a href="#設定-Firebase-Storage" class="headerlink" title="設定 Firebase Storage"></a>設定 Firebase Storage</h3><p>接下來你必須設置 Firebase Storage 的儲存區域，所以請你點一下左側功能列表找到「Storage」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2012.46.32.png?alt=media&token=7c240880-dd87-4074-87dc-3e5295199a65" data-fancybox="gallery" data-caption="storage"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2012.46.32.png?alt=media&token=7c240880-dd87-4074-87dc-3e5295199a65" alt="storage"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">storage</figcaption></figure>
+<p>接著點一下畫面「開始使用」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2013.37.04.png?alt=media&token=20e7bafc-0973-42bb-bde2-258fa1b7ade8" data-fancybox="gallery" data-caption="開始使用"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2013.37.04.png?alt=media&token=20e7bafc-0973-42bb-bde2-258fa1b7ade8" alt="開始使用"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">開始使用</figcaption></figure>
+<p>當你點了開始使用後，會跳出「設定 Cloud Storage」的視窗，這邊建議選「以正式模式啟動」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2014.57.00.png?alt=media&token=da01d5cf-ce40-4800-ae69-b650f25513f8" data-fancybox="gallery" data-caption="以正式模式啟動"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2014.57.00.png?alt=media&token=da01d5cf-ce40-4800-ae69-b650f25513f8" alt="以正式模式啟動"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">以正式模式啟動</figcaption></figure>
+<p>接著會需要選取 Storage 的地區，通常預設是 <code>us-central</code>，而這邊我們沒有必要去調整，所以你可以直接按下「完成」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.01.36.png?alt=media&token=bc70790f-f0c8-4dc7-863e-ec39b23fa4c5" data-fancybox="gallery" data-caption="Storage 地區"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.01.36.png?alt=media&token=bc70790f-f0c8-4dc7-863e-ec39b23fa4c5" alt="Storage 地區"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Storage 地區</figcaption></figure>
+<p>過程中會稍微等一下…</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.03.30.png?alt=media&token=047613d6-31a1-4c37-8b44-48e314cc0366" data-fancybox="gallery" data-caption="等待中..."><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.03.30.png?alt=media&token=047613d6-31a1-4c37-8b44-48e314cc0366" alt="等待中..."></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">等待中...</figcaption></figure>
+<p>當你看到這個畫面，就代表你的 Storage 已經設定完成了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.04.01.png?alt=media&token=b7ab7541-81f8-4551-a940-bcb67c2b78bc" data-fancybox="gallery" data-caption="設定完成"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2015.04.01.png?alt=media&token=b7ab7541-81f8-4551-a940-bcb67c2b78bc" alt="設定完成"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">設定完成</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>你如果不打算串接後端 API 你也可以直接在這個視窗上傳圖片。<br>但是如果你想要串接後端 API，那你就必須往後看唷！</p>
+</blockquote>
+<h3 id="取得-Firebase-Admin-SDK"><a href="#取得-Firebase-Admin-SDK" class="headerlink" title="取得 Firebase Admin SDK"></a>取得 Firebase Admin SDK</h3><p>接著由於我們需要上傳圖片，因此會使用到 Firebase Admin SDK，所以接著就來取得這個 SDK 吧！</p>
+<p>首先點一下上方「齒輪」 &#x3D;&gt; 「專案設定」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.05.46.png?alt=media&token=7ad005bc-2a5a-4958-9c36-e09ee40b888c" data-fancybox="gallery" data-caption="專案設定"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.05.46.png?alt=media&token=7ad005bc-2a5a-4958-9c36-e09ee40b888c" alt="專案設定"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">專案設定</figcaption></figure>
+<p>接著再點一下「服務帳號」，你就可以看到 Firebase Admin SDK 的頁面</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.29.37.png?alt=media&token=1a9b6822-90c2-41ad-8601-47df2e5e6dbf" data-fancybox="gallery" data-caption="Firebase Admin SDK"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-23%2023.29.37.png?alt=media&token=1a9b6822-90c2-41ad-8601-47df2e5e6dbf" alt="Firebase Admin SDK"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Firebase Admin SDK</figcaption></figure>
+<p>最後你只要按一下「產生新的私密金鑰」(你可以依照你的程式語言生成範例程式碼)，就可以取得你的 Firebase Admin SDK 金鑰，接著請把這份 JSON 檔案保存好，後面我們會使用。</p>
+<blockquote>
+<p><strong>Danger</strong><br>請不要隨意將金鑰提供給別人<br>請不要將這個金鑰放到你的 GitHub 上（如果你真這樣幹，請你把這個儲存庫刪除並重新生成一個新的金鑰吧。）</p>
+</blockquote>
+<p>到目前為止，我們已經準備好了 Firebase 的事前準備，接著就準備進入寫程式的部分吧。</p>
+<h2 id="Express-Firebase"><a href="#Express-Firebase" class="headerlink" title="Express + Firebase"></a>Express + Firebase</h2><p>接下來就是建立 Express 的部分，這邊我會使用 Express 產生器來建立一個新的專案，如果你還沒有安裝 Express 產生器，建議你可以先安裝一下，這樣可以讓你的開發速度更快</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install -g express-generator<br></code></pre></td></tr></table></figure>
+
+<h3 id="建立-Express-專案"><a href="#建立-Express-專案" class="headerlink" title="建立 Express 專案"></a>建立 Express 專案</h3><p>前面有提到我們會使用 Express 產生器來建立一個新的專案，所以這邊我就直接提供我使用的指令給你，讓你快速建立</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">express --view=ejs firebase-express<br><br><span class="hljs-built_in">cd</span> firebase-express<br><br>npm install<br></code></pre></td></tr></table></figure>
+
+<h3 id="建立-upload-資料夾"><a href="#建立-upload-資料夾" class="headerlink" title="建立 upload 資料夾"></a>建立 upload 資料夾</h3><p>接下來請你在 routes 底下建立一個 upload.js 的檔案，並貼入以下程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);<br><span class="hljs-keyword">const</span> router = express.<span class="hljs-title class_">Router</span>();<br><br>router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  res.<span class="hljs-title function_">send</span>(&#123;<br>    <span class="hljs-attr">imgUrl</span>: <span class="hljs-string">&#x27;https://israynotarray.com/&#x27;</span><br>  &#125;);<br>&#125;);<br><br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = router;<br></code></pre></td></tr></table></figure>
+
+<p>接著請記得要在 app.js 中引入這個檔案</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> uploadRouter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./routes/upload&#x27;</span>);<br><br><span class="hljs-comment">// ... 略過</span><br><br>app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/upload&#x27;</span>, uploadRouter);<br></code></pre></td></tr></table></figure>
+
+<p>不出意外的話，這時候你輸入 <code>npm start</code> 是可以透過 <code>http://localhost:3000/upload/image</code> 來測試你的 API 是否正常運作的，而這邊我推薦可以使用 <a href="/other/20211207/427026/">Postman</a> 來測試，因為這樣可以讓你更清楚的看到你的 API 回傳的資料。</p>
+<h3 id="安裝相關套件"><a href="#安裝相關套件" class="headerlink" title="安裝相關套件"></a>安裝相關套件</h3><p>接下來我們要安裝幾個套件</p>
+<ul>
+<li>dotenv<ul>
+<li>這個套件可以讓你在程式中使用環境變數</li>
+</ul>
+</li>
+<li>firebase-admin<ul>
+<li>這個套件可以讓你使用 Firebase 的 Admin SDK</li>
+</ul>
+</li>
+<li>multer<ul>
+<li>這個套件可以讓你處理上傳檔案的相關事務</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install dotenv firebase-admin multer<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>firebase 除了有提供 <strong>firebase-admin</strong> 套件之外，還有另一個叫做 <strong>firebase</strong> 的套件，這兩個套件很常被搞混，因為不清楚用途。<br>那麼，這兩個套件的差別是什麼呢？<br><strong>firebase-admin</strong>：這個套件可以讓你使用 Firebase 的 Admin SDK，而這個套件可以讓你使用 Firebase 的所有功能，包含認證、資料庫、儲存空間等等。<br><strong>firebase</strong>：這個套件可以讓你使用 Firebase 的 Client SDK，而這個套件只能讓你使用 Firebase 的部分功能，例如：認證、儲存空間等等。</p>
+</blockquote>
+<h3 id="建立-env-檔案"><a href="#建立-env-檔案" class="headerlink" title="建立 .env 檔案"></a>建立 .env 檔案</h3><p>接著請你在專案根目錄下建立一個 <code>.env</code> 檔案，內容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs env">FIREBASE_TYPE=<br>FIREBASE_PROJECT_ID=<br>FIREBASE_PRIVATE_KEY_ID=<br>FIREBASE_PRIVATE_KEY=<br>FIREBASE_CLIENT_EMAIL=<br>FIREBASE_CLIENT_ID=<br>FIREBASE_AUTH_URI=<br>FIREBASE_TOKEN_URI=<br>FIREBASE_AUTH_PROVIDER_X509_CERT_URL=<br>FIREBASE_CLIENT_X509_CERT_URL=<br></code></pre></td></tr></table></figure>
+
+<p>而這邊都會對應到你在「取得 Firebase Admin SDK」小節時所取得的 JSON 資料，請你將對應的資料填入 <code>.env</code> 檔案中。</p>
+<blockquote>
+<p><strong>Note</strong><br>接入 Env 資訊的時候，你可以把 <code>.env</code> 檔案加入到 <code>.gitignore</code> 中，這樣就可以避免你的資訊被其他人看到。</p>
+</blockquote>
+<p>接著請你在專案根目錄下建立一個 <code>connection/firebase.js</code> 檔案，內容如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><span class="hljs-keyword">const</span> admin = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;firebase-admin&quot;</span>);<br><br><span class="hljs-keyword">const</span> config = &#123;<br>  <span class="hljs-attr">type</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_TYPE</span>,<br>  <span class="hljs-attr">project_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PROJECT_ID</span>,<br>  <span class="hljs-attr">private_key_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PRIVATE_KEY_ID</span>,<br>  <span class="hljs-attr">private_key</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PRIVATE_KEY</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\\n/g</span>, <span class="hljs-string">&#x27;\n&#x27;</span>),<br>  <span class="hljs-attr">client_email</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_EMAIL</span>,<br>  <span class="hljs-attr">client_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_ID</span>,<br>  <span class="hljs-attr">auth_uri</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_AUTH_URI</span>,<br>  <span class="hljs-attr">token_uri</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_TOKEN_URI</span>,<br>  <span class="hljs-attr">auth_provider_X509_cert_url</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_AUTH_PROVIDER_X509_CERT_URL</span>,<br>  <span class="hljs-attr">client_x509_cert_url</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_X509_CERT_URL</span>,<br>&#125;;<br><br>admin.<span class="hljs-title function_">initializeApp</span>(&#123;<br>  <span class="hljs-attr">credential</span>: admin.<span class="hljs-property">credential</span>.<span class="hljs-title function_">cert</span>(config),<br>&#125;);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = admin;<br></code></pre></td></tr></table></figure>
+
+<p>接著只需要回到 <code>routes/upload.js</code> 檔案引入 <code>connection/firebase.js</code> 檔案即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> firebaseAdmin = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../connection/firebase&#x27;</span>);<br><br><span class="hljs-comment">//...略</span><br></code></pre></td></tr></table></figure>
+
+<p>接下來我們會準備實作一下上傳功能，那麼<a target="_blank" rel="noopener" href="https://firebase.google.com/docs/storage/admin/start">官方文件</a>有提供以下這一段程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; initializeApp, cert &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;firebase-admin/app&#x27;</span>);<br><span class="hljs-keyword">const</span> &#123; getStorage &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;firebase-admin/storage&#x27;</span>);<br><br><span class="hljs-keyword">const</span> serviceAccount = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./path/to/serviceAccountKey.json&#x27;</span>);<br><br><span class="hljs-title function_">initializeApp</span>(&#123;<br>  <span class="hljs-attr">credential</span>: <span class="hljs-title function_">cert</span>(serviceAccount),<br>  <span class="hljs-attr">storageBucket</span>: <span class="hljs-string">&#x27;&lt;BUCKET_NAME&gt;.appspot.com&#x27;</span><br>&#125;);<br><br><span class="hljs-keyword">const</span> bucket = <span class="hljs-title function_">getStorage</span>().<span class="hljs-title function_">bucket</span>();<br></code></pre></td></tr></table></figure>
+
+<p>那麼你會發現這邊有一個 <code>&lt;BUCKET_NAME&gt;.appspot.com</code>，<code>&lt;BUCKET_NAME&gt;</code> 其實就是你在 Firebase 建立專案時所取得的專案名稱，而 <code>.appspot.com</code> 則是固定的，如果你找不到你也可以看看你的 Firebase 專案的網址，例如：<code>https://&lt;BUCKET_NAME&gt;.firebaseapp.com</code>，那麼 <code>&lt;BUCKET_NAME&gt;</code> 就是你的專案名稱</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2017.05.53.png?alt=media&token=446ba542-3307-47dd-8fa6-eff16a843ae8" data-fancybox="gallery" data-caption="BUCKET_NAME"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-24%2017.05.53.png?alt=media&token=446ba542-3307-47dd-8fa6-eff16a843ae8" alt="BUCKET_NAME"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">BUCKET_NAME</figcaption></figure>
+<p>而剛好 <code>BUCKET_NAME</code> 就是我們 <code>.env</code> 中的 <code>FIREBASE_PROJECT_ID</code>，所以我們可以把 <code>FIREBASE_PROJECT_ID</code> 的值填入 <code>storageBucket</code>，所以這邊打開 <code>connection/firebase.js</code> 檔案，修改如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><span class="hljs-keyword">const</span> admin = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;firebase-admin&quot;</span>);<br><br><span class="hljs-keyword">const</span> config = &#123;<br>  <span class="hljs-attr">type</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_TYPE</span>,<br>  <span class="hljs-attr">project_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PROJECT_ID</span>,<br>  <span class="hljs-attr">private_key_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PRIVATE_KEY_ID</span>,<br>  <span class="hljs-attr">private_key</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_PRIVATE_KEY</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\\n/g</span>, <span class="hljs-string">&#x27;\n&#x27;</span>),<br>  <span class="hljs-attr">client_email</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_EMAIL</span>,<br>  <span class="hljs-attr">client_id</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_ID</span>,<br>  <span class="hljs-attr">auth_uri</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_AUTH_URI</span>,<br>  <span class="hljs-attr">token_uri</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_TOKEN_URI</span>,<br>  <span class="hljs-attr">auth_provider_X509_cert_url</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_AUTH_PROVIDER_X509_CERT_URL</span>,<br>  <span class="hljs-attr">client_x509_cert_url</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FIREBASE_CLIENT_X509_CERT_URL</span>,<br>&#125;;<br><br>admin.<span class="hljs-title function_">initializeApp</span>(&#123;<br>  <span class="hljs-attr">credential</span>: admin.<span class="hljs-property">credential</span>.<span class="hljs-title function_">cert</span>(config),<br>  <span class="hljs-attr">storageBucket</span>: <span class="hljs-string">`<span class="hljs-subst">$&#123;process.env.FIREBASE_PROJECT_ID&#125;</span>.appspot.com`</span>,<br>&#125;);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = admin;<br></code></pre></td></tr></table></figure>
+
+<p>到目前為止我們才將 Firebase 初始化完成，接著就準備來實現上傳功能吧。</p>
+<h2 id="實作上傳功能"><a href="#實作上傳功能" class="headerlink" title="實作上傳功能"></a>實作上傳功能</h2><p>接下來我們要來實作上傳功能，首先前面我們有安裝一個套件叫做 <code>multer</code>，而這個套件就是專門拿來幫我們處理檔案的，所以這邊先在 <code>routes/upload.js</code> 加入以下程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> multer  = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;multer&#x27;</span>);<br><br><span class="hljs-keyword">const</span> upload = <span class="hljs-title function_">multer</span>(&#123;<br>  <span class="hljs-attr">limits</span>: &#123;<br>    <span class="hljs-attr">fileSize</span>: <span class="hljs-number">5</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>,  <span class="hljs-comment">// 5MB</span><br>  &#125;,<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>上面的程式碼中，我們將檔案的大小限制再 5MB 以內。</p>
+<p>接著由於 <code>multer</code> 是一個 Middleware，所以我們可以在 <code>router.post</code> 中加入 <code>upload.single(&#39;file&#39;)</code>，這邊的 <code>file</code> 就是我們在前端上傳時所使用的 <code>name</code>，所以這邊我們就可以在 <code>req.file</code> 中取得上傳的檔案資訊</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(file);<br>  res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳成功&#x27;</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>接著你一樣可以先嘗試使用 Postman 戳戳看，看看是否有正確取得上傳的檔案資訊</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2000.07.31.png?alt=media&token=cedd4800-9208-4907-a51c-b6460e1dc69e" data-fancybox="gallery" data-caption="Postman"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2000.07.31.png?alt=media&token=cedd4800-9208-4907-a51c-b6460e1dc69e" alt="Postman"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Postman</figcaption></figure>
+<p>接下來我不得不說 Firebase 的文件關於這一塊的描述說明滿不清楚的，所以這一段我花了一點時間看文件，因此接下來我會區分上傳與取得檔案的網址來說明。</p>
+<h3 id="上傳檔案"><a href="#上傳檔案" class="headerlink" title="上傳檔案"></a>上傳檔案</h3><p>首先我們要先建立 Storage 的 Bucket(儲存桶)，所以這邊我們要在 <code>routes/upload.js</code> 中加入以下程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> bucket = firebaseAdmin.<span class="hljs-title function_">storage</span>().<span class="hljs-title function_">bucket</span>();<br></code></pre></td></tr></table></figure>
+
+<p>接著我們要將上傳的檔案存到 Storage 中，所以我們這邊要將路由修改成以下，底下我會盡可搭配註解說明</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-comment">// 取得上傳的檔案資訊</span><br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br>  <span class="hljs-comment">// 基於檔案的原始名稱建立一個 blob 物件</span><br>  <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(file.<span class="hljs-property">originalname</span>);<br>  <span class="hljs-comment">// 建立一個可以寫入 blob 的物件</span><br>  <span class="hljs-keyword">const</span> blobStream = blob.<span class="hljs-title function_">createWriteStream</span>()<br><br>  <span class="hljs-comment">// 監聽上傳狀態，當上傳完成時，會觸發 finish 事件</span><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;finish&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳成功&#x27;</span>);<br>  &#125;);<br><br>  <span class="hljs-comment">// 如果上傳過程中發生錯誤，會觸發 error 事件</span><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳失敗&#x27;</span>);<br>  &#125;);<br><br>  <span class="hljs-comment">// 將檔案的 buffer 寫入 blobStream</span><br>  blobStream.<span class="hljs-title function_">end</span>(file.<span class="hljs-property">buffer</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>這時候你在嘗試使用 Postman 上傳檔案，上傳成功後，你應該可以在 Firebase 的 Storage 中看到你上傳的檔案。</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2000.29.57.png?alt=media&token=4300e2cb-b2fb-49b2-89c7-e67556e4013b" data-fancybox="gallery" data-caption="上傳檔案"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2000.29.57.png?alt=media&token=4300e2cb-b2fb-49b2-89c7-e67556e4013b" alt="上傳檔案"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">上傳檔案</figcaption></figure>
+<h3 id="取得檔案網址"><a href="#取得檔案網址" class="headerlink" title="取得檔案網址"></a>取得檔案網址</h3><p>雖然我們已經將檔案上傳了，但是卻沒有回傳檔案的網址，所以這邊我們要在上傳成功後，回傳檔案的網址，這邊我們要修改上面的程式碼，讓上傳成功後，回傳檔案的網址</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br>  <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(file.<span class="hljs-property">originalname</span>);<br>  <span class="hljs-keyword">const</span> blobStream = blob.<span class="hljs-title function_">createWriteStream</span>()<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;finish&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-comment">// 設定檔案的存取權限</span><br>    <span class="hljs-keyword">const</span> config = &#123;<br>      <span class="hljs-attr">action</span>: <span class="hljs-string">&#x27;read&#x27;</span>, <span class="hljs-comment">// 權限</span><br>      <span class="hljs-attr">expires</span>: <span class="hljs-string">&#x27;12-31-2500&#x27;</span>, <span class="hljs-comment">// 網址的有效期限</span><br>    &#125;;<br>    <span class="hljs-comment">// 取得檔案的網址</span><br>    blob.<span class="hljs-title function_">getSignedUrl</span>(config, <span class="hljs-function">(<span class="hljs-params">err, imgUrl</span>) =&gt;</span> &#123;<br>      res.<span class="hljs-title function_">send</span>(&#123;<br>        imgUrl<br>      &#125;);<br>    &#125;);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳失敗&#x27;</span>);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">end</span>(file.<span class="hljs-property">buffer</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>由於取得檔案的網址需要設定檔案的存取權限與有效期限，因此我刻意寫成 2500 年，其實這樣子也等同於永久，而且 <code>expires</code> 這個屬性是必填的，不然會出現 <code>Error: The expiration date provided was invalid.</code> 的錯誤。</p>
+<p>這時候你再次使用 Postman 上傳檔案，上傳成功後，你應該可以在回傳的資料中看到檔案的網址。</p>
+<blockquote>
+<p><strong>Note</strong><br>Firebase 的 Storage 其實是使用了 Google Cloud Storage 來實作，所以你會發現在 Firebase 中的<a target="_blank" rel="noopener" href="https://firebase.google.com/docs/storage/admin/start">管理者</a>區塊只有提到開始使用，而沒有提到如何上傳檔案，因為這部分是由 Google Cloud Storage 來實作的，因此 Firebase 的文件才會有這一句話</p>
+</blockquote>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">You can use the bucket references returned by the Admin SDK in conjunction with the official Google Cloud Storage client libraries to upload, download, and modify content in the buckets associated with your Firebase projects. Note that you do not have to authenticate Google Cloud Storage libraries when using the Firebase Admin SDK. The bucket references returned by the Admin SDK are already authenticated with the credentials used to initialize your Firebase app.<br></code></pre></td></tr></table></figure>
+
+<h3 id="刪除檔案"><a href="#刪除檔案" class="headerlink" title="刪除檔案"></a>刪除檔案</h3><p>這邊也順便補充一下如何刪除上傳的檔案程式碼，這邊我也會補上註解</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">delete</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-comment">// 取得檔案名稱</span><br>  <span class="hljs-keyword">const</span> fileName = req.<span class="hljs-property">query</span>.<span class="hljs-property">fileName</span>;<br>  <span class="hljs-comment">// 取得檔案</span><br>  <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(fileName);<br>  <span class="hljs-comment">// 刪除檔案</span><br>  blob.<span class="hljs-title function_">delete</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;刪除成功&#x27;</span>);<br>  &#125;).<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;刪除失敗&#x27;</span>);<br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>如果圖片是放在資料夾底下的話，那麼就要包含資料夾一起傳給後端，例如 <code>images/截圖 2022-12-24 17.05.53.png</code>，這樣子才能正確的刪除檔案。</p>
+</blockquote>
+<h3 id="取得檔案名稱列表"><a href="#取得檔案名稱列表" class="headerlink" title="取得檔案名稱列表"></a>取得檔案名稱列表</h3><p>當然我也會補上取得檔案名稱列表的程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-comment">// 取得檔案列表</span><br>  bucket.<span class="hljs-title function_">getFiles</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> &#123;<br>    <span class="hljs-keyword">const</span> files = data[<span class="hljs-number">0</span>];<br>    <span class="hljs-keyword">const</span> fileList = [];<br>    files.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">file</span>) =&gt;</span> &#123;<br>      fileList.<span class="hljs-title function_">push</span>(file.<span class="hljs-property">name</span>);<br>    &#125;);<br>    res.<span class="hljs-title function_">send</span>(fileList);<br>  &#125;)<br>  .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;取得檔案列表失敗&#x27;</span>);<br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>如果是想要包含連結的話，則改成以下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-comment">// 取得檔案列表</span><br>  bucket.<span class="hljs-title function_">getFiles</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> &#123;<br>    <br>    <span class="hljs-keyword">return</span> data[<span class="hljs-number">0</span>]<br>  &#125;).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">files</span>) =&gt;</span> &#123;<br>    <span class="hljs-keyword">const</span> fileList = [];<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> file <span class="hljs-keyword">of</span> files) &#123;<br>      <span class="hljs-comment">// 取得檔案的簽署 URL</span><br>      <span class="hljs-keyword">const</span> fileUrl = <span class="hljs-keyword">await</span> file.<span class="hljs-title function_">getSignedUrl</span>(&#123;<br>        <span class="hljs-attr">action</span>: <span class="hljs-string">&#x27;read&#x27;</span>,<br>        <span class="hljs-attr">expires</span>: <span class="hljs-string">&#x27;03-09-2491&#x27;</span><br>      &#125;);<br>      fileList.<span class="hljs-title function_">push</span>(&#123;<br>        <span class="hljs-attr">fileName</span>: file.<span class="hljs-property">name</span>,<br>        <span class="hljs-attr">imgUrl</span>: fileUrl<br>      &#125;);<br>    &#125;<br>    res.<span class="hljs-title function_">send</span>(fileList);<br>  &#125;).<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;取得檔案列表失敗&#x27;</span>);<br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>這樣就可以取得檔案名稱和連結了。</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2014.41.00.png?alt=media&token=a24719fb-b21a-44cc-bfda-2b1166117fd0" data-fancybox="gallery" data-caption="檔案名稱與連結"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2014.41.00.png?alt=media&token=a24719fb-b21a-44cc-bfda-2b1166117fd0" alt="檔案名稱與連結"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">檔案名稱與連結</figcaption></figure>
+<h3 id="指定上傳檔案到特定資料夾"><a href="#指定上傳檔案到特定資料夾" class="headerlink" title="指定上傳檔案到特定資料夾"></a>指定上傳檔案到特定資料夾</h3><p>其實我們上傳圖片的時候，都會希望可以分類，但其實這一段是非常簡單的，只需要在前面的程式碼中，將 <code>bucket.file(file.originalname)</code> 改成 <code>bucket.file(&#39;images/&#39; + file.originalname)</code>，這樣上傳的檔案就會被放到 <code>images</code> 資料夾中。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs js">router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br>  <span class="hljs-comment">// 指定上傳的資料夾</span><br>  <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(<span class="hljs-string">`images/<span class="hljs-subst">$&#123;file.originalname&#125;</span>`</span>);<br>  <span class="hljs-keyword">const</span> blobStream = blob.<span class="hljs-title function_">createWriteStream</span>()<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;finish&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳成功&#x27;</span>);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳失敗&#x27;</span>);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">end</span>(file.<span class="hljs-property">buffer</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>如果資料不存在的話，Firebase 會自動幫你建立資料夾唷！</p>
+</blockquote>
+<h2 id="中途小結"><a href="#中途小結" class="headerlink" title="中途小結"></a>中途小結</h2><p>前面我們分別學習了上傳、取得檔案連結、刪除檔案、檔案列表等語法，這些都可以說是我們上傳檔案的基礎，但這一段其實我們缺少了一些地方，例如上傳檔案後應重新命名避免檔名重複以及先壓縮圖片後再上傳到 Firebase，所以後面就讓我們接著補充這些吧。</p>
+<h2 id="加碼補充"><a href="#加碼補充" class="headerlink" title="加碼補充"></a>加碼補充</h2><p>接著這邊我額外補充一些我們上傳檔案時會需要的功能，例如重新命名檔案、壓縮圖片等等重點</p>
+<h3 id="重新命名檔案"><a href="#重新命名檔案" class="headerlink" title="重新命名檔案"></a>重新命名檔案</h3><p>重新命名檔案的方式非常簡單，通常檔案名稱會有幾種方式</p>
+<ul>
+<li>時間戳記</li>
+<li>uuid</li>
+<li>亂數</li>
+</ul>
+<p>而這邊我們就使用 uuid 來重新命名檔案，那什麼是 uuid 呢？uuid 中文名稱是「通用唯一辨識碼(Universally Unique Identifier)」，並且它的重複機率是趨近於零，所以我們可以安心的使用它來重新命名檔案。</p>
+<p>在那之前你必須先替專案安裝 uuid 套件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install uuid<br></code></pre></td></tr></table></figure>
+
+<p>接著再來修改上傳檔案的程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; <span class="hljs-attr">v4</span>: uuidv4 &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;uuid&#x27;</span>);<br><br><span class="hljs-comment">//...略過</span><br><br>router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br>  <span class="hljs-comment">// 指定上傳的資料夾並將檔案重新命名，請記得補上副檔名</span><br>  <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(<span class="hljs-string">`images/<span class="hljs-subst">$&#123;uuidv4()&#125;</span>.<span class="hljs-subst">$&#123;file.originalname.split(<span class="hljs-string">&#x27;.&#x27;</span>).pop()&#125;</span>`</span>);<br>  <span class="hljs-keyword">const</span> blobStream = blob.<span class="hljs-title function_">createWriteStream</span>()<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;finish&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳成功&#x27;</span>);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳失敗&#x27;</span>);<br>  &#125;);<br><br>  blobStream.<span class="hljs-title function_">end</span>(file.<span class="hljs-property">buffer</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>這樣你的檔案上傳時，就會重新命名了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2014.03.34.png?alt=media&token=607923fa-53e1-4267-a475-6510cfcca4c8" data-fancybox="gallery" data-caption="重新命名"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2014.03.34.png?alt=media&token=607923fa-53e1-4267-a475-6510cfcca4c8" alt="重新命名"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">重新命名</figcaption></figure>
+<h3 id="壓縮圖片-TinyPNG"><a href="#壓縮圖片-TinyPNG" class="headerlink" title="壓縮圖片(TinyPNG)"></a>壓縮圖片(TinyPNG)</h3><p>接著我們要來壓縮圖片，壓縮圖片的方式滿多種的，但是這邊我們將會使用 TinyPNG 來壓縮圖片，而 TinyPNG 是一個圖片壓縮服務，它可以將圖片壓縮到原本的 1&#x2F;3，而且它的壓縮品質也不會有太大的差異，所以我們可以安心的使用它來壓縮圖片。</p>
+<blockquote>
+<p><strong>Note</strong><br>免費版的 TinyPNG 有一個限制要稍微注意一下，就是每個月只能壓縮 500 張圖片。</p>
+</blockquote>
+<p>一開始你必須先申請一個 TinyPNG 的帳號，請你先到<a target="_blank" rel="noopener" href="https://tinypng.com/developers">這個</a>頁面申請</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.09.33.png?alt=media&token=19f91bdb-137a-4a34-9736-c7c2bab941a3" data-fancybox="gallery" data-caption="TinyPNG"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.09.33.png?alt=media&token=19f91bdb-137a-4a34-9736-c7c2bab941a3" alt="TinyPNG"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">TinyPNG</figcaption></figure>
+<p>接著你就會收到一封信，裡面會有進入 TinyPNG 的網址</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.11.51.png?alt=media&token=c60bbd76-c8af-4a03-b042-d3e95743863c" data-fancybox="gallery" data-caption="信件"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.11.51.png?alt=media&token=c60bbd76-c8af-4a03-b042-d3e95743863c" alt="信件"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">信件</figcaption></figure>
+<p>點擊後，基本上你就可以到達 TinyPNG 的後台，裡面會有一組 API Key 先將它複製下來</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212251613.jpg?alt=media&token=83fe1598-75f4-4828-adec-98c35eec236e" data-fancybox="gallery" data-caption="API Key"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F202212251613.jpg?alt=media&token=83fe1598-75f4-4828-adec-98c35eec236e" alt="API Key"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">API Key</figcaption></figure>
+<p>接著就是安裝 TinyPNG 的套件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install tinify<br></code></pre></td></tr></table></figure>
+
+<p>並將 API Key 設定到環境變數</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">TINYPNG_API_KEY=<br></code></pre></td></tr></table></figure>
+
+<p>接下來就是修改上傳檔案的程式碼就可以囉~</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> tinify = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;tinify&quot;</span>);<br>tinify.<span class="hljs-property">key</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">TINYPNG_API_KEY</span>;<br><br><span class="hljs-comment">//...略過</span><br><br>router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/image&#x27;</span>, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&#x27;file&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res</span>) &#123;<br>  <span class="hljs-keyword">const</span> file = req.<span class="hljs-property">file</span>;<br><br>  <span class="hljs-comment">// 上傳圖片到 TinyPNG 並壓縮</span><br>  tinify.<span class="hljs-title function_">fromBuffer</span>(file.<span class="hljs-property">buffer</span>).<span class="hljs-title function_">toBuffer</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">err, resultData</span>) &#123;<br>    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;<br><br>    <span class="hljs-keyword">const</span> blob = bucket.<span class="hljs-title function_">file</span>(<span class="hljs-string">`images/<span class="hljs-subst">$&#123;uuidv4()&#125;</span>.<span class="hljs-subst">$&#123;file.originalname.split(<span class="hljs-string">&#x27;.&#x27;</span>).pop()&#125;</span>`</span>);<br>    <span class="hljs-keyword">const</span> blobStream = blob.<span class="hljs-title function_">createWriteStream</span>()<br><br>    blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;finish&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>      res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳成功&#x27;</span>);<br>    &#125;);<br><br>    blobStream.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>      res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;上傳失敗&#x27;</span>);<br>    &#125;);<br><br>    <span class="hljs-comment">// 將壓縮後的圖片上傳到 Firebase Storage</span><br>    blobStream.<span class="hljs-title function_">end</span>(resultData);<br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>接著你再去看看你的 Firebase Storage，你會發現你的圖片已經被壓縮，底下這兩個都是相同的圖片，一個是未壓縮 21.47kb，另一個是被壓縮後 6.78kb</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.23.12.png?alt=media&token=68f84506-dadb-4f57-bad7-f9fa4d31f837" data-fancybox="gallery" data-caption="壓縮前後"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/welcomewebworld-4097b.appspot.com/o/blogImg%2Ffirebase%2Ffirebase-express%2F%E6%88%AA%E5%9C%96%202022-12-25%2016.23.12.png?alt=media&token=68f84506-dadb-4f57-bad7-f9fa4d31f837" alt="壓縮前後"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">壓縮前後</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>TinyPNG 除了可以壓縮圖片之外，也可以調整圖片大小，詳細可以參考<a target="_blank" rel="noopener" href="https://tinypng.com/developers/reference/nodejs">官方文件</a>。<br>當然除了老牌的 TinyPNG 之外，也有 <a target="_blank" rel="noopener" href="https://kraken.io/docs/getting-started">Kraken.io</a> 可以使用唷。</p>
+</blockquote>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>這一篇稍微比較長一點，但是我想應該是滿詳細的了，畢竟 Firebase Storage 這一塊我發現在串接上真的滿複雜的，所以就乾脆把整個流程都給它記錄下來，如果你想要這份範例程式碼的話，我也放在 GitHub 上囉~</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/firebase-storage-example">GitHub</a></p>
+<h2 id="參考文獻"><a href="#參考文獻" class="headerlink" title="參考文獻"></a>參考文獻</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/appengine/docs/flexible/using-cloud-storage?hl=zh-tw&tab=node.js#application_code">Application code</a></li>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/stardustxx/58748550699228174b805aaadfc98a35">NodeJS Firebase Storage Sample</a></li>
+<li><a target="_blank" rel="noopener" href="https://firebase.google.com/docs/reference/admin/node/firebase-admin.storage.storage">Firebase API reference Bucket</a></li>
+<li><a target="_blank" rel="noopener" href="https://firebase.google.com/docs/storage/admin/start">Admin Cloud Storage API</a></li>
+<li><a target="_blank" rel="noopener" href="https://kraken.io/docs/getting-started">Kraken API Reference</a></li>
+<li><a target="_blank" rel="noopener" href="https://tinypng.com/developers/reference/nodejs">TinyPNG API Reference</a></li>
+</ul>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+
+    <!-- Support Section -->
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/gsap/20221222/1131507457/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            (11)前端好好玩用 GSAP 做一個特效 - 時間軸/線(2)
+          </span>
+        </a>
+      
+
+      
+        <a href="/git/20221230/27133639/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            關於 Git 的檔案名稱大小寫問題與修正
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20240101/268408973/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                六角旅館 API 系統（freyja）之後端完整部署教學
+              </h4>
+              <time datetime="2024-01-01" title="發布日期: 2024-01-01" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2024-01-01
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230504/3177278058/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Express 建立一個簡易 WebSocket 聊天室
+              </h4>
+              <time datetime="2023-05-04" title="發布日期: 2023-05-04" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-05-04
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230425/1940966356/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Express 部署到 Vercel
+              </h4>
+              <time datetime="2023-04-25" title="發布日期: 2023-04-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-04-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/other/20221216/786812101/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                將你的 Node.js 部署到 fly.io 吧！
+              </h4>
+              <time datetime="2022-12-16" title="發布日期: 2022-12-16" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-16
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20221225/1867465275/" data-title="一步一步帶你用 Node.js 上傳檔案到 Firebase Storage" data-hashtags="Node.js,Firebase,Express,Firebase Storage,Storage,multer,TinyPNG,Imgur" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20221225/1867465275/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20221225/1867465275/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20221225/1867465275/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Firebase-%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">Firebase 事前準備</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Firebase-%E5%B0%88%E6%A1%88"><span class="toc-text">建立 Firebase 專案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A-Firebase-Storage"><span class="toc-text">設定 Firebase Storage</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%96%E5%BE%97-Firebase-Admin-SDK"><span class="toc-text">取得 Firebase Admin SDK</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Express-Firebase"><span class="toc-text">Express + Firebase</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-Express-%E5%B0%88%E6%A1%88"><span class="toc-text">建立 Express 專案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-upload-%E8%B3%87%E6%96%99%E5%A4%BE"><span class="toc-text">建立 upload 資料夾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%9D%E7%9B%B8%E9%97%9C%E5%A5%97%E4%BB%B6"><span class="toc-text">安裝相關套件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-env-%E6%AA%94%E6%A1%88"><span class="toc-text">建立 .env 檔案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C%E4%B8%8A%E5%82%B3%E5%8A%9F%E8%83%BD"><span class="toc-text">實作上傳功能</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E5%82%B3%E6%AA%94%E6%A1%88"><span class="toc-text">上傳檔案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%96%E5%BE%97%E6%AA%94%E6%A1%88%E7%B6%B2%E5%9D%80"><span class="toc-text">取得檔案網址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%AA%E9%99%A4%E6%AA%94%E6%A1%88"><span class="toc-text">刪除檔案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%96%E5%BE%97%E6%AA%94%E6%A1%88%E5%90%8D%E7%A8%B1%E5%88%97%E8%A1%A8"><span class="toc-text">取得檔案名稱列表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A%E4%B8%8A%E5%82%B3%E6%AA%94%E6%A1%88%E5%88%B0%E7%89%B9%E5%AE%9A%E8%B3%87%E6%96%99%E5%A4%BE"><span class="toc-text">指定上傳檔案到特定資料夾</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E9%80%94%E5%B0%8F%E7%B5%90"><span class="toc-text">中途小結</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E7%A2%BC%E8%A3%9C%E5%85%85"><span class="toc-text">加碼補充</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E5%91%BD%E5%90%8D%E6%AA%94%E6%A1%88"><span class="toc-text">重新命名檔案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A3%93%E7%B8%AE%E5%9C%96%E7%89%87-TinyPNG"><span class="toc-text">壓縮圖片(TinyPNG)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-text">結論</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E6%96%87%E7%8D%BB"><span class="toc-text">參考文獻</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260331/1748203647/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code 哪些檔案該 Commit？CLAUDE.md、Settings、Rules、Skills 完整解析
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-31" title="發布日期: 2026-03-31" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/31
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260330/2896397295/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code Auto Memory 是什麼？自動記憶功能完整教學
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-30" title="發布日期: 2026-03-30" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/30
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              6 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260326/1431610072/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code Status Line 設定教學：在終端機即時監控 Context 用量與 Rate Limit
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/26
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              16 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260326/73911729/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            2026 年 AI Coding 工具怎麼選？GitHub Copilot、Cursor、Claude Code、Kiro 與 Antigravity 完整比較
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-26" title="發布日期: 2026-03-26" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/26
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              13 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260320/2827818448/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            不想用龍蝦（OpenClaw）？來試試看 Claude Code channels 吧！
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-20" title="發布日期: 2026-03-20" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/20
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              9 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>
