@@ -1,0 +1,1251 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>六角旅館 API 系統（freyja）之後端完整部署教學 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20240101/268408973/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="六角旅館 API 系統（freyja）之後端完整部署教學">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20240101/268408973/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&amp;token=6e8189e2-47c0-4732-9863-3920ca1fd578">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2024-01-01T13:46:51.000Z">
+    
+      <meta property="article:modified_time" content="2024-01-01T13:46:51.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="TypeScript">
+      
+        <meta property="article:tag" content="Express">
+      
+        <meta property="article:tag" content="MongoDB">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="六角旅館 API 系統（freyja）之後端完整部署教學">
+  <meta name="twitter:description" content="這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。">
+  
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&amp;token=6e8189e2-47c0-4732-9863-3920ca1fd578">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/nodejs/20240101/268408973/"},"headline":"六角旅館 API 系統（freyja）之後端完整部署教學 | 是 Ray 不是 Array","url":"https://israynotarray.com/nodejs/20240101/268408973/","datePublished":"2024-01-01T13:46:51.000Z","dateModified":"2024-01-01T13:46:51.000Z","description":"這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578"],"articleSection":["Nodejs"],"keywords":"Node.js, TypeScript, Express, MongoDB"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"六角旅館 API 系統（freyja）之後端完整部署教學 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"六角旅館 API 系統（freyja）之後端完整部署教學"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode & Color Palette Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-OzTITT57.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-Bs_9ZI5Y.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Color Palette Selector (精簡版) -->
+  <div class="palette-selector relative w-full">
+    <button data-palette-select class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox">
+      <div class="flex items-center gap-2">
+        <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: rgb(var(--color-primary-500))"></span>
+        <span class="palette-label text-sm text-gray-600 dark:text-gray-400">Theme</span>
+      </div>
+      <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+    </button>
+    <div class="palette-dropdown hidden absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+      <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+      </button>
+      <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2024-01-01" title="發布日期: 2024-01-01" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2024-01-01
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        六角旅館 API 系統（freyja）之後端完整部署教學
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/TypeScript/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #TypeScript
+            </a>
+          
+            <a href="/tags/Express/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Express
+            </a>
+          
+            <a href="/tags/MongoDB/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #MongoDB
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇將會針對六角學院所出的「六角旅館 API 系統（freyja）」後端記錄一下部署教學。</p>
+<h2 id="取得專案"><a href="#取得專案" class="headerlink" title="取得專案"></a>取得專案</h2><p>首先一開始先點擊<a target="_blank" rel="noopener" href="https://github.com/hexschool/freyja">這裡</a> 進入到六角學院的後端範例專案，然後這邊我會使用「Fork」的方式將專案複製到自己的 GitHub 帳號底下</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578" data-fancybox="gallery" data-caption="fork"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fgithub-fork.jpg?alt=media&token=6e8189e2-47c0-4732-9863-3920ca1fd578" alt="fork"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">fork</figcaption></figure>
+<p>接著你會進入 Fork 的頁面，你只需要點一下「Create Fork」就可以了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting.png?alt=media&token=1070d698-a0f8-4cfb-9500-4d7eccac630e" data-fancybox="gallery" data-caption="fork setting"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting.png?alt=media&token=1070d698-a0f8-4cfb-9500-4d7eccac630e" alt="fork setting"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">fork setting</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>如果你發現你的畫面上有出現「The repository freyja already exists on this account.」的話，那就代表你已經 Fork 過，那麼就可以不用重複 Fork 了。</p>
+</blockquote>
+<p>這樣你的專案底下就會多出一個專案</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting2.jpg?alt=media&token=3985355a-ec23-44c8-a812-4174edb99e47" data-fancybox="gallery" data-caption="Fork Repository"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffork_setting2.jpg?alt=media&token=3985355a-ec23-44c8-a812-4174edb99e47" alt="Fork Repository"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Fork Repository</figcaption></figure>
+<p>（紅框處通常會變成你的 GitHub 帳號名稱）</p>
+<p>接下來請你在你剛剛 Fork 的專案底下點擊「Code」，然後複製你的專案網址</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcopy_url.jpg?alt=media&token=de853a0e-b4d8-4656-a142-ee7c5b7d2e58" data-fancybox="gallery" data-caption="Copy Url"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcopy_url.jpg?alt=media&token=de853a0e-b4d8-4656-a142-ee7c5b7d2e58" alt="Copy Url"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Copy Url</figcaption></figure>
+<p>取得網址後，請打開你的終端機，並且輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> [剛剛複製的網址]<br></code></pre></td></tr></table></figure>
+
+<p>這樣就可以將專案複製到你的電腦上囉～</p>
+<h2 id="初始化環境"><a href="#初始化環境" class="headerlink" title="初始化環境"></a>初始化環境</h2><p>接下來我們要進入到專案底下，並且安裝相關套件，請輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> freyja<br>npm install<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>請注意這個專案至少要 Node.js 18.16.0 以上版本才可以執行喔～</p>
+</blockquote>
+<p>還原專案後，接著我們要設定一下環境變數，請你在終端機下輸入以下指令將 <code>.env.example</code> 複製一份 <code>.env</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span><br></code></pre></td></tr></table></figure>
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fenv_cp.jpg?alt=media&token=41e99169-542b-4549-9ec0-0490bcf1542d" data-fancybox="gallery" data-caption="cp env"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fenv_cp.jpg?alt=media&token=41e99169-542b-4549-9ec0-0490bcf1542d" alt="cp env"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">cp env</figcaption></figure>
+<p>接下來打開 <code>.env</code> 檔案，你會看到以下內容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 環境變數，區分開發或正式環境( development、production )</span><br>NODE_ENV = <span class="hljs-string">&quot;development&quot;</span><br><br><span class="hljs-comment"># 伺服器埠號</span><br>PORT = 3005<br><br><span class="hljs-comment"># MongoDB 連結</span><br>DATABASE =<br><span class="hljs-comment"># MongoDB 密碼</span><br>DATABASE_PASSWORD =<br><br><span class="hljs-comment"># JTW Token 到期日</span><br>JWT_EXPIRES_DAY = <span class="hljs-string">&quot;7d&quot;</span><br><span class="hljs-comment"># JTW Token 密鑰</span><br>JWT_SECRET = <span class="hljs-string">&quot;hexschool&quot;</span><br><br><span class="hljs-comment"># Gmail 帳號</span><br>EMAILER_USER =<br><span class="hljs-comment"># Gmail 應用程式密碼</span><br>EMAILER_PASSWORD =<br></code></pre></td></tr></table></figure>
+
+<p>這邊有幾個東西要準備一下，分別是：</p>
+<ul>
+<li>MongoDB 連結與密碼</li>
+<li>Gmail 帳號與應用程式密碼</li>
+</ul>
+<p>所以就讓我們來一個一個設定吧～</p>
+<h3 id="MongoDB-連結與密碼"><a href="#MongoDB-連結與密碼" class="headerlink" title="MongoDB 連結與密碼"></a>MongoDB 連結與密碼</h3><p>首先我們這邊將會使用 MongoDB Atlas 來當作我們的資料庫（這邊我會直接忽略註冊的過程），所以請你點一下<a target="_blank" rel="noopener" href="https://www.mongodb.com/">這裡</a>進入到 MongoDB Atlas 的官網，然後點一下「Sign in」，如下圖：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FMongoDB_sigin.jpg?alt=media&token=74f9a9b3-be1e-4457-957b-3c7f19232bea" data-fancybox="gallery" data-caption="Sign in"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FMongoDB_sigin.jpg?alt=media&token=74f9a9b3-be1e-4457-957b-3c7f19232bea" alt="Sign in"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Sign in</figcaption></figure>
+<p>接著你會進入到登入頁面，請你選擇適合你自己的方式登入</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmongodb_sigin_account.png?alt=media&token=6d0c0276-15da-4ed3-aab1-288216e5051a" data-fancybox="gallery" data-caption="Sign in"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmongodb_sigin_account.png?alt=media&token=6d0c0276-15da-4ed3-aab1-288216e5051a" alt="Sign in"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Sign in</figcaption></figure>
+<p>這邊我會選擇「GitHub」的方式登入，所以就麻煩你選擇你自己的方式登入囉～</p>
+<p>登入後，如果你是一個全新的帳號，那麼你會先被要求建立一個組織</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmogodb_Organizations.png?alt=media&token=4afaf3d8-472d-4154-a16f-f7a12f6736d4" data-fancybox="gallery" data-caption="Organizations"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fmogodb_Organizations.png?alt=media&token=4afaf3d8-472d-4154-a16f-f7a12f6736d4" alt="Organizations"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Organizations</figcaption></figure>
+<p>所以就請你點一下「Create Organization」，然後輸入你的組織名稱，然後選「MongoDB Atlas」，就可以儲存建立組織了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization.jpg?alt=media&token=b18c25fd-a746-442a-a774-ad2e3f84ee4d" data-fancybox="gallery" data-caption="Create Organization"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization.jpg?alt=media&token=b18c25fd-a746-442a-a774-ad2e3f84ee4d" alt="Create Organization"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create Organization</figcaption></figure>
+<p>按下儲存後，下一頁會是「Members and Security」，也就是成員與安全性的設定，這邊你可以選擇要不要邀請其他人加入，或是直接點擊「Create Organization」（基本上這邊都是預設的，所以你可以直接點擊「Create Organization」）</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization2.jpg?alt=media&token=e012fbea-36a5-4cc6-a06a-da98d6d4dc83" data-fancybox="gallery" data-caption="Members and Security"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FCreate_Organization2.jpg?alt=media&token=e012fbea-36a5-4cc6-a06a-da98d6d4dc83" alt="Members and Security"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Members and Security</figcaption></figure>
+<p>接下來我們要來建立一個專案，因為 MongoDB Atlas 是以組織為單位，所以前面才會需要設置組織，所以現在我們要建立一個專案，請你點一下「New Project」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FProjects.jpg?alt=media&token=630004a9-dd3c-476c-9c62-5f23efd33af8" data-fancybox="gallery" data-caption="New Project"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FProjects.jpg?alt=media&token=630004a9-dd3c-476c-9c62-5f23efd33af8" alt="New Project"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">New Project</figcaption></figure>
+<p>這個專案名稱可以隨便取，我就取「freyja-project」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffreyja-project.png?alt=media&token=441b9fe1-3601-4786-97a3-cbc65e28e5da" data-fancybox="gallery" data-caption="freyja-project"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Ffreyja-project.png?alt=media&token=441b9fe1-3601-4786-97a3-cbc65e28e5da" alt="freyja-project"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">freyja-project</figcaption></figure>
+<p>然後下一步基本上會問你要不要邀請其他人加入，這邊你可以直接點擊「Create Project」，然後就會進入到專案的首頁，這時候請你點一下畫面上的「Create」，因為我們要來部署一個資料庫</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcreate_db.jpg?alt=media&token=9aaa28dd-3d02-4a45-919b-a6e215bf9fbe" data-fancybox="gallery" data-caption="Create Db"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fcreate_db.jpg?alt=media&token=9aaa28dd-3d02-4a45-919b-a6e215bf9fbe" alt="Create Db"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create Db</figcaption></figure>
+<p>接下來你會進入「Deploy your database」頁面，這邊要請你選擇 「M0 Free」專案，就可以按下「Create」了</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FDeploy_your_database.jpg?alt=media&token=f8838fdd-7440-4e88-bb10-482270ea25c9" data-fancybox="gallery" data-caption="Deploy your database"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FDeploy_your_database.jpg?alt=media&token=f8838fdd-7440-4e88-bb10-482270ea25c9" alt="Deploy your database"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Deploy your database</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>底下的 Provider 跟 Region 的意思是指你的資料庫要部署在哪個雲端服務商的哪個地區以及哪個區域，基本上預設就很足夠了。</p>
+</blockquote>
+<p>然後你就會進入 MongoDB 的快速入門設定頁面，底下你會比較需要注意一件事情，請你記下你底下的帳號與密碼，因為這個帳號與密碼會是你連接資料庫的帳號與密碼，沒問題就可以按下「Create User」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FSecurity_Quickstart.jpg?alt=media&token=c6945a0b-d82c-4326-a94c-8188110b7e19" data-fancybox="gallery" data-caption="Security Quickstart"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FSecurity_Quickstart.jpg?alt=media&token=c6945a0b-d82c-4326-a94c-8188110b7e19" alt="Security Quickstart"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Security Quickstart</figcaption></figure>
+<p>接著往下滾，是要設定 IP 位址的部分，也就是你會怎麼連接到資料庫，由於我們只是練習而已，所以請你在 IP 欄位輸入 <code>0.0.0.0/0</code>，並按下「Add Entry」，然後按下「Finish And Close」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FNetwork%20Access.png?alt=media&token=dcb85df5-387e-4fff-b3d8-de14b0665a83" data-fancybox="gallery" data-caption="Network Access"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FNetwork%20Access.png?alt=media&token=dcb85df5-387e-4fff-b3d8-de14b0665a83" alt="Network Access"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Network Access</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>通常在正式環境下，我們會設定主機的固定 IP 位址，但因為這邊只是練習，所以我們就直接設定 <code>0.0.0.0/0</code>，代表任何 IP 位址都可以連接到資料庫。</p>
+</blockquote>
+<p>建立好後，畫面上有一個「Connect」的按鈕，請你點一下</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnent_Db.jpg?alt=media&token=06102c4a-f2a7-4da9-87b4-c95e638f68ec" data-fancybox="gallery" data-caption="Connect Db"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnent_Db.jpg?alt=media&token=06102c4a-f2a7-4da9-87b4-c95e638f68ec" alt="Connect Db"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Connect Db</figcaption></figure>
+<p>接著應該會跳出一個視窗，請你選擇「Connect your application」的「Driver」，然後選擇「Node.js」，然後複製你的連結字串</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnect%20Db2.jpg?alt=media&token=0ae9e2ae-d32e-41bf-b555-038b71563d11" data-fancybox="gallery" data-caption="Connect Db2"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FConnect%20Db2.jpg?alt=media&token=0ae9e2ae-d32e-41bf-b555-038b71563d11" alt="Connect Db2"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Connect Db2</figcaption></figure>
+<p>這就是我們的 MongoDB 連結字串，請你複製起來，然後回到剛剛的 <code>.env</code> 檔案，將 <code>DATABASE</code> 與 <code>DATABASE_PASSWORD</code> 的值改成你剛剛複製的連結字串，並且將 <code>&lt;password&gt;</code> 改成你剛剛設定的密碼，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs env"># MongoDB 連結<br>DATABASE = &quot;mongodb+srv://typescript-30-ray:&lt;password&gt;@cluster0.937ixka.mongodb.net/?retryWrites=true&amp;w=majority&quot;<br># MongoDB 密碼<br>DATABASE_PASSWORD = jqZsdqdwqwd31 # 不用擔心這是假密碼<br></code></pre></td></tr></table></figure>
+
+<p>恭喜你，到目前為止，終於完成了 MongoDB 的設定了～</p>
+<h3 id="Gmail-帳號與應用程式密碼"><a href="#Gmail-帳號與應用程式密碼" class="headerlink" title="Gmail 帳號與應用程式密碼"></a>Gmail 帳號與應用程式密碼</h3><p>接下來我們要來取得 Gmail 的帳號以及應用程式密碼，首先請你到 Google 設定中心，然後點選「<a target="_blank" rel="noopener" href="https://myaccount.google.com/u/1/security">安全性</a>」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.19.15.png?alt=media&token=5d31780f-8cc3-4c01-b09c-a6514424b8ee" data-fancybox="gallery" data-caption="Google 設定中心"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2Fnodemailer-google-email%2F2023-07-22%2012.19.15.png?alt=media&token=5d31780f-8cc3-4c01-b09c-a6514424b8ee" alt="Google 設定中心"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Google 設定中心</figcaption></figure>
+<p>這邊要麻煩你先確定你的帳號是否有先啟用<strong>兩步驗驗證</strong>，否則 Google 不會讓你繼續往下的哦！</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FTwo%20Security.jpg?alt=media&token=cd90951a-d3e8-4836-9823-8e6efad2c264" data-fancybox="gallery" data-caption="Two Security"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FTwo%20Security.jpg?alt=media&token=cd90951a-d3e8-4836-9823-8e6efad2c264" alt="Two Security"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Two Security</figcaption></figure>
+<p>確定有啟用後，麻煩你在上方搜尋欄位搜尋「應用程式密碼」，然後點一下「應用程式密碼」，如下圖：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password.png?alt=media&token=4f08087f-5d76-4e66-8007-a7ea69326160" data-fancybox="gallery" data-caption="Application Password"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password.png?alt=media&token=4f08087f-5d76-4e66-8007-a7ea69326160" alt="Application Password"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Application Password</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>早期可以在畫面上直接找到「應用程式密碼」，但是現在要搜尋才可以找到。</p>
+</blockquote>
+<p>接著你會進入到「應用程式密碼」的頁面，請你在 App Name 欄位輸入「freyja」，然後按下「建立」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password2.jpg?alt=media&token=5857b96e-65e4-42d8-bbf6-5ba1433971f2" data-fancybox="gallery" data-caption="Application Password"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password2.jpg?alt=media&token=5857b96e-65e4-42d8-bbf6-5ba1433971f2" alt="Application Password"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Application Password</figcaption></figure>
+<p>接下來畫面就會彈跳出由 Google 產生的密碼四組四位數的 16 字元密碼，如…</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">abba dqwd asbc d3hr # 這是假密碼<br></code></pre></td></tr></table></figure>
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password3.jpg?alt=media&token=ae77297a-f5af-4a40-ad28-a99fe98a79bd" data-fancybox="gallery" data-caption="Application Password3"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fapp_password3.jpg?alt=media&token=ae77297a-f5af-4a40-ad28-a99fe98a79bd" alt="Application Password3"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Application Password3</figcaption></figure>
+<p>接下來你就可以回到專案的 <code>.env</code> 檔案，將 <code>EMAILER_USER</code> 與 <code>EMAILER_PASSWORD</code> 的值改成你剛剛產生的密碼，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs env"># Gmail 帳號<br>EMAILER_USER = &quot;example@gmail.com&quot; # 你用來申請應用程式密碼的 Gmail 帳號<br># Gmail 應用程式密碼<br>EMAILER_PASSWORD = &quot;abba dqwd asbc d3hr&quot; # 你申請的應用程式密碼<br></code></pre></td></tr></table></figure>
+
+<p>到目前為止，你已經把這個 Freyja 專案所需要的環境變數都設定好了，接下來我們要來執行專案了～</p>
+<p>你只需要輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm run dev<br></code></pre></td></tr></table></figure>
+
+<p>你就可以看到終端機出現以下畫面：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fstart.png?alt=media&token=242cb6e6-f755-4f09-9683-d143aff3ac1a" data-fancybox="gallery" data-caption="npm run dev"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fstart.png?alt=media&token=242cb6e6-f755-4f09-9683-d143aff3ac1a" alt="npm run dev"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">npm run dev</figcaption></figure>
+<p>這樣我們 Freyja 專案的後端就算是完成囉！</p>
+<h2 id="部署到-Render-com"><a href="#部署到-Render-com" class="headerlink" title="部署到 Render.com"></a>部署到 Render.com</h2><p>接下來請你打開 「<a target="_blank" rel="noopener" href="https://render.com/">Render.com</a>」，然後點一下「Sign up」，登入到 <a href="Render.com">Render.com</a></p>
+<blockquote>
+<p><strong>Note</strong><br>如果你還沒註冊就請你註冊一下，這邊我會直接忽略註冊過程。（建議使用 GitHub 登入）</p>
+</blockquote>
+<p>接著要麻煩你點一下上方的「New」，然後選擇「New Web Service」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FRender_Dashboard.jpg?alt=media&token=cda0a9f2-02f3-488a-96e7-26239f139625" data-fancybox="gallery" data-caption="Web Service"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FRender_Dashboard.jpg?alt=media&token=cda0a9f2-02f3-488a-96e7-26239f139625" alt="Web Service"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Web Service</figcaption></figure>
+<p>進入「Create a new Web Service」之後，我們選「Build and deploy from a Git repository」，並點下一步</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_setp1.jpg?alt=media&token=7ea196fb-6347-436b-bca5-432903c221bc" data-fancybox="gallery" data-caption="Build and deploy from a Git repository"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_setp1.jpg?alt=media&token=7ea196fb-6347-436b-bca5-432903c221bc" alt="Build and deploy from a Git repository"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Build and deploy from a Git repository</figcaption></figure>
+<p>接下來請在「Connect a repository」欄位搜尋我們前面所 Fork 的名稱，也就是「freyja」，然後選擇「freyja」，並點 Connect</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fconnect_repository.jpg?alt=media&token=5408ee01-27d9-468f-8c65-ea7ba31c638e" data-fancybox="gallery" data-caption="Connect a Repository"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Fconnect_repository.jpg?alt=media&token=5408ee01-27d9-468f-8c65-ea7ba31c638e" alt="Connect a Repository"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Connect a Repository</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>如果找不到的話，代表你註冊 Render.com 的帳號跟你 Fork 的帳號不一樣，或者你的 GitHub 沒有正確給予 Render.com 的權限。</p>
+</blockquote>
+<p>接下來請你輸入以下欄位</p>
+<ul>
+<li>Name：請輸入「freyja」</li>
+<li>Instance Type：請選擇「Free」</li>
+<li>Environment Variables：請依照 .env 檔案的內容輸入</li>
+</ul>
+<p>所以會長的像這樣：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FEnvironment%20Variables.jpg?alt=media&token=07a6f78c-69c4-48fd-9faf-2167becf23e2" data-fancybox="gallery" data-caption="Environment Variables"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2FEnvironment%20Variables.jpg?alt=media&token=07a6f78c-69c4-48fd-9faf-2167becf23e2" alt="Environment Variables"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Environment Variables</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>這邊並不需要設定 PROT 跟 NODE_ENV，因為 Dockerfile 裡面已經有設定了；建議填寫在 Environment Variables 時，不用補上引號。</p>
+</blockquote>
+<p>接下來請你點一下「Create Web Service」，Render.com 就會開始幫你部署專案囉！</p>
+<p>你只要看到畫面出現以下畫面，就代表部署成功囉！</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy.jpg?alt=media&token=7a5a8e07-8627-4793-b24f-51aa514c9ed4" data-fancybox="gallery" data-caption="部署成功"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy.jpg?alt=media&token=7a5a8e07-8627-4793-b24f-51aa514c9ed4" alt="部署成功"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">部署成功</figcaption></figure>
+<p>接著你就可以滾到上方找到 Render.com 給你的網址，點一下就可以看到你的專案囉！</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_2.jpg?alt=media&token=47fc6538-d658-4255-b1f1-19feb2dc3070" data-fancybox="gallery" data-caption="部署成功"><img class="cursor-zoom-in !mb-0" src="https://firebasestorage.googleapis.com/v0/b/israynotarray2.appspot.com/o/blog2%2Fnodejs%2F2023-typescript-nodejs%2Frender_deploy_2.jpg?alt=media&token=47fc6538-d658-4255-b1f1-19feb2dc3070" alt="部署成功"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">部署成功</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>正常點網址進入你會收到一個 JSON 物件，所以建議你在網址後方補上 <code>swagger</code>，這樣就可以進入到 API Doc 頁面囉！</p>
+</blockquote>
+<p>以上就是完整的部署教學囉！</p>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+
+    <!-- Support Section -->
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/other/20231224/4103794407/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Windows 自然人憑證網頁總是出現「localhost 拒絕連線」的解決方式
+          </span>
+        </a>
+      
+
+      
+        <a href="/vue/20240106/910015012/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            遲早你會面對的問題，Vue3 Composition API 的 ref 與 reactive 差異是什麼？
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20230504/3177278058/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Express 建立一個簡易 WebSocket 聊天室
+              </h4>
+              <time datetime="2023-05-04" title="發布日期: 2023-05-04" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-05-04
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20230425/1940966356/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Express 部署到 Vercel
+              </h4>
+              <time datetime="2023-04-25" title="發布日期: 2023-04-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-04-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20221225/1867465275/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                一步一步帶你用 Node.js 上傳檔案到 Firebase Storage
+              </h4>
+              <time datetime="2022-12-25" title="發布日期: 2022-12-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/other/20221216/786812101/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                將你的 Node.js 部署到 fly.io 吧！
+              </h4>
+              <time datetime="2022-12-16" title="發布日期: 2022-12-16" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-16
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20240101/268408973/" data-title="六角旅館 API 系統（freyja）之後端完整部署教學" data-hashtags="Node.js,TypeScript,Express,MongoDB" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20240101/268408973/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20240101/268408973/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20240101/268408973/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%96%E5%BE%97%E5%B0%88%E6%A1%88"><span class="toc-text">取得專案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E7%92%B0%E5%A2%83"><span class="toc-text">初始化環境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MongoDB-%E9%80%A3%E7%B5%90%E8%88%87%E5%AF%86%E7%A2%BC"><span class="toc-text">MongoDB 連結與密碼</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gmail-%E5%B8%B3%E8%99%9F%E8%88%87%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F%E5%AF%86%E7%A2%BC"><span class="toc-text">Gmail 帳號與應用程式密碼</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2%E5%88%B0-Render-com"><span class="toc-text">部署到 Render.com</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260412/1749382056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            想自己跑 LLM？搞懂模型參數與量化讓你不再選錯模型
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-12" title="發布日期: 2026-04-12" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/12
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              11 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260410/2748391056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            AI Agent 不再是統稱了？認識 Coding Agent 與各類 AI Agent 的差異
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-10" title="發布日期: 2026-04-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260409/1057131696/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            你的 Claude Code Context 是不是都被吃光了？AGENTS.md 與 Context 管控全攻略
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-09" title="發布日期: 2026-04-09" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/09
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              10 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260408/3734112946/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            SEO 已經不夠了嗎？認識 AEO 答案引擎優化，讓 AI 搜尋找到你
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-08" title="發布日期: 2026-04-08" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/08
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              17 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260331/1748203647/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code 哪些檔案該 Commit？CLAUDE.md、Settings、Rules、Skills 完整解析
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-31" title="發布日期: 2026-03-31" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/31
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>

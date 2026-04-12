@@ -1,0 +1,1286 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>就算不讀 Clean Code，你也可以把程式碼寫好 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/other/20221011/704514203/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="就算不讀 Clean Code，你也可以把程式碼寫好">
+  <meta property="og:url" content="https://israynotarray.com/other/20221011/704514203/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://i.imgur.com/m3h6azU.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2022-10-11T02:26:32.000Z">
+    
+      <meta property="article:modified_time" content="2022-10-11T02:26:32.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="雜談">
+      
+    
+    
+      
+        <meta property="article:tag" content="JavaScript">
+      
+        <meta property="article:tag" content="Vue">
+      
+        <meta property="article:tag" content="React">
+      
+        <meta property="article:tag" content="Clean Code">
+      
+        <meta property="article:tag" content="Code Review">
+      
+        <meta property="article:tag" content="Code Style">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="就算不讀 Clean Code，你也可以把程式碼寫好">
+  <meta name="twitter:description" content="這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。">
+  
+    <meta name="twitter:image" content="https://i.imgur.com/m3h6azU.png">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/other/20221011/704514203/"},"headline":"就算不讀 Clean Code，你也可以把程式碼寫好 | 是 Ray 不是 Array","url":"https://israynotarray.com/other/20221011/704514203/","datePublished":"2022-10-11T02:26:32.000Z","dateModified":"2022-10-11T02:26:32.000Z","description":"這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://i.imgur.com/m3h6azU.png"],"articleSection":["雜談"],"keywords":"JavaScript, Vue, React, Clean Code, Code Review, Code Style"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"就算不讀 Clean Code，你也可以把程式碼寫好 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"雜談","item":"https://israynotarray.com/categories/other/"},{"@type":"ListItem","position":3,"name":"就算不讀 Clean Code，你也可以把程式碼寫好"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode & Color Palette Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-OzTITT57.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-Bs_9ZI5Y.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Color Palette Selector (精簡版) -->
+  <div class="palette-selector relative w-full">
+    <button data-palette-select class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox">
+      <div class="flex items-center gap-2">
+        <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: rgb(var(--color-primary-500))"></span>
+        <span class="palette-label text-sm text-gray-600 dark:text-gray-400">Theme</span>
+      </div>
+      <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+    </button>
+    <div class="palette-dropdown hidden absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+      <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+      </button>
+      <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2022-10-11" title="發布日期: 2022-10-11" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2022-10-11
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/other/" class="hover:text-primary-500 transition-colors">雜談</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        就算不讀 Clean Code，你也可以把程式碼寫好
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/JavaScript/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #JavaScript
+            </a>
+          
+            <a href="/tags/Vue/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Vue
+            </a>
+          
+            <a href="/tags/React/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #React
+            </a>
+          
+            <a href="/tags/Clean-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Clean Code
+            </a>
+          
+            <a href="/tags/Code-Review/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Code Review
+            </a>
+          
+            <a href="/tags/Code-Style/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Code Style
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這是一篇有點特別的文章，為了寫這一篇我花了約近一年多的時間，而這一篇主要是分享我當助教這段時間所看到的各種 Code 寫法，當然不會原封不動地貼上學生寫的範例，而是會修正過範例，避免學生看到後有不好的影響，因為這一篇僅僅只是分享「你還可以怎麼寫會更好」。</p>
+<h2 id="為什麼要寫這篇文章？"><a href="#為什麼要寫這篇文章？" class="headerlink" title="為什麼要寫這篇文章？"></a>為什麼要寫這篇文章？</h2><p>這一篇並不會像 Clean Code 那樣教你怎麼寫、怎麼命名，而是主要分享自己的當助教期間所看到的各種 Code 寫法，然後說明為什麼這樣寫不好，當然這一篇也會盡可能避免說明到一些太過複雜的概念，主軸比較偏向於「你還可以怎麼寫會更好」。</p>
+<p>當然每個人都有自己的 Code Style，所以分享這一篇並不代表你就一定要依照我的作法去做，而是讓你知道「為什麼我會這樣子建議」以及「為什麼不要這樣寫」。</p>
+<p>當然由於我是 Vue 開發者，所以你可能會看到一些關於 Vue 的建議。</p>
+<p>如果沒有什麼太大問題的話，就準備好好認識自己的程式碼是不是我舉例的其中一種吧！</p>
+<p>照慣例，一樣要補個迷因圖：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/m3h6azU.png" data-fancybox="gallery" data-caption="求你了"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://i.imgur.com/m3h6azU.png" alt="求你了"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">求你了</figcaption></figure>
+<h2 id="有意義的函式與變數命名"><a href="#有意義的函式與變數命名" class="headerlink" title="有意義的函式與變數命名"></a>有意義的函式與變數命名</h2><p>一開始我們先來看一個我最常見的奇怪狀況：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">xxxx</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// do something</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>有注意到問題嗎？函式名稱就真的叫做 <code>xxxx</code>，或許你並不會這樣寫甚至許多人也不會這樣寫，但是我在當助教的時候確實看到過這種毫無意義的命名，更不用說變數這樣子命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> bbbb = <span class="hljs-number">0</span>;<br><span class="hljs-keyword">const</span> bbbbArray = [];<br></code></pre></td></tr></table></figure>
+
+<p>我絕對不會說上面還是我業界的朋友提供給我的，甚至是下方這種也很常見：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> aaaa = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// do something</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>這種奇怪且毫無意義的命名都是非常常見的。</p>
+<p>那麼該怎麼命名會比較好呢？其實就是看裡面的程式碼(邏輯)是在做什麼為主，由於前面內容都是寫「<code>do something</code>」很難看出該怎麼命名，因此這邊我補上一下內容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> data = [];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">xxxx</span>(<span class="hljs-params"></span>) &#123;<br>  axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;<br>      data = res.<span class="hljs-property">data</span>;<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>以上面範例來說是一個與遠端進行溝通的 AJAX 函式，雖然我們可以透過閱讀內容略知一二，但以目前函式名稱來講，我們無法知道這函式是在做什麼，而必須閱讀完整程式碼才能知道用途。</p>
+<p>因此為了避免這種狀況我們可以透過有意義的命名來讓其他人知道這個函式是在做什麼，舉例來講可以改成這樣：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> data = [];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;<br>  axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;<br>      data = res.<span class="hljs-property">data</span>;<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>那麼這樣子當你看到該函式名稱時，就可以知道這個函式是在做「<strong>取得產品</strong>」的事情，因此有意義的命名是非常重要的，若你保持著「<code>xxxx</code>」則會讓開發者還要花時間去閱讀函式內做什麼，這樣子並不是一個好習慣。</p>
+<p>除了函式命名為什麼要有意義之外，變數命名也是一樣的，例如前面的範例雖然資料是放在 <code>data</code> 中：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> data = [];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;<br>  axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;<br>      data = res.<span class="hljs-property">data</span>;<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>雖然看是沒有什麼問題，但是你依然無法知道 <code>data</code> 是放什麼資料且是什麼資料，因此我們可以這樣命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> products = [];<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;<br>  axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;<br>      products = res.<span class="hljs-property">data</span>;<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>明確有意義的命名可以讓開發者知道你的變數是預計準備放什麼資料的，而不是讓開發者去通靈猜你到底要放什麼或者執行看看才知道。</p>
+<p>變數跟函式命名上基本上原則很簡單，寧可長、好閱讀也不要短而難理解。</p>
+<h2 id="避免曖昧的命名"><a href="#避免曖昧的命名" class="headerlink" title="避免曖昧的命名"></a>避免曖昧的命名</h2><p>除了上面提到的「有意義的命名」之外，還有一個問題是「曖昧的命名」，這個曖昧的命明我比較常在 Vue 的最終作業中看到：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;#&quot;</span> @<span class="hljs-attr">click.prevent</span>=<span class="hljs-string">&quot;click(&#x27;點我&#x27;)&quot;</span>&gt;</span>這是一個超連結<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>我們可以看到 <code>click</code> 與 Vue 的 <code>click</code> 事件非常曖昧，這種命名不但很曖昧之外也會讓開發者第一眼誤以為你是在使用 Vue 的 <code>click</code> 事件，因此非常的容易讓人混淆。</p>
+<p>如果你還真不知道該命名什麼，那麼還不如命名為 <code>handleClick</code>，這樣子就可以讓開發者知道這是一個處理點擊事件的函式：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;#&quot;</span> @<span class="hljs-attr">click.prevent</span>=<span class="hljs-string">&quot;handleClick(&#x27;點我&#x27;)&quot;</span>&gt;</span>這是一個超連結<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>請盡可能避免使用曖昧的命名，你應該不會想要讓開發者看著你的程式碼一直罵 F**K。</p>
+<p>題外話，我也曾經看過一種很神奇的寫法，然後問我為什麼每次打開網頁都會壞掉，因為它這樣子寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">click</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Click&#x27;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-title function_">click</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>這樣子寫的話，每次呼叫 <code>click</code> 函式時，就會無限的呼叫 <code>click</code> 函式，因此網頁就會爆掉，所以在命名上會建議多花個幾秒去思考一下，這樣子才不會出現這種問題。</p>
+<h2 id="避免漢語拼音"><a href="#避免漢語拼音" class="headerlink" title="避免漢語拼音"></a>避免漢語拼音</h2><p>我曾經看過一位同學的函式跟變數命名都是使用漢語拼音方式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">sanminTitle</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;三民區&#x27;</span>);<br>&#125;<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">llingyaTitle</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;苓雅區&#x27;</span>);<br>&#125;<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">bigTreeTitle</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;大樹區&#x27;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>這種命名方式不太建議的原因是因為，如果你要將專案交給國外開發者時，國外開發者大概會一臉問號，除此之外大部分的開發者還是會比較傾向使用英文的方式來命名，因此這邊還是會建議使用英文作為命名。</p>
+<p>（如果你英文不好，可以請 Google 翻譯幫你翻譯。）</p>
+<h2 id="減少使用-var"><a href="#減少使用-var" class="headerlink" title="減少使用 var"></a>減少使用 <code>var</code></h2><p>在 JavaScript 中，我們可以使用 <code>var</code>、<code>let</code> 與 <code>const</code> 來宣告變數，但是實戰開發上我們會盡可能使用 ES6 <code>let</code> 與 <code>const</code> 來宣告一個變數，其原因主要是出在 <code>var</code> 的作用域是函式(Function)，而 <code>let</code> 與 <code>const</code> 的作用域是區塊(Block)</p>
+<p>舉例來講，如果我們使用 <code>var</code> 來宣告一個變數，然後幾百行之後在裡面又重新宣告一次同名的變數，這時候你會發現你的變數值會被覆蓋掉，因為 <code>var</code> 作用域是函式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> a = <span class="hljs-number">1</span>;<br><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><br><span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) &#123;<br>  <span class="hljs-keyword">var</span> a = <span class="hljs-number">2</span>;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a); <span class="hljs-comment">// 2</span><br></code></pre></td></tr></table></figure>
+
+<p>而如果我們使用 <code>let</code> 或 <code>const</code> 來宣告變數，則不會有這樣的問題，因為只要有 <code>{}</code> 都是 <code>let</code> 或 <code>const</code> 的限制作用域：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;<br><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><span class="hljs-comment">// 這邊是一些程式碼</span><br><br><span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) &#123;<br>  <span class="hljs-keyword">let</span> a = <span class="hljs-number">2</span>;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a); <span class="hljs-comment">// 1</span><br></code></pre></td></tr></table></figure>
+
+<p>因此我們在實戰開發上，盡可能使用 <code>let</code> 與 <code>const</code> 來宣告變數，避免出現作用域的問題。</p>
+<p>儘管現今已經大力提倡使用 ES6 的 <code>let</code> 與 <code>const</code>，但還是有人會使用 <code>var</code> 來宣告變數，所以這邊才特別提出來，而這也是我批改作業時常見的錯誤。</p>
+<h2 id="請不要-var-跟-let-同時使用"><a href="#請不要-var-跟-let-同時使用" class="headerlink" title="請不要 var 跟 let 同時使用"></a>請不要 <code>var</code> 跟 <code>let</code> 同時使用</h2><p>這是一個很有趣的事情，如同前面所講的 JavaScript 同時具備 <code>var</code>、<code>let</code> 與 <code>const</code> 三種變數宣告方式，但是我們會盡可能避免使用 <code>var</code> 與 <code>let</code> 同時使用，這樣將會導致開發者很容易混淆變數作用域，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> a = <span class="hljs-number">1</span>;<br><br><span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) &#123;<br>  <span class="hljs-keyword">let</span> a = <span class="hljs-number">2</span>;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a); <span class="hljs-comment">// 1</span><br></code></pre></td></tr></table></figure>
+
+<p>當然我也有看過另一種寫法，也就是 <code>let</code> 宣告在 Global Scope，然後在 <code>if</code> 裡面使用 <code>var</code> 宣告變數，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;<br><br><span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) &#123;<br>  <span class="hljs-keyword">var</span> a = <span class="hljs-number">2</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>雖然以目前的瀏覽器已經有阻擋這樣的寫法(印象以前可以通過。)，但如果你嘗試貼入到瀏覽器 Console 內可能會看到以下錯誤（不同瀏覽器可能會有不同的錯誤訊息）：</p>
+<p>Chrome：<code>Uncaught SyntaxError: Identifier &#39;a&#39; has already been declared</code><br>Firefox：<code>Uncaught SyntaxError: redeclaration of let a</code></p>
+<p>因此為了避免這樣的問題，我們還是會盡可能避免使用 <code>var</code> 與 <code>let</code> 同時使用，這也是為了避免你被同事請出去喝咖啡。</p>
+<h2 id="善加利用-ES6-的解構賦值"><a href="#善加利用-ES6-的解構賦值" class="headerlink" title="善加利用 ES6 的解構賦值"></a>善加利用 ES6 的解構賦值</h2><p>這邊先來看一個簡單的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> user = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">age</span>: <span class="hljs-number">18</span>,<br>  <span class="hljs-attr">address</span>: <span class="hljs-string">&#x27;Taipei&#x27;</span>,<br>  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;example@gmail.com&#x27;</span>,<br>  <span class="hljs-attr">phone</span>: <span class="hljs-string">&#x27;0912345678&#x27;</span>,<br>  <span class="hljs-attr">isDeveloper</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isEnabled</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;developer&#x27;</span>,<br>  <span class="hljs-attr">isMale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isFemale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">loginType</span>: <span class="hljs-string">&#x27;google&#x27;</span>,<br>  <span class="hljs-attr">avatar</span>: <span class="hljs-string">&#x27;https://example.com/avatar.png&#x27;</span>,<br>  <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>  <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>&#125;;<br><br><span class="hljs-keyword">const</span> newUser = &#123;<br>  <span class="hljs-attr">name</span>: user.<span class="hljs-property">name</span>,<br>  <span class="hljs-attr">age</span>: user.<span class="hljs-property">age</span>,<br>  <span class="hljs-attr">address</span>: user.<span class="hljs-property">address</span>,<br>  <span class="hljs-attr">email</span>: user.<span class="hljs-property">email</span>,<br>  <span class="hljs-attr">phone</span>: user.<span class="hljs-property">phone</span>,<br>  <span class="hljs-attr">isDeveloper</span>: user.<span class="hljs-property">isDeveloper</span>,<br>  <span class="hljs-attr">isEnabled</span>: user.<span class="hljs-property">isEnabled</span>,<br>  <span class="hljs-attr">category</span>: user.<span class="hljs-property">category</span>,<br>  <span class="hljs-attr">isMale</span>: user.<span class="hljs-property">isMale</span>,<br>  <span class="hljs-attr">isFemale</span>: user.<span class="hljs-property">isFemale</span>,<br>  <span class="hljs-attr">loginType</span>: user.<span class="hljs-property">loginType</span>,<br>  <span class="hljs-attr">avatar</span>: user.<span class="hljs-property">avatar</span>,<br>  <span class="hljs-attr">createdAt</span>: user.<span class="hljs-property">createdAt</span>,<br>  <span class="hljs-attr">updatedAt</span>: user.<span class="hljs-property">updatedAt</span>,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>我們可以看到基本上我們只是將 <code>user</code> 物件的屬性值，一一複製到 <code>newUser</code> 物件裡面而已，我們可以看到 <code>newUser</code> 的寫法非常冗長，而且如果 <code>user</code> 物件的屬性值有變動，那麼我們也必須要同步修改 <code>newUser</code> 物件的屬性值，這樣的寫法非常不好維護，因此我們可以利用 ES6 的解構賦值來簡化這個寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> user = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">age</span>: <span class="hljs-number">18</span>,<br>  <span class="hljs-attr">address</span>: <span class="hljs-string">&#x27;Taipei&#x27;</span>,<br>  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;example@gmail.com&#x27;</span>,<br>  <span class="hljs-attr">phone</span>: <span class="hljs-string">&#x27;0912345678&#x27;</span>,<br>  <span class="hljs-attr">isDeveloper</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isEnabled</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;developer&#x27;</span>,<br>  <span class="hljs-attr">isMale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isFemale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">loginType</span>: <span class="hljs-string">&#x27;google&#x27;</span>,<br>  <span class="hljs-attr">avatar</span>: <span class="hljs-string">&#x27;https://example.com/avatar.png&#x27;</span>,<br>  <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>  <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>&#125;;<br><br><span class="hljs-keyword">const</span> newUser = &#123;<br>  ...user,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>善加利用 ES6 解構賦值的方式，可以讓我們的程式碼更簡潔，也更容易維護。</p>
+<p>但如果今天是只有部分屬性值需要複製，例如我們只想要複製 <code>name</code>、<code>age</code>、<code>address</code>、<code>email</code>、<code>phone</code> 這五個屬性值，那麼我們可以這樣寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> user = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">age</span>: <span class="hljs-number">18</span>,<br>  <span class="hljs-attr">address</span>: <span class="hljs-string">&#x27;Taipei&#x27;</span>,<br>  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;example@gmail.com&#x27;</span>,<br>  <span class="hljs-attr">phone</span>: <span class="hljs-string">&#x27;0912345678&#x27;</span>,<br>  <span class="hljs-attr">isDeveloper</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isEnabled</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;developer&#x27;</span>,<br>  <span class="hljs-attr">isMale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isFemale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">loginType</span>: <span class="hljs-string">&#x27;google&#x27;</span>,<br>  <span class="hljs-attr">avatar</span>: <span class="hljs-string">&#x27;https://example.com/avatar.png&#x27;</span>,<br>  <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>  <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>&#125;;<br><br><span class="hljs-keyword">const</span> data = [<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>, <span class="hljs-string">&#x27;address&#x27;</span>, <span class="hljs-string">&#x27;email&#x27;</span>, <span class="hljs-string">&#x27;phone&#x27;</span>];<br><br><span class="hljs-keyword">const</span> newUser = &#123;<br>  ...data.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">acc, key</span>) =&gt;</span> &#123;<br>    acc[key] = user[key];<br>    <span class="hljs-keyword">return</span> acc;<br>  &#125;, &#123;&#125;),<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>這樣子我們就只需要專心在 <code>data</code> 新增我們想要的屬性值，而不需要去修改 <code>newUser</code> 物件的屬性值。</p>
+<p>當然使用 <code>reduce</code> 這種做法是比較進階一點的，所以這邊你也可以改用 <code>forEach</code> 來寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> user = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">age</span>: <span class="hljs-number">18</span>,<br>  <span class="hljs-attr">address</span>: <span class="hljs-string">&#x27;Taipei&#x27;</span>,<br>  <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;example@gmail.com&#x27;</span>,<br>  <span class="hljs-attr">phone</span>: <span class="hljs-string">&#x27;0912345678&#x27;</span>,<br>  <span class="hljs-attr">isDeveloper</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isEnabled</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;developer&#x27;</span>,<br>  <span class="hljs-attr">isMale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">isFemale</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">loginType</span>: <span class="hljs-string">&#x27;google&#x27;</span>,<br>  <span class="hljs-attr">avatar</span>: <span class="hljs-string">&#x27;https://example.com/avatar.png&#x27;</span>,<br>  <span class="hljs-attr">createdAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>  <span class="hljs-attr">updatedAt</span>: <span class="hljs-string">&#x27;2019-01-01 00:00:00&#x27;</span>,<br>&#125;;<br><br><span class="hljs-keyword">const</span> data = [<span class="hljs-string">&#x27;name&#x27;</span>, <span class="hljs-string">&#x27;age&#x27;</span>, <span class="hljs-string">&#x27;address&#x27;</span>, <span class="hljs-string">&#x27;email&#x27;</span>, <span class="hljs-string">&#x27;phone&#x27;</span>];<br><br><span class="hljs-comment">// forEach</span><br><span class="hljs-keyword">const</span> newUser = &#123;&#125;;<br><br>data.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">key</span>) =&gt;</span> &#123;<br>  newUser[key] = user[key];<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>另一種我常見的奇怪寫法就是 <code>import</code>，下方是一個 Font Awesome icon 的引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; faUser &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; faUserSecret &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; faUserTie &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; faUserCircle &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; faUserAstronaut &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; faUserNinja &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>相同的引入來源，但我們寫了六次，這樣的寫法非常不好維護，因此我們可以這樣寫：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123;<br>  faUser,<br>  faUserSecret,<br>  faUserTie,<br>  faUserCircle,<br>  faUserAstronaut,<br>  faUserNinja,<br>&#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@fortawesome/free-solid-svg-icons&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>這樣子我們就可以一次引入多個 icon，而不需要一個一個引入。</p>
+<h2 id="被忽略的大括號"><a href="#被忽略的大括號" class="headerlink" title="被忽略的大括號"></a>被忽略的大括號</h2><p>在 JavaScript 中，很常可以看到許多開發者忽略 <code>if</code> 語句的大括號，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>這種寫法本身並沒有錯誤，這是因為 JavaScript 引擎會自動幫我們加上大括號，當只有一行時還沒有什麼，但當你有多個判斷時就會顯得稍微有點混亂，尤其是搭配用 <code>else if</code> 時，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><br><span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;Ray&#x27;</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello Ray&#x27;</span>);<br><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;John&#x27;</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello John&#x27;</span>);<br><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;Mary&#x27;</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello Mary&#x27;</span>);<br><span class="hljs-keyword">else</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>應該稍微可以感覺到混亂了，對於一位新手工程師來講，這一段必須先花個幾秒的時間去理解，因此如果有多個判斷時，會建議你還是加上大括號，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><br><span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;Ray&#x27;</span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello Ray&#x27;</span>);<br>&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;John&#x27;</span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello John&#x27;</span>);<br>&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (myName === <span class="hljs-string">&#x27;Mary&#x27;</span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello Mary&#x27;</span>);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>儘管程式碼感覺較多，但是在表達上也比較清楚。</p>
+<p>（除此之外，你不是在寫 Python，不要這麼簡寫）</p>
+<p>當然，提到這件事情並不代表你就不要這樣做，只是因為許多人會過度的去省略大括號，因此實際開發來講，最佳實踐上依然很常見一行解決的狀況。</p>
+<h2 id="不要亂寫註解"><a href="#不要亂寫註解" class="headerlink" title="不要亂寫註解"></a>不要亂寫註解</h2><p>適當的註解是可以幫助開發者釐清當初的想法，但是如果你的註解太多，那麼你的程式碼就會變得很難閱讀，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// 宣告一個變數叫做 products 並賦予一個空陣列</span><br><span class="hljs-keyword">const</span> products = [];<br><span class="hljs-comment">// 宣告一個函式叫做 getProducts</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// 使用 axios 來取得產品資料，來源是 https://example.com/products</span><br>  axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>    <span class="hljs-comment">// 資料取得成功時走這裡</span><br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">response</span>) =&gt;</span> &#123;<br>      <span class="hljs-comment">// 取得資料後，將資料放入 products 陣列中</span><br>      products = response.<span class="hljs-property">data</span>;<br>    &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我們可以看到註解的數量已經快要比程式碼還要多了，過多的註解並不會幫助開發者理解程式碼，反而會讓程式碼變得複雜，因為程式碼本身就是一個註解，如果你的程式碼寫得不好，那麼你的註解也就沒有意義，與其花一大推時間在寫註解，不如花時間在寫程式碼上，思考如何讓程式碼更好閱讀，除非你這一塊的邏輯真的非常複雜。</p>
+<p>除了上面這個例子之外，我也曾在 Vue 的專案中看到這樣的註解：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; createApp &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span><br><br><span class="hljs-title function_">createApp</span>(&#123;<br>  <span class="hljs-title function_">data</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">return</span> &#123;<br>      <span class="hljs-attr">products</span>: [],<br>    &#125;<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;<br>      axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>)<br>        .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">response</span>) =&gt;</span> &#123;<br>          <span class="hljs-variable language_">this</span>.<span class="hljs-property">products</span> = response.<span class="hljs-property">data</span>;<br>        &#125;);<br>    &#125;,<br>  &#125;,<br>  <span class="hljs-comment">// mounted</span><br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title function_">getProducts</span>();<br>  &#125;,<br>&#125;).<span class="hljs-title function_">mount</span>(<span class="hljs-string">&#x27;#app&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>看到那一個 <code>mounted</code> 的註解了嗎？依照程式碼來看我們可以看到 <code>getProducts</code> 是在 <code>created</code> 階段被呼叫，但 <code>created</code> 上方卻有一個 <code>mounted</code>，此時的我會認為這個註解是不是寫錯了，還是有什麼特別意義，那麼為了確認這一條註解意義我可能要去問原本的開發者，如果他還在職那就沒什麼，但如果他離職呢？那麼這個註解就會變得毫無意義，因此我們應該要避免這樣的註解。</p>
+<p>還有另一種註解，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// import getProducts from &#x27;./getProducts&#x27;; // 記得註解</span><br></code></pre></td></tr></table></figure>
+
+<p>其實當我看到這一段的時候我完全很茫然的狀態，因為這一段程式碼不是已經註解了嗎？為什麼還要特別寫一個記得註解？因此註解也是要適當的使用，盡可能避免過多、無意義的註解。</p>
+<p>除此之外也會建議你盡可能地移除已經沒有作用的註解程式碼，只要確保該程式碼已經毫無價值且意義，那麼就會建議移除，確保程式碼的乾淨。</p>
+<h2 id="不要雞婆把程式碼改成一行"><a href="#不要雞婆把程式碼改成一行" class="headerlink" title="不要雞婆把程式碼改成一行"></a>不要雞婆把程式碼改成一行</h2><p>我之前有看過一段程式碼是直接各種壓縮到一行，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> products = [];<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getProducts</span>(<span class="hljs-params"></span>) &#123;axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/products&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">response</span>) =&gt;</span> &#123;products = response.<span class="hljs-property">data</span>;&#125;);&#125;<br><span class="hljs-title function_">getProducts</span>();<br></code></pre></td></tr></table></figure>
+
+<p>拜託不要為了追求程式碼的行數然後各種壓縮成一行，這樣子可讀性是非常差的，壓縮這件事情我們可以透過 <code>Gulp</code>、<code>Webpack</code> 等工具來幫助我們，如果這樣子做，只會讓人家想請你喝咖啡泡茶聊天而已。</p>
+<h2 id="不要濫用三元運算子"><a href="#不要濫用三元運算子" class="headerlink" title="不要濫用三元運算子"></a>不要濫用三元運算子</h2><p>三元運算子是一個非常好用的技巧，但是如果你過度濫用的話，其實反而會大幅降低可讀性，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> products = [];<br><br><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">return</span> myName === <span class="hljs-string">&#x27;Ray&#x27;</span> ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;<br>&#125;<br><br><span class="hljs-keyword">const</span> status = (products.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) || <span class="hljs-title function_">fn</span>()  ? <span class="hljs-string">&#x27;success&#x27;</span> : <span class="hljs-string">&#x27;error&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>因此在實際上來講，三元運算子還是會傾向於簡單的判斷，如果判斷較複雜的話，還是會建議使用 <code>if</code> 來去判斷較好。</p>
+<h2 id="片地開花的-console-log"><a href="#片地開花的-console-log" class="headerlink" title="片地開花的 console.log"></a>片地開花的 <code>console.log</code></h2><p><code>console.log</code> 是我們在開發時，最常拿來 debug 的技巧，但是也請記得當一個專案完成時，盡可能的移除 <code>console.log</code>，許多狀況跟一些規範都會提到 <code>console.log</code> 是開發階段時所使用的語法，因此在正式上線時應移除 <code>console.log</code>，這也是為了避免一些敏感資訊不小心曝露出來。</p>
+<p>當然除了避免敏感資訊之外，過多的 <code>console.log</code> 遺留在專案上也會讓人覺得你是不是不太會寫程式，因此也請記得在專案完成時，盡可能的移除 <code>console.log</code>。</p>
+<h2 id="換行要適當，也不要過度換行"><a href="#換行要適當，也不要過度換行" class="headerlink" title="換行要適當，也不要過度換行"></a>換行要適當，也不要過度換行</h2><p>我之前看過一份作業是這樣子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName);<br></code></pre></td></tr></table></figure>
+
+<p>一個變數跟 <code>console.log</code> 距離超級無敵遠，整份作業只有少少一百多行，打開來卻高達五百多行，其餘都是空白的換行，這樣子其實在閱讀上非常困擾，你會滾輪滾到爆。</p>
+<p>再不然就是完全不換行，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName);<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">sayHello</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello&#x27;</span>);<br>&#125;<br><span class="hljs-title function_">sayHello</span>();<br></code></pre></td></tr></table></figure>
+
+<p>適當的換行可以讓程式碼更好閱讀，但是過度的換行也不好，因此請記得適當的換行而不要過度換行。</p>
+<h2 id="能用迴圈就迴圈寫"><a href="#能用迴圈就迴圈寫" class="headerlink" title="能用迴圈就迴圈寫"></a>能用迴圈就迴圈寫</h2><p>這邊提醒一下，接下來後面稍微會比較偏向框架方面的東西哩。</p>
+<p>實戰開發時，往往會有許多地方是重複性的，曾經就有看過一位同學在寫程式碼時，每一個 <code>option</code> 都是自己手寫，就這樣子寫了 20 個 <code>option</code>，例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">select</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1&quot;</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2&quot;</span>&gt;</span>2<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;3&quot;</span>&gt;</span>3<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;4&quot;</span>&gt;</span>4<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;5&quot;</span>&gt;</span>5<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br>  ...<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/CkTwb0B.png" data-fancybox="gallery" data-caption="耐心十足"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/CkTwb0B.png" alt="耐心十足"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">耐心十足</figcaption></figure>
+<p>如果你是使用框架開發的話，請善加利用框架提供的迴圈功能，以 Vue 來講就是 <code>v-for</code>，例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">select</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;i in 20&quot;</span> <span class="hljs-attr">:value</span>=<span class="hljs-string">&quot;i&quot;</span>&gt;</span>&#123;&#123; i &#125;&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>若是 React 則是：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs jsx">&lt;select&gt;<br>  &#123;[...<span class="hljs-title class_">Array</span>(<span class="hljs-number">20</span>).<span class="hljs-title function_">keys</span>()].<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> (<br>    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&#123;i</span> + <span class="hljs-attr">1</span>&#125;&gt;</span>&#123;i + 1&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span></span><br>  ))&#125;<br>&lt;/select&gt;<br></code></pre></td></tr></table></figure>
+
+<p>不管怎麼樣都遠比你手動打 20 個 <code>option</code> 好。</p>
+<h2 id="Composition-API-不要與-Options-API-混用"><a href="#Composition-API-不要與-Options-API-混用" class="headerlink" title="Composition API 不要與 Options API 混用"></a>Composition API 不要與 Options API 混用</h2><p>這個算是我最常在 Vue3 最終作業上遇到的狀況，有些同學會在同一個頁面中混用 Composition API 與 Options API，而這種我稱之為 ComOption API(誤）：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span><br><span class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;</span><br><span class="language-javascript">  <span class="hljs-title function_">data</span> () &#123;</span><br><span class="language-javascript">    <span class="hljs-keyword">return</span> &#123;</span><br><span class="language-javascript">    &#125;</span><br><span class="language-javascript">  &#125;,</span><br><span class="language-javascript">  <span class="hljs-title function_">mounted</span> () &#123;</span><br><span class="language-javascript">    <span class="hljs-comment">// ...</span></span><br><span class="language-javascript">  &#125;,</span><br><span class="language-javascript">  <span class="hljs-title function_">setup</span>(<span class="hljs-params"></span>) &#123;</span><br><span class="language-javascript">    <span class="hljs-keyword">return</span> &#123;</span><br><span class="language-javascript">      <span class="hljs-comment">// ...</span></span><br><span class="language-javascript">    &#125;</span><br><span class="language-javascript">  &#125;</span><br><span class="language-javascript">&#125;</span><br><span class="language-javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>不要懷疑，這我很常看見有人這樣寫，雖然程式碼可以正常運作，但是強烈的建議不要混用。</p>
+<p>那麼為什麼不建議混用呢？</p>
+<p>首先這兩者本身生命週期本身就不同了，以 Option API 來講我們實戰開發上常用的是 <code>created</code> 與 <code>mounted</code> 這兩個生命週期，而 Composition API 則是 <code>onMounted</code>，因此光生命週期就有滿明顯的差異，更不用說是 Composition API 與 Option API 兩者的撰寫風格更是不同，你可以試想一下你接手的專案有兩種寫法你會有何感想。</p>
+<p>這邊也附上 Kuro 準備好的 <a target="_blank" rel="noopener" href="https://book.vue.tw/CH1/1-7-lifecycle.html">Vue 生命週期</a> 對照表：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/2nKfyHv.png" data-fancybox="gallery" data-caption="Vue 生命週期"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/2nKfyHv.png" alt="Vue 生命週期"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Vue 生命週期</figcaption></figure>
+<p>React 的話則是 class component 與 function component，這兩者本身也是不同的撰寫風格，因此也是不建議混用。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>以上差不多就是我當助教這段時間看到的一些狀況，希望這些狀況跟舉例可以幫助到你的程式碼寫得更好，也希望可以避免你被同事約出去喝咖啡。</p>
+<p>當然以上都只是一個參考而已，並不代表你就一定要這樣子寫，因為實際專案來講還是要看團隊的 Code Style，其中裡面的不要忽略大括號就非常看情境，只是許多人會過度的去省略。</p>
+<p>除此之外其實上面有許多建議搭配 Lint 就可以解決，只是在使用 Lint 之前你可以先養好一定的開發習慣，這樣子打開 Lint 時就比較不會覺得害怕與可怕。</p>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+
+    <!-- Support Section -->
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/react/20221011/3592716318/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            終究都要學 React 何不現在學呢？ - React Router - Hook - (27)
+          </span>
+        </a>
+      
+
+      
+        <a href="/react/20221012/622986263/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            終究都要學 React 何不現在學呢？ - React Router - Lazy Loading - (28)
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/javascript/20240727/2019383251/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                常見面試考題之 Vue 與 React 差異在哪裡？以及為什麼 React 比較紅？
+              </h4>
+              <time datetime="2024-07-27" title="發布日期: 2024-07-27" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2024-07-27
+              </time>
+            </div>
+          </a>
+        
+          <a href="/vue/20230711/2687889198/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                關於在 Vue 的 Single-File Components 上使用 HOF 分析
+              </h4>
+              <time datetime="2023-07-11" title="發布日期: 2023-07-11" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-07-11
+              </time>
+            </div>
+          </a>
+        
+          <a href="/javascript/20230629/1402048802/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                解決 「quill Overwriting modules/xxx with class...」問題
+              </h4>
+              <time datetime="2023-06-29" title="發布日期: 2023-06-29" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-06-29
+              </time>
+            </div>
+          </a>
+        
+          <a href="/vue/20211024/829255545/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Vue.js 重設或還原 data 初始值的小技巧
+              </h4>
+              <time datetime="2021-10-24" title="發布日期: 2021-10-24" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2021-10-24
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/other/20221011/704514203/" data-title="就算不讀 Clean Code，你也可以把程式碼寫好" data-hashtags="JavaScript,Vue,React,Clean Code,Code Review,Code Style" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/other/20221011/704514203/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/other/20221011/704514203/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/other/20221011/704514203/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A6%81%E5%AF%AB%E9%80%99%E7%AF%87%E6%96%87%E7%AB%A0%EF%BC%9F"><span class="toc-text">為什麼要寫這篇文章？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E6%84%8F%E7%BE%A9%E7%9A%84%E5%87%BD%E5%BC%8F%E8%88%87%E8%AE%8A%E6%95%B8%E5%91%BD%E5%90%8D"><span class="toc-text">有意義的函式與變數命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%BF%E5%85%8D%E6%9B%96%E6%98%A7%E7%9A%84%E5%91%BD%E5%90%8D"><span class="toc-text">避免曖昧的命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%BF%E5%85%8D%E6%BC%A2%E8%AA%9E%E6%8B%BC%E9%9F%B3"><span class="toc-text">避免漢語拼音</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B8%9B%E5%B0%91%E4%BD%BF%E7%94%A8-var"><span class="toc-text">減少使用 var</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AB%8B%E4%B8%8D%E8%A6%81-var-%E8%B7%9F-let-%E5%90%8C%E6%99%82%E4%BD%BF%E7%94%A8"><span class="toc-text">請不要 var 跟 let 同時使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%96%84%E5%8A%A0%E5%88%A9%E7%94%A8-ES6-%E7%9A%84%E8%A7%A3%E6%A7%8B%E8%B3%A6%E5%80%BC"><span class="toc-text">善加利用 ES6 的解構賦值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84%E5%A4%A7%E6%8B%AC%E8%99%9F"><span class="toc-text">被忽略的大括號</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E4%BA%82%E5%AF%AB%E8%A8%BB%E8%A7%A3"><span class="toc-text">不要亂寫註解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E9%9B%9E%E5%A9%86%E6%8A%8A%E7%A8%8B%E5%BC%8F%E7%A2%BC%E6%94%B9%E6%88%90%E4%B8%80%E8%A1%8C"><span class="toc-text">不要雞婆把程式碼改成一行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E6%BF%AB%E7%94%A8%E4%B8%89%E5%85%83%E9%81%8B%E7%AE%97%E5%AD%90"><span class="toc-text">不要濫用三元運算子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%87%E5%9C%B0%E9%96%8B%E8%8A%B1%E7%9A%84-console-log"><span class="toc-text">片地開花的 console.log</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%9B%E8%A1%8C%E8%A6%81%E9%81%A9%E7%95%B6%EF%BC%8C%E4%B9%9F%E4%B8%8D%E8%A6%81%E9%81%8E%E5%BA%A6%E6%8F%9B%E8%A1%8C"><span class="toc-text">換行要適當，也不要過度換行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%BD%E7%94%A8%E8%BF%B4%E5%9C%88%E5%B0%B1%E8%BF%B4%E5%9C%88%E5%AF%AB"><span class="toc-text">能用迴圈就迴圈寫</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Composition-API-%E4%B8%8D%E8%A6%81%E8%88%87-Options-API-%E6%B7%B7%E7%94%A8"><span class="toc-text">Composition API 不要與 Options API 混用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AA%9E"><span class="toc-text">結語</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260412/1749382056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            想自己跑 LLM？搞懂模型參數與量化讓你不再選錯模型
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-12" title="發布日期: 2026-04-12" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/12
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              11 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260410/2748391056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            AI Agent 不再是統稱了？認識 Coding Agent 與各類 AI Agent 的差異
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-10" title="發布日期: 2026-04-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260409/1057131696/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            你的 Claude Code Context 是不是都被吃光了？AGENTS.md 與 Context 管控全攻略
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-09" title="發布日期: 2026-04-09" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/09
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              10 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260408/3734112946/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            SEO 已經不夠了嗎？認識 AEO 答案引擎優化，讓 AI 搜尋找到你
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-08" title="發布日期: 2026-04-08" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/08
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              17 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260331/1748203647/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code 哪些檔案該 Commit？CLAUDE.md、Settings、Rules、Skills 完整解析
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-31" title="發布日期: 2026-03-31" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/31
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>

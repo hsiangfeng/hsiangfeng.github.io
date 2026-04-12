@@ -1,0 +1,1258 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用 OpenAI GPT-3 建立一個 Discord 聊天機器人 | 是 Ray 不是 Array</title>
+  
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://israynotarray.com/nodejs/20221215/2411869749/">
+
+  <!-- SEO & Meta -->
+  <meta name="description" content="這一篇將會來介紹如何使用 OpenAI GPT-3 來建立一個 Discord 聊天機器人，並且讓它可以回應我們的訊息，而且你會發現 Discord 非常適合拿來串 OpenAI，雖然主軸是以 GPT-3 為主，但是我的範例程式碼也有提供 GPT-3.5 的 Commit 給予參考唷~">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="用 OpenAI GPT-3 建立一個 Discord 聊天機器人">
+  <meta property="og:url" content="https://israynotarray.com/nodejs/20221215/2411869749/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這一篇將會來介紹如何使用 OpenAI GPT-3 來建立一個 Discord 聊天機器人，並且讓它可以回應我們的訊息，而且你會發現 Discord 非常適合拿來串 OpenAI，雖然主軸是以 GPT-3 為主，但是我的範例程式碼也有提供 GPT-3.5 的 Commit 給予參考唷~">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://i.imgur.com/a0Od41t.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    <!-- Article Metadata -->
+    <meta property="article:published_time" content="2022-12-15T13:15:00.000Z">
+    
+      <meta property="article:modified_time" content="2023-03-22T01:48:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Discord">
+      
+        <meta property="article:tag" content="Nodejs">
+      
+        <meta property="article:tag" content="GPT-3">
+      
+        <meta property="article:tag" content="OpenAI">
+      
+    
+  
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="用 OpenAI GPT-3 建立一個 Discord 聊天機器人">
+  <meta name="twitter:description" content="這一篇將會來介紹如何使用 OpenAI GPT-3 來建立一個 Discord 聊天機器人，並且讓它可以回應我們的訊息，而且你會發現 Discord 非常適合拿來串 OpenAI，雖然主軸是以 GPT-3 為主，但是我的範例程式碼也有提供 GPT-3.5 的 Commit 給予參考唷~">
+  
+    <meta name="twitter:image" content="https://i.imgur.com/a0Od41t.png">
+  
+  
+
+  <!-- JSON-LD Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"是 Ray 不是 Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  <!-- JSON-LD Structured Data: BlogPosting -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/nodejs/20221215/2411869749/"},"headline":"用 OpenAI GPT-3 建立一個 Discord 聊天機器人 | 是 Ray 不是 Array","url":"https://israynotarray.com/nodejs/20221215/2411869749/","datePublished":"2022-12-15T13:15:00.000Z","dateModified":"2023-03-22T01:48:00.000Z","description":"這一篇將會來介紹如何使用 OpenAI GPT-3 來建立一個 Discord 聊天機器人，並且讓它可以回應我們的訊息，而且你會發現 Discord 非常適合拿來串 OpenAI，雖然主軸是以 GPT-3 為主，但是我的範例程式碼也有提供 GPT-3.5 的 Commit 給予參考唷~","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com"},"publisher":{"@type":"Organization","name":"是 Ray 不是 Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"image":["https://i.imgur.com/a0Od41t.png"],"articleSection":["Nodejs"],"keywords":"Discord, Nodejs, GPT-3, OpenAI"}
+  </script>
+  
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"用 OpenAI GPT-3 建立一個 Discord 聊天機器人 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"用 OpenAI GPT-3 建立一個 Discord 聊天機器人"}]}
+  </script>
+  
+  <!-- Google Fonts (Non-blocking, display=optional to eliminate font swap CLS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  <!-- Press Start 2P (8-bit font for terminal easter egg, low priority) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  <!-- Bootstrap Icons (CDN, preloaded to reduce CLS from icon font swap) -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  <!-- Dark Mode & Color Palette Script (Prevent FOUC) - MUST run before CSS loads -->
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  <!-- Styles - Page Specific CSS -->
+  
+    
+<link rel="stylesheet" href="/css/css-post-OzTITT57.css">
+
+  
+  
+  <!-- Remove inline background after CSS loads -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  <!-- Scripts -->
+  <script defer src="/js/main-Bs_9ZI5Y.js"></script>
+  
+  <!-- Google AdSense -->
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190" crossorigin="anonymous"></script>
+  
+
+  <!-- Google Analytics 4 -->
+  
+    
+    
+      <!-- GA4 Script (Respects DNT) -->
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  <!-- Microsoft Clarity -->
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  <!-- Math Support -->
+  
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="是 Ray 不是 Array" type="application/atom+xml">
+</head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- Mobile Top Navbar -->
+  <div id="mobile-navbar" class="lg:hidden fixed top-0 left-0 w-full z-30 transition-all duration-300">
+  <div class="flex items-center justify-between px-4 py-3">
+    <!-- Site Title -->
+    <a href="/" class="text-lg font-bold text-gray-900 dark:text-white font-sans">
+      是 Ray 不是 Array
+    </a>
+
+    <!-- Mobile Actions -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Mobile Search Button -->
+      <button id="mobile-search-trigger" aria-label="Open search" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-search text-xl"></i>
+      </button>
+      
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" aria-label="Toggle mobile menu" class="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto pt-16 lg:pt-0">
+    
+    <!-- Left Sidebar (Navigation & Bio) -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 h-screen overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 lg:static lg:w-1/5 lg:h-screen lg:sticky lg:top-0 lg:flex lg:flex-col">
+      <div class="p-6 pb-32 lg:pb-6">
+        
+<!-- 文章頁精簡版：頭像+名字 + 語錄 + 圖標導航 + 廣告 + Dark Mode -->
+<div class="flex flex-col items-center lg:items-start space-y-5">
+
+  <!-- Avatar + Name (整合成一行) -->
+  <a href="/" class="flex items-center gap-3 group w-full">
+    <img src="/images/octocat.webp" alt="Ray" class="w-12 h-12 rounded-full border-2 border-primary-100 dark:border-primary-900 shadow-sm object-cover transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+    <span class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      是 Ray 不是 Array
+    </span>
+  </a>
+
+  <!-- Mini Quote (保留原本風格) -->
+  <div class="w-full p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm min-h-[52px]">
+    <p id="post-random-quote" class="text-[10px] text-gray-700 dark:text-gray-300" style="font-family: 'Press Start 2P', monospace; line-height: 1.8;">
+      &nbsp;
+    </p>
+  </div>
+
+  <!-- Navigation (緊湊版，保留文字) -->
+  <nav class="w-full">
+    <ul class="space-y-0.5">
+      
+        
+        
+        
+        <li>
+          <a href="/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-house-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">首頁</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/tags/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-tags-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">標籤</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/categories/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-grid-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">分類</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/archives/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-archive-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">歸檔</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/atom.xml" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">RSS</span>
+          </a>
+        </li>
+      
+        
+        
+        
+        <li>
+          <a href="/links/" class="flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-200 group text-sm">
+            <i class="bi bi-link-45deg w-5 text-center mr-2 text-gray-400 group-hover:text-primary-500 transition-colors text-xs"></i>
+            <span class="font-medium text-xs">更多</span>
+          </a>
+        </li>
+      
+    </ul>
+  </nav>
+
+  <!-- Left Sidebar Ad (文章頁專屬) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+      <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+        <!-- Fallback Text (Visible when AdBlock is on) -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+          </p>
+        </div>
+        <!-- Ad Unit (z-index higher than fallback) -->
+        <div class="relative z-10 w-full h-[580px]">
+          <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:600px;max-height:600px;"
+               data-ad-client="ca-pub-4319471747130190"
+               data-ad-slot="4559796060"
+               data-ad-format="auto"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- Color Palette Selector (精簡版) -->
+  <div class="palette-selector relative w-full">
+    <button data-palette-select class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox">
+      <div class="flex items-center gap-2">
+        <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: rgb(var(--color-primary-500))"></span>
+        <span class="palette-label text-sm text-gray-600 dark:text-gray-400">Theme</span>
+      </div>
+      <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+    </button>
+    <div class="palette-dropdown hidden absolute bottom-full left-0 w-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+      <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+      </button>
+      <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+      <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+        <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+        <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+        <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dark Mode Toggle (精簡版) -->
+  <button id="theme-toggle" class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 w-full transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-none text-left" role="switch" aria-label="Toggle dark mode" aria-checked="false">
+    <div class="flex items-center gap-2">
+      <i class="bi bi-moon-stars-fill w-5 text-center text-gray-500 dark:text-gray-400 text-sm"></i>
+      <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+    </div>
+    <span class="theme-switch pointer-events-none" style="transform: scale(0.85);">
+      <span class="theme-switch-slider">
+        <i class="theme-switch-icon bi bi-moon-stars-fill"></i>
+      </span>
+    </span>
+  </button>
+</div>
+
+<!-- Mini Quote Script for Post Page -->
+<script>
+  {
+    const hexoConfig = window.hexo_config || {};
+    const themeConfig = hexoConfig.theme || {};
+    const terminalConfig = themeConfig.terminal || {};
+
+    const quotes = terminalConfig.quotes || [
+      'Code is like humor. When you have to explain it, it\'s bad.',
+      'Debug 是我的 cardio。',
+      'First, solve the problem. Then, write the code.'
+    ];
+
+    const quoteElement = document.getElementById('post-random-quote');
+    if (quoteElement) {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = '"' + randomQuote + '"';
+    }
+  }
+</script>
+
+
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      <!-- In Article Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_In_Article -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    <!-- Post Header -->
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2022-12-15" title="發布日期: 2022-12-15" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2022-12-15
+        </time>
+        
+          <time datetime="2023-03-22" title="更新日期: 2023-03-22" class="flex items-center">
+            <i class="bi bi-arrow-repeat w-4 text-center mr-2"></i>
+            2023-03-22
+          </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        用 OpenAI GPT-3 建立一個 Discord 聊天機器人
+      </h1>
+
+      <!-- Tags -->
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Discord/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Discord
+            </a>
+          
+            <a href="/tags/Nodejs/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Nodejs
+            </a>
+          
+            <a href="/tags/GPT-3/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #GPT-3
+            </a>
+          
+            <a href="/tags/OpenAI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #OpenAI
+            </a>
+          
+        </div>
+      
+    </header>
+
+    <!-- Post Content -->
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      <!-- markdownlint-disable MD033 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇將會來介紹如何使用 OpenAI GPT-3 來建立一個 Discord 聊天機器人，並且讓它可以回應我們的訊息，而且你會發現 Discord 非常適合拿來串 OpenAI，雖然主軸是以 GPT-3 為主，但是我的範例程式碼也有提供 GPT-3.5 的 Commit 給予參考唷~</p>
+<blockquote>
+<p><strong>Warning</strong><br>請注意，本篇<strong>必須自己申請 OpenAI Key</strong>，申請流程可詳見<a href="/nodejs/20221210/1224824056/#%E7%94%B3%E8%AB%8B-OpenAI-API">這一篇</a>文章</p>
+</blockquote>
+<h2 id="事前說明"><a href="#事前說明" class="headerlink" title="事前說明"></a>事前說明</h2><p>這一篇將不會有過多的著墨說明 Node.js、Git、GitHub、npm 等等的基礎知識，因為如果包含這些的話這一篇內容可能會多。</p>
+<p>但是如果你對於 npm 與 Git 指令不熟悉的話，這邊我倒是可以提供自己先前的一些文章給予參考</p>
+<ul>
+<li><a href="/hexo/20200921/849819598/">(8) 試著學 Hexo - 你應該懂基本的 npm 指令</a></li>
+<li><a href="/git/20190615/1148594701/">基礎 Git 指令</a></li>
+</ul>
+<p>當然結尾我也會附上範例程式碼的 GitHub 連結，到時候我也會針對 README 進行一些說明，方便你可以快速運作一個 Discord 機器人。</p>
+<h2 id="Discord-準備動作"><a href="#Discord-準備動作" class="headerlink" title="Discord 準備動作"></a>Discord 準備動作</h2><p>首先第一個步驟是我們要先去建立一個 Discord 機器人，首先請你先到 <a target="_blank" rel="noopener" href="https://discord.com/developers/applications">Discord Developer Portal</a> 頁面點選 Application</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/a0Od41t.png" data-fancybox="gallery" data-caption="Application"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://i.imgur.com/a0Od41t.png" alt="Application"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Application</figcaption></figure>
+<p>然後點選 「New Application」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/aEa0M5F.png" data-fancybox="gallery" data-caption="New Application"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/aEa0M5F.png" alt="New Application"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">New Application</figcaption></figure>
+<p>接著會要求你輸入這個機器人的名稱，這邊我們就叫做「OpenAI GPT-3」吧</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/cFSnLzP.png" data-fancybox="gallery" data-caption="OpenAI GPT-3"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/cFSnLzP.png" alt="OpenAI GPT-3"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">OpenAI GPT-3</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>請注意，這個應用程式的名稱不是機器人的名稱，除此之外到時候這個應用程式名稱也會變成 Discord 伺服器的權限名稱，所以請記得要取一個好的名稱。</p>
+</blockquote>
+<p>進到「OpenAI GPT-3」應用程式頁面後，我們要先去建立一個機器人，點選左邊的「Bot」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/baUchls.png" data-fancybox="gallery" data-caption="Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/baUchls.png" alt="Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Bot</figcaption></figure>
+<p>然後再點右邊「Add Bot」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/vnpXA5Y.png" data-fancybox="gallery" data-caption="Add Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/vnpXA5Y.png" alt="Add Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add Bot</figcaption></figure>
+<p>當你按下「Add Bot」後，Discord 會要求你確認是否要建立一個機器人，點選「Yes, do it!」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/N6LdkrN.png" data-fancybox="gallery" data-caption="Yes, do it!"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/N6LdkrN.png" alt="Yes, do it!"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Yes, do it!</figcaption></figure>
+<p>接著下方就會出現你的機器人，這邊請你找到「Token」的欄位，並且按一下「Reset Token」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/A5iTEwZ.png" data-fancybox="gallery" data-caption="Reset Token"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/A5iTEwZ.png" alt="Reset Token"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Reset Token</figcaption></figure>
+<p>這時候你會取得一串 Token，這串 Token 就是你的機器人的 Token，請記得要把它記下來，因為之後我們會用到它。</p>
+<p>請不要隨意將你的機器人 Token 分享給別人，因為這樣會讓別人可以控制你的機器人。</p>
+<p>除此之外，這邊 <code>Username</code> 將會是你的機器人的名稱，在最後的範例程式碼，我是把它叫做「妙麗·格蘭傑」就是了。</p>
+<p>接著這邊有一件事情很重要，麻煩滾到下方一點的地方找到「Privileged Gateway Intents」，然後把「Message Content Intent」打開，這樣才能讓機器人可以接收到訊息唷！</p>
+<p>接著呢？我們要去把這個機器人加入到我們的 Discord 伺服器中，點選左邊的「OAuth2」，然後再選「URL Generator」的方式（比較簡單）</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/LtQioGX.png" data-fancybox="gallery" data-caption="URL Generator"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/LtQioGX.png" alt="URL Generator"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">URL Generator</figcaption></figure>
+<p>進入後，請在左邊的「SCOPES」中勾選「bot」，然後在「BOT PERMISSIONS」中勾選「Send Messages」</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/eiUZwyz.png" data-fancybox="gallery" data-caption="Send Messages"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/eiUZwyz.png" alt="Send Messages"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Send Messages</figcaption></figure>
+<p>由於我們只是要讓機器人可以回應我們的訊息，所以我們只勾選「Send Messages」，如果你想要讓機器人可以做更多事情，可以再斟酌一下要勾選哪些權限。</p>
+<p>接著下方你應該就會看到一塊「Generated URL」的區塊，將那一串 URL 複製下來並貼到瀏覽器的網址列上，然後按下 Enter，基本上你應該就會看到選擇要將機器人加入到哪個伺服器的畫面，選擇好你的伺服器後就大膽的把它加入吧！</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/ePRXynz.png" data-fancybox="gallery" data-caption="Add to Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/ePRXynz.png" alt="Add to Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add to Bot</figcaption></figure>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/pbMp7A7.png" data-fancybox="gallery" data-caption="Add to Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/pbMp7A7.png" alt="Add to Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add to Bot</figcaption></figure>
+<p>這樣子你的機器人就會進入到你的伺服器了，那麼到這邊為止，我們基本的 Discord 機器人算是建立完成了。</p>
+<h2 id="建立專案環境"><a href="#建立專案環境" class="headerlink" title="建立專案環境"></a>建立專案環境</h2><p>首先請你先建立一個資料夾，例如…叫做「discord-bot」，然後當然就是初始化這個專案，所以我這邊就快速貼上相關的指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> discord-bot<br><span class="hljs-built_in">cd</span> discord-bot<br>npm init -y<br></code></pre></td></tr></table></figure>
+
+<p>接著我們要來安裝一些我們會使用到的套件</p>
+<ul>
+<li>dotenv<ul>
+<li>用來讀取 .env 檔案</li>
+</ul>
+</li>
+<li>discord.js<ul>
+<li>用來操作 Discord 的 套件</li>
+</ul>
+</li>
+<li>openai<ul>
+<li>用來操作 OpenAI GPT-3 的 套件</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install dotenv discord.js openai<br></code></pre></td></tr></table></figure>
+
+<p>接著在專案根目錄建立一個「index.js」的檔案，因為接下來我們會開始在這一個檔案內撰寫我們的機器人程式碼。</p>
+<p>（你也可以考慮加入 ESLint 管理你的程式碼品質唷）</p>
+<h2 id="撰寫程式碼"><a href="#撰寫程式碼" class="headerlink" title="撰寫程式碼"></a>撰寫程式碼</h2><p>終於到了撰寫程式碼的環節了，那麼這邊可能不會每一行都說明，但會盡可能的簡單一點，讓你可以盡可能做出一個自己的機器人。</p>
+<h3 id="Discord-機器人"><a href="#Discord-機器人" class="headerlink" title="Discord 機器人"></a>Discord 機器人</h3><p>首先，先讓我們撰寫 Discord 的機器人程式碼，那麼在官方 npm 上面，我們可以找到 Discord.js 的使用方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Client</span>, <span class="hljs-title class_">GatewayIntentBits</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;discord.js&#x27;</span>);<br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Client</span>(&#123; <span class="hljs-attr">intents</span>: [<span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">Guilds</span>] &#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;ready&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Logged in as <span class="hljs-subst">$&#123;client.user.tag&#125;</span>!`</span>);<br>&#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;interactionCreate&#x27;</span>, <span class="hljs-keyword">async</span> interaction =&gt; &#123;<br>  <span class="hljs-keyword">if</span> (!interaction.<span class="hljs-title function_">isChatInputCommand</span>()) <span class="hljs-keyword">return</span>;<br><br>  <span class="hljs-keyword">if</span> (interaction.<span class="hljs-property">commandName</span> === <span class="hljs-string">&#x27;ping&#x27;</span>) &#123;<br>    <span class="hljs-keyword">await</span> interaction.<span class="hljs-title function_">reply</span>(<span class="hljs-string">&#x27;Pong!&#x27;</span>);<br>  &#125;<br>&#125;);<br><br>client.<span class="hljs-title function_">login</span>(<span class="hljs-variable constant_">TOKEN</span>);<br></code></pre></td></tr></table></figure>
+
+<p>這一段程式碼是官方提供的範例程式碼，這邊我們來看一下這些程式碼的意思</p>
+<ul>
+<li><code>Client</code>：這是我們要使用的 Discord 的 Client，我們可以透過這個 Client 來操作 Discord 的 API</li>
+<li><code>GatewayIntentBits</code>：這是我們要使用的 Discord 的 GatewayIntent，我們可以透過這個 GatewayIntent 來決定我們的機器人要做什麼事情</li>
+<li><code>client.on(&#39;ready&#39;, () =&gt; { ... })</code>：這是我們要在機器人啟動後要做的事情，例如：在 console 上面印出「<code>Logged in as ${client.user.tag}!</code>」，告知我們機器人已經啟動了。</li>
+<li><code>client.login(TOKEN)</code>：這是我們要登入我們的機器人，這邊的 <code>TOKEN</code> 就是我們在 Discord Developer Portal 上面產生的機器人的 Token</li>
+</ul>
+<p>其中比較需要留意的是 <code>client.on(&#39;Event&#39;, () =&gt; { ... })</code>，這邊的 <code>Event</code> 就是我們要監聽的事件，例如前面的 <code>ready</code> 就代表著我們要監聽機器人啟動的事件。</p>
+<p>當然 Discord 的事件非常的多，比較常見的事件有：</p>
+<ul>
+<li><code>ready</code>：當機器人啟動時觸發</li>
+<li><code>interactionCreate</code>：當使用者呼叫機器人的指令時觸發</li>
+<li><code>messageCreate</code>：當使用者發送訊息時觸發</li>
+</ul>
+<p>這三個算是最常見的事件，只是我們這邊只會使用到 <code>ready</code> 跟 <code>messageCreate</code>，然後還有一個地方必須調整，也就是 <code>intents</code>，這邊的 <code>intents</code> 就是我們要決定我們的機器人要做什麼事情，而我們這邊會需要 <code>GuildsMessages</code> 與 <code>MessageContent</code> 這兩個權限，所以我們就先把官方的程式碼修改成以下並貼入到 <code>index.js</code> 中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>()<br><br><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Client</span>, <span class="hljs-title class_">GatewayIntentBits</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;discord.js&#x27;</span>);<br><br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Client</span>(&#123; <span class="hljs-attr">intents</span>: [<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">Guilds</span>,<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">GuildMessages</span>,<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">MessageContent</span>,<br>]&#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;ready&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Logged in as <span class="hljs-subst">$&#123;client.user.tag&#125;</span>!`</span>);<br>&#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;messageCreate&#x27;</span>, <span class="hljs-keyword">async</span> message =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;使用者發送的訊息：&#x27;</span>, message.<span class="hljs-property">content</span>);<br>&#125;);<br><br>client.<span class="hljs-title function_">login</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DISCORD_TOKEN</span>);<br></code></pre></td></tr></table></figure>
+
+<p>接著你就可以在終端機輸入 <code>node index.js</code> 來啟動你的機器人了，當你看到 <code>Logged in as ${client.user.tag}!</code> 這樣的訊息時，代表你的機器人已經啟動了，接著你的 Discord 上面發送訊息時，同時終端機也會印出你發送的訊息。</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/WXtW6hO.png" data-fancybox="gallery" data-caption="Discord"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/WXtW6hO.png" alt="Discord"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Discord</figcaption></figure>
+<p>到目前為止，其實我們已經將一個 Discord 給完成了，接下來，當然就是準備來接 OpenAI 的 API 啦！</p>
+<h3 id="串接-OpenAI-的-API"><a href="#串接-OpenAI-的-API" class="headerlink" title="串接 OpenAI 的 API"></a>串接 OpenAI 的 API</h3><p>接著，請你在根目錄下面建立一個資料夾叫做 <code>services</code>，然後在 <code>services</code> 資料夾下面建立一個檔案叫做 <code>openai.js</code>，接著我們將會在 <code>openai.js</code> 中貼入以下的程式碼，下方這一段程式碼我有點稍微封裝一下，方便可以直接匯出使用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>()<br><br><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Configuration</span>, <span class="hljs-title class_">OpenAIApi</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;openai&#x27;</span>);<br><br><span class="hljs-keyword">const</span> configuration = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(&#123;<br>  <span class="hljs-attr">apiKey</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>,<br>&#125;);<br><br><span class="hljs-keyword">const</span> openAI = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIApi</span>(configuration);<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">openAiMessage</span>(<span class="hljs-params">prompt</span>) &#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> &#123; data &#125; = <span class="hljs-keyword">await</span> openAI.<span class="hljs-title function_">createCompletion</span>(&#123;<br>      <span class="hljs-attr">model</span>: <span class="hljs-string">&#x27;text-davinci-003&#x27;</span>,<br>      prompt,<br>      <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">100</span>,<br>    &#125;);<br>    <span class="hljs-keyword">const</span> [choices] = data.<span class="hljs-property">choices</span>;<br><br>    <span class="hljs-keyword">return</span> choices.<span class="hljs-property">text</span>.<span class="hljs-title function_">trim</span>(); <span class="hljs-comment">// OpenAI 回傳時都會有許多空白，因此要使用 trim 去除前後空白</span><br>  &#125; <span class="hljs-keyword">catch</span> (error) &#123;<br>    <span class="hljs-comment">// eslint-disable-next-line no-console</span><br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(error);<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">`對不起，我發生 **<span class="hljs-subst">$&#123;error.response.status&#125;</span> - <span class="hljs-subst">$&#123;error.response.statusText&#125;</span>** 錯誤，所以不知道該怎麼回你 QQ`</span>;<br>  &#125;<br>&#125;<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = &#123;<br>  openAiMessage,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>openAI 有提供多個 model 可以選擇，分別是</p>
+<ul>
+<li><code>text-davinci-003</code></li>
+<li><code>text-curie-001</code></li>
+<li><code>text-babbage-001</code></li>
+<li><code>text-ada-001</code></li>
+</ul>
+<p>其中目前比較厲害的就是 text-davinci-003，因此我們這邊也會使用這個 model，每一個 model 都有不同的特性，你可以在<a target="_blank" rel="noopener" href="https://beta.openai.com/docs/models/gpt-3">這裡</a>找到它的介紹。</p>
+<p>接著回到 <code>index.js</code>，我們將會在 <code>messageCreate</code> 事件中，將訊息傳入到 <code>openai.js</code> 中，並且將回傳的訊息回傳給使用者，所以我們將會修改成以下的程式碼</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>()<br><br><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Client</span>, <span class="hljs-title class_">GatewayIntentBits</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;discord.js&#x27;</span>);<br><span class="hljs-keyword">const</span> &#123; openAiMessage &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./services/openai&#x27;</span>);<br><br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Client</span>(&#123; <span class="hljs-attr">intents</span>: [<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">Guilds</span>,<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">GuildMessages</span>,<br>  <span class="hljs-title class_">GatewayIntentBits</span>.<span class="hljs-property">MessageContent</span>,<br>]&#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;ready&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Logged in as <span class="hljs-subst">$&#123;client.user.tag&#125;</span>!`</span>);<br>&#125;);<br><br>client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;messageCreate&#x27;</span>, <span class="hljs-keyword">async</span> message =&gt; &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;使用者發送的訊息：&#x27;</span>, message.<span class="hljs-property">content</span>);<br>  <span class="hljs-keyword">if</span> (message.<span class="hljs-property">author</span>.<span class="hljs-property">bot</span>) <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 避免機器人互相回覆</span><br>  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">openAiMessage</span>(message.<span class="hljs-property">content</span>);<br>  message.<span class="hljs-title function_">reply</span>(response);<br>&#125;);<br><br>client.<span class="hljs-title function_">login</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DISCORD_TOKEN</span>);<br></code></pre></td></tr></table></figure>
+
+<p>那麼這邊比較需要這邊多了一個新語法，也就是 <code>message.reply(response);</code>，這個語法簡單來講就是針對使用者的訊息去「回覆」，接著你就可以試著在 Discord 中輸入一些訊息，然後你就會發現你的 Discord Bot 已經會回覆你一些訊息，而這些訊息就是 OpenAI 所回傳的訊息唷！</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/3dJOApu.png" data-fancybox="gallery" data-caption="JOJO"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/3dJOApu.png" alt="JOJO"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">JOJO</figcaption></figure>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/2V0pEpu.png" data-fancybox="gallery" data-caption="JOJO"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/2V0pEpu.png" alt="JOJO"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">JOJO</figcaption></figure>
+<h2 id="讓你的-Discord-Bot-更聰明吧"><a href="#讓你的-Discord-Bot-更聰明吧" class="headerlink" title="讓你的 Discord Bot 更聰明吧"></a>讓你的 Discord Bot 更聰明吧</h2><p>到目前為止，其實我們已經完成了一個串接 OpenAI 的 Discord 聊天機器人，但是這個聊天機器人還是有一些缺點…</p>
+<ul>
+<li>好像有點笨</li>
+<li>無法前後文理解</li>
+</ul>
+<p>那麼要解決這個問題的核心重點在於，要將先前的訊息(包含機器人回你的部分)在每次使用者發送訊息後疊加發送給 OpenAI，這樣 OpenAI 才能夠理解使用者的上下文。</p>
+<p>但是這一段其實有一個很大的問題存在，也就是 OpenAI 的計算方式是一個字代表一個 Token，因此疊加上去是非常可怕的，詳情可以參考<a target="_blank" rel="noopener" href="https://jcyh.work/chatgpt-integration-with-linebot/">這位</a>大大的分享，我就不多述了。</p>
+<p>所以如果你還是期望你的 Discord Bot 能夠更聰明的話，這邊我提供幾個思路方向，第一種方式就是利用 Discord 的 Forum 論壇就可以解決這個問題</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/jQ4swB2.png" data-fancybox="gallery" data-caption="Forum"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/jQ4swB2.png" alt="Forum"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Forum</figcaption></figure>
+<p>因為論壇就是以一個貼文作為一個主題貼文來集中討論，因此就可以針對該主題的內容撈全部上下文，接著就可以疊加送給 OpenAI 分析，這樣就可以解決上下文的問題，而且我們也可以去限制一則貼文內的總字數，進而限制 OpenAI 的計算量，這樣就可以避免 OpenAI 的計算量太大的問題發生。</p>
+<p>但是 Discord 的 Forum 論壇我印象是必須為「社群」模式才能夠擁有的，因此另一種做法就是只撈特定數量的訊息，例如只撈前 10 筆訊息，只要超過就直接重新計算，這樣也可以解決上下文的問題。</p>
+<p>只是我自己認為還是沒有 Forum 論壇模式的好就是了 xD</p>
+<h2 id="範例程式碼"><a href="#範例程式碼" class="headerlink" title="範例程式碼"></a>範例程式碼</h2><p>最後這邊，我也提供一下我自己做的範例程式碼，你可以參考這一篇文章建立 Discord，然後搭配我提供的程式碼去建立屬於你自己的 Discord 聊天機器人唷。</p>
+<p>GitHub：<a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/hermione">https://github.com/hsiangfeng/hermione</a></p>
+<h2 id="後續更新"><a href="#後續更新" class="headerlink" title="後續更新"></a>後續更新</h2><p>由於 OpenAI 後來放了 ChatGPT 的 API，所以範例程式碼我也有做了一下，你可以直接觀看以下 Commit 的程式碼來了解如果要從 GPT-3 轉換到 GPT-3.5 要改哪些唷~</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/hermione/commit/ccb78b0f5f5b42eb366e5f85f50612a5f31842be">轉換改用 createChatCompletion 方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/hermione/commit/2a701f7c4335850b9ace40c1511900c7c80aabb7">論壇寫法調整</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/hermione/commit/3957938f69e548d0a5ecb03534685861d41cbf19">文字串寫法調整</a></li>
+</ul>
+<p>除此之外我也有開出分支區分兩個版本，所以你可以直接切換到不同的分支來了解不同版本的程式碼唷~</p>
+<h2 id="重要事項"><a href="#重要事項" class="headerlink" title="重要事項"></a>重要事項</h2><p>本篇並沒有免費提供 OpenAI 的 API Key 或是 Discord Token 給你使用，所以你必須自行申請，這邊僅是提供一個串接範例，所以在使用時，請務必申請以下兩者</p>
+<ul>
+<li>OpenAI API Key：<a target="_blank" rel="noopener" href="https://platform.openai.com/">https://platform.openai.com/</a></li>
+<li>Discord Token：<a target="_blank" rel="noopener" href="https://discord.com/developers/applications">https://discord.com/developers/applications</a></li>
+</ul>
+<p>OpenAI Key 的申請教學可以參考：「<a href="https://israynotarray.com//odejs/20221210/1224824056/#%E7%94%B3%E8%AB%8B-OpenAI-API">申請 OpenAI API</a>」章節</p>
+<p>本專案範例是採用 Env 環境變數掛入的，如果你確實申請了相關 Token 與 Key，但使用時依然出現「<code>RequestAbortedError [AbortError]: Request aborted</code>、<code>對不起，我發生 401 - Unauthorized 錯誤，所以沒有辦法回覆你。</code>」，代表你的 Key 或是 Token 有問題，請務必確認你的 Env 是否填寫正確，除此之外專案的執行方式是採用 Node.js，所以你必須要先安裝 Node.js 才能夠執行唷。</p>
+<p>最後這邊也提供關於 Env 的教學：<a href="https://israynotarray.com/other/20230218/3618693250/">什麼是 Env 以及什麼時候該用 Env？</a></p>
+
+    </div>
+
+    <!-- Article Footer -->
+    
+  <div class="space-y-8 mt-12">
+
+    <!-- Support Section -->
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    <!-- Terminal Section -->
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        <!-- Import 8-bit Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  <!-- Terminal Header -->
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  <!-- Terminal Content -->
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    <!-- Welcome Message -->
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    <!-- Input Line -->
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type 'help' for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    <!-- Post Navigation -->
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/other/20221213/3036227586/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            關於從 Heroku 跳到 Render 這件事情
+          </span>
+        </a>
+      
+
+      
+        <a href="/gsap/20221216/3838160668/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            (9)前端好好玩用 GSAP 做一個特效 - Eases
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+<!-- Post Footer Ad (獨立於 article 外，防止 AdSense 注入 height:auto!important 影響內容) -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Post_Footer -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Related Posts -->
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/nodejs/20221210/1224824056/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Node.js 建立你的第一個 LINE Bot 聊天機器人以 OpenAI GPT-3 與 GPT-3.5 為例
+              </h4>
+              <time datetime="2022-12-10" title="發布日期: 2022-12-10" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-10
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260320/2827818448/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                不想用龍蝦（OpenClaw）？來試試看 Claude Code channels 吧！
+              </h4>
+              <time datetime="2026-03-20" title="發布日期: 2026-03-20" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-20
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20250313/3008873732/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                六角專題班學習組電商 API 之完整教學
+              </h4>
+              <time datetime="2025-03-13" title="發布日期: 2025-03-13" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-03-13
+              </time>
+            </div>
+          </a>
+        
+          <a href="/other/20240422/247586401/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                解決 GitHub Pages 無法驗證 Discord .well-known 網域問題
+              </h4>
+              <time datetime="2024-04-22" title="發布日期: 2024-04-22" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2024-04-22
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+<!-- Social Share -->
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/nodejs/20221215/2411869749/" data-title="用 OpenAI GPT-3 建立一個 Discord 聊天機器人" data-hashtags="Discord,Nodejs,GPT-3,OpenAI" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/nodejs/20221215/2411869749/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/nodejs/20221215/2411869749/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/nodejs/20221215/2411869749/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+<!-- Comments -->
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    <!-- Utterances Script will be injected here via theme.ts or inline script -->
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Widgets & TOC) -->
+    <aside class="w-full lg:w-1/5 p-5 lg:h-screen lg:sticky lg:top-0 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+  
+  <!-- Search Widget (Placeholder) -->
+  <!-- Search Widget -->
+  <div class="relative cursor-pointer" id="search-trigger">
+    <input type="text" readonly placeholder="Search..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all cursor-pointer">
+    <i class="bi bi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+  </div>
+
+  <!-- Table of Contents (Only on Post pages) -->
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%89%8D%E8%AA%AA%E6%98%8E"><span class="toc-text">事前說明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Discord-%E6%BA%96%E5%82%99%E5%8B%95%E4%BD%9C"><span class="toc-text">Discord 準備動作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E5%B0%88%E6%A1%88%E7%92%B0%E5%A2%83"><span class="toc-text">建立專案環境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%92%B0%E5%AF%AB%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">撰寫程式碼</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Discord-%E6%A9%9F%E5%99%A8%E4%BA%BA"><span class="toc-text">Discord 機器人</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%B2%E6%8E%A5-OpenAI-%E7%9A%84-API"><span class="toc-text">串接 OpenAI 的 API</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%93%E4%BD%A0%E7%9A%84-Discord-Bot-%E6%9B%B4%E8%81%B0%E6%98%8E%E5%90%A7"><span class="toc-text">讓你的 Discord Bot 更聰明吧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AF%84%E4%BE%8B%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-text">範例程式碼</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%8C%E7%BA%8C%E6%9B%B4%E6%96%B0"><span class="toc-text">後續更新</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E4%BA%8B%E9%A0%85"><span class="toc-text">重要事項</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  <!-- Ad Widget (Google Ads) -->
+  
+    <!-- 外層固定高度防止 AdSense 注入 height:auto!important 造成 CLS -->
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <!-- Fallback Text (Visible when AdBlock is on) -->
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <!-- Ad Unit (z-index higher than fallback) -->
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <!-- ArrayException_Sidebar -->
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  <!-- Recent Posts -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+      <i class="bi bi-newspaper w-5 text-center mr-2 text-primary-500"></i> 最新文章
+    </h3>
+    <div class="space-y-2">
+      
+        
+        <a href="/ai/20260412/1749382056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            想自己跑 LLM？搞懂模型參數與量化讓你不再選錯模型
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-12" title="發布日期: 2026-04-12" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/12
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              11 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260410/2748391056/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            AI Agent 不再是統稱了？認識 Coding Agent 與各類 AI Agent 的差異
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-10" title="發布日期: 2026-04-10" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/10
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260409/1057131696/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            你的 Claude Code Context 是不是都被吃光了？AGENTS.md 與 Context 管控全攻略
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-09" title="發布日期: 2026-04-09" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/09
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              10 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260408/3734112946/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            SEO 已經不夠了嗎？認識 AEO 答案引擎優化，讓 AI 搜尋找到你
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-04-08" title="發布日期: 2026-04-08" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              04/08
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              17 分鐘
+            </span>
+          </div>
+        </a>
+      
+        
+        <a href="/ai/20260331/1748203647/" 
+           class="block p-3 rounded-lg border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md">
+          
+          <h4 class="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Claude Code 哪些檔案該 Commit？CLAUDE.md、Settings、Rules、Skills 完整解析
+          </h4>
+          
+          <!-- Meta Info -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <time datetime="2026-03-31" title="發布日期: 2026-03-31" class="flex items-center gap-1">
+              <i class="bi bi-calendar3 w-3 text-center text-[10px]"></i>
+              03/31
+            </time>
+            <span class="text-gray-300 dark:text-gray-600">•</span>
+            <span class="flex items-center gap-1">
+              <i class="bi bi-clock w-3 text-center text-[10px]"></i>
+              8 分鐘
+            </span>
+          </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+
+  <!-- Fake Login Trigger -->
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Background overlay -->
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    <!-- Modal panel -->
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          <!-- Header -->
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          <!-- Results Area -->
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Search Script -->
+  <script>
+    
+    window.algoliaConfig = {
+      appId: 'MU7N4K4R36',
+      apiKey: '110ed15d0a4842310bafc6fdfda119c4',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script defer src="/js/search-BWjLIi5W.js"></script>
+  
+
+</body>
+</html>
