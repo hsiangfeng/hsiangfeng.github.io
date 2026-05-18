@@ -1,0 +1,1634 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Want to Run Your Own LLM? Understanding Model Parameters and Quantization | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20260412/1749382056/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20260412/1749382056/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+
+  
+  <meta name="description" content="If you&#39;ve ever tried downloading an AI model to run on your own machine, you&#39;ve probably hit Hugging Face and seen 7B, Q4_K_M, GGUF — a wall of codes with no clue which one your computer can handle. This post unpacks what those codes actually mean and how to pick a model that fits your hardware.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Want to Run Your Own LLM? Understanding Model Parameters and Quantization">
+  <meta property="og:url" content="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="If you&#39;ve ever tried downloading an AI model to run on your own machine, you&#39;ve probably hit Hugging Face and seen 7B, Q4_K_M, GGUF — a wall of codes with no clue which one your computer can handle. This post unpacks what those codes actually mean and how to pick a model that fits your hardware.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/ai-llm-mode-value/Gemini_Generated_Image_fzdnwwfzdnwwfzdn_1280x698.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-04-12T23:30:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-04-12T23:30:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="LLM">
+      
+        <meta property="article:tag" content="語言模型">
+      
+        <meta property="article:tag" content="Ollama">
+      
+        <meta property="article:tag" content="LM Studio">
+      
+        <meta property="article:tag" content="Hugging Face">
+      
+        <meta property="article:tag" content="量化">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Want to Run Your Own LLM? Understanding Model Parameters and Quantization">
+  <meta name="twitter:description" content="If you&#39;ve ever tried downloading an AI model to run on your own machine, you&#39;ve probably hit Hugging Face and seen 7B, Q4_K_M, GGUF — a wall of codes with no clue which one your computer can handle. This post unpacks what those codes actually mean and how to pick a model that fits your hardware.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/ai-llm-mode-value/Gemini_Generated_Image_fzdnwwfzdnwwfzdn_1280x698.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"Is Ray, Not Array","url":"https://israynotarray.com","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@type":"Organization","name":"Is Ray, Not Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}}}
+  </script>
+
+  
+  
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/"},"headline":"Want to Run Your Own LLM? Understanding Model Parameters and Quantization","url":"https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/","datePublished":"2026-04-12T23:30:00.000Z","dateModified":"2026-04-12T23:30:00.000Z","description":"If you've ever tried downloading an AI model to run on your own machine, you've probably hit Hugging Face and seen 7B, Q4_K_M, GGUF — a wall of codes with no clue which one your computer can handle. This post unpacks what those codes actually mean and how to pick a model that fits your hardware.","author":{"@type":"Person","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},"publisher":{"@type":"Organization","name":"Is Ray, Not Array","logo":{"@type":"ImageObject","url":"https://israynotarray.com/images/logo.png"}},"inLanguage":"en","wordCount":10961,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":["https://images.israynotarray.com/blog/ai/ai-llm-mode-value/Gemini_Generated_Image_fzdnwwfzdnwwfzdn_1280x698.png"],"articleSection":["AI"],"keywords":"AI, LLM, 語言模型, Ollama, LM Studio, Hugging Face, 量化"}
+  </script>
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much memory do I need to run an LLM locally?","acceptedAnswer":{"@type":"Answer","text":"Without compression, every billion parameters needs roughly 2 GB of memory. Quantization changes that drastically — a 7B model with Q4_K_M only needs around 3.8 GB, so an 8 GB machine can run it."}},{"@type":"Question","name":"What does Q4_K_M mean? How do I pick a quantization level?","acceptedAnswer":{"@type":"Answer","text":"Q4 means 4-bit quantization precision; K_M is a medium compression strategy that intelligently preserves precision for important parameters. Q4_K_M is the best starting point for most people — quality loss is small and barely noticeable in everyday chat."}},{"@type":"Question","name":"GGUF, GPTQ, AWQ — which format should I pick?","acceptedAnswer":{"@type":"Answer","text":"For most people, just pick GGUF. It's the dominant format for running models locally, supported by Ollama and LM Studio, and runs on both CPU and GPU. GPTQ and AWQ are NVIDIA-GPU-only — skip them unless you have an NVIDIA card."}}]}
+  </script>
+  
+
+  
+
+  
+
+  
+  <script type="application/ld+json">
+  
+  {"@context":"https://schema.org","@type":"BreadcrumbList","name":"Want to Run Your Own LLM? Understanding Model Parameters and Quantization | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"Want to Run Your Own LLM? Understanding Model Parameters and Quantization"}]}
+  </script>
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-DFThejcY.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/ai/20260412/1749382056/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/ai/20260412/1749382056/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        87 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        200 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-04-13" title="Published: 2026-04-13" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-04-13
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Want to Run Your Own LLM? Understanding Model Parameters and Quantization
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/LLM/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LLM
+            </a>
+          
+            <a href="/tags/%E8%AA%9E%E8%A8%80%E6%A8%A1%E5%9E%8B/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #語言模型
+            </a>
+          
+            <a href="/tags/Ollama/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Ollama
+            </a>
+          
+            <a href="/tags/LM-Studio/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LM Studio
+            </a>
+          
+            <a href="/tags/Hugging-Face/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Hugging Face
+            </a>
+          
+            <a href="/tags/%E9%87%8F%E5%8C%96/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #量化
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-llm-mode-value/Gemini_Generated_Image_fzdnwwfzdnwwfzdn_1280x698.png" data-fancybox="gallery" data-caption="Want to Run Your Own LLM? Understanding Model Parameters and Quantization"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-llm-mode-value/Gemini_Generated_Image_fzdnwwfzdnwwfzdn_1280x698.png" alt="Want to Run Your Own LLM? Understanding Model Parameters and Quantization"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Want to Run Your Own LLM? Understanding Model Parameters and Quantization</figcaption></figure>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>If you’ve ever tried downloading an AI model to run on your own machine, you’ve probably hit Hugging Face and seen 7B, Q4_K_M, GGUF — a wall of codes with no clue which one your computer can handle. This post unpacks what those codes actually mean and how to pick a model that fits your hardware.</p>
+<blockquote>
+<p><strong>Note</strong><br>If you don’t know how to run a model locally yet, check out <a href="https://israynotarray.com/ai/20250502/2743392124/">Setting Up Your Own AI Language Model Lab With LM Studio</a> (article in Mandarin) first — it covers everything from installation to usage.</p>
+</blockquote>
+<h2 id="What-does-the-B-after-the-model-name-mean"><a href="#What-does-the-B-after-the-model-name-mean" class="headerlink" title="What does the B after the model name mean?"></a>What does the B after the model name mean?</h2><p>When you’re browsing models, you’ll often see a number followed by <code>B</code> after the model name — 4B, 7B, 70B. That <code>B</code> stands for <em>Billion</em>, and it’s how many parameters (Parameters) the model has.</p>
+<p>So what’s a parameter? Simple: parameters are the numerical values the model learned from massive amounts of data during training. If you want a more everyday analogy, think of parameters as the books a person has read — someone who has read tens of thousands of books can answer way more questions than someone who has read a few thousand, right? It’s the same idea for parameters: 7B means 7 billion parameters, 70B means 70 billion. More parameters means the model has learned more.</p>
+<p>I touched briefly on B&#x2F;M&#x2F;T notation in <a href="https://israynotarray.com/ai/20250502/2743392124/">Setting Up Your Own AI Language Model Lab With LM Studio</a> (article in Mandarin) — this post goes deeper into how parameter count translates to actual usage.</p>
+<h3 id="Bigger-parameter-count-is-always-better-right"><a href="#Bigger-parameter-count-is-always-better-right" class="headerlink" title="Bigger parameter count is always better, right?"></a>Bigger parameter count is always better, right?</h3><p>You might think: “Why not just grab the model with the biggest number?”</p>
+<p>It’s not that simple. More parameters means more hardware demand — your machine has to be beefy enough to actually run it. And more parameters doesn’t automatically mean smarter. A well-trained 14B model can outperform a mediocre 70B one. So parameter count is just one signal, not the whole story.</p>
+<p>What kind of parameter range fits what kind of task? Here’s a rough breakdown:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Parameters</th>
+<th>Tier</th>
+<th>Suited for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1B - 3B</td>
+<td>Lightweight</td>
+<td>Simple chat, summarization, translation — phones and low-end devices</td>
+</tr>
+<tr>
+<td>4B - 9B</td>
+<td>Entry</td>
+<td>Coding assist, Q&amp;A, general chat — the starting point for most people</td>
+</tr>
+<tr>
+<td>13B - 14B</td>
+<td>Mid</td>
+<td>Noticeably better reasoning, can handle more complex problems</td>
+</tr>
+<tr>
+<td>27B - 32B</td>
+<td>Advanced</td>
+<td>Multi-step reasoning, domain-specific Q&amp;A</td>
+</tr>
+<tr>
+<td>70B+</td>
+<td>High-end</td>
+<td>Approaches cloud-service quality, hardware bar is high</td>
+</tr>
+</tbody></table></div>
+<p>Looking at the table — for most people, 4B - 9B is already plenty. No need to jump straight to 70B.</p>
+<h3 id="Will-my-computer-actually-run-it"><a href="#Will-my-computer-actually-run-it" class="headerlink" title="Will my computer actually run it?"></a>Will my computer actually run it?</h3><p>Once you know the parameter count, the next very practical question is: how much memory do I actually need?</p>
+<p>Easy rule: with no compression, every billion parameters takes about 2 GB of memory. So a 7B model needs around 14 GB, and a 70B model needs about 140 GB.</p>
+<p>Seeing that 140 GB number, you might already be sweating — “My machine only has 16 GB of RAM, so I can only run the smallest models?”</p>
+<p>Hold on — that’s exactly what quantization solves. We’ll get to it shortly. First, let’s look at what else is hiding in those model names.</p>
+<h2 id="Decoding-every-part-of-a-model-name"><a href="#Decoding-every-part-of-a-model-name" class="headerlink" title="Decoding every part of a model name"></a>Decoding every part of a model name</h2><p>Say you spot this model on Hugging Face:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">bartowski/Meta-Llama-3.1-8B-Instruct-GGUF<br></code></pre></td></tr></table></figure>
+
+<p>It looks dense, but each segment means something specific:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bartowski</td>
+<td>Uploader (a well-known community quantizer)</td>
+</tr>
+<tr>
+<td>Meta</td>
+<td>Developer (Meta AI)</td>
+</tr>
+<tr>
+<td>Llama</td>
+<td>Model family name</td>
+</tr>
+<tr>
+<td>3.1</td>
+<td>Version number</td>
+</tr>
+<tr>
+<td>8B</td>
+<td>8 billion parameters</td>
+</tr>
+<tr>
+<td>Instruct</td>
+<td>Instruction-tuned — follows your instructions</td>
+</tr>
+<tr>
+<td>GGUF</td>
+<td>File format (for running locally)</td>
+</tr>
+</tbody></table></div>
+<p>So what that whole string is telling you: a Meta Llama 3.1 model, repackaged by bartowski, 8B parameters, instruction-tuned, stored in GGUF format.</p>
+<h3 id="What-do-tags-like-Instruct-Base-Chat-mean"><a href="#What-do-tags-like-Instruct-Base-Chat-mean" class="headerlink" title="What do tags like Instruct, Base, Chat mean?"></a>What do tags like Instruct, Base, Chat mean?</h3><p>Model names often carry tags that signal what kind of training the model went through. The most common ones:</p>
+<ul>
+<li><strong>Base</strong>: the raw model — like a student who has read a lot of books but hasn’t learned how to converse yet. Not great for chatting directly</li>
+<li><strong>Instruct &#x2F; IT</strong>: instruction-tuned — follows your instructions and replies accordingly. This is what most people want</li>
+<li><strong>Chat</strong>: optimised for multi-turn conversation</li>
+<li><strong>Coder</strong>: specialised for code generation</li>
+<li><strong>Distill</strong>: distilled from a larger model — keeps most of the capability but is smaller</li>
+</ul>
+<p>Personally — if you just want to chat locally or have AI help with everyday tasks, see Instruct, pick it.</p>
+<blockquote>
+<p><strong>Note</strong><br>The LM Studio post covers the basic concept of Distill vs. Instruct — feel free to flip back if you’re curious.</p>
+</blockquote>
+<h3 id="What’s-MoE-Don’t-panic-when-you-see-A22B"><a href="#What’s-MoE-Don’t-panic-when-you-see-A22B" class="headerlink" title="What’s MoE? Don’t panic when you see A22B"></a>What’s MoE? Don’t panic when you see A22B</h3><p>A lot of recent models include the MoE tag, like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">Qwen3-235B-A22B (MoE)<br></code></pre></td></tr></table></figure>
+
+<p>You see 235B and immediately think: “235 billion parameters? My machine has zero chance, right?”</p>
+<p>Hold on — there’s an A22B after it. MoE stands for Mixture of Experts. What does that mean? Simply put, the model contains many “experts”, but it doesn’t activate all of them for every question — it only picks a few relevant ones to handle the task.</p>
+<p>So 235B is the total parameter count across all experts (235 billion), and A22B is the <em>Active</em> parameter count — only 22 billion actually run for any given query. In other words, this model has the knowledge breadth of 235B parameters, but the runtime cost of a 22B-class model.</p>
+<p>That’s why MoE has been getting popular — it makes giant models that used to be exclusively in the cloud actually runnable on consumer hardware.</p>
+<blockquote>
+<p><strong>Note</strong><br>One catch: MoE models still need disk space for <em>all</em> parameters — the file size doesn’t shrink because only some experts are active. The savings are at runtime in memory and compute.</p>
+</blockquote>
+<h2 id="What-is-quantization-It’s-how-your-machine-runs-big-models"><a href="#What-is-quantization-It’s-how-your-machine-runs-big-models" class="headerlink" title="What is quantization? It’s how your machine runs big models"></a>What is quantization? It’s how your machine runs big models</h2><p>Earlier I mentioned that an uncompressed 7B model needs 14 GB of memory — still too much for most people. That’s where quantization comes in.</p>
+<p>So what’s quantization? Think of it like photo resolution. A 50-megapixel photo is the sharpest, but the file is huge. If you compress it down to 12 megapixels, you basically can’t tell the difference on your phone screen, but the file is way smaller. Quantization works similarly — it lowers the precision of each parameter, shrinking the file and the memory footprint.</p>
+<h3 id="What-do-Q4-Q8-mean"><a href="#What-do-Q4-Q8-mean" class="headerlink" title="What do Q4, Q8 mean?"></a>What do Q4, Q8 mean?</h3><p>When you download a model, you’ll see codes like Q4_K_M and Q8_0. The number is the quantization precision — smaller means more compression and smaller files, but with some quality loss.</p>
+<p>Using a 7B model as the example:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Quantization</th>
+<th>7B model size</th>
+<th>Quality impact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FP16 (no compression)</td>
+<td>About 14 GB</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Q8_0 (8-bit)</td>
+<td>About 7 GB</td>
+<td>Almost imperceptible</td>
+</tr>
+<tr>
+<td>Q5_K_M (5-bit)</td>
+<td>About 4.8 GB</td>
+<td>Very minor</td>
+</tr>
+<tr>
+<td>Q4_K_M (4-bit)</td>
+<td>About 3.8 GB</td>
+<td>Minor — most people’s pick</td>
+</tr>
+<tr>
+<td>Q3_K_M (3-bit)</td>
+<td>About 3 GB</td>
+<td>Starts to feel noticeable</td>
+</tr>
+<tr>
+<td>Q2_K (2-bit)</td>
+<td>About 2.5 GB</td>
+<td>Clearly degraded — not recommended</td>
+</tr>
+</tbody></table></div>
+<p>Look at that table — the same 7B model goes from 14 GB to 3.8 GB at Q4_K_M, so an 8 GB machine can handle it. And Q4 quality loss is genuinely small — for everyday chat you won’t really feel it.</p>
+<h3 id="So-what-about-K-S-K-M-K-L"><a href="#So-what-about-K-S-K-M-K-L" class="headerlink" title="So what about K_S, K_M, K_L?"></a>So what about K_S, K_M, K_L?</h3><p>Quantization codes often have K_S, K_M, or K_L suffixes, which describe the compression strategy:</p>
+<ul>
+<li><strong>K_L (Large)</strong>: keeps the most detail, biggest file</li>
+<li><strong>K_M (Medium)</strong>: balanced — the most commonly recommended option</li>
+<li><strong>K_S (Small)</strong>: most compressed, smallest file, fastest</li>
+</ul>
+<p>The K refers to K-Quants, which is a smarter form of compression. Instead of squashing everything to the same precision, it figures out which parameters matter more and keeps higher precision for those, only compressing the less important ones harder. So overall quality is much better than naive compression.</p>
+<p>Personally — for most situations, Q4_K_M is a great starting point.</p>
+<h3 id="How-do-I-pick-between-GGUF-GPTQ-and-AWQ"><a href="#How-do-I-pick-between-GGUF-GPTQ-and-AWQ" class="headerlink" title="How do I pick between GGUF, GPTQ, and AWQ?"></a>How do I pick between GGUF, GPTQ, and AWQ?</h3><p>Beyond quantization level, you’ll also see different file formats. Here are the three most common:</p>
+<p><strong>GGUF</strong> is the dominant format for running models locally — Ollama, LM Studio, and llama.cpp all use it. The big upside is that it runs on both CPU and GPU and isn’t picky about hardware. For most people, just pick GGUF.</p>
+<p><strong>GPTQ</strong> and <strong>AWQ</strong> are NVIDIA-GPU-only formats. They preserve quality well, but you have to have an NVIDIA card. No NVIDIA GPU? Skip them.</p>
+<p>So if you’re not sure what to pick, just remember one combo: <strong>GGUF + Q4_K_M</strong>. It works for most situations.</p>
+<h2 id="Picking-a-model-based-on-your-hardware"><a href="#Picking-a-model-based-on-your-hardware" class="headerlink" title="Picking a model based on your hardware"></a>Picking a model based on your hardware</h2><p>With those concepts down, the practical question becomes: based on the hardware I have, what should I download?</p>
+<h3 id="8-GB-RAM-no-discrete-GPU"><a href="#8-GB-RAM-no-discrete-GPU" class="headerlink" title="8 GB RAM (no discrete GPU)"></a>8 GB RAM (no discrete GPU)</h3><p>This tier is limited but still usable. Aim for 3B - 4B models with Q4_K_M, like Phi-4 Mini (3.8B) or Llama 3.2-3B — files are around 2 - 3 GB. Simple chat and summarization are fine, though inference will be slow.</p>
+<h3 id="16-GB-RAM-or-8-GB-VRAM"><a href="#16-GB-RAM-or-8-GB-VRAM" class="headerlink" title="16 GB RAM or 8 GB VRAM"></a>16 GB RAM or 8 GB VRAM</h3><p>This is the sweet spot for most people right now. You can run 7B - 8B models with Q4_K_M — Llama 3.1-8B or Qwen 2.5-7B — file sizes around 4 - 6 GB. Coding assist, Q&amp;A, and translation all work well.</p>
+<h3 id="32-GB-RAM-or-16-24-GB-VRAM"><a href="#32-GB-RAM-or-16-24-GB-VRAM" class="headerlink" title="32 GB RAM or 16 - 24 GB VRAM"></a>32 GB RAM or 16 - 24 GB VRAM</h3><p>If you have an RTX 4090 (24 GB VRAM) or 32 GB+ RAM, your options open up a lot. 30B-class models can use Q5_K_M or even Q6_K, and 70B can run at Q4_K_M. Quality is approaching cloud-service territory.</p>
+<h3 id="Apple-Silicon-Mac-users"><a href="#Apple-Silicon-Mac-users" class="headerlink" title="Apple Silicon Mac users"></a>Apple Silicon Mac users</h3><p>If you’re on a Mac, here’s some good news. Apple Silicon uses Unified Memory — system RAM can be used directly as GPU memory, which is a huge advantage for running LLMs.</p>
+<p>For example, a 36 GB MacBook Pro can run 30B-class models (Q4 - Q8). A similarly priced Windows laptop, where system RAM and VRAM are separate, would have to fall back to CPU-only inference and be much slower.</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Mac config</th>
+<th>Memory</th>
+<th>Models it can run</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M-series base</td>
+<td>8 - 16 GB</td>
+<td>3B - 7B (Q4)</td>
+</tr>
+<tr>
+<td>M-series Pro</td>
+<td>18 - 36 GB</td>
+<td>13B - 30B (Q4 - Q8)</td>
+</tr>
+<tr>
+<td>M-series Max</td>
+<td>64 - 96 GB</td>
+<td>70B (Q4) or 30B (near-lossless)</td>
+</tr>
+<tr>
+<td>M-series Ultra</td>
+<td>128 GB+</td>
+<td>100B+ MoE models</td>
+</tr>
+</tbody></table></div>
+<h3 id="A-practical-rule-of-thumb"><a href="#A-practical-rule-of-thumb" class="headerlink" title="A practical rule of thumb"></a>A practical rule of thumb</h3><p>A general guideline:</p>
+<blockquote>
+<p><em>Rather than picking a big model and squeezing it into very low quantization, pick a slightly smaller model at higher quantization.</em></p>
+</blockquote>
+<p>What does that mean? If your machine’s memory is limited, an 8B model at Q5_K_M will usually outperform a 13B model crushed down to Q3_K_M. Over-compression strips too much capability away.</p>
+<h2 id="Where-to-download-models"><a href="#Where-to-download-models" class="headerlink" title="Where to download models"></a>Where to download models</h2><p>Now that you know how to pick, where do you download them?</p>
+<h3 id="Hugging-Face"><a href="#Hugging-Face" class="headerlink" title="Hugging Face"></a>Hugging Face</h3><p>Think of it as the GitHub of AI models — it’s the largest model hub right now. Beyond original models, the community uploads pre-quantized versions. When looking for GGUF models, recognised quantizers like bartowski and hugging-quants are reliable bets.</p>
+<h3 id="Ollama"><a href="#Ollama" class="headerlink" title="Ollama"></a>Ollama</h3><p>If you don’t want to mess with details, Ollama is the easiest option. Open your terminal and run a single command to download and start a model:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ollama run llama3.1<br></code></pre></td></tr></table></figure>
+
+<p>It auto-downloads the model, picks a quantization level appropriate for your hardware, and drops you straight into a chat — no file picking required.</p>
+<h3 id="LM-Studio"><a href="#LM-Studio" class="headerlink" title="LM Studio"></a>LM Studio</h3><p>If you prefer a GUI, LM Studio lets you search, download, and load models entirely inside an app — no command line involved.</p>
+<blockquote>
+<p><strong>Note</strong><br>For a full LM Studio walkthrough, see <a href="https://israynotarray.com/ai/20250502/2743392124/">Setting Up Your Own AI Language Model Lab With LM Studio</a> (article in Mandarin).</p>
+</blockquote>
+<h2 id="Popular-open-source-models-in-2026"><a href="#Popular-open-source-models-in-2026" class="headerlink" title="Popular open-source models in 2026"></a>Popular open-source models in 2026</h2><p>To wrap up, here are some of the more popular open-source models right now, so you have a starting point.</p>
+<p>If this is your first time, the 7B - 14B range is a good place to begin:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Developer</th>
+<th>Parameters</th>
+<th>Highlights</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Llama 3.1 8B</td>
+<td>Meta</td>
+<td>8B</td>
+<td>Highly versatile, strong community ecosystem</td>
+</tr>
+<tr>
+<td>Qwen 2.5 7B</td>
+<td>Alibaba</td>
+<td>7B</td>
+<td>Solid Chinese performance, good multilingual support</td>
+</tr>
+<tr>
+<td>Phi-4</td>
+<td>Microsoft</td>
+<td>14B</td>
+<td>Reasoning above its weight class, MIT license</td>
+</tr>
+<tr>
+<td>Gemma 3 9B</td>
+<td>Google</td>
+<td>9B</td>
+<td>Multimodal support, balanced overall</td>
+</tr>
+</tbody></table></div>
+<p>If your hardware is stronger, take on the 27B - 70B range:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Developer</th>
+<th>Parameters</th>
+<th>Highlights</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gemma 4 27B</td>
+<td>Google</td>
+<td>27B (MoE, 4B active)</td>
+<td>Fast, lower memory needs than peers</td>
+</tr>
+<tr>
+<td>Qwen 2.5 32B</td>
+<td>Alibaba</td>
+<td>32B</td>
+<td>High quality, excellent Chinese performance</td>
+</tr>
+<tr>
+<td>Llama 3.3 70B</td>
+<td>Meta</td>
+<td>70B</td>
+<td>Higher hardware bar, near cloud-service quality</td>
+</tr>
+<tr>
+<td>DeepSeek-R1 distilled</td>
+<td>DeepSeek</td>
+<td>7B - 70B</td>
+<td>Strong reasoning, multiple sizes available</td>
+</tr>
+</tbody></table></div>
+<p>And on the MoE architecture side mentioned earlier, current standouts include:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Developer</th>
+<th>Total &#x2F; Active params</th>
+<th>Highlights</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qwen3 235B-A22B</td>
+<td>Alibaba</td>
+<td>235B &#x2F; 22B</td>
+<td>Big knowledge base, relatively low resource needs</td>
+</tr>
+<tr>
+<td>DeepSeek-V3</td>
+<td>DeepSeek</td>
+<td>671B &#x2F; 37B</td>
+<td>One of the open-source ceilings right now</td>
+</tr>
+<tr>
+<td>Llama 4 Scout</td>
+<td>Meta</td>
+<td>109B &#x2F; 17B</td>
+<td>Supports an extreme 10M token context</td>
+</tr>
+</tbody></table></div>
+<p>This space moves fast — new models drop almost every month, so these picks will shift over time. If you want to track the latest, watch Hugging Face’s Open LLM Leaderboard for benchmark rankings across models.</p>
+<h2 id="Wrapping-up"><a href="#Wrapping-up" class="headerlink" title="Wrapping up"></a>Wrapping up</h2><p>Quick recap:</p>
+<ul>
+<li>The B in model names means billions of parameters — bigger means more knowledge, but heavier hardware demands</li>
+<li>Pick the Instruct variant when downloading; Base is for researchers</li>
+<li>For MoE models with an A-prefixed number, the active parameter count is much smaller than the total — way easier on resources</li>
+<li>Quantization compresses models; Q4_K_M is the best starting point for most people</li>
+<li>For file format, GGUF is the safe pick — runs on both CPU and GPU</li>
+<li>Pick a model that fits cleanly in your memory rather than cramming a giant model down to extreme quantization</li>
+<li>Mac users have a natural edge for local inference thanks to Unified Memory</li>
+</ul>
+<p>Hope this gives you a clearer picture of LLM parameters and quantization — next time you’re picking a model on Hugging Face, those codes won’t feel like alphabet soup anymore.</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/ai/2026/04/10/coding-agent-vs-ai-agent-differences/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            AI Agent Isn't One Thing Anymore — Understanding Coding Agents and Other AI Agent Types
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/ai/2025/05/02/lm-studio-self-host-llm-lab/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Build Your Own AI Language Model Lab — No Help Needed, with LM Studio
+              </h4>
+              <time datetime="2025-05-02" title="Published: 2025-05-02" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-05-02
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/04/23/decoding-ai-spec-sheets-token-context-compute/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Decoding AI Spec Sheets: Token, Context Window, Compute — What Are These Numbers Actually About?
+              </h4>
+              <time datetime="2026-04-23" title="Published: 2026-04-23" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-23
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2025/04/25/genai-glossary-llm-rag-prompt-mcp/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Heard of LLM, RAG, Prompt? A Quick Guide to Common Generative AI Terms
+              </h4>
+              <time datetime="2025-04-25" title="Published: 2025-04-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-04-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/05/03/gpt-5-5-chatgpt-images-2-0-guide-30-prompt-templates/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                How to Use GPT-5.5 and ChatGPT Images 2.0: 30 Prompt Templates for IG Cards, Knowledge Decks, and Product Mockups
+              </h4>
+              <time datetime="2026-05-03" title="Published: 2026-05-03" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-03
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/" data-title="Want to Run Your Own LLM? Understanding Model Parameters and Quantization" data-hashtags="AI,LLM,語言模型,Ollama,LM Studio,Hugging Face,量化" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/ai/2026/04/13/llm-parameters-quantization-guide/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-does-the-B-after-the-model-name-mean"><span class="toc-text">What does the B after the model name mean?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bigger-parameter-count-is-always-better-right"><span class="toc-text">Bigger parameter count is always better, right?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Will-my-computer-actually-run-it"><span class="toc-text">Will my computer actually run it?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Decoding-every-part-of-a-model-name"><span class="toc-text">Decoding every part of a model name</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#What-do-tags-like-Instruct-Base-Chat-mean"><span class="toc-text">What do tags like Instruct, Base, Chat mean?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#What%E2%80%99s-MoE-Don%E2%80%99t-panic-when-you-see-A22B"><span class="toc-text">What’s MoE? Don’t panic when you see A22B</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-quantization-It%E2%80%99s-how-your-machine-runs-big-models"><span class="toc-text">What is quantization? It’s how your machine runs big models</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#What-do-Q4-Q8-mean"><span class="toc-text">What do Q4, Q8 mean?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#So-what-about-K-S-K-M-K-L"><span class="toc-text">So what about K_S, K_M, K_L?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#How-do-I-pick-between-GGUF-GPTQ-and-AWQ"><span class="toc-text">How do I pick between GGUF, GPTQ, and AWQ?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Picking-a-model-based-on-your-hardware"><span class="toc-text">Picking a model based on your hardware</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-GB-RAM-no-discrete-GPU"><span class="toc-text">8 GB RAM (no discrete GPU)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#16-GB-RAM-or-8-GB-VRAM"><span class="toc-text">16 GB RAM or 8 GB VRAM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-GB-RAM-or-16-24-GB-VRAM"><span class="toc-text">32 GB RAM or 16 - 24 GB VRAM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Apple-Silicon-Mac-users"><span class="toc-text">Apple Silicon Mac users</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#A-practical-rule-of-thumb"><span class="toc-text">A practical rule of thumb</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Where-to-download-models"><span class="toc-text">Where to download models</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Hugging-Face"><span class="toc-text">Hugging Face</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Ollama"><span class="toc-text">Ollama</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LM-Studio"><span class="toc-text">LM Studio</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Popular-open-source-models-in-2026"><span class="toc-text">Popular open-source models in 2026</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wrapping-up"><span class="toc-text">Wrapping up</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>
