@@ -1,0 +1,1688 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20260531/2738461950/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20260531/2738461950/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/plain" title="llms.txt — site index for AI agents" href="/llms.txt">
+  <link rel="alternate" type="text/plain" title="llms-full.txt — full content for AI agents" href="/llms-full.txt">
+
+  
+  <meta name="description" content="When you&#39;re developing with Claude Code, do you find yourself constantly telling it to run Prettier again? Or worrying that one day it&#39;ll accidentally fire off rm -rf? This post walks through how Claude Code Hooks work — when events like PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, Notification, and Stop fire, how to set up matcher and command in settings.json, how to block actions with exit code 2 — and runs through practical hooks: auto-format, blocking rm -rf, reinjecting project context after Compact, Mac desktop notifications, plus prompt / agent hook types and /hooks debugging.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="When you&#39;re developing with Claude Code, do you find yourself constantly telling it to run Prettier again? Or worrying that one day it&#39;ll accidentally fire off rm -rf? This post walks through how Claude Code Hooks work — when events like PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, Notification, and Stop fire, how to set up matcher and command in settings.json, how to block actions with exit code 2 — and runs through practical hooks: auto-format, blocking rm -rf, reinjecting project context after Compact, Mac desktop notifications, plus prompt / agent hook types and /hooks debugging.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/claude-hooks/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%8831%E6%97%A5%20%E4%B8%8B%E5%8D%8803_35_04.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-05-31T14:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-05-31T14:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="Claude Code">
+      
+        <meta property="article:tag" content="AI Agent">
+      
+        <meta property="article:tag" content="Claude Code Hooks">
+      
+        <meta property="article:tag" content="Hooks">
+      
+        <meta property="article:tag" content="AI Development">
+      
+        <meta property="article:tag" content="AI Automation">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide | Is Ray, Not Array">
+  <meta name="twitter:description" content="When you&#39;re developing with Claude Code, do you find yourself constantly telling it to run Prettier again? Or worrying that one day it&#39;ll accidentally fire off rm -rf? This post walks through how Claude Code Hooks work — when events like PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, Notification, and Stop fire, how to set up matcher and command in settings.json, how to block actions with exit code 2 — and runs through practical hooks: auto-format, blocking rm -rf, reinjecting project context after Compact, Mac desktop notifications, plus prompt / agent hook types and /hooks debugging.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/claude-hooks/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%8831%E6%97%A5%20%E4%B8%8B%E5%8D%8803_35_04.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/"},"headline":"What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide","url":"https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/","datePublished":"2026-05-31T14:00:00.000Z","dateModified":"2026-05-31T14:00:00.000Z","description":"When you're developing with Claude Code, do you find yourself constantly telling it to run Prettier again? Or worrying that one day it'll accidentally fire off rm -rf? This post walks through how Claude Code Hooks work — when events like PreToolUse, PostToolUse, UserPromptSubmit, SessionStart, Notification, and Stop fire, how to set up matcher and command in settings.json, how to block actions with exit code 2 — and runs through practical hooks: auto-format, blocking rm -rf, reinjecting project context after Compact, Mac desktop notifications, plus prompt / agent hook types and /hooks debugging.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":26968,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/ai/claude-hooks/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%8831%E6%97%A5%20%E4%B8%8B%E5%8D%8803_35_04.png","width":1200,"height":630}],"articleSection":["AI"],"keywords":"AI, Claude Code, AI Agent, Claude Code Hooks, Hooks, AI Development, AI Automation"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/#breadcrumb","name":"What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-DFThejcY.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/ai/20260531/2738461950/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/ai/20260531/2738461950/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1029 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1050 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-05-31" title="Published: 2026-05-31" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-05-31
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/Claude-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code
+            </a>
+          
+            <a href="/tags/AI-Agent/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Agent
+            </a>
+          
+            <a href="/tags/Claude-Code-Hooks/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code Hooks
+            </a>
+          
+            <a href="/tags/Hooks/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Hooks
+            </a>
+          
+            <a href="/tags/AI-Development/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Development
+            </a>
+          
+            <a href="/tags/AI-Automation/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Automation
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-hooks/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%8831%E6%97%A5%20%E4%B8%8B%E5%8D%8803_35_04.png" data-fancybox="gallery" data-caption="What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide"><img class="cursor-zoom-in !mb-0" fetchpriority="high" src="https://images.israynotarray.com/blog/ai/claude-hooks/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%8831%E6%97%A5%20%E4%B8%8B%E5%8D%8803_35_04.png" alt="What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>Claude Code Hooks are “automatic trigger points” in Claude Code’s lifecycle — they fire your Shell command at the moment you specify. The common ones are <code>PreToolUse</code> (before a tool runs), <code>PostToolUse</code> (after a tool runs), <code>UserPromptSubmit</code> (every time you send a prompt), and <code>SessionStart</code> (when a session opens). You just write the config into the <code>hooks</code> block of <code>settings.json</code> and you’re set.</p>
+</blockquote>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>After using Claude Code for a while, you’ve probably hit a situation like this: every time it edits a file, you have to remind it to run Prettier and ESLint again (sure, you could just run <code>npm run format</code> yourself, but humans are lazy). Or you wanted to go fast so you flipped on <code>--dangerously-skip-permissions</code>, but now you’re nervous it might fire off something like <code>rm -rf</code>. Or your Context got Compacted and Claude completely forgot some important project conventions you’d already explained, so you have to explain them again — ugh.</p>
+<p>So this post is about a really important Claude Code technique: Hooks. They let you “hook into” Claude Code’s lifecycle and trigger automated actions, making sure it does the right thing at the right moment.</p>
+<p>I’ve also written <a href="/en/ai/2026/03/31/which-claude-code-files-should-you-commit/">Which Claude Code Files Should You Commit? CLAUDE.md, Settings, Rules, Skills — A Complete Breakdown</a> which covers the layering concept of <code>.claude/settings.json</code>. This post is a follow-up that pulls the hooks feature buried in settings out into its own deep dive.</p>
+<h2 id="What’s-the-difference-between-Hooks-Skills-CLAUDE-md-and-Rules"><a href="#What’s-the-difference-between-Hooks-Skills-CLAUDE-md-and-Rules" class="headerlink" title="What’s the difference between Hooks, Skills, CLAUDE.md, and Rules?"></a>What’s the difference between Hooks, Skills, CLAUDE.md, and Rules?</h2><p>Before getting into how to set up hooks, let’s quickly compare it against the other “teach Claude what to do” mechanisms, so it’s clearer what each one is actually for.</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Who runs it</th>
+<th>When it triggers</th>
+<th>What it’s for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CLAUDE.md</td>
+<td>Claude</td>
+<td>Loaded on every conversation</td>
+<td>Project conventions, naming, workflows</td>
+</tr>
+<tr>
+<td>Rules</td>
+<td>Claude</td>
+<td>Loaded on startup OR when relevant paths are touched</td>
+<td>Modular rules that can fire by path</td>
+</tr>
+<tr>
+<td>Skill</td>
+<td>Claude</td>
+<td>Claude decides on its own when to use</td>
+<td>Bundling an entire workflow into a reusable capability</td>
+</tr>
+<tr>
+<td>Hook</td>
+<td>Your Shell</td>
+<td>Claude Code lifecycle events</td>
+<td>Forced automated actions</td>
+</tr>
+</tbody></table></div>
+<p>If the table didn’t quite click, think of it this way:</p>
+<ol>
+<li>CLAUDE.md and Rules are “rules”</li>
+<li>Skill is a “capability” — these three all rely on Claude reading them and choosing to follow</li>
+<li>Hook is different — hooks are run by Claude Code itself, <strong>Claude has no choice</strong>, the moment the trigger fires the command will run</li>
+</ol>
+<p>Here’s a concrete example. Say in CLAUDE.md you write “run Prettier after every file edit”. Most of the time Claude listens, but occasionally it forgets (Context might’ve blown up?!). If you use a PostToolUse hook to set “run Prettier automatically after every <code>Edit</code> or <code>Write</code>“, then regardless of whether Claude feels like it, your Shell command is guaranteed to run.</p>
+<p>So hooks fit the scenario of…</p>
+<blockquote>
+<p>Things I absolutely cannot tolerate Claude missing</p>
+</blockquote>
+<p>Like lint, format, security guardrails. The fuzzier stuff that needs Claude’s judgment is still better off in CLAUDE.md.</p>
+<h2 id="What-does-the-hook-config-file-look-like"><a href="#What-does-the-hook-config-file-look-like" class="headerlink" title="What does the hook config file look like?"></a>What does the hook config file look like?</h2><p>All hook config goes into the <code>hooks</code> block of <code>settings.json</code>. The structure looks like this:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;EventName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;filter condition&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;the Shell command you want to run&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>The outer <code>key</code> is the “event name” (like <code>PreToolUse</code> or <code>PostToolUse</code>), wrapping an array where each entry is a config group containing <code>matcher</code> (filters when this group activates) and <code>hooks</code> (the actual commands to run).</p>
+<p>If you’ve read <a href="https://israynotarray.com/ai/20260326/1431610072/">Claude Code Status Line Setup Guide (article in Mandarin)</a>, this structure should feel familiar — like Status Line, it’s “Claude Code hands data to your Shell, and you decide how to respond”.</p>
+<h3 id="Where-does-the-config-file-go"><a href="#Where-does-the-config-file-go" class="headerlink" title="Where does the config file go?"></a>Where does the config file go?</h3><p>Like other Claude Code settings, hooks also have layers:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Scope</th>
+<th>Commit it?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>~/.claude/settings.json</code></td>
+<td>All your projects</td>
+<td>Won’t end up in the project repo</td>
+</tr>
+<tr>
+<td><code>.claude/settings.json</code></td>
+<td>The whole team</td>
+<td>Yes, commit it</td>
+</tr>
+<tr>
+<td><code>.claude/settings.local.json</code></td>
+<td>Just you personally</td>
+<td>Don’t commit (already in <code>.gitignore</code>)</td>
+</tr>
+</tbody></table></div>
+<p>In short: hooks the whole team should have (like lint) go in <code>.claude/settings.json</code>, personal preferences (like desktop notifications) go in <code>~/.claude/settings.json</code>, and sensitive-path local rules go in <code>.claude/settings.local.json</code>.</p>
+<h2 id="What-events-are-available"><a href="#What-events-are-available" class="headerlink" title="What events are available?"></a>What events are available?</h2><p>Now we get to the main event of this post: “what events can we actually hook into?”</p>
+<p>Honestly, Claude Code offers more than 20 events. Listing them all would scare people off, so I’ll group them by “how often I actually use them in real work”.</p>
+<p>Here’s a diagram of a typical Claude Code session lifecycle, with the events that fire on each arrow — you can match it up with where each hook fits:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-hooks/20260531154519.png" data-fancybox="gallery" data-caption="Diagram showing when Claude Code Hooks events fire"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/claude-hooks/20260531154519.png" alt="Diagram showing when Claude Code Hooks events fire"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Diagram showing when Claude Code Hooks events fire</figcaption></figure>
+<h3 id="The-most-commonly-used-ones"><a href="#The-most-commonly-used-ones" class="headerlink" title="The most commonly used ones"></a>The most commonly used ones</h3><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When it fires</th>
+<th>Classic use case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PreToolUse</code></td>
+<td>Before a tool runs</td>
+<td>Block dangerous commands, rewrite parameters</td>
+</tr>
+<tr>
+<td><code>PostToolUse</code></td>
+<td>After a tool succeeds</td>
+<td>Auto-format, run lint</td>
+</tr>
+<tr>
+<td><code>UserPromptSubmit</code></td>
+<td>When you press Enter to send a prompt</td>
+<td>Inject extra context, filter sensitive info</td>
+</tr>
+<tr>
+<td><code>SessionStart</code></td>
+<td>When a session opens or resumes</td>
+<td>Load project context, output git status</td>
+</tr>
+<tr>
+<td><code>Stop</code></td>
+<td>When Claude finishes responding and is about to stop</td>
+<td>Verify the task was really completed</td>
+</tr>
+<tr>
+<td><code>Notification</code></td>
+<td>When Claude needs your attention</td>
+<td>Desktop notifications, voice prompts</td>
+</tr>
+</tbody></table></div>
+<p>These six are the most frequently used — most real-world examples revolve around them.</p>
+<h3 id="Other-ones-that-are-rarer-but-worth-knowing"><a href="#Other-ones-that-are-rarer-but-worth-knowing" class="headerlink" title="Other ones that are rarer but worth knowing"></a>Other ones that are rarer but worth knowing</h3><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When it fires</th>
+<th>Classic use case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PermissionRequest</code></td>
+<td>When a permission dialog is about to appear</td>
+<td>Auto-approve specific actions</td>
+</tr>
+<tr>
+<td><code>PermissionDenied</code></td>
+<td>When auto mode blocks a tool call</td>
+<td>Log blocked commands</td>
+</tr>
+<tr>
+<td><code>PostToolUseFailure</code></td>
+<td>When a tool execution fails</td>
+<td>Notify on failure or auto-retry</td>
+</tr>
+<tr>
+<td><code>SubagentStop</code></td>
+<td>When a subagent finishes a task</td>
+<td>Verify subagent results</td>
+</tr>
+<tr>
+<td><code>PreCompact</code> &#x2F; <code>PostCompact</code></td>
+<td>Before &#x2F; after context compaction</td>
+<td>Back up the conversation, reinject rules after compaction</td>
+</tr>
+<tr>
+<td><code>SessionEnd</code></td>
+<td>When the session closes</td>
+<td>Clean up temp files, write logs</td>
+</tr>
+<tr>
+<td><code>ConfigChange</code></td>
+<td>When a settings file is modified during the session</td>
+<td>Audit config changes</td>
+</tr>
+<tr>
+<td><code>CwdChanged</code> &#x2F; <code>FileChanged</code></td>
+<td>When the working directory or a watched file changes</td>
+<td>Reload environment variables (pair with direnv)</td>
+</tr>
+</tbody></table></div>
+<p>At this point, you should see that hooks pretty much cover every node Claude Code passes through. Almost anything you can imagine in the shape of “I want X to run automatically when Y happens” is doable — the concept is the same as the “lifecycle events” you’d find in a framework.</p>
+<h2 id="How-do-you-write-a-matcher"><a href="#How-do-you-write-a-matcher" class="headerlink" title="How do you write a matcher?"></a>How do you write a matcher?</h2><p>Time to talk about how to actually write the hook condition.</p>
+<p>You saw the hook example earlier looks like this:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;EventName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;filter condition&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;the Shell command you want to run&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>matcher</code> decides “under what conditions this hook group activates”, and what it compares against depends on the event. For the commonly used <code>PreToolUse</code> &#x2F; <code>PostToolUse</code>, it compares against the “tool name”, so the most intuitive way to write it is to just drop the tool name into the <code>matcher</code> field.</p>
+<p>Here’s a concrete example — this hook is “before Claude runs Bash, show a reminder in the terminal”:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -n &#x27;&#123; systemMessage: \&quot;Bash is about to run\&quot; &#125;&#x27;&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>After this, you’ll see the <code>Bash is about to run</code> reminder pop up:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-hooks/20260531131433.png" data-fancybox="gallery" data-caption="Screenshot showing the &#39;Bash is about to run&#39; reminder"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/claude-hooks/20260531131433.png" alt="Screenshot showing the &#39;Bash is about to run&#39; reminder"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Screenshot showing the &#39;Bash is about to run&#39; reminder</figcaption></figure>
+<p>The value of <code>matcher</code> is the tool name <code>Bash</code>, meaning “this hook only fires when Claude uses the Bash tool”.</p>
+<blockquote>
+<p><strong>Note</strong><br>Why use <code>jq</code> here instead of <code>echo</code>? Because Claude Code talks to hooks in “JSON format”. If you just write <code>echo &quot;Bash is about to run&quot;</code>, what Claude Code receives is unstructured plain text — it doesn’t know what you want it to do, so it just treats it as an execution log entry and Claude never sees it. But <code>jq -n &#39;{ systemMessage: &quot;Bash is about to run&quot; }&#39;</code> produces a JSON output, which is basically telling Claude Code “this field is called systemMessage, please show its contents to Claude”. When Claude Code sees that recognized format, it actually feeds the message in.</p>
+</blockquote>
+<p>If you want to watch multiple tools at once, separate them with <code>|</code>. For example, this hook is “run Prettier automatically every time Claude uses <code>Edit</code> or <code>Write</code> to modify a file”:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PostToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Edit|Write&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -r &#x27;.tool_input.file_path&#x27; | xargs npx prettier --write&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>The <code>command</code> looks a bit complicated, so let me break it down:</p>
+<ol>
+<li>When Claude finishes editing a file with <code>Edit</code> &#x2F; <code>Write</code>, Claude Code sends a JSON payload to this hook that looks roughly like <code>{ &quot;tool_input&quot;: {&quot;file_path&quot;: &quot;/path/to/file.ts&quot; }, ... }</code>, telling you which file it just changed.</li>
+<li>Then <code>jq -r &#39;.tool_input.file_path&#39;</code> parses that JSON and extracts the value of <code>tool_input.file_path</code> (the file path). The <code>-r</code> means “give me raw text, no quotes”.</li>
+<li><code>|</code> (pipe) — think of it like a relay baton: “take the output of the previous command and feed it as input to the next one”.</li>
+<li><code>xargs</code> takes that incoming text and “appends it as an argument to the next command”, so what actually runs is <code>npx prettier --write /path/to/file.ts</code>.</li>
+<li><code>npx prettier --write</code> calls Prettier to format that file.</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong><br><code>prettier</code> is a code formatter. The <code>--write</code> flag means “actually modify the file in place”. If you’d rather just see the diff without writing, swap it for <code>--check</code>. If your project uses ESLint instead of Prettier, replace <code>npx prettier --write</code> with <code>npx eslint --fix</code>.</p>
+</blockquote>
+<p>Basically, in later examples, whenever you see <code>jq -r &#39;.xxx&#39;</code>, it’s doing this same thing:</p>
+<blockquote>
+<p><code>jq -r</code> parses the JSON that Claude Code sent in, pulls out the field you want, and hands it off to the next command. The <code>jq -n</code> from earlier is the reverse — it “generates” a JSON payload from scratch to feed back to Claude Code.</p>
+</blockquote>
+<p>Finally, if you want to “trigger no matter what tool runs”, just leave <code>matcher</code> as an empty string:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -r &#x27;.tool_name&#x27; &gt;&gt; ~/.claude/all-tools.log&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>This hook appends the tool name to a log file before any tool is used by Claude — basically logging every tool call across the whole session.</p>
+<p>This covers 95% of cases. If you want to look up what each tool is called, see my earlier post <a href="/en/ai/2026/04/29/claude-code-built-in-tools-explained/">What do Claude Code’s built-in tools actually do? Understanding how it picks tools</a> — it lists every tool by name.</p>
+<h3 id="Advanced-use-regex-to-match-MCP-tools"><a href="#Advanced-use-regex-to-match-MCP-tools" class="headerlink" title="Advanced: use regex to match MCP tools"></a>Advanced: use regex to match MCP tools</h3><p>The remaining 5% is when you want to match tools provided by an MCP server. MCP tools are named like <code>mcp__&lt;server&gt;__&lt;tool&gt;</code> — for example, the search tool from GitHub’s MCP server is called <code>mcp__github__search_repositories</code>.</p>
+<p>If you want to watch every tool from a given MCP server at once, use the regex <code>.*</code> to match anything:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;mcp__github__.*&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;echo &#x27;GitHub MCP tool called&#x27; &gt;&amp;2&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>.*</code> is regex for “any character”, so <code>mcp__github__.*</code> means “starts with <code>mcp__github__</code>, followed by anything”. Claude Code’s rule for when to use regex is simple: if the matcher is made of anything other than letters, digits, <code>_</code>, and <code>|</code>, it runs as a JavaScript regex; otherwise it’s compared as a literal string. So earlier writings like <code>Bash</code> or <code>Edit|Write</code> won’t accidentally be treated as regex.</p>
+<h3 id="Not-all-events-match-on-tool-name"><a href="#Not-all-events-match-on-tool-name" class="headerlink" title="Not all events match on tool name"></a>Not all events match on tool name</h3><p>Everything above was tool-related events, but some events don’t match on tool name — they match on some other “category of the event itself”.</p>
+<p>The most common example is <code>SessionStart</code>, which matches on “how the session was started”. This hook is “when a session rebuilds after Context is Compacted, remind Claude of the project rules”:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;SessionStart&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;compact&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;echo &#x27;Reminder: use pnpm for package management, not npm&#x27;&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>When you see <code>echo &#39;Reminder: use pnpm...&#39;</code>, you might be thinking…</p>
+<p>“Wait, didn’t you just say <code>echo</code> doesn’t work with <code>PreToolUse</code>? How come it works here?”</p>
+<p>That’s because <code>SessionStart</code> and <code>UserPromptSubmit</code> are two special events — whatever the hook outputs to stdout gets automatically picked up by Claude Code as “extra context to inject for Claude”, so <code>echo</code> works and Claude sees it. Other events (like the <code>PreToolUse</code> we saw earlier) have to go through <code>jq -n &#39;{systemMessage: ...}&#39;</code> JSON format to talk to Claude Code.</p>
+<p><code>matcher: &quot;compact&quot;</code> restricts this to “only fire when the session rebuilds after Compact” — opening Claude Code for the first time or resuming an old session won’t trigger it. <code>SessionStart</code>‘s valid values are <code>startup</code> (first open), <code>resume</code> (resuming an old session), <code>clear</code> (cleared context), and <code>compact</code> (after compaction).</p>
+<p><code>Notification</code> follows similar logic — it matches on “notification type”. The common ones are <code>permission_prompt</code> (Claude is waiting for your approval) and <code>idle_prompt</code> (Claude has nothing to do and is waiting for the next message); rarer ones include <code>auth_success</code>, <code>elicitation_dialog</code>, <code>elicitation_complete</code>, and <code>elicitation_response</code>. For what each event’s matcher corresponds to, check the <a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/hooks">official hooks reference</a> — I won’t list them all here.</p>
+<h3 id="Advanced-use-if-to-filter-on-tool-arguments-too"><a href="#Advanced-use-if-to-filter-on-tool-arguments-too" class="headerlink" title="Advanced: use if to filter on tool arguments too"></a>Advanced: use <code>if</code> to filter on tool arguments too</h3><p><code>matcher</code> alone isn’t precise enough because it only compares tool names. If you want to say “only trigger the hook when Claude runs <code>git push</code>, ignore other Bash commands”, you need the more granular <code>if</code> field:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;if&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash(git push *)&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;echo &#x27;Blocked: please go through a PR, do not push to main directly&#x27; &gt;&amp;2; exit 2&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>What this example does: when Claude wants to run any Bash command starting with <code>git push</code>, the hook outputs a blocking message and uses <code>exit 2</code> to block the action. But if Claude wants to run <code>git status</code> or <code>npm test</code>, the hook won’t even fire.</p>
+<p>The difference between the two filter fields:</p>
+<ul>
+<li><code>matcher: &quot;Bash&quot;</code> is the first-level coarse filter: “only look at the Bash tool”.</li>
+<li><code>if: &quot;Bash(git push *)&quot;</code> is the second-level fine filter — it also matches the actual command Bash is about to run. <code>*</code> is the “anything after this” wildcard, using the same syntax as the permissions settings.</li>
+</ul>
+<p>The biggest upside is “the hook subprocess only spins up when the condition is actually matched”. Compared to firing the hook every time and then using <code>jq</code> to parse arguments to decide what to do, the performance is way better.</p>
+<blockquote>
+<p><strong>Note</strong><br>The <code>if</code> field was added later, so older versions of Claude Code might not recognize it and just ignore it. If you wrote <code>if</code> but the hook behaves as if it isn’t there, run <code>claude --version</code> first to check your version and update.</p>
+</blockquote>
+<h2 id="How-does-a-hook-talk-to-Claude-Code"><a href="#How-does-a-hook-talk-to-Claude-Code" class="headerlink" title="How does a hook talk to Claude Code?"></a>How does a hook talk to Claude Code?</h2><p>Now that matcher makes sense, let’s look at how a hook actually “exchanges messages” with Claude Code. Here’s the smallest possible example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><br><span class="hljs-comment"># 1. Capture the JSON Claude Code sent into the INPUT variable</span><br>INPUT=$(<span class="hljs-built_in">cat</span>)<br><br><span class="hljs-comment"># 2. Output a message back to Claude Code — this doesn&#x27;t show up in your terminal,</span><br><span class="hljs-comment">#    Claude Code picks it up as the hook&#x27;s response</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Hello Claude&quot;</span><br><br><span class="hljs-comment"># 3. Exit the script. Returning 0 means &quot;all good, continue&quot;.</span><br><span class="hljs-comment">#    If you write `exit 2`, that means &quot;something&#x27;s wrong, block this action&quot;.</span><br><span class="hljs-built_in">exit</span> 0<br></code></pre></td></tr></table></figure>
+
+<p>To give you a <code>PreToolUse</code> example: when Claude wants to run <code>npm test</code>, your hook receives a JSON payload like this on stdin:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;session_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;abc123&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/Users/ray/myproject&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;hook_event_name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;tool_name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;tool_input&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npm test&quot;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>A lot of people writing their first hook trip up here: they assume <code>exit 1</code> will block. <strong>But only exit 2 blocks</strong> — any other non-zero exit code doesn’t.</p>
+</blockquote>
+<h3 id="Using-JSON-output-for-finer-control"><a href="#Using-JSON-output-for-finer-control" class="headerlink" title="Using JSON output for finer control"></a>Using JSON output for finer control</h3><p>Are <code>exit 0</code> and <code>exit 2</code> your only options? Not quite — you can do more granular things (like auto-approving, or directly rewriting the command Claude is about to run). The trick is <code>exit 0</code> plus outputting a JSON payload to stdout:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hookSpecificOutput&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;hookEventName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;permissionDecision&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;deny&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;permissionDecisionReason&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Please use pnpm, not npm&quot;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>permissionDecision</code> has four values for <code>PreToolUse</code>:</p>
+<ul>
+<li><code>allow</code>: skip the permission prompt and allow directly</li>
+<li><code>deny</code>: block the action and feed the reason back to Claude</li>
+<li><code>ask</code>: fall back to the normal permission flow and prompt you</li>
+<li><code>defer</code>: the hook has no opinion, go back to the normal permission flow (same effect as not writing this field)</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong><br>Don’t mix exit 2 and JSON output. When Claude Code sees exit 2, it reads stderr as the reason and ignores any JSON on stdout. Pick one approach: either exit 2 with stderr, or exit 0 with JSON.</p>
+</blockquote>
+<h2 id="Five-hook-types"><a href="#Five-hook-types" class="headerlink" title="Five hook types"></a>Five hook types</h2><p>All the examples so far used <code>type: &quot;command&quot;</code>, which is the most common form. But Claude Code has four others:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>How it runs</th>
+<th>What it’s for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>command</code></td>
+<td>Run a Shell command</td>
+<td>Most situations — flexible and simple</td>
+</tr>
+<tr>
+<td><code>http</code></td>
+<td>POST event data to a URL</td>
+<td>Hooking into a remote service for shared auditing or org-wide validation</td>
+</tr>
+<tr>
+<td><code>mcp_tool</code></td>
+<td>Call a tool on a connected MCP server</td>
+<td>Reusing existing MCP tools as hook logic</td>
+</tr>
+<tr>
+<td><code>prompt</code></td>
+<td>Hand data to a Claude model to decide</td>
+<td>Situations needing semantic judgment instead of hard-coded rules</td>
+</tr>
+<tr>
+<td><code>agent</code></td>
+<td>Dispatch a subagent with tools to verify</td>
+<td>Situations where you need to actually read files or run commands to decide</td>
+</tr>
+</tbody></table></div>
+<p>90% of people writing hooks stop at <code>command</code>, but the other three (especially <code>prompt</code>) are pretty worth knowing about — they upgrade what hooks can do from “dumb rules” to “gatekeepers with judgment”.</p>
+<p>Here’s a <code>prompt</code> hook example. Say you want another model to check whether Claude really finished the requested task after it stops talking:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Stop&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;prompt&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;prompt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Check whether Claude actually completed every requested task. If not, reply &#123;\&quot;ok\&quot;: false, \&quot;reason\&quot;: \&quot;what&#x27;s missing\&quot;&#125;.&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>When this hook fires, Claude Code automatically calls a model to do a single-turn yes&#x2F;no decision. If it replies that the task wasn’t finished, the main Claude keeps going — basically a free quality-control checkpoint.</p>
+<h2 id="Real-world-examples"><a href="#Real-world-examples" class="headerlink" title="Real-world examples"></a>Real-world examples</h2><p>Enough concept, time for actual examples. The ones below are the ones I find most useful day-to-day, highest bang-for-buck.</p>
+<h3 id="Auto-format-modified-files"><a href="#Auto-format-modified-files" class="headerlink" title="Auto-format modified files"></a>Auto-format modified files</h3><p>After Claude uses <code>Edit</code> or <code>Write</code> to modify a file, run Prettier automatically to fix the formatting:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PostToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Edit|Write&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -r &#x27;.tool_input.file_path&#x27; | xargs npx prettier --write&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>This uses <a target="_blank" rel="noopener" href="https://jqlang.github.io/jq/"><code>jq</code></a> to parse the <code>file_path</code> out of the JSON stdin and pipe it to Prettier — all in one line. If your system doesn’t have jq, on Mac it’s <code>brew install jq</code>, on Ubuntu it’s <code>apt install jq</code>.</p>
+<p>If your project uses ESLint instead of Prettier, swap <code>npx prettier --write</code> for <code>npx eslint --fix</code>.</p>
+<p>This hook is tied to the project’s lint&#x2F;format rules, so put it in <code>.claude/settings.json</code> and commit it for the whole team.</p>
+<h3 id="Block-dangerous-commands-like-rm-rf"><a href="#Block-dangerous-commands-like-rm-rf" class="headerlink" title="Block dangerous commands like rm -rf"></a>Block dangerous commands like rm -rf</h3><p>It’s easier to maintain hooks as standalone Shell scripts. Start by creating <code>.claude/hooks/block-rm.sh</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br>INPUT=$(<span class="hljs-built_in">cat</span>)<br>COMMAND=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$INPUT</span>&quot;</span> | jq -r <span class="hljs-string">&#x27;.tool_input.command&#x27;</span>)<br><br><span class="hljs-comment"># Only block actual rm -rf / or rm -r /. Other paths (like /tmp/foo) are allowed through</span><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$COMMAND</span>&quot;</span> | grep -qE <span class="hljs-string">&#x27;rm[[:space:]]+-rf?[[:space:]]+/([[:space:]]|$)&#x27;</span>; <span class="hljs-keyword">then</span><br>  <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Blocked: rm -rf from root is not allowed&quot;</span> &gt;&amp;2<br>  <span class="hljs-built_in">exit</span> 2<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-built_in">exit</span> 0<br></code></pre></td></tr></table></figure>
+
+<p>I’m using the POSIX character class <code>[[:space:]]</code> instead of <code>\s</code> here because <code>\s</code> is a GNU grep extension — macOS’s default BSD grep doesn’t necessarily support it, which would silently break the match. <code>[[:space:]]</code> is the POSIX standard syntax and works in every grep on Mac and Linux.</p>
+<p>The <code>(/([[:space:]]|$))</code> part forces <code>/</code> to be followed by whitespace or end-of-line, so:</p>
+<ul>
+<li><code>rm -rf /</code>: blocked</li>
+<li><code>rm -r /</code>: blocked</li>
+<li><code>rm -rf /tmp/foo</code>: allowed, because what follows <code>/</code> isn’t whitespace or end-of-line</li>
+</ul>
+<p>This pattern is intentionally conservative — it only blocks literal <code>rm -rf /</code> and <code>rm -r /</code>. If you want to go harder (like blocking <code>rm -rf /*</code>, <code>rm -rf ~</code>, <code>rm -rf $HOME</code> and other variants), follow the same model and chain more <code>grep -qE</code> checks, each one with its own <code>exit 2</code>.</p>
+<p>Don’t forget to make it executable:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">chmod</span> +x .claude/hooks/block-rm.sh<br></code></pre></td></tr></table></figure>
+
+<p>Then register it in <code>.claude/settings.json</code>:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\&quot;$CLAUDE_PROJECT_DIR\&quot;/.claude/hooks/block-rm.sh&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>$CLAUDE_PROJECT_DIR</code> is a built-in Claude Code environment variable — it expands to the project root, safer than hardcoding an absolute path.</p>
+<blockquote>
+<p><strong>Note</strong><br>This hook fires even under <code>--dangerously-skip-permissions</code>. <code>PreToolUse</code> runs before the permission mode check, so hooks are one of the few mechanisms that can actually block actions in “bypass permissions” mode.</p>
+</blockquote>
+<p>This kind of safety guardrail goes in <code>.claude/settings.json</code> committed to the repo so the whole team is protected. If you only want personal insurance, putting it in <code>~/.claude/settings.json</code> is fine too.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-hooks/20260531150218.png" data-fancybox="gallery" data-caption="Screenshot showing rm -rf being blocked"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/claude-hooks/20260531150218.png" alt="Screenshot showing rm -rf being blocked"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Screenshot showing rm -rf being blocked</figcaption></figure>
+<h3 id="Reinject-project-context-after-Compact"><a href="#Reinject-project-context-after-Compact" class="headerlink" title="Reinject project context after Compact"></a>Reinject project context after Compact</h3><p>Once Context gets Compacted, Claude often forgets important conventions. You can use <code>SessionStart</code> with the <code>compact</code> matcher to inject a reminder every time after compaction:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;SessionStart&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;compact&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;echo &#x27;Reminder: use pnpm for package management, not npm; always run pnpm test before commit.&#x27;&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>What <code>SessionStart</code> and <code>UserPromptSubmit</code> hooks output to stdout gets added as extra context for Claude — that’s what makes these two events different from the others.</p>
+<p>If you want to inject dynamic content (like the current git branch or uncommitted files), swap the <code>echo</code> for your own script:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br>BRANCH=$(git rev-parse --abbrev-ref HEAD 2&gt;/dev/null)<br>DIRTY=$(git status --porcelain | <span class="hljs-built_in">wc</span> -l)<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Current branch: <span class="hljs-variable">$BRANCH</span>, uncommitted files: <span class="hljs-variable">$DIRTY</span>&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>This hook is best placed in <code>.claude/settings.json</code>, because “use pnpm” and “run pnpm test before commit” are internal project conventions — committing it means everyone who clones the repo picks it up automatically, no one has to set it up themselves.</p>
+<h3 id="Mac-desktop-notification"><a href="#Mac-desktop-notification" class="headerlink" title="Mac desktop notification"></a>Mac desktop notification</h3><p>Get a notification when Claude is waiting for your permission or your next prompt, so you can confidently go do other things:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;Notification&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;osascript -e &#x27;display notification \&quot;Claude Code is waiting\&quot; with title \&quot;Claude Code\&quot;&#x27;&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>On Linux, swap <code>osascript</code> for <code>notify-send</code>; on Windows PowerShell, use <code>MessageBox.Show</code> — same idea.</p>
+<blockquote>
+<p><strong>Note</strong><br>On Mac the first run might not show anything, because <code>osascript</code> sends notifications through the built-in Script Editor app. You need to go to System Settings → Notifications, find Script Editor, and enable its notification permission. If Script Editor isn’t even showing up in the list, run <code>osascript -e &#39;display notification &quot;test&quot;&#39;</code> once in Terminal first — that will make it appear in the notification settings list.</p>
+</blockquote>
+<p>Desktop notifications are purely personal preference — put this in <code>~/.claude/settings.json</code>, no need to commit.</p>
+<h3 id="Send-every-Claude-action-to-Discord"><a href="#Send-every-Claude-action-to-Discord" class="headerlink" title="Send every Claude action to Discord"></a>Send every Claude action to Discord</h3><p>If you don’t want to babysit the terminal, or you want to share what Claude is up to with the team via a Discord channel, you can use a PreToolUse hook to call a Discord webhook.</p>
+<p>First, generate a webhook URL in your Discord channel settings, then export it in your shell profile (don’t hardcode it in the script — committing it to a repo basically leaks it):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> DISCORD_WEBHOOK_URL=<span class="hljs-string">&quot;https://discord.com/api/webhooks/your-webhook-id/your-token&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>Next, create <code>~/.claude/hooks/discord-notify.js</code>:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-meta">#!/usr/bin/env node</span><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">WEBHOOK_URL</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">DISCORD_WEBHOOK_URL</span>;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Read the JSON Claude Code sent in via stdin</span><br>  <span class="hljs-keyword">const</span> chunks = [];<br>  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> process.<span class="hljs-property">stdin</span>) chunks.<span class="hljs-title function_">push</span>(chunk);<br>  <span class="hljs-keyword">const</span> input = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">concat</span>(chunks).<span class="hljs-title function_">toString</span>());<br><br>  <span class="hljs-keyword">const</span> toolName = input.<span class="hljs-property">tool_name</span> || <span class="hljs-string">&quot;unknown tool&quot;</span>;<br>  <span class="hljs-keyword">const</span> toolInput = input.<span class="hljs-property">tool_input</span> || &#123;&#125;;<br><br>  <span class="hljs-comment">// Build a Discord embed so the message looks nicer</span><br>  <span class="hljs-keyword">const</span> embed = &#123;<br>    <span class="hljs-attr">color</span>: <span class="hljs-number">0x7289da</span>,<br>    <span class="hljs-attr">author</span>: &#123; <span class="hljs-attr">name</span>: <span class="hljs-string">`🔧 <span class="hljs-subst">$&#123;toolName&#125;</span>`</span> &#125;,<br>    <span class="hljs-attr">description</span>: toolInput.<span class="hljs-property">file_path</span><br>      ? <span class="hljs-string">`\`<span class="hljs-subst">$&#123;toolInput.file_path&#125;</span>\``</span><br>      : toolInput.<span class="hljs-property">command</span><br>        ? <span class="hljs-string">`\`\`\`bash\n<span class="hljs-subst">$&#123;toolInput.command&#125;</span>\n\`\`\``</span><br>        : <span class="hljs-string">&quot;&quot;</span>,<br>    <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),<br>  &#125;;<br><br>  <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-variable constant_">WEBHOOK_URL</span>, &#123;<br>    <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,<br>    <span class="hljs-attr">headers</span>: &#123; <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span> &#125;,<br>    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; <span class="hljs-attr">embeds</span>: [embed] &#125;),<br>  &#125;);<br>&#125;<br><br><span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);<br></code></pre></td></tr></table></figure>
+
+<p>Finally, register it in <code>~/.claude/settings.json</code> (using personal settings so it works across all projects):</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node ~/.claude/hooks/discord-notify.js&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>matcher: &quot;&quot;</code> means “notify on any tool”, so no matter what Claude is about to do — <code>Read</code>, <code>Edit</code>, <code>Bash</code> — you’ll get a Discord message. If you want different emoji, colors, or fields per tool type, extend along these lines.</p>
+<p>This whole hook is for personal notifications and the webhook URL is yours alone — put it in <code>~/.claude/settings.json</code> at the personal layer, no need to commit.</p>
+<blockquote>
+<p><strong>Note</strong><br>The webhook URL should always be read from an environment variable, never hardcoded in the script. If you really want to share one webhook with the team, the hook itself can live in <code>.claude/settings.json</code>, but the webhook URL should still only live in each person’s shell profile or <code>.claude/settings.local.json</code> (which doesn’t get committed).</p>
+</blockquote>
+<h3 id="Log-every-Bash-command"><a href="#Log-every-Bash-command" class="headerlink" title="Log every Bash command"></a>Log every Bash command</h3><p>If you want to audit which Bash commands Claude has actually run, add a one-liner to <code>PostToolUse</code>:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PostToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -r &#x27;.tool_input.command&#x27; &gt;&gt; ~/.claude/bash.log&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>Every Bash command Claude runs gets appended to <code>~/.claude/bash.log</code>, easy to review later. This is personal auditing — put it in <code>~/.claude/settings.json</code>.</p>
+<h2 id="How-do-multiple-hooks-combine"><a href="#How-do-multiple-hooks-combine" class="headerlink" title="How do multiple hooks combine?"></a>How do multiple hooks combine?</h2><p>When you set multiple hooks on the same event, they all <strong>run in parallel</strong> — they don’t block each other, and Claude Code combines all the results at the end. For <code>PreToolUse</code>, the permission decision follows the “strictest wins” rule: deny beats ask, ask beats allow.</p>
+<p>A concrete example — you can set both “log every Bash command” and “block rm -rf” at the same time:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PreToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Bash&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jq -r .tool_input.command &gt;&gt; ~/.claude/bash.log&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\&quot;$CLAUDE_PROJECT_DIR\&quot;/.claude/hooks/block-rm.sh&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>When Claude tries to run <code>rm -rf /tmp/build</code>, both hooks fire at the same time — the log gets written, the rm gets blocked. The log doesn’t miss the entry just because rm was blocked, because the two hooks run independently.</p>
+<h2 id="How-do-you-confirm-a-hook-actually-ran"><a href="#How-do-you-confirm-a-hook-actually-ran" class="headerlink" title="How do you confirm a hook actually ran?"></a>How do you confirm a hook actually ran?</h2><p>You’ve set up a hook but aren’t sure if it’s even firing? Claude Code gives you two ways to check.</p>
+<p>The first is the <code>/hooks</code> command — type <code>/hooks</code> inside Claude Code to bring up a list of currently configured hooks, grouped by event, each one drillable to see its matcher and command. <code>/hooks</code> is read-only — to actually edit a hook, you still need to edit <code>settings.json</code>.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-hooks/20260531150538.png" data-fancybox="gallery" data-caption="Screenshot of the &#x2F;hooks command interface"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/claude-hooks/20260531150538.png" alt="Screenshot of the &#x2F;hooks command interface"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Screenshot of the &#x2F;hooks command interface</figcaption></figure>
+<p>The second is the debug log. When you launch, add <code>--debug-file /tmp/claude.log</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude --debug-file /tmp/claude.log<br></code></pre></td></tr></table></figure>
+
+<p>Then open another window and run <code>tail -f /tmp/claude.log</code> — every hook trigger will show its full stdout, stderr, and exit code in the log. If you only want hook-related output without other debug noise drowning it out, use <code>claude --debug hooks</code> with a filter.</p>
+<h2 id="Further-reading"><a href="#Further-reading" class="headerlink" title="Further reading"></a>Further reading</h2><ul>
+<li><a href="/en/ai/2026/03/31/which-claude-code-files-should-you-commit/">Which Claude Code Files Should You Commit? CLAUDE.md, Settings, Rules, Skills — A Complete Breakdown</a>: once you’ve nailed down the layering of <code>.claude/settings.json</code>, hooks make a lot more sense.</li>
+<li><a href="/en/ai/2026/04/29/claude-code-built-in-tools-explained/">What do Claude Code’s built-in tools actually do? Understanding how it picks tools</a>: to write a hook you first need to know the tool names that matcher targets.</li>
+<li><a href="/en/ai/2026/01/20/agent-skills-vs-mcp-token-efficient/">Agent Skills: More Token-Efficient Than MCP</a>: Skills and Hooks are complementary — Skills give capability, Hooks give guarantee.</li>
+</ul>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/ai/2026/06/02/claude-code-auto-memory-cleanup-guide/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Is Claude Code Auto Memory Hogging Your Memory? A Cleanup & Diagnostics Guide
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/misc/2026/05/26/how-much-does-a-blog-really-earn-with-google-adsense/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Can a Blog Really Make Tens of Thousands of Dollars a Month? Real Google AdSense Numbers, Explained
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/ai/2026/04/29/claude-code-built-in-tools-explained/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                What Are Claude Code's Built-in Tools Doing? Understand How It Picks Tools — Then Write Better Prompts
+              </h4>
+              <time datetime="2026-04-29" title="Published: 2026-04-29" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-29
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/01/28/want-to-develop-with-claude-code-beginner-to-advanced/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Want to Develop With Claude Code? This Guide Takes You From Beginner to Advanced
+              </h4>
+              <time datetime="2026-01-28" title="Published: 2026-01-28" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-01-28
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/02/claude-code-auto-memory-cleanup-guide/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Is Claude Code Auto Memory Hogging Your Memory? A Cleanup & Diagnostics Guide
+              </h4>
+              <time datetime="2026-06-02" title="Published: 2026-06-02" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-02
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/05/25/claude-code-routines-schedule-and-branch-push-fix/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Routines: How to Set Up /schedule (and Why It Pushes to claude/ Instead of main)
+              </h4>
+              <time datetime="2026-05-25" title="Published: 2026-05-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-25
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/" data-title="What Are Claude Code Hooks? Auto-Run Lint, Block rm -rf, Inject Context on SessionStart — A Complete Guide" data-hashtags="AI,Claude Code,AI Agent,Claude Code Hooks,Hooks,AI Development,AI Automation" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/ai/2026/05/31/claude-code-hooks-complete-guide/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What%E2%80%99s-the-difference-between-Hooks-Skills-CLAUDE-md-and-Rules"><span class="toc-text">What’s the difference between Hooks, Skills, CLAUDE.md, and Rules?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-does-the-hook-config-file-look-like"><span class="toc-text">What does the hook config file look like?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Where-does-the-config-file-go"><span class="toc-text">Where does the config file go?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-events-are-available"><span class="toc-text">What events are available?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#The-most-commonly-used-ones"><span class="toc-text">The most commonly used ones</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Other-ones-that-are-rarer-but-worth-knowing"><span class="toc-text">Other ones that are rarer but worth knowing</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-do-you-write-a-matcher"><span class="toc-text">How do you write a matcher?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Advanced-use-regex-to-match-MCP-tools"><span class="toc-text">Advanced: use regex to match MCP tools</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Not-all-events-match-on-tool-name"><span class="toc-text">Not all events match on tool name</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Advanced-use-if-to-filter-on-tool-arguments-too"><span class="toc-text">Advanced: use if to filter on tool arguments too</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-does-a-hook-talk-to-Claude-Code"><span class="toc-text">How does a hook talk to Claude Code?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-JSON-output-for-finer-control"><span class="toc-text">Using JSON output for finer control</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Five-hook-types"><span class="toc-text">Five hook types</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Real-world-examples"><span class="toc-text">Real-world examples</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Auto-format-modified-files"><span class="toc-text">Auto-format modified files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Block-dangerous-commands-like-rm-rf"><span class="toc-text">Block dangerous commands like rm -rf</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reinject-project-context-after-Compact"><span class="toc-text">Reinject project context after Compact</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mac-desktop-notification"><span class="toc-text">Mac desktop notification</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Send-every-Claude-action-to-Discord"><span class="toc-text">Send every Claude action to Discord</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Log-every-Bash-command"><span class="toc-text">Log every Bash command</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-do-multiple-hooks-combine"><span class="toc-text">How do multiple hooks combine?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-do-you-confirm-a-hook-actually-ran"><span class="toc-text">How do you confirm a hook actually ran?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Further-reading"><span class="toc-text">Further reading</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>
