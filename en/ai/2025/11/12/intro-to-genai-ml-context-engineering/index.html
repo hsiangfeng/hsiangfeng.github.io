@@ -1,0 +1,1523 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20251112/978259833/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20251112/978259833/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="Today&#39;s AI applications are basically all tied to Prompt Engineering and Context Engineering. So what&#39;s the difference between the two, and how do they relate? This post digs into how these two concepts shape how AI Agents work.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="Today&#39;s AI applications are basically all tied to Prompt Engineering and Context Engineering. So what&#39;s the difference between the two, and how do they relate? This post digs into how these two concepts shape how AI Agents work.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2025-11-12T00:51:29.000Z">
+    
+      <meta property="article:modified_time" content="2025-11-12T00:51:29.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="LLM">
+      
+        <meta property="article:tag" content="Context Engineering">
+      
+        <meta property="article:tag" content="Generative AI">
+      
+        <meta property="article:tag" content="Hung-yi Lee">
+      
+        <meta property="article:tag" content="How ChatGPT Works">
+      
+        <meta property="article:tag" content="LLM Tutorial">
+      
+        <meta property="article:tag" content="AI Hallucination">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering | Is Ray, Not Array">
+  <meta name="twitter:description" content="Today&#39;s AI applications are basically all tied to Prompt Engineering and Context Engineering. So what&#39;s the difference between the two, and how do they relate? This post digs into how these two concepts shape how AI Agents work.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/"},"headline":"Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering","url":"https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/","datePublished":"2025-11-12T00:51:29.000Z","dateModified":"2025-11-12T00:51:29.000Z","description":"Today's AI applications are basically all tied to Prompt Engineering and Context Engineering. So what's the difference between the two, and how do they relate? This post digs into how these two concepts shape how AI Agents work.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":21592,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png","width":1200,"height":630}],"articleSection":["AI"],"keywords":"LLM, Context Engineering, Generative AI, Hung-yi Lee, How ChatGPT Works, LLM Tutorial, AI Hallucination"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/#breadcrumb","name":"Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/ai/20251112/978259833/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/ai/20251112/978259833/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2025-11-12" title="Published: 2025-11-12" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2025-11-12
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/LLM/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LLM
+            </a>
+          
+            <a href="/tags/Context-Engineering/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Context Engineering
+            </a>
+          
+            <a href="/tags/Generative-AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Generative AI
+            </a>
+          
+            <a href="/tags/Hung-yi-Lee/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Hung-yi Lee
+            </a>
+          
+            <a href="/tags/How-ChatGPT-Works/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #How ChatGPT Works
+            </a>
+          
+            <a href="/tags/LLM-Tutorial/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LLM Tutorial
+            </a>
+          
+            <a href="/tags/AI-Hallucination/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Hallucination
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png" data-fancybox="gallery" data-caption="Intro to Generative AI and Machine Learning"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8811_04_43.png" alt="Intro to Generative AI and Machine Learning"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Intro to Generative AI and Machine Learning</figcaption></figure>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>Today’s AI applications are basically all tied to Prompt Engineering and Context Engineering. So what’s the difference between the two, and how do they relate? This post digs into how these two concepts shape how AI Agents work.</p>
+<h2 id="What-is-Context-Engineering"><a href="#What-is-Context-Engineering" class="headerlink" title="What is Context Engineering?"></a>What is Context Engineering?</h2><p>The previous post “<a href="/en/ai/2025/11/02/intro-to-genai-ml-just-text-prediction/">Intro to Generative AI and Machine Learning (1) — It’s All Just Text Prediction</a>“ kept hammering one thing:</p>
+<p>“A language model is basically a ‘text prediction’ system.”</p>
+<p>Given the Prompt you input, the language model predicts the next character based on the input, then keeps repeating until it finishes the full response.</p>
+<p>Let’s revisit the formula:</p>
+<p>$f(x)&#x3D;ax+b$</p>
+<ul>
+<li><code>x</code>: input prompt</li>
+<li><code>f</code>: language model</li>
+<li><code>a</code>, <code>b</code>: parameters inside the language model</li>
+<li><code>f(x)</code>: model output</li>
+</ul>
+<p>When you input a Prompt <code>x</code>, the language model <code>f</code> calculates the output <code>f(x)</code> based on its internal parameters <code>a</code> and <code>b</code>. But when the output <code>f(x)</code> isn’t what you wanted, you can only adjust <code>x</code> (the prompt) or <code>f</code> (the language model itself).</p>
+<p>If you’re adjusting the model, that’s called “Training”. If you’re changing the model’s <code>a</code> and <code>b</code> parameters, that’s called “Learning”.</p>
+<p>Usually we don’t go in and tweak the model’s parameters directly, so we focus on “tuning the prompt (Prompt Engineering)” — designing a better prompt <code>x</code> to get the language model <code>f</code> to output what we want as <code>f(x)</code>. Most of the time we can’t actually modify the language model itself — ChatGPT for example, you can only use OpenAI’s API or interface to interact with it, you can’t change its parameters directly. It’s a closed online language model, so even if there’s a problem, you can’t fix it.</p>
+<h2 id="Prompt-Engineering-vs-Context-Engineering"><a href="#Prompt-Engineering-vs-Context-Engineering" class="headerlink" title="Prompt Engineering vs Context Engineering"></a>Prompt Engineering vs Context Engineering</h2><p>So we’ve said most of the time we modify the Prompt to get the result we want — this is called “Prompt Engineering”. We design a better prompt <code>x</code> to get the language model <code>f</code> to output what we want as <code>f(x)</code>.</p>
+<p>So what’s “Context Engineering”?</p>
+<p>The course’s professor mentioned that, fundamentally, there’s not much difference — it’s basically just a fancier name.</p>
+<p>But is that really the case? There are still real differences between the two. The concept is similar, but the focus is different. Prompt Engineering is about “how to design a good prompt”, or even “magical-sounding prompts” that coax the language model into producing what we want.</p>
+<p>For example:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">You must respond in JSON format and include the following fields:<br><br>- name: user name...<br></code></pre></td></tr></table></figure>
+
+<p>This is a classic Prompt Engineering example, because it directly tells the model what response format we want. As time has passed, AIs have gotten smarter — basically any prompt a human can understand, the AI can understand too. So we can design more complex prompts to get the result we want.</p>
+<p>In the early days, models like GPT-3 were really rough — if you didn’t put effort into the Prompt, the response usually wasn’t great. So Prompt Engineering became really important, and people discovered all kinds of “magical spells” (prompts). Like, if you told the model “every response must be at least 3,000 words”, the answer would actually become noticeably more precise.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112212652.png" data-fancybox="gallery" data-caption="magical prompts"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112212652.png" alt="magical prompts"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">magical prompts</figcaption></figure>
+<p>Other “magical spells” emerged later — take three deep breaths, role-play as a particular character, even emotionally pressure the model — all of which could improve response quality.</p>
+<p>There’s <a target="_blank" rel="noopener" href="https://minimaxir.com/2024/02/chatgpt-tips-analysis/">an experiment at minimaxir.com</a> that offered ChatGPT four options for “what you get if you answer correctly”: Taylor Swift tickets, world peace, a tip, getting love. ChatGPT cared about world peace the most.</p>
+<p>As time goes on, these magical prompts are slowly becoming less magical — thanks to models getting more capable.</p>
+<p>As the magic of prompt spells fades, a new thing has emerged — “Context Engineering”. The focus of Context Engineering is the automated management of “context information”. We’re no longer just designing a single prompt — we’re managing the entire conversation’s context information so the model can understand our needs better.</p>
+<h3 id="User-Prompt-give-the-premise"><a href="#User-Prompt-give-the-premise" class="headerlink" title="User Prompt: give the premise"></a>User Prompt: give the premise</h3><p>What should Context Engineering include? Basically everything Prompt Engineering uses, like:</p>
+<ol>
+<li>Task description: write a TodoList Web Application.</li>
+<li>Detailed instructions (options): use Vue + Vite and Bootstrap, persist data to LocalStorage so it’s available next time.</li>
+<li>Extra conditions: input fields need form validation, completed todos should be deletable.</li>
+<li>Output style: code should be readable, with comments explaining what each function does.</li>
+</ol>
+<p>The clearer you can be, the better — language models can’t read minds. They respond based on the info you give them.</p>
+<p>For example, if you ask ChatGPT in Mandarin:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">What&#x27;s a &quot;carrier&quot;?<br></code></pre></td></tr></table></figure>
+
+<p>ChatGPT has no idea what you’re asking about, so the response will be vague:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112215502.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112215502.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>This is a classic case of not giving the model a clear “premise”. Mandarin is full of nuance — a single word can have many meanings depending on context. The Mandarin word “載具” can mean different things in different situations. If you clarify:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">At a 7-Eleven checkout, the clerk asked me whether I wanted to use a &quot;載具&quot;. What does &quot;載具&quot; mean here?<br></code></pre></td></tr></table></figure>
+
+<p>ChatGPT’s response suddenly becomes really precise:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112215745.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112215745.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>(For non-Mandarin readers: in Taiwan, “載具” is the term used for a digital receipt carrier registered with the tax system. The model needs context to disambiguate from “vehicle”.)</p>
+<p>Giving the model a clear “premise” is genuinely useful — this is a key idea in Context Engineering.</p>
+<h3 id="User-Prompt-give-a-reference"><a href="#User-Prompt-give-a-reference" class="headerlink" title="User Prompt: give a reference"></a>User Prompt: give a reference</h3><p>Beyond clear premises, providing a concrete example helps a lot. For example:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">Please rewrite the text below in Martian script:<br><br>Hello, I&#x27;m a blogger called Ray, and I love writing technical posts!<br></code></pre></td></tr></table></figure>
+
+<p>You’ll find ChatGPT’s response probably isn’t what you expected:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112220127.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112220127.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>This is because “Martian script” doesn’t have a single agreed definition, so the model can’t figure out what you mean. If you provide an example:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs txt">Please rewrite the text below in Martian script. Examples of Martian script:<br><br>- the =&gt; teh<br>- is =&gt; 4<br>- love =&gt; Love<br>- I =&gt; 1<br><br>Now rewrite this in Martian script:<br>Hello, I&#x27;m a blogger called Ray, and I love writing technical posts!<br></code></pre></td></tr></table></figure>
+
+<p>You’ll find the model can now produce something matching your expectation more easily:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112220700.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251112220700.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>Providing examples this way is called “In-Context Learning”. Heads up: the “Learning” here doesn’t change the model’s parameters — it just means the model uses the context info we provide to learn within that conversation.</p>
+<p>The course also brought up a fun case — “Karamonji language”, apparently spoken by only a few thousand people, with basically no internet presence (I searched too — really no info). So the model has no way to learn anything about it. What do you do? Provide reference material like textbooks and papers, and you’ll find the model can produce responses in Karamonji too.</p>
+<p>That’s a textbook “In-Context Learning” case.</p>
+<p>So… how does the model actually learn? Again, “learning” here doesn’t mean changing the model’s parameters — it’s letting the model use the context info to “learn” within that session.</p>
+<p>What gives the language model the ability to translate “Karamonji” is the “example sentences” in those textbooks and papers — what really helps the model is example sentences, not grammar rules. Because the model is fundamentally a “text prediction” system that learns from massive amounts of text, give it enough example sentences and it can figure out how to translate Karamonji.</p>
+<h3 id="What-exactly-is-a-System-Prompt"><a href="#What-exactly-is-a-System-Prompt" class="headerlink" title="What exactly is a System Prompt?"></a>What exactly is a System Prompt?</h3><p>So far we’ve talked about User Prompt (the user’s prompt). What about System Prompt?</p>
+<p>A System Prompt is a set of rules the developers of the language model set at the system level to guide the model’s behavior. Claude has its <a target="_blank" rel="noopener" href="https://docs.claude.com/en/release-notes/system-prompts">System Prompts publicly documented</a> — let me pull a snippet from Claude Sonnet 4.5:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;behavior_instructions&gt; &lt;general_claude_info&gt; The assistant is Claude, created by Anthropic.<br>The current date is &#123;&#123;currentDateTime&#125;&#125;.<br><br>Here is some information about Claude and Anthropic&#x27;s products in case the person asks:<br>This iteration of Claude is Claude Sonnet 4.5 from the Claude 4 model family. The Claude 4 family currently consists of Claude Opus 4.1, 4 and Claude Sonnet 4.5 and 4. Claude Sonnet 4.5 is the smartest model and is efficient for everyday use.<br>If the person asks, Claude can tell them about the following products which allow them to access Claude. Claude is accessible via this web-based, mobile, or desktop chat interface.<br>...<br></code></pre></td></tr></table></figure>
+
+<p>It’s pretty long, so I’m only showing part of it.</p>
+<p>The first line immediately tells the model who it is, then today’s date — this is why even though the model is “locked in a closed system”, it still knows the date: because the System Prompt told it. A good model’s System Prompt is <em>very</em> long, with lots of rules guiding behavior.</p>
+<p>System Prompts usually aren’t shown to users. For Claude’s System Prompt, the key categories include:</p>
+<ul>
+<li>Identity and product info: “The assistant is Claude, created by Anthropic.”</li>
+<li>Usage instructions and limits: “If asked about the Anthropic API, point to <a target="_blank" rel="noopener" href="https://docs.anthropic.com/">https://docs.anthropic.com</a>“</li>
+<li>Interaction style and user feedback: “If user is unhappy, suggest pressing the thumbs down button”</li>
+<li>Safety and forbidden content: “Claude does not provide info to make chemical or nuclear weapons”</li>
+<li>Response style and format: “Claude never starts its response with ‘good question’”</li>
+<li>Knowledge and factuality: “Claude’s knowledge cutoff is Jan 2025”</li>
+<li>Self-positioning and philosophy: “Claude does not claim to be human or conscious”</li>
+<li>Error handling and interaction detail: “If corrected, Claude first thinks carefully before acknowledging”</li>
+</ul>
+<p>So we can see — a good System Prompt is really long, with lots of rules that directly shape the model’s response quality and style.</p>
+<h2 id="Dialogue-History-short-term-memory"><a href="#Dialogue-History-short-term-memory" class="headerlink" title="Dialogue History (short-term memory)"></a>Dialogue History (short-term memory)</h2><p>When you use ChatGPT, the current chat window is essentially “short-term memory”.</p>
+<p>What does that mean? Try this — in chat window A, say:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001344.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001344.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>Then open a new chat window B and say:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001417.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001417.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>You’ll find ChatGPT suddenly doesn’t remember what you said in A. This is because each chat window is “short-term memory” — it only remembers the current window’s conversation. Open a new one and the prior conversation is gone.</p>
+<p>In the image above, ChatGPT mentioned:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">If you want me to remember &quot;Little Wang is the legendary Pharaoh&quot; long-term, I actually can&#x27;t do that right now — you&#x27;d need to go to Settings &gt; Personalization &gt; Memory and turn on the memory feature.<br><br>Within this conversation, I can definitely treat &quot;Little Wang = legendary Pharaoh&quot; as context, but it won&#x27;t automatically persist to future conversations.<br></code></pre></td></tr></table></figure>
+
+<p>ChatGPT now offers a way to remember things “across windows” — it’s called “Memory”. You can enable it in settings, and ChatGPT will remember things across chat windows.</p>
+<h2 id="Long-Term-Memory"><a href="#Long-Term-Memory" class="headerlink" title="Long-Term Memory"></a>Long-Term Memory</h2><p>So how does ChatGPT’s long-term memory actually work?</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001730.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114001730.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p><del>Obviously by going to personalization settings and turning on “Memory”!</del></p>
+<p>Once you enable the Memory feature, every new chat starts with ChatGPT first reading your stored “memories” and using them as part of the context. The shape is roughly:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">[System Prompt]<br><br>[Long-Term Memory]<br><br>[User Prompt]<br></code></pre></td></tr></table></figure>
+
+<p>ChatGPT first loads the developer-set System Prompt, then your Long-Term Memory, then finally your User Prompt. That way ChatGPT can respond while taking your stored memories into account.</p>
+<h2 id="Other-source-references"><a href="#Other-source-references" class="headerlink" title="Other source references"></a>Other source references</h2><p>Let’s also talk about how models handle outdated information. You’ve probably hit a situation where AI gives you stale info — like always replying with Vue 2 patterns when we’re clearly in Vue 3 territory now. What do you do?</p>
+<p>The most common approach: search engines. Let the language model search the web for fresh info and use that as part of the context, so the model can give you up-to-date info.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114002621.png" data-fancybox="gallery" data-caption="Web Fetch"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114002621.png" alt="Web Fetch"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Web Fetch</figcaption></figure>
+<p>So before asking the model to do something, you can have it search first, then respond or generate content. You can also feed your own database to the model.</p>
+<p>This actually has a formal name:</p>
+<p>“Retrieval-Augmented Generation (RAG)”</p>
+<p>Even with RAG strengthening the model’s knowledge, the model’s output isn’t guaranteed to be correct — at the end of the day, it’s still “text prediction”. So we still need to review and verify the info the model provides.</p>
+<h2 id="Tool-Use"><a href="#Tool-Use" class="headerlink" title="Tool Use"></a>Tool Use</h2><p>While we’re here — using a search engine is itself a “Tool Use”. For example, Gemini can read and even modify your Gmail and Google Calendar.</p>
+<p>How does the model actually use tools? Simple — in the Context, you tell the model what tools it can use. When the model needs to use one, it follows the Context’s instructions, uses the tool, and returns the result to the user.</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs txt">If you hit a problem you can&#x27;t solve, you can use tools.<br>Wrap tool use commands in &lt;tool&gt; and &lt;/tool&gt; tags. After using a tool, put the result between &lt;output&gt; and &lt;/output&gt;.<br></code></pre></td></tr></table></figure>
+
+<p>Then you tell the model how to use each tool:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">Available tools:<br><br>- Search engine: search for latest info. Usage: `WebSearch(value)`. Example: `WebSearch(&quot;latest AI tech in 2025&quot;)`<br>- Calculator: do math. Usage: `Calculator(value)`. Example: `Calculator(&quot;12345 * 6789&quot;)`<br></code></pre></td></tr></table></figure>
+
+<p>So when you give the model a User Prompt like:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">Please search for &quot;latest AI tech in 2025&quot; and tell me the key points.<br></code></pre></td></tr></table></figure>
+
+<p>The model will use the search engine tool based on the Context instructions:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>WebSearch(&quot;latest AI tech in 2025&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>One thing to flag here — the model isn’t <em>actually</em> using the tool, because that string is just text. You need a small program to convert that text into real tool invocation — usually called a “Mediator”.</p>
+<p>So when the model produces:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>WebSearch(&quot;latest AI tech in 2025&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>The output gets handed to the mediator, which might look something like:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">performWebSearch</span>(<span class="hljs-params">query</span>) &#123;<br>  <span class="hljs-comment">// actual search code goes here</span><br>  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`https://api.example.com/search?q=<span class="hljs-subst">$&#123;<span class="hljs-built_in">encodeURIComponent</span>(query)&#125;</span>`</span>);<br>  <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();<br>  <span class="hljs-keyword">return</span> data.<span class="hljs-property">results</span>;<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">mediator</span>(<span class="hljs-params">modelOutput</span>) &#123;<br>  <span class="hljs-keyword">const</span> toolRegex = <span class="hljs-regexp">/&lt;tool&gt;([\s\S]*?)&lt;\/tool&gt;/</span>;<br>  <span class="hljs-keyword">const</span> match = modelOutput.<span class="hljs-title function_">match</span>(toolRegex);<br>  <span class="hljs-keyword">if</span> (match) &#123;<br>    <span class="hljs-keyword">const</span> toolCommand = match[<span class="hljs-number">1</span>].<span class="hljs-title function_">trim</span>();<br>    <span class="hljs-keyword">if</span> (toolCommand.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;WebSearch&quot;</span>)) &#123;<br>      <span class="hljs-keyword">const</span> query = toolCommand.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/WebSearch\(&quot;([\s\S]*?)&quot;\)/</span>)[<span class="hljs-number">1</span>];<br>      <span class="hljs-keyword">const</span> searchResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">performWebSearch</span>(query);<br>      <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;output&gt;<span class="hljs-subst">$&#123;searchResults&#125;</span>&lt;/output&gt;`</span>;<br>    &#125;<br>    <span class="hljs-comment">// extensible to other tools</span><br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Tool-Use-Computer-Use"><a href="#Tool-Use-Computer-Use" class="headerlink" title="Tool Use: Computer Use"></a>Tool Use: Computer Use</h3><p>Among all tools, the most powerful and general-purpose one is your computer — this is called “Computer Use”. It lets the model use the computer for various operations like reading files, writing files, running code, etc.</p>
+<p>ChatGPT has a feature called “AI Agent” that lets the model use the computer to do things — reading files, writing files, running code, even booking tickets, sending emails, organizing data. All of these are accomplished by letting the model use the computer.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114102649.png" data-fancybox="gallery" data-caption="ChatGPT"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251114102649.png" alt="ChatGPT"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">ChatGPT</figcaption></figure>
+<p>How does the model actually pull this off? The concept is the same as “Tool Use” — you tell the model what tools are available in the Context, and when it needs to use them, it follows the Context’s instructions and returns the result.</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">Available tools:<br><br>- Mouse: click, drag, scroll, move. Usage: `Mouse(action, x, y)`. Example: `Mouse(&quot;click&quot;, 100, 200)`<br>- Keyboard: type text, press keys. Usage: `Keyboard(action, key)`. Example: `Keyboard(&quot;type&quot;, &quot;Hello World&quot;)`<br>- File system: read/write files. Usage: `FileSystem(action, path, content)`. Example: `FileSystem(&quot;write&quot;, &quot;/path/to/file.txt&quot;, &quot;Hello World&quot;)`<br>- Network request: send HTTP requests. Usage: `NetworkRequest(method, url, data)`. Example: `NetworkRequest(&quot;GET&quot;, &quot;https://api.example.com/data&quot;)`<br></code></pre></td></tr></table></figure>
+
+<p>So when you give a User Prompt like:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">Please open the browser, search for &quot;latest AI tech in 2025&quot;, then save the results to search_results.txt on the desktop.<br></code></pre></td></tr></table></figure>
+
+<p>The model uses the tools based on the Context:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;tool&gt;<br>Mouse(&quot;click&quot;, 100, 200)  // click browser search bar<br>Keyboard(&quot;type&quot;, &quot;latest AI tech in 2025&quot;)<br>Keyboard(&quot;type&quot;, &quot;Enter&quot;)  // press Enter<br>FileSystem(&quot;write&quot;, &quot;/Users/username/Desktop/search_results.txt&quot;, &quot;search result content&quot;)<br>&lt;/tool&gt;<br></code></pre></td></tr></table></figure>
+
+<p>Same thing — a mediator translates the text into actual computer operations.</p>
+<h2 id="Reasoning"><a href="#Reasoning" class="headerlink" title="Reasoning"></a>Reasoning</h2><p>Now let’s talk about “Reasoning”. A lot of models claim to have “deep thinking” capability — DeepSeek series, Gemini series, certain ChatGPT models. How do they do it?</p>
+<p>Usually a language model responds directly to your User Prompt based on the context. “Deep thinking” means “it doesn’t answer right away — it does an internal mental rehearsal first”, trying various approaches and self-verifying:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;reasoning&gt;<br>1. Approach 1: try solution A... no, doesn&#x27;t work<br>2. Approach 2: try solution B... seems fine<br>3. Approach 3: try solution C... feels off<br>&lt;/reasoning&gt;<br></code></pre></td></tr></table></figure>
+
+<p>Then it produces the final answer based on Approach 2.</p>
+<p>Most models don’t expose the full reasoning trace — usually only a summary. The reasoning is also part of the Context, just contributed by the model itself rather than the user.</p>
+<h2 id="So-what-is-Context-anyway"><a href="#So-what-is-Context-anyway" class="headerlink" title="So what is Context, anyway?"></a>So what <em>is</em> Context, anyway?</h2><p>We’ve gone through a lot, but it’s all “Context”:</p>
+<ul>
+<li>System Prompt</li>
+<li>User Prompt</li>
+<li>Dialogue History</li>
+<li>Memory</li>
+<li>Relevant info from other sources</li>
+<li>Tool Use</li>
+<li>Reasoning</li>
+</ul>
+<p>That’s a <em>lot</em>. So Context is really long, and the core focus of Context Engineering is:</p>
+<p>“Avoid Context Too Long.”</p>
+<p>When Context blows up, the language model easily forgets earlier setups, info, etc., and can’t respond properly.</p>
+<h2 id="Why-the-AI-Agent-era-needs-Context-Engineering"><a href="#Why-the-AI-Agent-era-needs-Context-Engineering" class="headerlink" title="Why the AI Agent era needs Context Engineering"></a>Why the AI Agent era needs Context Engineering</h2><p>Three common ways we use AI:</p>
+<ul>
+<li>Standard usage: one question, one answer — let the AI generate content.</li>
+<li>Agentic Workflow: let the AI complete a workflow you defined — a fixed flow.</li>
+<li>AI Agent: rather than a fixed SOP, the AI Agent itself decides how to complete the workflow, even which tools to use. Like “book me a train ticket from Taipei to Kaohsiung” — and the model figures out what tools to use, whether to check the schedule first, etc. The core is: no fixed flow, the AI decides.</li>
+</ul>
+<p>An AI Agent is like a loop — it keeps deciding the next step based on context, then re-decides based on new context, until the task is done.</p>
+<p>Each iteration of an AI Agent has two phases:</p>
+<ul>
+<li>Observation: the result of the previous Action — like a tool’s output, an API response, an error message, or a new instruction from the user.</li>
+<li>Action: what the Agent decides to do next based on the current Observation and overall context — like calling a tool, fetching info, updating the plan, or directly returning a result.</li>
+</ul>
+<p>The task goal is called the “Goal”.</p>
+<blockquote>
+<p><strong>Note</strong><br>When using AI Agents, be careful with the action flow — make sure it doesn’t do harmful things like deleting files it shouldn’t, sending spam, etc.</p>
+</blockquote>
+<h2 id="From-the-LLM’s-perspective-what-is-an-AI-Agent-really-solving"><a href="#From-the-LLM’s-perspective-what-is-an-AI-Agent-really-solving" class="headerlink" title="From the LLM’s perspective, what is an AI Agent really solving?"></a>From the LLM’s perspective, what is an AI Agent really solving?</h2><p>Remember — a language model is still just playing “text prediction”. AI Agents are just built on top of the LLM’s prediction capability, iterating to complete a complex task. They’re not some completely new technology.</p>
+<p>The biggest challenge for AI Agents is “Context Too Long”. An AI Agent keeps adding new Observations to the Context, so the Context keeps growing, eventually exceeding the model’s max Context length. At that point the model can’t respond properly.</p>
+<p>You’ll see models claim huge Context Window sizes, but the actually usable Context length is usually shorter than the official number — because handling the Context has overhead: System Prompt, Tool Use, Reasoning, etc. — all of which take up Context.</p>
+<p>Many models will Auto Summarize earlier Context before hitting the limit — compressing longer Context into shorter summaries. This saves Context length but often loses information, because you don’t know exactly which info got kept and which got dropped.</p>
+<p>One more thing — being able to input millions of tokens doesn’t mean the model can actually <em>understand</em> all of it. Same idea as asking you to read a thick book — you won’t necessarily understand all the content, and you won’t know what the key points are. Many experiments have shown “the more data you give, the worse the model performs” — because it can’t comprehend everything.</p>
+<p>Initially the model can handle a certain amount, but as the data grows, the model loses understanding and gets confused. Many studies have shown language models mostly remember the “beginning” and “end” of the context, not the middle. That’s why when designing Context, important info should go at the beginning and end so the model is more likely to remember it.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251115024502.png" data-fancybox="gallery" data-caption="Context Too Long"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251115024502.png" alt="Context Too Long"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Context Too Long</figcaption></figure>
+<p>It turns out the model’s memory pattern is really similar to humans — we mostly remember the beginning and end too, and forget the middle.</p>
+<h2 id="The-basics-of-Context-Engineering"><a href="#The-basics-of-Context-Engineering" class="headerlink" title="The basics of Context Engineering"></a>The basics of Context Engineering</h2><p>From all the examples above, the core of Context Engineering boils down to:</p>
+<p>“Manage your Context well.”</p>
+<p>Put the important Context in, leave the unimportant Context out, and make sure Context doesn’t go too long — then the model can respond correctly.</p>
+<p>Let’s go through three common Context Engineering techniques.</p>
+<h3 id="Select"><a href="#Select" class="headerlink" title="Select"></a>Select</h3><p>Pick the Context info the model actually needs — don’t dump every related (or unrelated) piece of info on it, because that overloads the model and hurts response quality.</p>
+<p>For example: you use RAG to grab a pile of related info from the web, but you should only hand the model the parts it actually needs to read, not the whole document. Like I said earlier — even humans mostly remember just the beginning and end, and models are the same.</p>
+<p>My recent personal example — I just rewatched all 700 episodes of Naruto over a month. If you ask me what happened in the middle, I can’t tell you. I can only tell you the beginning and ending, plus a few highlights — Naruto is an orphan with the Nine-Tailed Demon Fox sealed inside him, his teacher is Jiraiya, he grew up with Sasuke, Sasuke turned bad, Naruto fought him, in the end Naruto won him over and there was peace.</p>
+<p>So… is filtering out the unnecessary info something humans should do? No — let the language model do it, not by hand.</p>
+<p>The core point is: “Only include the Context info the model actually needs.” This avoids Context blow-up. Same for tools — don’t dump 100 tools at it, pick the few it actually needs.</p>
+<p>One more thing — when the model makes a mistake, don’t immediately tell it to fix the mistake. Sometimes those error traces actually make the model perform worse — like when someone says “don’t think about elephants” and now you can’t stop thinking about elephants.</p>
+<p>So how do you get the AI to stop making the same mistakes? Use better techniques — give it correct examples, give clearer instructions, etc. — and then put those correct examples in the Context so the model can learn the correct behavior pattern. That’s how you avoid the same mistake.</p>
+<h3 id="Compress"><a href="#Compress" class="headerlink" title="Compress"></a>Compress</h3><p>Compression mainly comes up when the Context is too long. So… do we compress it ourselves? No — let the model do it.</p>
+<p>For example, you can ask the model to summarize and compress the previous content whenever its Context Window hits 90%, or every 100 interactions. Then subsequent responses use the compressed version. That avoids Context Too Long.</p>
+<p>Each compression includes the previous compression’s content:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251115224632.png" data-fancybox="gallery" data-caption="Compress"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/intro-to-genai-ml/day2/20251115224632.png" alt="Compress"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Compress</figcaption></figure>
+<p>So the older the content, the less detail the model can remember.</p>
+<p>A common real-world trick: store the data in Markdown files and have the model read those files, then compress the contents, then put the compressed versions in Context.</p>
+<p>If there’s important content you don’t want lost to compression, you can put it in long-term storage and use RAG to pull it back, so the important stuff doesn’t get compressed away.</p>
+<h3 id="Multi-Agent"><a href="#Multi-Agent" class="headerlink" title="Multi-Agent"></a>Multi-Agent</h3><p>The Multi-Agent concept is:</p>
+<p>You set up multiple AI agents with different specialties, then have them cooperate on a complex task — like CEO Agent, CTO Agent, Project Manager Agent, Developer Agent, Designer Agent, etc. Each agent owns its slice of work, and they collaborate.</p>
+<p>Multi-Agent is actually a really effective way to manage Context, because each agent only focuses on its own slice and doesn’t get distracted by unrelated content.</p>
+<p>For example, without Multi-Agent, building a website would mean cramming requirements, design, development, testing, etc., all into one Context — basically having one person handle design, frontend, backend, and testing all at once. That’s Single-Agent.</p>
+<p>With Multi-Agent, you have a Lead role (like a Project Manager Agent) that coordinates the team. When a request comes in, the Lead analyzes it and decides which agent handles which piece. Each agent applies its expertise to its piece, returns the result to the Lead, and the Lead sends the result back to the user.</p>
+<p>It looks like this:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">I want a website with members, product display, shopping cart, and order management.<br></code></pre></td></tr></table></figure>
+
+<p>The first to receive this is the Lead (Project Manager Agent):</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">User wants a website with members, product display, shopping cart, and order management.<br><br>But I need to understand the specifics first, so I&#x27;ll hand this to the Product Manager Agent for requirements gathering with the user.<br></code></pre></td></tr></table></figure>
+
+<p>So the overall flow looks like:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">User → Lead Agent → Product Manager Agent → Lead Agent → Designer Agent → Lead Agent → Developer Agent → Lead Agent → User<br></code></pre></td></tr></table></figure>
+
+<p>This is a way more effective way to manage Context.</p>
+<p>When the task is simple, Single-Agent works fine. When it’s complex, Multi-Agent shines.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://speech.ee.ntu.edu.tw/~hylee/GenAI-ML/2025-fall.php">From language models to AI Agents</a> (course in Mandarin)</li>
+</ul>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/scss/2025/11/23/sass-deprecated-import-use-forward-migration/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            SCSS Is Deprecating @import?!
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/vue/2025/11/06/vue-sfc-spec-block-for-ai-development/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Use a Custom &lt;spec lang="md"&gt; Block in Vue SFC for Smoother AI Development
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/ai/2025/11/02/intro-to-genai-ml-just-text-prediction/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Intro to Generative AI and Machine Learning (1) — It's All Just Text Prediction
+              </h4>
+              <time datetime="2025-11-02" title="Published: 2025-11-02" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-11-02
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/16/aistupidlevel-llm-degradation-monitor/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Is AI Getting Quietly Dumber? AIStupidLevel: A 24-Hour Watchdog for LLM Degradation
+              </h4>
+              <time datetime="2026-06-16" title="Published: 2026-06-16" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-16
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/04/22/decoding-ai-spec-sheets-token-context-compute/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Decoding AI Spec Sheets: Token, Context Window, Compute — What Are These Numbers Actually About?
+              </h4>
+              <time datetime="2026-04-23" title="Published: 2026-04-23" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-23
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/04/12/llm-parameters-quantization-guide/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Want to Run Your Own LLM? Understanding Model Parameters and Quantization
+              </h4>
+              <time datetime="2026-04-13" title="Published: 2026-04-13" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-13
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/" data-title="Intro to Generative AI and Machine Learning (2) — The Key Technique Behind AI Agents: Context Engineering" data-hashtags="LLM,Context Engineering,Generative AI,Hung-yi Lee,How ChatGPT Works,LLM Tutorial,AI Hallucination" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/ai/2025/11/12/intro-to-genai-ml-context-engineering/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-Context-Engineering"><span class="toc-text">What is Context Engineering?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prompt-Engineering-vs-Context-Engineering"><span class="toc-text">Prompt Engineering vs Context Engineering</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Prompt-give-the-premise"><span class="toc-text">User Prompt: give the premise</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Prompt-give-a-reference"><span class="toc-text">User Prompt: give a reference</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#What-exactly-is-a-System-Prompt"><span class="toc-text">What exactly is a System Prompt?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dialogue-History-short-term-memory"><span class="toc-text">Dialogue History (short-term memory)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Long-Term-Memory"><span class="toc-text">Long-Term Memory</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Other-source-references"><span class="toc-text">Other source references</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tool-Use"><span class="toc-text">Tool Use</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tool-Use-Computer-Use"><span class="toc-text">Tool Use: Computer Use</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reasoning"><span class="toc-text">Reasoning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#So-what-is-Context-anyway"><span class="toc-text">So what is Context, anyway?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-the-AI-Agent-era-needs-Context-Engineering"><span class="toc-text">Why the AI Agent era needs Context Engineering</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#From-the-LLM%E2%80%99s-perspective-what-is-an-AI-Agent-really-solving"><span class="toc-text">From the LLM’s perspective, what is an AI Agent really solving?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-basics-of-Context-Engineering"><span class="toc-text">The basics of Context Engineering</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Select"><span class="toc-text">Select</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compress"><span class="toc-text">Compress</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Multi-Agent"><span class="toc-text">Multi-Agent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

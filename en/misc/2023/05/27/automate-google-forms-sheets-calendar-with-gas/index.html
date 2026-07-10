@@ -1,0 +1,1491 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/other/20230527/3505650923/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/other/20230527/3505650923/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="Google Forms and Google Calendar are tools we use constantly, but copying form submissions into the calendar by hand is the kind of busywork that screams &#34;automate me&#34;. This post walks through using Google Apps Script (GAS) to wire Forms → Sheets → Calendar end to end — reading sheet data, parsing the locale-dependent time format, avoiding duplicate event creation, and triggering the script on a 10-minute schedule.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="Google Forms and Google Calendar are tools we use constantly, but copying form submissions into the calendar by hand is the kind of busywork that screams &#34;automate me&#34;. This post walks through using Google Apps Script (GAS) to wire Forms → Sheets → Calendar end to end — reading sheet data, parsing the locale-dependent time format, avoiding duplicate event creation, and triggering the script on a 10-minute schedule.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blogImg/other/Ray_google_c4f6667d-15fb-48cc-a3d1-d28ddfbfbb14.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2023-05-27T11:17:05.000Z">
+    
+      <meta property="article:modified_time" content="2023-08-03T09:36:05.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Misc">
+      
+    
+    
+      
+        <meta property="article:tag" content="Google Apps Script">
+      
+        <meta property="article:tag" content="Automation">
+      
+        <meta property="article:tag" content="GAS">
+      
+        <meta property="article:tag" content="Google Forms">
+      
+        <meta property="article:tag" content="Google Sheets">
+      
+        <meta property="article:tag" content="Google Calendar">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS | Is Ray, Not Array">
+  <meta name="twitter:description" content="Google Forms and Google Calendar are tools we use constantly, but copying form submissions into the calendar by hand is the kind of busywork that screams &#34;automate me&#34;. This post walks through using Google Apps Script (GAS) to wire Forms → Sheets → Calendar end to end — reading sheet data, parsing the locale-dependent time format, avoiding duplicate event creation, and triggering the script on a 10-minute schedule.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blogImg/other/Ray_google_c4f6667d-15fb-48cc-a3d1-d28ddfbfbb14.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/"},"headline":"Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS","url":"https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/","datePublished":"2023-05-27T11:17:05.000Z","dateModified":"2023-08-03T09:36:05.000Z","description":"Google Forms and Google Calendar are tools we use constantly, but copying form submissions into the calendar by hand is the kind of busywork that screams \"automate me\". This post walks through using Google Apps Script (GAS) to wire Forms → Sheets → Calendar end to end — reading sheet data, parsing the locale-dependent time format, avoiding duplicate event creation, and triggering the script on a 10-minute schedule.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":12831,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blogImg/other/Ray_google_c4f6667d-15fb-48cc-a3d1-d28ddfbfbb14.png","width":1200,"height":630}],"articleSection":["Misc"],"keywords":"Google Apps Script, Automation, GAS, Google Forms, Google Sheets, Google Calendar"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/#breadcrumb","name":"Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Misc","item":"https://israynotarray.com/categories/Misc/"},{"@type":"ListItem","position":3,"name":"Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/other/20230527/3505650923/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/other/20230527/3505650923/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2023-05-27" title="Published: 2023-05-27" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2023-05-27
+        </time>
+        
+          <time datetime="2023-08-03" title="Updated: 2023-08-03" class="flex items-center">
+            <i class="bi bi-arrow-repeat w-4 text-center mr-2"></i>
+            2023-08-03
+          </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/Misc/" class="hover:text-primary-500 transition-colors">Misc</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Google-Apps-Script/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Google Apps Script
+            </a>
+          
+            <a href="/tags/Automation/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Automation
+            </a>
+          
+            <a href="/tags/GAS/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #GAS
+            </a>
+          
+            <a href="/tags/Google-Forms/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Google Forms
+            </a>
+          
+            <a href="/tags/Google-Sheets/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Google Sheets
+            </a>
+          
+            <a href="/tags/Google-Calendar/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Google Calendar
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/Ray_google_c4f6667d-15fb-48cc-a3d1-d28ddfbfbb14.png" data-fancybox="gallery" data-caption="Google"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/Ray_google_c4f6667d-15fb-48cc-a3d1-d28ddfbfbb14.png" alt="Google"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Google</figcaption></figure>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>Google Forms and Google Calendar are two tools most of us use a lot, both for work and for life. This post is about using GAS (Google Apps Script) to integrate them — let’s get more done with less manual copying.</p>
+<h2 id="The-scenario"><a href="#The-scenario" class="headerlink" title="The scenario"></a>The scenario</h2><p>Quick context on what we’re building.</p>
+<p>Say you’re an office admin. You hand out a Google Form for your manager to fill in, and then for every submission, you have to manually go to Google Calendar and create an event based on the form data.</p>
+<p>This post solves that. The use case as a user story:</p>
+<ul>
+<li>User submits data through a Google Form</li>
+<li>Submitted data auto-writes into a Google Sheet</li>
+<li>Every 10 minutes, the script reads new rows and creates corresponding Google Calendar events</li>
+</ul>
+<p>OK, on to the build.</p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><p>You’ll need:</p>
+<ul>
+<li>A Google account</li>
+<li>A Google Form</li>
+<li>A Google Calendar</li>
+</ul>
+<p>I’m assuming the Google account part is covered — pretty much everyone has one. (You do, right?) If not, register one — otherwise you can’t follow along.</p>
+<h3 id="Google-Calendar"><a href="#Google-Calendar" class="headerlink" title="Google Calendar"></a>Google Calendar</h3><p>We’ll create a test calendar so we don’t mess up your main one. Open Google Calendar:</p>
+<p><a target="_blank" rel="noopener" href="https://calendar.google.com/calendar">Google Calendar</a></p>
+<p>Click the <code>+</code> on the left to add a calendar:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.19.00.png" data-fancybox="gallery" data-caption="Add calendar"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.19.00.png" alt="Add calendar"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add calendar</figcaption></figure>
+<p>Pick “Create new calendar”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.20.11.png" data-fancybox="gallery" data-caption="Create new calendar"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.20.11.png" alt="Create new calendar"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create new calendar</figcaption></figure>
+<p>Fill in the name, description, and time zone (usually auto-picked). Click “Create calendar”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.21.06.png" data-fancybox="gallery" data-caption="Calendar form"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.21.06.png" alt="Calendar form"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Calendar form</figcaption></figure>
+<p>The new calendar shows up in the left sidebar:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305271322.jpg" data-fancybox="gallery" data-caption="New calendar"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305271322.jpg" alt="New calendar"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">New calendar</figcaption></figure>
+<p>We’ll need this calendar’s ID later, so click it and scroll down to “Integrate calendar” — copy the “Calendar ID”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305271325.jpg" data-fancybox="gallery" data-caption="Calendar ID"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305271325.jpg" alt="Calendar ID"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Calendar ID</figcaption></figure>
+<p>Calendar IDs look something like this:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">da39a3ee5e6b4b0d3255bfef95601890afd80709@group.calendar.google.com<br></code></pre></td></tr></table></figure>
+
+<p>(Don’t worry — that’s just an example, not a real ID.)</p>
+<p>With the ID copied, on to the form.</p>
+<h3 id="Google-Form"><a href="#Google-Form" class="headerlink" title="Google Form"></a>Google Form</h3><p>Open Google Forms:</p>
+<p><a target="_blank" rel="noopener" href="https://docs.google.com/forms">Google Forms</a></p>
+<p>Click <code>+</code> to create a new form:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.44.21.png" data-fancybox="gallery" data-caption="New form"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.44.21.png" alt="New form"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">New form</figcaption></figure>
+<p>You’ll see the initial blank form — customize as needed:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.45.39.png" data-fancybox="gallery" data-caption="Blank form"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.45.39.png" alt="Blank form"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Blank form</figcaption></figure>
+<p>I’ve set mine up like this for demonstration — feel free to use it as reference:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/2023_5_27_13_49.jpg" data-fancybox="gallery" data-caption="Form sample"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/2023_5_27_13_49.jpg" alt="Form sample"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Form sample</figcaption></figure>
+<p>Now link the form to a sheet. Click “Responses” at the top, then “Link to Sheets”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.51.16.png" data-fancybox="gallery" data-caption="Link to Sheets"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.51.16.png" alt="Link to Sheets"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Link to Sheets</figcaption></figure>
+<p>It asks whether to create a new sheet or link to an existing one — pick “Create a new spreadsheet” and give it a meaningful name so you can find it later:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.53.33.png" data-fancybox="gallery" data-caption="Create new sheet"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.53.33.png" alt="Create new sheet"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create new sheet</figcaption></figure>
+<p>Google should pop the sheet open for you:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.54.19.png" data-fancybox="gallery" data-caption="Sheet"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.54.19.png" alt="Sheet"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Sheet</figcaption></figure>
+<p>If not, you can also get to it via “Responses” → “View in Sheets”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.55.08.png" data-fancybox="gallery" data-caption="View in Sheets"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2013.55.08.png" alt="View in Sheets"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">View in Sheets</figcaption></figure>
+<p>Form and sheet are ready — onto the code.</p>
+<h2 id="GAS-Google-Apps-Script"><a href="#GAS-Google-Apps-Script" class="headerlink" title="GAS (Google Apps Script)"></a>GAS (Google Apps Script)</h2><figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/gasbanner.png" data-fancybox="gallery" data-caption="Google Apps Script"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/gasbanner.png" alt="Google Apps Script"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Google Apps Script</figcaption></figure>
+<p>GAS stands for Google Apps Script. Basically a Google-hosted JavaScript runtime with first-party access to Google’s APIs — so anything you’d want to automate across Google products, GAS is the obvious tool.</p>
+<p>If you’re already a frontend dev you’ll feel right at home. If you’re not from a coding background, I’ll do my best with detailed screenshots and step-by-step instructions.</p>
+<h3 id="Create-a-GAS-project"><a href="#Create-a-GAS-project" class="headerlink" title="Create a GAS project"></a>Create a GAS project</h3><p>To create a GAS project, open the sheet you just linked to your form, click “Extensions” → “Apps Script”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.11.43.png" data-fancybox="gallery" data-caption="Apps Script"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.11.43.png" alt="Apps Script"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Apps Script</figcaption></figure>
+<p>You should land on the GAS editor’s initial state:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.14.30.png" data-fancybox="gallery" data-caption="Initial editor"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.14.30.png" alt="Initial editor"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Initial editor</figcaption></figure>
+<p>If not, double-check that you opened Apps Script from the right sheet.</p>
+<blockquote>
+<p><strong>Note</strong><br>If you don’t open Apps Script via the sheet’s “Extensions” menu, you’ll run into a few issues later. I’ll mention them as we go — but the recommendation is always to open GAS from the sheet.</p>
+</blockquote>
+<p>Paste this into <code>myFunction</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">myFunction</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-title class_">Logger</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Hit “Save”, select <code>myFunction</code> in the function dropdown, then click “Run”. You should see “Hello World” appear in the “Execution log” — confirms GAS is working.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272322.jpg" data-fancybox="gallery" data-caption="Test run"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272322.jpg" alt="Test run"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Test run</figcaption></figure>
+<p>GAS is good to go.</p>
+<h3 id="Connect-to-the-sheet"><a href="#Connect-to-the-sheet" class="headerlink" title="Connect to the sheet"></a>Connect to the sheet</h3><p>Now to read sheet data. Replace <code>myFunction</code> with this (comments included):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getSheetData</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Get the active sheet (the one your form is linked to)</span><br>  <span class="hljs-keyword">const</span> spreadsheet = <span class="hljs-title class_">SpreadsheetApp</span>.<span class="hljs-title function_">getActiveSheet</span>();<br><br>  <span class="hljs-comment">// Define the data range — B2 down through column F</span><br>  <span class="hljs-keyword">const</span> getRange = spreadsheet.<span class="hljs-title function_">getRange</span>(<span class="hljs-string">&#x27;B2:F&#x27;</span>);<br><br>  <span class="hljs-comment">// Convert to a 2D array</span><br>  <span class="hljs-keyword">const</span> displayDataValues =  getRange.<span class="hljs-title function_">getDisplayValues</span>();<br><br>  <span class="hljs-comment">// Log it so it shows in the Execution log</span><br>  <span class="hljs-title class_">Logger</span>.<span class="hljs-title function_">log</span>(displayDataValues);<br><br>  <span class="hljs-comment">// Return the data (will use this later)</span><br>  <span class="hljs-keyword">return</span> displayDataValues<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Hit “Save”, select <code>myFunction</code>, click “Run”. A permission prompt pops up — click “Review permissions”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.29.26.png" data-fancybox="gallery" data-caption="Review permissions"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.29.26.png" alt="Review permissions"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Review permissions</figcaption></figure>
+<p>Pick the Google account you’re using for GAS — it needs your account to access your sheet:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272330.jpg" data-fancybox="gallery" data-caption="Pick account"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272330.jpg" alt="Pick account"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Pick account</figcaption></figure>
+<p>Then a scary-looking “Google hasn’t verified this app” warning — click “Advanced”, then “Go to XXX (unsafe)”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272333.jpg" data-fancybox="gallery" data-caption="Unverified app"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272333.jpg" alt="Unverified app"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Unverified app</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>Don’t panic — this is just Google’s general security warning. Since this is your own project, it’s safe to proceed. You only see this on first run.</p>
+</blockquote>
+<p>The next dialog tells you the GAS project needs access to your sheet — click “Allow”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272334.jpg" data-fancybox="gallery" data-caption="Allow access"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272334.jpg" alt="Allow access"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Allow access</figcaption></figure>
+<p>You should now see a bunch of empty arrays in the Execution log — that’s because the sheet has no data yet:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.36.05.png" data-fancybox="gallery" data-caption="Execution log empty"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.36.05.png" alt="Execution log empty"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Execution log empty</figcaption></figure>
+<p>(If nothing shows up at all, try running once more — sometimes the first run fails due to the permission flow.)</p>
+<p>Now go back to the form and submit a row of test data (please use the form — don’t manually edit the sheet):</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.39.24.png" data-fancybox="gallery" data-caption="Submit data"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.39.24.png" alt="Submit data"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Submit data</figcaption></figure>
+<p>Re-run the GAS function and you should see your submission in the Execution log:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.42.32.png" data-fancybox="gallery" data-caption="Execution log with data"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.42.32.png" alt="Execution log with data"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Execution log with data</figcaption></figure>
+<p>Tweak the function to format the data nicely — paste this in:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getSheetData</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Get the active sheet (linked to your form)</span><br>  <span class="hljs-keyword">const</span> spreadsheet = <span class="hljs-title class_">SpreadsheetApp</span>.<span class="hljs-title function_">getActiveSheet</span>();<br>  <span class="hljs-comment">// Range — B2 down through column F</span><br>  <span class="hljs-keyword">const</span> getRange = spreadsheet.<span class="hljs-title function_">getRange</span>(<span class="hljs-string">&#x27;B2:F&#x27;</span>);<br>  <span class="hljs-comment">// Convert to 2D array</span><br>  <span class="hljs-keyword">const</span> displayDataValues =  getRange.<span class="hljs-title function_">getDisplayValues</span>();<br><br>  <span class="hljs-comment">// Buffer for processed data</span><br>  <span class="hljs-keyword">const</span> data = [];<br><br>  <span class="hljs-comment">// Loop through each row</span><br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; displayDataValues.<span class="hljs-property">length</span>; i++) &#123;<br>    <span class="hljs-comment">// Check if the first column has a value (i.e., there&#x27;s data)</span><br>    <span class="hljs-keyword">if</span> (displayDataValues[i][<span class="hljs-number">0</span>]) &#123;<br>      <span class="hljs-comment">// Shape each row into an object for easier downstream use</span><br>      data.<span class="hljs-title function_">push</span>(&#123;<br>        <span class="hljs-attr">email</span>: displayDataValues[i][<span class="hljs-number">0</span>],     <span class="hljs-comment">// Submitter email</span><br>        <span class="hljs-attr">name</span>: displayDataValues[i][<span class="hljs-number">1</span>],      <span class="hljs-comment">// Submitter name</span><br>        <span class="hljs-attr">date</span>: displayDataValues[i][<span class="hljs-number">2</span>],      <span class="hljs-comment">// Booking date</span><br>        <span class="hljs-attr">startTime</span>: displayDataValues[i][<span class="hljs-number">3</span>], <span class="hljs-comment">// Start time</span><br>        <span class="hljs-attr">endTime</span>: displayDataValues[i][<span class="hljs-number">4</span>],   <span class="hljs-comment">// End time</span><br>      &#125;);<br>    &#125;<br>  &#125;<br>  <span class="hljs-comment">// Log it</span><br>  <span class="hljs-title class_">Logger</span>.<span class="hljs-title function_">log</span>(data);<br>  <span class="hljs-comment">// Return</span><br>  <span class="hljs-keyword">return</span> data<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>What do <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code> map to? They’re the indices of columns <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code> in the sheet — the range we set earlier. Adjust as needed to match your own sheet:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272367.jpg" data-fancybox="gallery" data-caption="Column mapping"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305272367.jpg" alt="Column mapping"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Column mapping</figcaption></figure>
+<p>Last housekeeping — click the three-dot menu next to <code>程式碼.gs</code> (or <code>Code.gs</code>) in the left sidebar, pick Rename:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.58.52.png" data-fancybox="gallery" data-caption="Rename file"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-27%2023.58.52.png" alt="Rename file"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Rename file</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br><code>.gs</code> is the GAS file extension — you don’t need to include it when renaming.</p>
+</blockquote>
+<p>Rename to <code>getSheetData</code>:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.00.19.png" data-fancybox="gallery" data-caption="getSheetData"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.00.19.png" alt="getSheetData"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">getSheetData</figcaption></figure>
+<p>Sheet-reading part done. Next up.</p>
+<h3 id="Build-a-pseudo-env-var-file"><a href="#Build-a-pseudo-env-var-file" class="headerlink" title="Build a pseudo-env-var file"></a>Build a pseudo-env-var file</h3><p>I’m calling it “pseudo” environment variables because GAS doesn’t actually have env vars — but the pattern of putting config in one place is the same idea.</p>
+<p>Quick recap on env vars — they’re a mechanism for using different config in different environments (e.g., different DB passwords for dev vs. prod) without touching code.</p>
+<p>Earlier we copied a Google Calendar ID. To make it easier to maintain (change the ID in one place, not scattered everywhere), we’ll put it in a config-style file.</p>
+<p>Click the <code>+</code> next to “Files” and create a new script called <code>Env</code>:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.09.37.png" data-fancybox="gallery" data-caption="Env file"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.09.37.png" alt="Env file"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Env file</figcaption></figure>
+<p>Contents:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> env = &#123;<br>  <span class="hljs-attr">calendarId</span>: <span class="hljs-string">&#x27;da39a3ee5e6b4b0d3255bfef95601890afd80709@group.calendar.google.com&#x27;</span>, <span class="hljs-comment">// paste your calendar ID</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>(Reminder — that calendar ID is just an example, not a real one.)</p>
+<p>Done. Easy.</p>
+<h3 id="Connect-to-Google-Calendar"><a href="#Connect-to-Google-Calendar" class="headerlink" title="Connect to Google Calendar"></a>Connect to Google Calendar</h3><p>Create another file called <code>main</code> — main logic lives here. Paste this:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">setCalendar</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Read sheet data — array of objects</span><br>  <span class="hljs-keyword">const</span> sheetData = <span class="hljs-title function_">getSheetData</span>();<br><br>  <span class="hljs-comment">// Get the Google Calendar by ID</span><br>  <span class="hljs-keyword">const</span> calendar = <span class="hljs-title class_">CalendarApp</span>.<span class="hljs-title function_">getCalendarById</span>(env.<span class="hljs-property">calendarId</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>The “needs authorization” prompt shows up again — click through it the same way (Review permissions → Advanced → Go to project (unsafe) → Allow). Only happens once.</p>
+<p>Nothing actually does anything yet — we just got past the permission gate.</p>
+<h3 id="Advanced-time-parsing-→-calendar"><a href="#Advanced-time-parsing-→-calendar" class="headerlink" title="Advanced time parsing → calendar"></a>Advanced time parsing → calendar</h3><p>This part’s slightly tricky. Create another file called <code>parseTime</code>, paste this:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">parseTime</span>(<span class="hljs-params">date, time</span>) &#123;<br>  <span class="hljs-keyword">const</span> timeRegex = <span class="hljs-regexp">/([上下]午) (\d+):(\d+):(\d+)/</span>;<br>  <span class="hljs-keyword">const</span> match = time.<span class="hljs-title function_">match</span>(timeRegex);<br><br>  <span class="hljs-keyword">if</span> (!match) &#123;<br>    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Invalid time format: <span class="hljs-subst">$&#123;time&#125;</span>`</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">let</span> hours = <span class="hljs-built_in">parseInt</span>(match[<span class="hljs-number">2</span>], <span class="hljs-number">10</span>);<br>  <span class="hljs-keyword">const</span> minutes = <span class="hljs-built_in">parseInt</span>(match[<span class="hljs-number">3</span>], <span class="hljs-number">10</span>);<br>  <span class="hljs-keyword">const</span> seconds = <span class="hljs-built_in">parseInt</span>(match[<span class="hljs-number">4</span>], <span class="hljs-number">10</span>);<br><br>  <span class="hljs-keyword">if</span> (match[<span class="hljs-number">1</span>] === <span class="hljs-string">&#x27;下午&#x27;</span> &amp;&amp; hours &lt; <span class="hljs-number">12</span>) &#123;<br>    hours += <span class="hljs-number">12</span>;<br>  &#125;<br><br>  <span class="hljs-keyword">const</span> parsedTime = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(date);<br>  parsedTime.<span class="hljs-title function_">setHours</span>(hours, minutes, seconds);<br><br>  <span class="hljs-keyword">return</span> parsedTime;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.35.09.png" data-fancybox="gallery" data-caption="parseTime"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.35.09.png" alt="parseTime"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">parseTime</figcaption></figure>
+<p>This is a bit dense. All it’s doing is parsing time strings stored in the sheet into a format Google Calendar can use.</p>
+<blockquote>
+<p><strong>Note</strong><br>The regex here matches Traditional Chinese AM&#x2F;PM markers (<code>上午</code>&#x2F;<code>下午</code>) because that’s what Google Sheets renders when your locale is zh-TW. If your locale renders AM&#x2F;PM in English, you’d want a regex like <code>/(AM|PM)\s+(\d+):(\d+):(\d+)/i</code> instead. The simpler approach in the next section sidesteps the locale issue entirely.</p>
+</blockquote>
+<p>Back to <code>main.gs</code> — fill in the rest:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">setCalendar</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Read sheet data</span><br>  <span class="hljs-keyword">const</span> sheetData = <span class="hljs-title function_">getSheetData</span>();<br><br>  <span class="hljs-comment">// Get Google Calendar</span><br>  <span class="hljs-keyword">const</span> calendar = <span class="hljs-title class_">CalendarApp</span>.<span class="hljs-title function_">getCalendarById</span>(env.<span class="hljs-property">calendarId</span>);<br><br>  <span class="hljs-comment">// Loop over each row</span><br>  sheetData.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> &#123;<br>    <span class="hljs-comment">// Convert start/end times to a format Calendar accepts</span><br>    <span class="hljs-keyword">const</span> startTime = <span class="hljs-title function_">parseTime</span>(data.<span class="hljs-property">date</span>, data.<span class="hljs-property">startTime</span>);<br>    <span class="hljs-keyword">const</span> endTime = <span class="hljs-title function_">parseTime</span>(data.<span class="hljs-property">date</span>, data.<span class="hljs-property">endTime</span>);<br><br>    <span class="hljs-comment">// Create the calendar event from the sheet row</span><br>    calendar.<span class="hljs-title function_">createEvent</span>(data.<span class="hljs-property">name</span>, startTime, endTime, &#123;<br>      <span class="hljs-attr">description</span>: data.<span class="hljs-property">email</span>, <span class="hljs-comment">// put email in event description</span><br>    &#125;);<br>  &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Click “Run”. Once it finishes you’ll see your form data show up as calendar events:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305280041.jpg" data-fancybox="gallery" data-caption="Calendar events"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/202305280041.jpg" alt="Calendar events"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Calendar events</figcaption></figure>
+<p>Congrats — sheet data is now landing in your calendar.</p>
+<h3 id="Simpler-time-parsing-→-calendar"><a href="#Simpler-time-parsing-→-calendar" class="headerlink" title="Simpler time parsing → calendar"></a>Simpler time parsing → calendar</h3><p>Honestly that’s a lot. Here’s an easier route that sidesteps <code>parseTime</code> by using a Sheets-side trick.</p>
+<p>Open your sheet and add two new columns: <code>Start Time</code> and <code>End Time</code>:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.55.01.png" data-fancybox="gallery" data-caption="Sheet tweak"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.55.01.png" alt="Sheet tweak"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Sheet tweak</figcaption></figure>
+<p>In Start Time enter <code>=D2+E2</code>, in End Time enter <code>=D2+F2</code>, drag the formula down:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.56.45.png" data-fancybox="gallery" data-caption="Time formula"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.56.45.png" alt="Time formula"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Time formula</figcaption></figure>
+<p>This combines the date column with each time column into a proper datetime that Google Calendar accepts natively. Now you can ditch <code>parseTime</code> and update <code>main.gs</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">setCalendar</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Read sheet data</span><br>  <span class="hljs-keyword">const</span> sheetData = <span class="hljs-title function_">getSheetData</span>();<br><br>  <span class="hljs-comment">// Get Google Calendar</span><br>  <span class="hljs-keyword">const</span> calendar = <span class="hljs-title class_">CalendarApp</span>.<span class="hljs-title function_">getCalendarById</span>(env.<span class="hljs-property">calendarId</span>);<br><br>  <span class="hljs-comment">// Loop over each row</span><br>  sheetData.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> &#123;<br>    <span class="hljs-comment">// Create the calendar event from the sheet row</span><br>    calendar.<span class="hljs-title function_">createEvent</span>(data.<span class="hljs-property">name</span>, data.<span class="hljs-property">startTime</span>, data.<span class="hljs-property">endTime</span>, &#123;<br>      <span class="hljs-attr">description</span>: data.<span class="hljs-property">email</span>,<br>    &#125;);<br>  &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Update <code>getSheetData</code> to grab the new columns and use <code>getValues</code> (raw values) instead of <code>getDisplayValues</code> (formatted strings):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getSheetData</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Get the active sheet (linked to your form)</span><br>  <span class="hljs-keyword">const</span> spreadsheet = <span class="hljs-title class_">SpreadsheetApp</span>.<span class="hljs-title function_">getActiveSheet</span>();<br>  <span class="hljs-comment">// Range — B2 down through H now that we added columns</span><br>  <span class="hljs-keyword">const</span> getRange = spreadsheet.<span class="hljs-title function_">getRange</span>(<span class="hljs-string">&#x27;B2:H&#x27;</span>);<br>  <span class="hljs-comment">// Raw values — gives us Date objects directly</span><br>  <span class="hljs-keyword">const</span> displayDataValues =  getRange.<span class="hljs-title function_">getValues</span>(); <span class="hljs-comment">// &lt;- swapped getDisplayValues for getValues</span><br><br>  <span class="hljs-comment">// Buffer for processed data</span><br>  <span class="hljs-keyword">const</span> data = [];<br><br>  <span class="hljs-comment">// Loop through each row</span><br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; displayDataValues.<span class="hljs-property">length</span>; i++) &#123;<br>    <span class="hljs-comment">// Check if the first column has a value</span><br>    <span class="hljs-keyword">if</span> (displayDataValues[i][<span class="hljs-number">0</span>]) &#123;<br>      <span class="hljs-comment">// Shape each row into an object</span><br>      data.<span class="hljs-title function_">push</span>(&#123;<br>        <span class="hljs-attr">email</span>: displayDataValues[i][<span class="hljs-number">0</span>],     <span class="hljs-comment">// Submitter email</span><br>        <span class="hljs-attr">name</span>: displayDataValues[i][<span class="hljs-number">1</span>],      <span class="hljs-comment">// Submitter name</span><br>        <span class="hljs-attr">date</span>: displayDataValues[i][<span class="hljs-number">2</span>],      <span class="hljs-comment">// Booking date</span><br>        <span class="hljs-attr">startTime</span>: displayDataValues[i][<span class="hljs-number">5</span>], <span class="hljs-comment">// Start time (computed column)</span><br>        <span class="hljs-attr">endTime</span>: displayDataValues[i][<span class="hljs-number">6</span>],   <span class="hljs-comment">// End time (computed column)</span><br>      &#125;);<br>    &#125;<br>  &#125;<br>  <span class="hljs-comment">// Log</span><br>  <span class="hljs-title class_">Logger</span>.<span class="hljs-title function_">log</span>(data);<br>  <span class="hljs-comment">// Return</span><br>  <span class="hljs-keyword">return</span> data<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>The difference between <code>getValues</code> and <code>getDisplayValues</code> — the former returns underlying raw values (e.g., Date objects), the latter returns the formatted strings as you see them in the sheet.</p>
+</blockquote>
+<h3 id="The-duplicate-event-problem"><a href="#The-duplicate-event-problem" class="headerlink" title="The duplicate event problem"></a>The duplicate event problem</h3><p>You’ll quickly notice — every time <code>setCalendar</code> runs, it creates events for every row in the sheet, even ones already added before. So we need a duplicate check.</p>
+<p>Create a new file <code>isEventExist</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">isEventExist</span>(<span class="hljs-params">calendar, name, startTime, endTime</span>) &#123;<br>  <span class="hljs-keyword">const</span> events = calendar.<span class="hljs-title function_">getEvents</span>(startTime, endTime, &#123;<br>    <span class="hljs-attr">search</span>: name,<br>  &#125;);<br><br>  <span class="hljs-keyword">return</span> events.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Update <code>main.gs</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">setCalendar</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Read sheet data</span><br>  <span class="hljs-keyword">const</span> sheetData = <span class="hljs-title function_">getSheetData</span>();<br><br>  <span class="hljs-comment">// Get Google Calendar</span><br>  <span class="hljs-keyword">const</span> calendar = <span class="hljs-title class_">CalendarApp</span>.<span class="hljs-title function_">getCalendarById</span>(env.<span class="hljs-property">calendarId</span>);<br><br>  <span class="hljs-comment">// Loop over each row</span><br>  sheetData.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> &#123;<br>    <span class="hljs-comment">// Check if the event already exists</span><br>    <span class="hljs-keyword">const</span> isExist = <span class="hljs-title function_">isEventExist</span>(calendar, data.<span class="hljs-property">name</span>, data.<span class="hljs-property">startTime</span>, data.<span class="hljs-property">endTime</span>);<br><br>    <span class="hljs-comment">// Only create if it doesn&#x27;t already exist</span><br>    <span class="hljs-keyword">if</span> (!isExist) &#123;<br>      calendar.<span class="hljs-title function_">createEvent</span>(data.<span class="hljs-property">name</span>, data.<span class="hljs-property">startTime</span>, data.<span class="hljs-property">endTime</span>, &#123;<br>        <span class="hljs-attr">description</span>: data.<span class="hljs-property">email</span>,<br>      &#125;);<br>    &#125;<br>  &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>No more duplicate events on re-runs.</p>
+<h3 id="Set-up-a-scheduled-trigger"><a href="#Set-up-a-scheduled-trigger" class="headerlink" title="Set up a scheduled trigger"></a>Set up a scheduled trigger</h3><p>Last step — make it run automatically. Click “Triggers” on the left sidebar:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.48.31.png" data-fancybox="gallery" data-caption="Triggers"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.48.31.png" alt="Triggers"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Triggers</figcaption></figure>
+<p>Click “Add Trigger”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.49.29.png" data-fancybox="gallery" data-caption="Add Trigger"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.49.29.png" alt="Add Trigger"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add Trigger</figcaption></figure>
+<p>Set:</p>
+<ul>
+<li>Function to run: <code>setCalendar</code></li>
+<li>Event source: <code>Time-driven</code></li>
+<li>Type of time-based trigger: <code>Minutes timer</code></li>
+<li>Minute interval: <code>Every 10 minutes</code></li>
+</ul>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.51.25.png" data-fancybox="gallery" data-caption="Trigger config"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blogImg/other/gsp-form-auto/%E6%88%AA%E5%9C%96%202023-05-28%2000.51.25.png" alt="Trigger config"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Trigger config</figcaption></figure>
+<p>Hit “Save” and you’re done. The function fires every 10 minutes from here on.</p>
+<p>Submit another form entry, wait 10 minutes, and the new event should show up on your calendar.</p>
+<h2 id="Solving-the-auto-fill-problem-Copy-Down"><a href="#Solving-the-auto-fill-problem-Copy-Down" class="headerlink" title="Solving the auto-fill problem (Copy Down)"></a>Solving the auto-fill problem (Copy Down)</h2><p>If you went with the simpler time-parsing approach, you might hit a snag. Quick demo —</p>
+<p>Your sheet starts like this:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.40.23.png" data-fancybox="gallery" data-caption="Before submit"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.40.23.png" alt="Before submit"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Before submit</figcaption></figure>
+<p>After a form submission, you’ll notice <code>Start Time</code> and <code>End Time</code> don’t auto-fill the formula for the new row:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.40.56.png" data-fancybox="gallery" data-caption="No auto-fill"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.40.56.png" alt="No auto-fill"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">No auto-fill</figcaption></figure>
+<p>You could drag the formula down by hand every time, but as engineers that’s painful. Use a Sheets add-on instead.</p>
+<p>In your sheet, click “Extensions” → “Add-ons” → “Get add-ons”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.42.45.png" data-fancybox="gallery" data-caption="Get add-ons"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.42.45.png" alt="Get add-ons"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Get add-ons</figcaption></figure>
+<p>Search for <a target="_blank" rel="noopener" href="https://workspace.google.com/marketplace/app/copy_down/889269636541">Copy Down</a> and install:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030944.jpg" data-fancybox="gallery" data-caption="Copy Down search"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030944.jpg" alt="Copy Down search"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Copy Down search</figcaption></figure>
+<p>Click into Copy Down and install:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030945.jpg" data-fancybox="gallery" data-caption="Install Copy Down"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030945.jpg" alt="Install Copy Down"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Install Copy Down</figcaption></figure>
+<p>Authorization prompts pop up — just click Allow:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.45.08.png" data-fancybox="gallery" data-caption="Auth prompt"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.45.08.png" alt="Auth prompt"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auth prompt</figcaption></figure>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030947.jpg" data-fancybox="gallery" data-caption="Auth prompt"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030947.jpg" alt="Auth prompt"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auth prompt</figcaption></figure>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030948.jpg" data-fancybox="gallery" data-caption="Auth prompt"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/202308030948.jpg" alt="Auth prompt"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auth prompt</figcaption></figure>
+<p>Once this screen shows up, installation is complete:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.46.24.png" data-fancybox="gallery" data-caption="Install complete"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.46.24.png" alt="Install complete"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Install complete</figcaption></figure>
+<p>Back to “Extensions”, find “Copy Down” → “Copy Down Settings”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.54.53.png" data-fancybox="gallery" data-caption="Copy Down Settings"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.54.53.png" alt="Copy Down Settings"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Copy Down Settings</figcaption></figure>
+<p>A panel pops up — flip it to <code>ON</code>:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.56.49.png" data-fancybox="gallery" data-caption="Turn on"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.56.49.png" alt="Turn on"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Turn on</figcaption></figure>
+<p>Copy Down auto-detects your formula columns. Just click “Save Settings”.</p>
+<p>Submit a new form entry — the formula columns auto-fill now:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.59.50.png" data-fancybox="gallery" data-caption="Auto-filled"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/gas-example-calendar/%E6%88%AA%E5%9C%96%202023-08-03%2009.59.50.png" alt="Auto-filled"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auto-filled</figcaption></figure>
+<p>With Copy Down, the automation is genuinely hands-off.</p>
+<h2 id="Closing-thoughts"><a href="#Closing-thoughts" class="headerlink" title="Closing thoughts"></a>Closing thoughts</h2><p>GAS can do way more than just Sheet → Calendar — but the goal of this post is just to give you a feel for automating with it. There’s a bit of code involved, but for anyone with even light JS exposure it’s not bad.</p>
+<p>For reference, here’s the example code:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/gas-auto-setCalendar">GitHub repo</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/13naltBKIGFZINwf87XMAXEo26dE7ZevaNqhgxf3u77s/edit?usp=sharing">Google Sheets sample</a></li>
+<li><a target="_blank" rel="noopener" href="https://forms.gle/fjanwpGWv2HfR9vv6">Google Forms sample</a></li>
+</ul>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/git/2023/05/30/simplest-way-to-deploy-gh-pages/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            The Simplest Way to Deploy Your Own gh-pages Site
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/html/2023/05/26/is-html-a-programming-language/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Is HTML a Programming Language?
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/misc/2022/02/11/google-apps-script-sheets-as-rest-api/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Use Google Apps Script + Google Sheets to Spin Up a Quick API
+              </h4>
+              <time datetime="2022-02-11" title="Published: 2022-02-11" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-02-11
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/05/25/claude-code-routines-schedule-and-branch-push-fix/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Routines: How to Set Up /schedule (and Why It Pushes to claude/ Instead of main)
+              </h4>
+              <time datetime="2026-05-25" title="Published: 2026-05-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/javascript/2019/06/17/gas-cors-proxy/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Hit a CORS Wall and Can't Touch the Backend? Wrap It With Google Apps Script
+              </h4>
+              <time datetime="2019-06-17" title="Published: 2019-06-17" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2019-06-17
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/" data-title="Productivity Boost: Automate Google Forms, Sheets, and Calendar With GAS" data-hashtags="Google Apps Script,Automation,GAS,Google Forms,Google Sheets,Google Calendar" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/misc/2023/05/27/automate-google-forms-sheets-calendar-with-gas/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-scenario"><span class="toc-text">The scenario</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-text">Prerequisites</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Google-Calendar"><span class="toc-text">Google Calendar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Google-Form"><span class="toc-text">Google Form</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GAS-Google-Apps-Script"><span class="toc-text">GAS (Google Apps Script)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create-a-GAS-project"><span class="toc-text">Create a GAS project</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Connect-to-the-sheet"><span class="toc-text">Connect to the sheet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build-a-pseudo-env-var-file"><span class="toc-text">Build a pseudo-env-var file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Connect-to-Google-Calendar"><span class="toc-text">Connect to Google Calendar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Advanced-time-parsing-%E2%86%92-calendar"><span class="toc-text">Advanced time parsing → calendar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Simpler-time-parsing-%E2%86%92-calendar"><span class="toc-text">Simpler time parsing → calendar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-duplicate-event-problem"><span class="toc-text">The duplicate event problem</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Set-up-a-scheduled-trigger"><span class="toc-text">Set up a scheduled trigger</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Solving-the-auto-fill-problem-Copy-Down"><span class="toc-text">Solving the auto-fill problem (Copy Down)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-text">Closing thoughts</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

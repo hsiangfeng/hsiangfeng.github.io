@@ -1,0 +1,1587 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/nodejs/20221210/1224824056/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/nodejs/20221210/1224824056/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="OpenAI&#39;s ChatGPT has been blowing up recently, and OpenAI also exposes an API we can integrate with. This post focuses on GPT-3 but also covers how to switch to ChatGPT API. We&#39;ll use Node.js to build a LINE chatbot backed by OpenAI.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="OpenAI&#39;s ChatGPT has been blowing up recently, and OpenAI also exposes an API we can integrate with. This post focuses on GPT-3 but also covers how to switch to ChatGPT API. We&#39;ll use Node.js to build a LINE chatbot backed by OpenAI.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://i.imgur.com/2lo6Ynj.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2022-12-10T17:12:11.000Z">
+    
+      <meta property="article:modified_time" content="2023-03-06T15:30:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Nodejs">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="OpenAI">
+      
+        <meta property="article:tag" content="ChatGPT">
+      
+        <meta property="article:tag" content="GPT-3">
+      
+        <meta property="article:tag" content="GPT-3.5">
+      
+        <meta property="article:tag" content="LINE Bot">
+      
+        <meta property="article:tag" content="API">
+      
+        <meta property="article:tag" content="Render">
+      
+        <meta property="article:tag" content="LINE">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples | Is Ray, Not Array">
+  <meta name="twitter:description" content="OpenAI&#39;s ChatGPT has been blowing up recently, and OpenAI also exposes an API we can integrate with. This post focuses on GPT-3 but also covers how to switch to ChatGPT API. We&#39;ll use Node.js to build a LINE chatbot backed by OpenAI.">
+  
+    <meta name="twitter:image" content="https://i.imgur.com/2lo6Ynj.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/"},"headline":"Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples","url":"https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/","datePublished":"2022-12-10T17:12:11.000Z","dateModified":"2023-03-06T15:30:00.000Z","description":"OpenAI's ChatGPT has been blowing up recently, and OpenAI also exposes an API we can integrate with. This post focuses on GPT-3 but also covers how to switch to ChatGPT API. We'll use Node.js to build a LINE chatbot backed by OpenAI.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":14217,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://i.imgur.com/2lo6Ynj.png","width":1200,"height":630}],"articleSection":["Nodejs"],"keywords":"Node.js, OpenAI, ChatGPT, GPT-3, GPT-3.5, LINE Bot, API, Render, LINE"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/#breadcrumb","name":"Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Nodejs","item":"https://israynotarray.com/categories/nodejs/"},{"@type":"ListItem","position":3,"name":"Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/nodejs/20221210/1224824056/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/nodejs/20221210/1224824056/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2022-12-11" title="Published: 2022-12-11" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2022-12-11
+        </time>
+        
+          <time datetime="2023-03-06" title="Updated: 2023-03-06" class="flex items-center">
+            <i class="bi bi-arrow-repeat w-4 text-center mr-2"></i>
+            2023-03-06
+          </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/nodejs/" class="hover:text-primary-500 transition-colors">Nodejs</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/OpenAI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #OpenAI
+            </a>
+          
+            <a href="/tags/ChatGPT/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #ChatGPT
+            </a>
+          
+            <a href="/tags/GPT-3/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #GPT-3
+            </a>
+          
+            <a href="/tags/GPT-3-5/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #GPT-3.5
+            </a>
+          
+            <a href="/tags/LINE-Bot/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LINE Bot
+            </a>
+          
+            <a href="/tags/API/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #API
+            </a>
+          
+            <a href="/tags/Render/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Render
+            </a>
+          
+            <a href="/tags/LINE/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #LINE
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/2lo6Ynj.png" data-fancybox="gallery" data-caption="Robot"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://i.imgur.com/2lo6Ynj.png" alt="Robot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Robot</figcaption></figure>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><blockquote>
+<p><strong>Danger</strong><br>The main focus is GPT-3, but I’ve added GPT-3.5 conversion and sample code at the end. If you want to use GPT-3.5, check the later section.</p>
+</blockquote>
+<p>OpenAI’s ChatGPT has been blowing up recently. OpenAI also exposes an API we can integrate with. This post focuses on GPT-3, but also covers how to switch to ChatGPT API. We’ll use Node.js to build a LINE chatbot backed by OpenAI.</p>
+<blockquote>
+<p><strong>Note</strong><br>This post doesn’t walk through every line of code — the signup flow alone is already pretty long.<br>If you don’t want to wait until the end for the sample code, here it is:<br><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-line-bot">Sample code for this post</a></p>
+</blockquote>
+<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>A few prep steps before we get into the code.</p>
+<blockquote>
+<p><strong>Note</strong><br>This post was written on December 10, 2022. If the UI has changed since, follow whatever you see currently.</p>
+</blockquote>
+<h3 id="Apply-for-OpenAI-API"><a href="#Apply-for-OpenAI-API" class="headerlink" title="Apply for OpenAI API"></a>Apply for OpenAI API</h3><p>Go to <a target="_blank" rel="noopener" href="https://openai.com/api/">OpenAI</a> and <a target="_blank" rel="noopener" href="https://chat.openai.com/auth/login">sign up</a>. You can use a third-party login (Google, Microsoft) or email.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/p91aMB9.png" data-fancybox="gallery" data-caption="Sign up"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/p91aMB9.png" alt="Sign up"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Sign up</figcaption></figure>
+<p>After signup, you can apply for the API.</p>
+<p>If you already have an account, just log in.</p>
+<p>After login, you’ll see:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/Oim3CDc.png" data-fancybox="gallery" data-caption="Welcome to OpenAI"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/Oim3CDc.png" alt="Welcome to OpenAI"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Welcome to OpenAI</figcaption></figure>
+<p>Click your avatar → “View API keys”.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/qVET6jI.png" data-fancybox="gallery" data-caption="View API keys"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/qVET6jI.png" alt="View API keys"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">View API keys</figcaption></figure>
+<p>On the API keys page, click “Create New Secret key”. You’ll get your OpenAI key — save it.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/W9vG5xL.png" data-fancybox="gallery" data-caption="OpenAI Key"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/W9vG5xL.png" alt="OpenAI Key"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">OpenAI Key</figcaption></figure>
+<blockquote>
+<p><strong>Danger</strong><br>The API key is sensitive. Don’t share it with anyone.</p>
+</blockquote>
+<p>What’s this key for? We’ll use it to call OpenAI’s API to use GPT. If you’ve never tried GPT, play with <a target="_blank" rel="noopener" href="https://chat.openai.com/chat">ChatGPT</a> — it’s smarter than GPT-3 and can do things like:</p>
+<ul>
+<li>Plan a Japan travel itinerary</li>
+<li>Write marketing copy</li>
+<li>Find bugs in your code</li>
+<li>Solve coding problems</li>
+</ul>
+<p>…and a lot more.</p>
+<p>ChatGPT API isn’t open yet, but we can use GPT-3, which is what this API key is for.</p>
+<blockquote>
+<p><strong>Note</strong><br>OpenAI gives you a free trial credit ($18 USD for 3 months). Pricing varies by model — Davinci is $0.0200 USD per 1K tokens. See <a target="_blank" rel="noopener" href="https://beta.openai.com/pricing">pricing</a>.</p>
+</blockquote>
+<h4 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h4><p>What are tokens?<br>Tokens are characters in your input. For example, “I want to travel to Japan” has 6 words&#x2F;tokens. (Token counting actually breaks down by tokenization rules rather than word count, but characters are a rough analog.)</p>
+<h3 id="Apply-for-LINE-Developer"><a href="#Apply-for-LINE-Developer" class="headerlink" title="Apply for LINE Developer"></a>Apply for LINE Developer</h3><p>Now apply for a LINE Developer account. Go to <a target="_blank" rel="noopener" href="https://developers.line.biz/en/">LINE Developer</a>. Log in with a LINE account.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/Bi3Brmd.png" data-fancybox="gallery" data-caption="LINE login"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/Bi3Brmd.png" alt="LINE login"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">LINE login</figcaption></figure>
+<p>Once logged in, go to the <a target="_blank" rel="noopener" href="https://developers.line.biz/console/">LINE Developer Console</a>.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/ThU9rgl.png" data-fancybox="gallery" data-caption="Developer Console"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/ThU9rgl.png" alt="Developer Console"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Developer Console</figcaption></figure>
+<p>The dashboard is empty, so click “Create a new provider”. Think of a provider as a company — it can host multiple services like LINE Bot, LINE MUSIC, etc.</p>
+<p>We’ll call ours “Example Bot”.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/7ocAeSh.png" data-fancybox="gallery" data-caption="Example Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/7ocAeSh.png" alt="Example Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Example Bot</figcaption></figure>
+<p>Creating is fast. Click “Create” and you’ll land on the Example Bot page.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/XSdXBOh.png" data-fancybox="gallery" data-caption="Example Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/XSdXBOh.png" alt="Example Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Example Bot</figcaption></figure>
+<p>Click “Create a Messaging API channel” since we’re building a chatbot.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/AZxGFZk.png" data-fancybox="gallery" data-caption="Create a Messaging API channel"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/AZxGFZk.png" alt="Create a Messaging API channel"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create a Messaging API channel</figcaption></figure>
+<p>Fill in the fields:</p>
+<ul>
+<li>Channel type<ul>
+<li>Keep the default Messaging API</li>
+</ul>
+</li>
+<li>Provider<ul>
+<li>Keep “Example Bot”</li>
+</ul>
+</li>
+<li>Company or owner’s country or region<ul>
+<li>Pick your country</li>
+</ul>
+</li>
+<li>Channel icon<ul>
+<li>Upload later, skip</li>
+</ul>
+</li>
+<li>Channel name<ul>
+<li>Let’s call it “Run-Away School” (sorry boss)</li>
+</ul>
+</li>
+<li>Channel description<ul>
+<li>Brief description like “Hi, I’m Run-Away School’s little customer service rep”</li>
+</ul>
+</li>
+<li>Category<ul>
+<li>Pick “Other media”</li>
+</ul>
+</li>
+<li>Subcategory<ul>
+<li>“Media (Other)”</li>
+</ul>
+</li>
+<li>Email address<ul>
+<li>For LINE to contact you about your bot</li>
+</ul>
+</li>
+<li>Privacy policy URL and Terms of use URL<ul>
+<li>Skip, not needed</li>
+</ul>
+</li>
+</ul>
+<p>Check both consent boxes and click “Create”.</p>
+<p>(Page is too long to screenshot.)</p>
+<p>After clicking “Create”, a confirmation popup appears — click ok.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/ynbHP69.png" data-fancybox="gallery" data-caption="Create"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/ynbHP69.png" alt="Create"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Create</figcaption></figure>
+<p>Now we have a LINE Bot. Get the following from “Basic settings”:</p>
+<ul>
+<li>Channel ID</li>
+<li>Channel secret</li>
+</ul>
+<p>Then switch to “Messaging API” and find “Channel access token”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/VyYlM4L.png" data-fancybox="gallery" data-caption="Channel access token"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/VyYlM4L.png" alt="Channel access token"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Channel access token</figcaption></figure>
+<p>Click “Issue” — you’ll get a long Token. Save it for later.</p>
+<p>LINE Bot and OpenAI signups done. Time to code.</p>
+<h2 id="Build-the-project"><a href="#Build-the-project" class="headerlink" title="Build the project"></a>Build the project</h2><p>I’ll skip the basics — you probably know how to init a project and install Node.js. I’m using <code>pnpm</code> here, but you can use <code>npm</code> or <code>yarn</code>. Quick commands:</p>
+<blockquote>
+<p><strong>Note</strong><br>The commands below are for Mac. Windows users, look up the equivalents.</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Create folder</span><br><span class="hljs-built_in">mkdir</span> example-line-bot<br><span class="hljs-comment"># Enter folder</span><br><span class="hljs-built_in">cd</span> example-line-bot<br><span class="hljs-comment"># Init project</span><br>pnpm init<br></code></pre></td></tr></table></figure>
+
+<p>Project initialized. Time to install the LINE Bot package.</p>
+<h3 id="Install-packages"><a href="#Install-packages" class="headerlink" title="Install packages"></a>Install packages</h3><p>Install:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pnpm i @line/bot-sdk express dotenv<br></code></pre></td></tr></table></figure>
+
+<p>Then create <code>app.js</code> in the project root.</p>
+<h3 id="Write-the-LINE-Bot"><a href="#Write-the-LINE-Bot" class="headerlink" title="Write the LINE Bot"></a>Write the LINE Bot</h3><p>Import <code>@line/bot-sdk</code>, <code>express</code>, and <code>dotenv</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);<br><span class="hljs-keyword">const</span> line = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@line/bot-sdk&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>LINE provides a <a target="_blank" rel="noopener" href="https://github.com/line/line-bot-sdk-nodejs/blob/master/examples/echo-bot/index.js">sample</a> we can use as-is to test:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><br><span class="hljs-keyword">const</span> line = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@line/bot-sdk&#x27;</span>);<br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);<br><br><span class="hljs-comment">// create LINE SDK config from env variables</span><br><span class="hljs-keyword">const</span> config = &#123;<br>  <span class="hljs-attr">channelAccessToken</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHANNEL_ACCESS_TOKEN</span>,<br>  <span class="hljs-attr">channelSecret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHANNEL_SECRET</span>,<br>&#125;;<br><br><span class="hljs-comment">// create LINE SDK client</span><br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> line.<span class="hljs-title class_">Client</span>(config);<br><br><span class="hljs-comment">// create Express app</span><br><span class="hljs-comment">// about Express itself: https://expressjs.com/</span><br><span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>();<br><br><span class="hljs-comment">// register a webhook handler with middleware</span><br><span class="hljs-comment">// about the middleware, please refer to doc</span><br>app.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/callback&#x27;</span>, line.<span class="hljs-title function_">middleware</span>(config), <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-title class_">Promise</span><br>    .<span class="hljs-title function_">all</span>(req.<span class="hljs-property">body</span>.<span class="hljs-property">events</span>.<span class="hljs-title function_">map</span>(handleEvent))<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> res.<span class="hljs-title function_">json</span>(result))<br>    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>      res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">end</span>();<br>    &#125;);<br>&#125;);<br><br><span class="hljs-comment">// event handler</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">handleEvent</span>(<span class="hljs-params">event</span>) &#123;<br>  <span class="hljs-keyword">if</span> (event.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;message&#x27;</span> || event.<span class="hljs-property">message</span>.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;text&#x27;</span>) &#123;<br>    <span class="hljs-comment">// ignore non-text-message event</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-comment">// create a echoing text message</span><br>  <span class="hljs-keyword">const</span> echo = &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;text&#x27;</span>, <span class="hljs-attr">text</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span> &#125;;<br><br>  <span class="hljs-comment">// use reply API</span><br>  <span class="hljs-keyword">return</span> client.<span class="hljs-title function_">replyMessage</span>(event.<span class="hljs-property">replyToken</span>, echo);<br>&#125;<br><br><span class="hljs-comment">// listen on port</span><br><span class="hljs-keyword">const</span> port = process.<span class="hljs-property">env</span>.<span class="hljs-property">PORT</span> || <span class="hljs-number">3000</span>;<br>app.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`listening on <span class="hljs-subst">$&#123;port&#125;</span>`</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Create <code>.env</code> with:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs env">CHANNEL_ACCESS_TOKEN=<br>CHANNEL_SECRET=<br></code></pre></td></tr></table></figure>
+
+<p>Try <code>node app.js</code> — if it doesn’t start, check the previous steps.</p>
+<h3 id="Deploy-to-Render"><a href="#Deploy-to-Render" class="headerlink" title="Deploy to Render"></a>Deploy to Render</h3><p>Now deploy to Render to test. You need a Render account first — sign up <a target="_blank" rel="noopener" href="https://render.com/">here</a>.</p>
+<p>Push your code to GitHub since Render integrates with GitHub. I’ll skip the GitHub steps — assuming you’ve pushed your code, go to <a target="_blank" rel="noopener" href="https://dashboard.render.com/">Render Dashboard</a>.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/An3Y5ye.png" data-fancybox="gallery" data-caption="Render Dashboard"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/An3Y5ye.png" alt="Render Dashboard"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Render Dashboard</figcaption></figure>
+<p>Choose “Web Services”.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/dOLJLYU.png" data-fancybox="gallery" data-caption="New Web Services"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/dOLJLYU.png" alt="New Web Services"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">New Web Services</figcaption></figure>
+<p>If you don’t see any projects, click “Configure account”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/sQTAfcN.png" data-fancybox="gallery" data-caption="Configure account"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/sQTAfcN.png" alt="Configure account"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Configure account</figcaption></figure>
+<p>Choose which project to give Render access to. I picked just the one I needed:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/CuH1Hv4.png" data-fancybox="gallery" data-caption="Single project"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/CuH1Hv4.png" alt="Single project"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Single project</figcaption></figure>
+<p>Now you’ll see your project. Click it.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/pRml6jU.png" data-fancybox="gallery" data-caption="Project"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/pRml6jU.png" alt="Project"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Project</figcaption></figure>
+<p>Click “Connect”.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/eunRRTH.png" data-fancybox="gallery" data-caption="Connect"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/eunRRTH.png" alt="Connect"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Connect</figcaption></figure>
+<p>Fill in the fields — here’s my setup:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/hTj4Tu8.png" data-fancybox="gallery" data-caption="Setup"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/hTj4Tu8.png" alt="Setup"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Setup</figcaption></figure>
+<p>Scroll down — choose “Free”, then click “Advanced”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/52ycXOO.png" data-fancybox="gallery" data-caption="Advanced"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/52ycXOO.png" alt="Advanced"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Advanced</figcaption></figure>
+<p>We need to add environment variables in “Advanced”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/1t0DM63.png" data-fancybox="gallery" data-caption="Environment Variable"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/1t0DM63.png" alt="Environment Variable"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Environment Variable</figcaption></figure>
+<p>Click “Add Environment Variable” and fill in:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/QrnXocV.png" data-fancybox="gallery" data-caption="Add Environment Variable"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/QrnXocV.png" alt="Add Environment Variable"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Add Environment Variable</figcaption></figure>
+<p>Skip the rest and click “Create Web Service”.</p>
+<p>By default, Render watches your commits and auto-redeploys on new commits. To disable, go to “Advanced” and turn off “Auto Deploy”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/h6GGOsW.png" data-fancybox="gallery" data-caption="Auto Deploy"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/h6GGOsW.png" alt="Auto Deploy"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auto Deploy</figcaption></figure>
+<p>I’ll keep it on for the demo.</p>
+<p>Deployment starts:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/Lcde1RP.png" data-fancybox="gallery" data-caption="Deploying"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/Lcde1RP.png" alt="Deploying"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Deploying</figcaption></figure>
+<p>This takes a while — Render builds a Docker image, then deploys to its server. It does this all automatically, so just wait.</p>
+<p>When done, you’ll see the deploy confirmation:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/Q39XiV9.png" data-fancybox="gallery" data-caption="Deploy running"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/Q39XiV9.png" alt="Deploy running"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Deploy running</figcaption></figure>
+<p>Your project URL is here:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/CD4N6G4.png" data-fancybox="gallery" data-caption="Project URL"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/CD4N6G4.png" alt="Project URL"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Project URL</figcaption></figure>
+<p>Opening it directly won’t work since we only have a <code>POST</code> API. Deployment is done.</p>
+<p>Save this URL — we need it later.</p>
+<h2 id="Add-the-LINE-Bot-as-a-friend"><a href="#Add-the-LINE-Bot-as-a-friend" class="headerlink" title="Add the LINE Bot as a friend"></a>Add the LINE Bot as a friend</h2><p>Time to test. Get the LINE Bot ID from the Developer Console’s “Messaging API”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/sktUN25.png" data-fancybox="gallery" data-caption="LINE Bot"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/sktUN25.png" alt="LINE Bot"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">LINE Bot</figcaption></figure>
+<p>Add as friend — you’ll see the welcome message:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/30H6jH6.png" data-fancybox="gallery" data-caption="Welcome"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/30H6jH6.png" alt="Welcome"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Welcome</figcaption></figure>
+<p>Try sending “Test” — you’ll notice no response:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/IQn9Fjp.png" data-fancybox="gallery" data-caption="Test"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/IQn9Fjp.png" alt="Test"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Test</figcaption></figure>
+<p>Time to fix that.</p>
+<h3 id="Configure-the-LINE-Bot"><a href="#Configure-the-LINE-Bot" class="headerlink" title="Configure the LINE Bot"></a>Configure the LINE Bot</h3><p>Back in the <a target="_blank" rel="noopener" href="https://developers.line.biz/console/">LINE Bot console</a>, click “Messaging API”, find “Webhook settings”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/CQtnVl8.png" data-fancybox="gallery" data-caption="Webhook settings"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/CQtnVl8.png" alt="Webhook settings"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Webhook settings</figcaption></figure>
+<p>Click “Edit” and enter your Render URL as Webhook URL, e.g. <code>https://example.com/callback</code>:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/aqPo7eV.png" data-fancybox="gallery" data-caption="Webhook URL"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/aqPo7eV.png" alt="Webhook URL"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Webhook URL</figcaption></figure>
+<p><code>callback</code> matches our Express route. If yours is different, adjust:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js">app.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/callback&#x27;</span>, line.<span class="hljs-title function_">middleware</span>(config), <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-title class_">Promise</span><br>    .<span class="hljs-title function_">all</span>(req.<span class="hljs-property">body</span>.<span class="hljs-property">events</span>.<span class="hljs-title function_">map</span>(handleEvent))<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> res.<span class="hljs-title function_">json</span>(result))<br>    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>      res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">end</span>();<br>    &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Save and click “Verify”. If you see “Success”, your URL works:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/X7aU7BA.png" data-fancybox="gallery" data-caption="Success"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/X7aU7BA.png" alt="Success"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Success</figcaption></figure>
+<p>Turn on “Use webhook”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/HvKIHYj.png" data-fancybox="gallery" data-caption="Use webhook"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/HvKIHYj.png" alt="Use webhook"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Use webhook</figcaption></figure>
+<p>Now send a message to your LINE Bot — it’ll echo back whatever you typed.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/ySLHrI0.png" data-fancybox="gallery" data-caption="Echo response"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/ySLHrI0.png" alt="Echo response"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Echo response</figcaption></figure>
+<p>LINE Bot is officially working.</p>
+<h3 id="Turn-off-the-default-replies"><a href="#Turn-off-the-default-replies" class="headerlink" title="Turn off the default replies"></a>Turn off the default replies</h3><p>You might want to disable these annoying defaults:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">Thanks for your message!<br><br>We&#x27;re sorry, but this account can&#x27;t reply to individual users.<br>Please look forward to our next broadcast (moon smile)<br></code></pre></td></tr></table></figure>
+
+<p>And the friend-add message:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt">Hi Ray!<br>I&#x27;m Run-Away School.<br>Thanks for adding me as a friend.<br><br>This official account will send you the latest info periodically.<br>Stay tuned.<br></code></pre></td></tr></table></figure>
+
+<p>To disable both, go back to the <a target="_blank" rel="noopener" href="https://developers.line.biz/console/">LINE Bot console</a>, click “Messaging API”, find “Auto-reply messages”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/SQPAXEU.png" data-fancybox="gallery" data-caption="Auto-reply messages"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/SQPAXEU.png" alt="Auto-reply messages"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Auto-reply messages</figcaption></figure>
+<p>You’ll be taken to LINE@ admin. Turn off “Greeting messages” and “Auto-response”:</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/kFyMAZW.png" data-fancybox="gallery" data-caption="Turn off defaults"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/kFyMAZW.png" alt="Turn off defaults"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Turn off defaults</figcaption></figure>
+<h2 id="Integrating-OpenAI-API"><a href="#Integrating-OpenAI-API" class="headerlink" title="Integrating OpenAI API"></a>Integrating OpenAI API</h2><p>The main event. The LINE Bot setup is long and complex, so I covered it carefully — to make sure you don’t hit issues here.</p>
+<h3 id="Install-the-OpenAI-package"><a href="#Install-the-OpenAI-package" class="headerlink" title="Install the OpenAI package"></a>Install the OpenAI package</h3><p>Install:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pnpm i openai<br></code></pre></td></tr></table></figure>
+
+<p>OpenAI provides a sample:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Configuration</span>, <span class="hljs-title class_">OpenAIApi</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;openai&quot;</span>);<br><br><span class="hljs-keyword">const</span> configuration = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(&#123;<br>  <span class="hljs-attr">apiKey</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>,<br>&#125;);<br><span class="hljs-keyword">const</span> openai = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIApi</span>(configuration);<br><br><span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createCompletion</span>(&#123;<br>  <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-davinci-002&quot;</span>,<br>  <span class="hljs-attr">prompt</span>: <span class="hljs-string">&quot;Hello world&quot;</span>,<br>&#125;);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(completion.<span class="hljs-property">data</span>.<span class="hljs-property">choices</span>[<span class="hljs-number">0</span>].<span class="hljs-property">text</span>);<br></code></pre></td></tr></table></figure>
+
+<p>We’ll modify this to work with LINE Bot.</p>
+<p>OpenAI offers multiple models:</p>
+<ul>
+<li><code>text-davinci-003</code></li>
+<li><code>text-curie-001</code></li>
+<li><code>text-babbage-001</code></li>
+<li><code>text-ada-001</code></li>
+</ul>
+<p><code>text-davinci-003</code> is the strongest, so we’ll use that. See <a target="_blank" rel="noopener" href="https://beta.openai.com/docs/models/gpt-3">model intro</a>.</p>
+<h3 id="Update-app-js"><a href="#Update-app-js" class="headerlink" title="Update app.js"></a>Update app.js</h3><p>Import OpenAI in app.js:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Configuration</span>, <span class="hljs-title class_">OpenAIApi</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;openai&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>Instantiate:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> configuration = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(&#123;<br>  <span class="hljs-attr">apiKey</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>,<br>&#125;);<br><span class="hljs-keyword">const</span> openai = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIApi</span>(configuration);<br></code></pre></td></tr></table></figure>
+
+<p><code>apiKey</code> is the OpenAI API Key we got earlier, from <code>.env</code>.</p>
+<p>If you haven’t applied for it, you can’t continue. Apply for an OpenAI API Key.</p>
+<p><code>.env</code> should now look like:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs env">CHANNEL_ACCESS_TOKEN=<br>CHANNEL_SECRET=<br><br>OPENAI_API_KEY=<br></code></pre></td></tr></table></figure>
+
+<p>Modify the <code>handleEvent</code> function from LINE’s sample:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleEvent</span>(<span class="hljs-params">event</span>) &#123;<br>  <span class="hljs-keyword">if</span> (event.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;message&#x27;</span> || event.<span class="hljs-property">message</span>.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;text&#x27;</span>) &#123;<br>    <span class="hljs-comment">// ignore non-text-message event</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createCompletion</span>(&#123;<br>    <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-davinci-003&quot;</span>,<br>    <span class="hljs-attr">prompt</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span> ,<br>  &#125;);<br><br>  <span class="hljs-comment">// create a echoing text message</span><br>  <span class="hljs-keyword">const</span> echo = &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;text&#x27;</span>, <span class="hljs-attr">text</span>: completion.<span class="hljs-property">data</span>.<span class="hljs-property">choices</span>[<span class="hljs-number">0</span>].<span class="hljs-property">text</span> &#125;;<br><br>  <span class="hljs-comment">// use reply API</span><br>  <span class="hljs-keyword">return</span> client.<span class="hljs-title function_">replyMessage</span>(event.<span class="hljs-property">replyToken</span>, echo);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>We changed <code>prompt</code> to <code>event.message.text</code> (user input). <code>completion.data.choices[0].text</code> is OpenAI’s response.</p>
+<p>Save, commit, push to GitHub. Render will auto-redeploy.</p>
+<blockquote>
+<p><strong>Note</strong><br>Remember to add <code>OPENAI_API_KEY</code> to Render’s environment variables, otherwise you’ll get errors.</p>
+</blockquote>
+<p>After deploy, message your LINE Bot — it’ll talk back.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/E3ktdNJ.png" data-fancybox="gallery" data-caption="Chat started"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/E3ktdNJ.png" alt="Chat started"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Chat started</figcaption></figure>
+<p>You’ll notice replies are short. We haven’t told it how many Tokens to use:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createCompletion</span>(&#123;<br>  <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-davinci-003&quot;</span>,<br>  <span class="hljs-attr">prompt</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span> ,<br>  <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">200</span>,<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p><code>max_tokens</code> controls response length. 200 should be plenty.</p>
+<h3 id="Trim-OpenAI’s-response"><a href="#Trim-OpenAI’s-response" class="headerlink" title="Trim OpenAI’s response"></a>Trim OpenAI’s response</h3><p>OpenAI responses come with extra whitespace because it breaks responses into sections separated by spaces. Trim:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createCompletion</span>(&#123;<br>  <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-davinci-003&quot;</span>,<br>  <span class="hljs-attr">prompt</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span> ,<br>  <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">200</span>,<br>&#125;);<br><br><span class="hljs-keyword">const</span> echo = &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;text&#x27;</span>, <span class="hljs-attr">text</span>: completion.<span class="hljs-property">data</span>.<span class="hljs-property">choices</span>[<span class="hljs-number">0</span>].<span class="hljs-property">text</span>.<span class="hljs-title function_">trim</span>() &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>Push again, and the bot will reply cleanly.</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://i.imgur.com/j8xuJgN.png" data-fancybox="gallery" data-caption="Clean reply"><img class="cursor-zoom-in !mb-0" src="https://i.imgur.com/j8xuJgN.png" alt="Clean reply"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Clean reply</figcaption></figure>
+<p>You now have a working chatbot integrated with OpenAI.</p>
+<h2 id="Using-GPT-3-5"><a href="#Using-GPT-3-5" class="headerlink" title="Using GPT-3.5"></a>Using GPT-3.5</h2><p>OpenAI later released the ChatGPT API. I’ll show what changes — the code conversion is pretty minimal.</p>
+<p>Before:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createCompletion</span>(&#123;<br>  <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-davinci-003&quot;</span>,<br>  <span class="hljs-attr">prompt</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span>,<br>  <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">200</span>,<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Change <code>createCompletion</code> to <code>createChatCompletion</code> (<del>weirdly the official docs don’t mention this</del>). Change <code>prompt</code> to <code>messages</code> and adjust <code>model</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> completion = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createChatCompletion</span>(&#123;<br>  <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-3.5-turbo&quot;</span>,<br>  <span class="hljs-attr">messages</span>: [&#123;<br>    <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,<br>    <span class="hljs-attr">content</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span>,<br>  &#125;],<br>  <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">200</span>,<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Also update <code>const echo = { type: &#39;text&#39;, text: completion.data.choices[0].text.trim() };</code> to:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> echo = &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;text&#x27;</span>, <span class="hljs-attr">text</span>: choices.<span class="hljs-property">message</span>.<span class="hljs-property">content</span>.<span class="hljs-title function_">trim</span>() || <span class="hljs-string">&#x27;Sorry, I have nothing to say.&#x27;</span> &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>That’s the switch from GPT-3 to GPT-3.5.</p>
+<p>Full code:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv&#x27;</span>).<span class="hljs-title function_">config</span>();<br><br><span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);<br><span class="hljs-keyword">const</span> line = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@line/bot-sdk&#x27;</span>);<br><span class="hljs-keyword">const</span> &#123; <span class="hljs-title class_">Configuration</span>, <span class="hljs-title class_">OpenAIApi</span> &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;openai&quot;</span>);<br><br><span class="hljs-keyword">const</span> configuration = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(&#123;<br>  <span class="hljs-attr">apiKey</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>,<br>&#125;);<br><span class="hljs-keyword">const</span> openai = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIApi</span>(configuration);<br><br><span class="hljs-comment">// create LINE SDK config from env variables</span><br><span class="hljs-keyword">const</span> config = &#123;<br>  <span class="hljs-attr">channelAccessToken</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHANNEL_ACCESS_TOKEN</span>,<br>  <span class="hljs-attr">channelSecret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHANNEL_SECRET</span>,<br>&#125;;<br><br><span class="hljs-comment">// create LINE SDK client</span><br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> line.<span class="hljs-title class_">Client</span>(config);<br><br><span class="hljs-comment">// create Express app</span><br><span class="hljs-comment">// about Express itself: https://expressjs.com/</span><br><span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>();<br><br><span class="hljs-comment">// register a webhook handler with middleware</span><br><span class="hljs-comment">// about the middleware, please refer to doc</span><br>app.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/callback&#x27;</span>, line.<span class="hljs-title function_">middleware</span>(config), <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> &#123;<br>  <span class="hljs-title class_">Promise</span><br>    .<span class="hljs-title function_">all</span>(req.<span class="hljs-property">body</span>.<span class="hljs-property">events</span>.<span class="hljs-title function_">map</span>(handleEvent))<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> res.<span class="hljs-title function_">json</span>(result))<br>    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);<br>      res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">end</span>();<br>    &#125;);<br>&#125;);<br><br><span class="hljs-comment">// event handler</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleEvent</span>(<span class="hljs-params">event</span>) &#123;<br>  <span class="hljs-keyword">if</span> (event.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;message&#x27;</span> || event.<span class="hljs-property">message</span>.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;text&#x27;</span>) &#123;<br>    <span class="hljs-comment">// ignore non-text-message event</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">const</span> &#123; data &#125; = <span class="hljs-keyword">await</span> openai.<span class="hljs-title function_">createChatCompletion</span>(&#123;<br>    <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-3.5-turbo&quot;</span>,<br>    <span class="hljs-attr">messages</span>: [<br>      &#123;<br>        <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,<br>        <span class="hljs-attr">content</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span>,<br>      &#125;<br>    ],<br>    <span class="hljs-attr">max_tokens</span>: <span class="hljs-number">500</span>,<br>  &#125;);<br><br>  <span class="hljs-comment">// create a echoing text message</span><br>  <span class="hljs-keyword">const</span> [choices] = data.<span class="hljs-property">choices</span>;<br>  <span class="hljs-keyword">const</span> echo = &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;text&#x27;</span>, <span class="hljs-attr">text</span>: choices.<span class="hljs-property">message</span>.<span class="hljs-property">content</span>.<span class="hljs-title function_">trim</span>() || <span class="hljs-string">&#x27;Sorry, I have nothing to say.&#x27;</span> &#125;;<br><br>  <span class="hljs-comment">// use reply API</span><br>  <span class="hljs-keyword">return</span> client.<span class="hljs-title function_">replyMessage</span>(event.<span class="hljs-property">replyToken</span>, echo);<br>&#125;<br><br><span class="hljs-comment">// listen on port</span><br><span class="hljs-keyword">const</span> port = process.<span class="hljs-property">env</span>.<span class="hljs-property">PORT</span> || <span class="hljs-number">3000</span>;<br>app.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`listening on <span class="hljs-subst">$&#123;port&#125;</span>`</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>One more thing about <code>messages</code>. We currently send an array with one object:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js">[&#123;<br>  <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,<br>  <span class="hljs-attr">content</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span>,<br>&#125;]<br></code></pre></td></tr></table></figure>
+
+<p>This means the message is from the “user”. If you want to maintain conversation context like ChatGPT, there’s another role — <code>system</code>. Add the bot’s previous response too:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js">[<br>  &#123;<br>    <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,<br>    <span class="hljs-attr">content</span>: event.<span class="hljs-property">message</span>.<span class="hljs-property">text</span>,<br>  &#125;,<br>  &#123;<br>    <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;system&#x27;</span>,<br>    <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Hi, I&#x27;m a bot&quot;</span>,<br>  &#125;<br>],<br></code></pre></td></tr></table></figure>
+
+<p>Now ChatGPT knows which message is from the bot and which is from the user.</p>
+<h2 id="Wrap-up"><a href="#Wrap-up" class="headerlink" title="Wrap-up"></a>Wrap-up</h2><p>The LINE Bot creation flow is incredibly long with a lot of steps and details. But you also learn how to integrate third-party services and deploy code to Render — a great little practice project. If you want to try a chatbot, this method works.</p>
+<p>One thing to watch out for: to make OpenAI’s GPT smarter, you need to pass the entire context (including bot replies) along with new messages. Otherwise it’ll feel a bit dumb. But LINE chatbots aren’t great for this — over time the message volume gets huge and you can’t delete messages, so I left this out. We reply per-question without including history.</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hsiangfeng/example-line-bot">Sample code</a> if you want to grab it directly. Most of the code follows the official samples with minimal modification, so you can use it as-is.</p>
+<p>Hope you have fun building a LINE Bot.</p>
+<blockquote>
+<p><strong>Info</strong><br>If you find Render slow for debugging, consider <code>ngrok</code> — it exposes your local service publicly. See <a href="/other/20230210/1090666501/">this post (article in Mandarin)</a>.</p>
+</blockquote>
+<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Render’s free plan goes to sleep after about 15 minutes of inactivity, like Heroku’s old free tier. Waking up takes 30 seconds to a minute. To avoid this, consider <a target="_blank" rel="noopener" href="https://uptimerobot.com/">UptimeRobot</a> to keep it awake (<del>exploiting the worker</del>).</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/gsap/2022/12/11/gsap3-fx-08-special-properties/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            (8) Fun Frontend Effects With GSAP3 - Special Properties
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/misc/2022/12/06/buy-a-domain-for-your-blog-with-github-pages-and-cloudflare/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Buy a Domain (Google Domains) and Point It at Your Blog on GitHub Pages With Cloudflare
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/misc/2023/04/13/free-chatgpt-account-and-prompting-tips/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Use ChatGPT Without Paying or Writing Code (2023 Snapshot)
+              </h4>
+              <time datetime="2023-04-14" title="Published: 2023-04-14" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-04-14
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/learning/2023/03/15/will-chatgpt-ai-replace-engineers/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                About Whether ChatGPT / AI Will Replace Engineers
+              </h4>
+              <time datetime="2023-03-15" title="Published: 2023-03-15" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2023-03-15
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/nodejs/2022/12/15/discord-bot-with-openai-gpt3/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Building a Discord Chatbot with OpenAI GPT-3
+              </h4>
+              <time datetime="2022-12-16" title="Published: 2022-12-16" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-16
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/16/aistupidlevel-llm-degradation-monitor/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Is AI Getting Quietly Dumber? AIStupidLevel: A 24-Hour Watchdog for LLM Degradation
+              </h4>
+              <time datetime="2026-06-16" title="Published: 2026-06-16" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-16
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/" data-title="Build Your First LINE Bot with Node.js — Using OpenAI GPT-3 and GPT-3.5 as Examples" data-hashtags="Node.js,OpenAI,ChatGPT,GPT-3,GPT-3.5,LINE Bot,API,Render,LINE" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/nodejs/2022/12/10/build-first-line-bot-with-nodejs-and-openai/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setup"><span class="toc-text">Setup</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Apply-for-OpenAI-API"><span class="toc-text">Apply for OpenAI API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Apply-for-LINE-Developer"><span class="toc-text">Apply for LINE Developer</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Build-the-project"><span class="toc-text">Build the project</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-packages"><span class="toc-text">Install packages</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Write-the-LINE-Bot"><span class="toc-text">Write the LINE Bot</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy-to-Render"><span class="toc-text">Deploy to Render</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Add-the-LINE-Bot-as-a-friend"><span class="toc-text">Add the LINE Bot as a friend</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure-the-LINE-Bot"><span class="toc-text">Configure the LINE Bot</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Turn-off-the-default-replies"><span class="toc-text">Turn off the default replies</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Integrating-OpenAI-API"><span class="toc-text">Integrating OpenAI API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-the-OpenAI-package"><span class="toc-text">Install the OpenAI package</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-app-js"><span class="toc-text">Update app.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Trim-OpenAI%E2%80%99s-response"><span class="toc-text">Trim OpenAI’s response</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-GPT-3-5"><span class="toc-text">Using GPT-3.5</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wrap-up"><span class="toc-text">Wrap-up</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Note"><span class="toc-text">Note</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1483 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Deep Dive Into JavaScript's this: Every Way It Bites You | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/javascript/20210403/2190440925/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/javascript/20210403/2190440925/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="I&#39;ve written about this plenty of times, but this round I wanted to go deeper into the this keyword. For any JavaScript engineer or frontend dev, this is one of those keywords you bump into constantly — so let&#39;s really pin down where it points in every situation.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="A Deep Dive Into JavaScript&#39;s this: Every Way It Bites You | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="I&#39;ve written about this plenty of times, but this round I wanted to go deeper into the this keyword. For any JavaScript engineer or frontend dev, this is one of those keywords you bump into constantly — so let&#39;s really pin down where it points in every situation.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://israynotarray.com/images/default-og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2021-04-03T15:52:56.000Z">
+    
+      <meta property="article:modified_time" content="2021-04-03T15:52:56.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="JavaScript">
+      
+    
+    
+      
+        <meta property="article:tag" content="JavaScript">
+      
+        <meta property="article:tag" content="this">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A Deep Dive Into JavaScript&#39;s this: Every Way It Bites You | Is Ray, Not Array">
+  <meta name="twitter:description" content="I&#39;ve written about this plenty of times, but this round I wanted to go deeper into the this keyword. For any JavaScript engineer or frontend dev, this is one of those keywords you bump into constantly — so let&#39;s really pin down where it points in every situation.">
+  
+    <meta name="twitter:image" content="https://israynotarray.com/images/default-og-image.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/"},"headline":"A Deep Dive Into JavaScript's this: Every Way It Bites You","url":"https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/","datePublished":"2021-04-03T15:52:56.000Z","dateModified":"2021-04-03T15:52:56.000Z","description":"I've written about this plenty of times, but this round I wanted to go deeper into the this keyword. For any JavaScript engineer or frontend dev, this is one of those keywords you bump into constantly — so let's really pin down where it points in every situation.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":17442,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://israynotarray.com/images/default-og-image.png","width":1200,"height":630}],"articleSection":["JavaScript"],"keywords":"JavaScript, this"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/#breadcrumb","name":"A Deep Dive Into JavaScript's this: Every Way It Bites You | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"JavaScript","item":"https://israynotarray.com/categories/javascript/"},{"@type":"ListItem","position":3,"name":"A Deep Dive Into JavaScript's this: Every Way It Bites You"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/javascript/20210403/2190440925/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/javascript/20210403/2190440925/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2021-04-03" title="Published: 2021-04-03" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2021-04-03
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/javascript/" class="hover:text-primary-500 transition-colors">JavaScript</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        A Deep Dive Into JavaScript's this: Every Way It Bites You
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/JavaScript/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #JavaScript
+            </a>
+          
+            <a href="/tags/this/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #this
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>I’ve written a bunch of posts about <code>this</code> already, but this time I wanted to go a bit deeper into the <code>this</code> keyword. For a JavaScript engineer or frontend dev, <code>this</code> is one of those keywords you run into all the time — so it’s worth really understanding it.</p>
+<h2 id="this"><a href="#this" class="headerlink" title="this"></a>this</h2><p>Let’s start with what <code>this</code> even is. On MDN, <code>this</code> is filed under “Expressions and operators” as a <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators"><strong>primary expression</strong></a>.</p>
+<p>What does that mean? Things like <code>{}</code>, <code>[]</code>, and <code>function</code> are all expressions. Notice the English word — an expression. So from here on, whether I say “expression” or “statement expression,” I’m talking about expressions.</p>
+<p>Quick note: when I say <code>function</code> here, I mean an anonymous function expression — declaring a function without giving it a name. If you can’t quite tell the difference yet, don’t worry, I’ll give plenty of examples.</p>
+<p>First, which one is a named function statement? That’s the function declaration you see all the time:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params"></span>) &#123;&#125; <span class="hljs-comment">// named statement</span><br></code></pre></td></tr></table></figure>
+
+<p>And an anonymous function expression looks like one of these:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> fn = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;&#125;;<br><br><span class="hljs-keyword">const</span> obj1 = &#123;<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;&#125;,<br>&#125;;<br><br><span class="hljs-keyword">const</span> obj2 = &#123;<br>  <span class="hljs-title function_">fn</span>(<span class="hljs-params"></span>) &#123;&#125;, <span class="hljs-comment">// heads up: this is still an anonymous expression, just the shorthand form</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>(We’ll skip IIFE — immediately invoked function expressions — for now.)</p>
+<p>So what’s an expression? An expression is what we usually call <a href="/javascript/20200607/196651152/">expressions vs statements</a> (article in Mandarin). <strong>When you type a piece of code, it returns something back to you.</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs js">[]; <span class="hljs-comment">// Array []</span><br>myName = <span class="hljs-string">&#x27;Ray&#x27;</span>; <span class="hljs-comment">// &quot;Ray&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>But if you try typing <code>{}</code> on its own, you’ll probably get <code>undefined</code>, because plain <code>{}</code> is usually treated by JavaScript as a statement. So when I talk about <code>{}</code> here, I mean the Object initializer (object literal) form. Writing <code>{}</code> directly does have some interesting edge cases, so let’s chat about those for a sec.</p>
+<p>Here’s a basic example to start:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">&#123;<br>  <span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;is Ray&#x27;</span>;<br>&#125; <span class="hljs-comment">// undefined</span><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName); <span class="hljs-comment">// is Ray;</span><br></code></pre></td></tr></table></figure>
+
+<p>In real-world dev you rarely write code like this, but how you declare the variable actually changes what <code>console.log(myName)</code> outputs. Above I used <code>var</code>. What happens if I switch to ES6 declarations (<code>let</code>, <code>const</code>)?</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">&#123;<br>  <span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;is Ray&#x27;</span>;<br>&#125; <span class="hljs-comment">// undefined</span><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName); <span class="hljs-comment">// Uncaught ReferenceError: myName is not defined</span><br></code></pre></td></tr></table></figure>
+
+<p>If you want the why behind that, I’d point you to my earlier notes — <a href="/javascript/20210614/664758344/">JavaScript Core Concepts (59) — ES6: Let and Const basics</a> (article in Mandarin). I won’t dig into it here.</p>
+<p>On the flip side, if you use the object literal form, you get an error:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js">&#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;is Ray&#x27;</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Type that into the browser and you’ll see an error thrown right at you (different browsers display errors differently — I’m using Firefox): <code>Uncaught SyntaxError: expected expression, got &#39;}&#39;</code>. In short, this expression has to be held by some container, and usually that container is a variable.</p>
+<p>Anonymous functions are the same deal:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>except an anonymous function throws <code>Uncaught SyntaxError: function statement requires a name</code>.</p>
+<p>Anyway, that’s not the main topic this time — I’m just chatting about it briefly.</p>
+<p>The star of this post is <code>this</code>. The stuff above was just a quick intro to expressions vs statements, otherwise the rest might confuse you.</p>
+<p>So because <code>this</code> is classified as an expression, typing it directly into the browser console returns a value:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">this</span>; <span class="hljs-comment">// the browser&#x27;s window object</span><br></code></pre></td></tr></table></figure>
+
+<p>And of course you can store that returned value in a variable:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;is Ray&#x27;</span>;<br><span class="hljs-keyword">var</span> vm = <span class="hljs-variable language_">this</span>;<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(vm.<span class="hljs-property">myName</span>); <span class="hljs-comment">// is Ray</span><br></code></pre></td></tr></table></figure>
+
+<p>So… where does <code>this</code> come from? In real dev, you see the <code>this</code> keyword pop up all the time.</p>
+<p>For example, here’s grabbing <code>this</code> from a button element:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>2<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>3<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>4<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>5<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> btns = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;.btn&#x27;</span>);<br><br>btns.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">btn</span>) &#123;<br>  btn.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); <span class="hljs-comment">// the DOM element you clicked</span><br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<iframe height="300" style="width: 100%;" scrolling="no" title="this-1" src="https://codepen.io/hsiangfeng/embed/preview/WNEzXdM?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng/pen/WNEzXdM">
+  this-1</a> by Ray (<a target="_blank" rel="noopener" href="https://codepen.io/hsiangfeng">@hsiangfeng</a>)
+  on <a target="_blank" rel="noopener" href="https://codepen.io">CodePen</a>.
+</iframe>
+
+<p>If you’ve done any Vue dev, you’ve seen this pattern a lot:</p>
+<p>(This is the classic Vue 2 style — from Vue 3 onward it’s called the Options API)</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>You can even call <code>this</code> inside a plain function statement:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); <span class="hljs-comment">// the browser&#x27;s window object</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>From all these examples we can see <code>this</code> is everywhere — you’ve probably been using it without even thinking about it. But that’s exactly the problem: we use it so casually that we never really understand it, and if you keep dodging it, you’ll run into a lot of weird bugs in real dev.</p>
+<p>For example, say I expect to get my name back:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span> (<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>&#125;<br><span class="hljs-keyword">const</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">getName</span>: fn,<br>&#125;;<br><br>obj.<span class="hljs-title function_">getName</span>(); <span class="hljs-comment">// Ray;</span><br></code></pre></td></tr></table></figure>
+
+<p>Looks totally normal. But if you accidentally write it like this, you might get a nasty surprise:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span> (<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>&#125;<br><span class="hljs-keyword">const</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">getName</span>: fn,<br>&#125;;<br><br><span class="hljs-keyword">const</span> getName = obj.<span class="hljs-property">getName</span>;<br><span class="hljs-title function_">getName</span>();<span class="hljs-comment">// undefined, WTF?</span><br></code></pre></td></tr></table></figure>
+
+<p>Yeah, plenty of WTFs there. You can see <code>this</code> completely wandered off.</p>
+<p>All those examples and all that rambling were really just to show you the traps in the <code>this</code> keyword. If you don’t get to know it properly, you’ll definitely step on a bug at some point.</p>
+<p>So… where does <code>this</code> come from? In short, JavaScript creates this keyword every time it sets up an execution context — and that includes creating a function. Just keep that fact in mind for now, and let’s go through how <code>this</code> behaves and what it points to in different situations.</p>
+<h2 id="Global-environment"><a href="#Global-environment" class="headerlink" title="Global environment"></a>Global environment</h2><p>Basically, if you call <code>this</code> directly in the global environment, you get the <code>window</code> object — and they’re exactly the same thing.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">this</span> === <span class="hljs-variable language_">window</span>; <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>Even <code>document</code> is the same:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">this</span>.<span class="hljs-property">document</span> === <span class="hljs-variable language_">document</span>; <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>And of course you can use <code>this</code> to add a property directly onto Window (note: this isn’t creating a variable, it’s adding a property — details in <a href="/javascript/20200425/539985371/">this post</a> (article in Mandarin)).</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName); <span class="hljs-comment">// Ray</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">window</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br><br><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> === <span class="hljs-variable language_">window</span>.<span class="hljs-property">myName</span>; <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> === myName; <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>Even if you use <code>&#39;use strict&#39;</code> (strict mode), <code>this</code> still points to <code>window</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-meta">&#x27;use strict&#x27;</span><br><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> = <span class="hljs-string">&#x27;Ray&#x27;</span>;<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myName); <span class="hljs-comment">// Ray</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">window</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br><br><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> === <span class="hljs-variable language_">window</span>.<span class="hljs-property">myName</span>; <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> === myName; <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Function-environment"><a href="#Function-environment" class="headerlink" title="Function environment"></a>Function environment</h2><p>Inside a function, what <code>this</code> points to depends on <strong>how you call that function</strong> — that’s what decides who it refers to. But if you “call it directly,” <code>this</code> points straight to <code>window</code>, and this behavior is called a <strong>simple call</strong>.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>;<br>&#125;<br><br><span class="hljs-title function_">fn</span>() === <span class="hljs-variable language_">window</span>; <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>In practice we try to <strong>avoid simple calls as much as possible</strong>. Here’s a chunk of Vue code as an example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Looks fine, right? Now let me change it a little — what does the result become this time?</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>      array.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// undefined * 3, WTF?</span><br>      &#125;);<br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Now that’s strange — why does just adding a forEach turn it into <code>undefined</code>? Let’s imagine how <code>forEach</code> might be implemented (this is just an example):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">forEach</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">callback</span>)&#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> index = <span class="hljs-number">0</span>; index &lt; <span class="hljs-variable language_">this</span>.<span class="hljs-property">length</span>; index += <span class="hljs-number">1</span>) &#123;<br>    <span class="hljs-title function_">callback</span>(<span class="hljs-variable language_">this</span>[index], index, <span class="hljs-variable language_">this</span>);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>You can see the function passed into <code>forEach</code> is <strong>called directly</strong>, which easily turns <code>this</code> into a <strong>simple call</strong> — and that’s why <code>this</code> wanders off. So how do we fix it? There are actually two approaches, so let’s get to know them.</p>
+<p>The first is declaring a variable to store <code>this</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-keyword">const</span> vm = <span class="hljs-variable language_">this</span>;<br>      <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>      array.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(vm.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray * 3, is Good!</span><br>      &#125;);<br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>(ps. <code>vm</code> stands for ViewModel.)</p>
+<p>The second is using an arrow function:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>      array.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray * 3, is Good!</span><br>      &#125;);<br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Wait, why does using an arrow function fix it? That’s completely beyond what you’d expect.</p>
+<p><code>this</code> feels harder to pin down than I imagined, but don’t worry — we’ll go through exactly why one piece at a time.</p>
+<p>So what other situations create a simple call? Generally, any time you <strong>call a function directly</strong> or pass in an anonymous function, you can easily end up with a simple call — even an IIFE hits this problem.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      (<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// undefined, WTF...</span><br>      &#125;)();<br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>So the things that create a simple call boil down to:</p>
+<ol>
+<li>Usually calling a function directly.</li>
+<li>Passing in an anonymous function also creates a simple call.</li>
+</ol>
+<p>But arrow functions can behave differently — and we’ll get into why later.</p>
+<h2 id="Object-methods"><a href="#Object-methods" class="headerlink" title="Object methods"></a>Object methods</h2><p>Another common <code>this</code> situation is inside an object’s method, where one slip can also send <code>this</code> wandering all over the place:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>  &#125;<br>&#125;<br><br>obj.<span class="hljs-title function_">fn</span>(); <span class="hljs-comment">// Ray</span><br><br><span class="hljs-keyword">var</span> fn = obj.<span class="hljs-property">fn</span>;<br><span class="hljs-title function_">fn</span>() <span class="hljs-comment">// oh No!, WTF?</span><br></code></pre></td></tr></table></figure>
+
+<p>Here’s another fun quirk — if you change <code>var</code> to ES6 <code>let</code> or <code>const</code>, you actually get a different result:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">const</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>  &#125;<br>&#125;<br><br>obj.<span class="hljs-title function_">fn</span>(); <span class="hljs-comment">// Ray</span><br><br><span class="hljs-keyword">var</span> fn = obj.<span class="hljs-property">fn</span>;<br><span class="hljs-title function_">fn</span>() <span class="hljs-comment">// undefined, WTF?</span><br></code></pre></td></tr></table></figure>
+
+<p>Figuring out where <code>this</code> points in an object call is pretty easy (<del>or so I think</del>). You just look at which object the function is called and run under. For example, <code>fn();</code> is called and run under <code>obj</code>, so <code>this</code> points to <code>obj</code>.</p>
+<p>And the reason that calling <code>fn()</code> on its own forms a simple call is this: here we’ve pointed the variable <code>fn</code> at the path <code>obj.fn</code> without calling it, and then on the next line we <strong>call it directly</strong> — note, <strong>directly</strong>. That behavior forms a simple call, which sends <code>this</code> straight to <code>window</code>.</p>
+<h2 id="new-constructor"><a href="#new-constructor" class="headerlink" title="new constructor"></a>new constructor</h2><p>The <code>new</code> constructor has a neat, fun behavior too. When you put <code>new</code> in front of the function you’re calling, the <code>this</code> inside is used as the object’s properties:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params">myName</span>) &#123;<br>  <span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> = myName;<br>&#125;<br><br><span class="hljs-keyword">const</span> newFn = <span class="hljs-keyword">new</span> <span class="hljs-title function_">fn</span>(<span class="hljs-string">&#x27;Ray&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(newFn.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br></code></pre></td></tr></table></figure>
+
+<p>This works much like creating an object with an object literal:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(obj.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray</span><br></code></pre></td></tr></table></figure>
+
+<p>There’s also a case that changes what <code>new</code> returns:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params">myName</span>) &#123;<br>  <span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> = myName;<br><br>  <span class="hljs-keyword">return</span> &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;oh No!&#x27;</span>,<br>  &#125;<br>&#125;<br><br><span class="hljs-keyword">const</span> newFn = <span class="hljs-keyword">new</span> <span class="hljs-title function_">fn</span>(<span class="hljs-string">&#x27;Ray&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(newFn.<span class="hljs-property">myName</span>); <span class="hljs-comment">// oh No!</span><br></code></pre></td></tr></table></figure>
+
+<p>Using <code>return</code> to hand back another object does kill off the <code>new</code> object. In real dev you’d basically never write this — and if someone did, I think they’d be the one getting invited out for a “coffee chat,” if you know what I mean.</p>
+<h2 id="DOM"><a href="#DOM" class="headerlink" title="DOM"></a>DOM</h2><p><code>this</code> behaves differently again with the DOM. When you pair it with <code>addEventListener</code>, <code>this</code> always points to that DOM element — I actually showed this earlier.</p>
+<p>For example:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>2<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>3<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>4<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>5<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> buttons = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;.btn&#x27;</span>);<br><br>buttons.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">button</span>) &#123;<br>  button.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); <span class="hljs-comment">// the DOM element you clicked</span><br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Once you set up an <code>addEventListener</code> listener, the function you pass in basically gets parked somewhere waiting to be called, and by default that function points to the DOM you’re listening on. So you can picture it like this:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> click = &#123;<br>  <span class="hljs-attr">button</span>: <span class="hljs-string">&#x27;&lt;button type=&quot;button&quot; class=&quot;btn&quot;&gt;1&lt;/button&gt;&#x27;</span>,<br>  <span class="hljs-title function_">addEventListener</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>);<br>  &#125;<br>&#125;<br><br>click.<span class="hljs-title function_">addEventListener</span>(); <span class="hljs-comment">// clicking triggers this call</span><br></code></pre></td></tr></table></figure>
+
+<p>But there’s one case that sends the <code>this</code> reference wandering again — the arrow function:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> buttons = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;.btn&#x27;</span>);<br><br>buttons.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">button</span>) &#123;<br>  button.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); <span class="hljs-comment">// window, WTF?</span><br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>Feels like every time arrow functions get involved, things get extra annoying, right? Don’t worry — let’s figure out what the heck ES6 arrow functions are actually doing.</p>
+<h2 id="arrow-function-expression"><a href="#arrow-function-expression" class="headerlink" title="arrow function expression"></a>arrow function expression</h2><p>Before explaining arrow functions, we need to understand the difference between traditional functions and arrow functions. MDN <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">explains</a> that an arrow function has no <code>this</code>, <code>arguments</code>, <code>super</code>, or <code>new.target</code> of its own. The last three aren’t the point — the key one is “an arrow function has no <code>this</code> of its own.” What does that mean? When you use an arrow function, since it has no <code>this</code> of its own, where does its <code>this</code> come from? It refers to the outer scope — the parent (one level up).</p>
+<p>That’s why so many of the earlier examples behaved this way: <code>this</code> wandered off at first, but switching to an arrow function fixed it.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br>  <span class="hljs-attr">el</span>: <span class="hljs-string">&#x27;#app&#x27;</span>,<br>  <span class="hljs-attr">data</span>: &#123;<br>    <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  &#125;,<br>  <span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">getName</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>      array.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>); <span class="hljs-comment">// Ray * 3, is Good!</span><br>      &#125;);<br>    &#125;<br>  &#125;,<br>  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getName</span>();<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>In this example, if we’d written <code>array.forEach(function () { ... });</code>, <code>this</code> would point to <code>window</code> or <code>undefined</code>. As I mentioned, an arrow function has no <code>this</code> of its own, so it refers to the parent’s <code>this</code> (kind of like the prototype chain). A traditional function, having its own <code>this</code>, ends up forming the simple call I described earlier. That’s why using arrow functions where appropriate can simplify your code and make <code>this</code> easier to work with.</p>
+<p>But you have to be more careful with object calls:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>  &#125;<br>&#125;<br><br>obj.<span class="hljs-title function_">fn</span>(); <span class="hljs-comment">// oh No!</span><br></code></pre></td></tr></table></figure>
+
+<p>In the code above, <code>this</code> isn’t inside any other function, so it refers straight to the outermost scope.</p>
+<h2 id="Force-binding-this"><a href="#Force-binding-this" class="headerlink" title="Force-binding this"></a>Force-binding this</h2><p>JavaScript’s <code>Function.prototype</code> gives us three methods to force-bind where <code>this</code> points:</p>
+<ol>
+<li><code>call()</code></li>
+<li><code>apply()</code></li>
+<li><code>bind()</code></li>
+</ol>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj1 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray 2&#x27;</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> obj2 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>  &#125;<br>&#125;<br><br>obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">call</span>(obj1); <span class="hljs-comment">// Ray 2</span><br></code></pre></td></tr></table></figure>
+
+<p>One thing to note: once you pass the <code>this</code> argument into <code>call()</code>, it executes immediately.</p>
+<p>Besides the <code>this</code> argument, <code>call()</code> can take other arguments too.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj1 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray 2&#x27;</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> obj2 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> + <span class="hljs-string">&#x27; &#x27;</span> + message);<br>  &#125;<br>&#125;<br><br>obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">call</span>(obj1, <span class="hljs-string">&#x27;Hello&#x27;</span>); <span class="hljs-comment">// Ray 2 Hello</span><br></code></pre></td></tr></table></figure>
+
+<p><code>apply()</code> and <code>call()</code> are nearly identical — they just take a different type for the second argument. Where <code>call()</code> takes a pile of arguments, <code>apply()</code> takes an array.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj1 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray 2&#x27;</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> obj2 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> + <span class="hljs-string">&#x27; &#x27;</span> + message);<br>  &#125;<br>&#125;<br><br>obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">apply</span>(obj1, [<span class="hljs-string">&#x27;Hello&#x27;</span>]); <span class="hljs-comment">// Ray 2 Hello</span><br></code></pre></td></tr></table></figure>
+
+<p>Last one is <code>bind()</code>. Why save <code>bind()</code> for last? There’s a reason. <code>bind()</code> is a lot like <code>call()</code>, except the special thing about <code>bind()</code> is that it doesn’t execute the function right away — it returns a function with <code>this</code> already bound.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj1 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray 2&#x27;</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> obj2 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> + <span class="hljs-string">&#x27; &#x27;</span> + message);<br>  &#125;<br>&#125;<br><br><span class="hljs-keyword">var</span> newFn = obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">bind</span>(obj1, <span class="hljs-string">&#x27;Hello&#x27;</span>);<br><span class="hljs-title function_">newFn</span>(); <span class="hljs-comment">// Ray 2 Hello</span><br></code></pre></td></tr></table></figure>
+
+<p>One small detail to watch: if the first argument you pass is <code>null</code> or <code>undefined</code>, it always points back to <code>window</code> — and that’s true for <code>call()</code>, <code>apply()</code>, and <code>bind()</code> alike.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj1 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray 2&#x27;</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> obj2 = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span> + <span class="hljs-string">&#x27; &#x27;</span> + message);<br>  &#125;<br>&#125;<br><br><span class="hljs-keyword">var</span> newFn = obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">bind</span>(obj1, <span class="hljs-string">&#x27;Hello&#x27;</span>);<br><span class="hljs-title function_">newFn</span>(); <span class="hljs-comment">// Ray 2 Hello</span><br><br><span class="hljs-keyword">var</span> newFn2 = obj2.<span class="hljs-property">fn</span>.<span class="hljs-title function_">bind</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;this is Goods!&#x27;</span>);<br><span class="hljs-title function_">newFn2</span>(); <span class="hljs-comment">// oh No! this is Goods!</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Another-way-to-bind-this"><a href="#Another-way-to-bind-this" class="headerlink" title="Another way to bind this"></a>Another way to bind this</h2><p>Besides <code>call()</code>, <code>apply()</code>, and <code>bind()</code>, there’s actually another way to bind <code>this</code>.</p>
+<p>Earlier we got a quick look at how handy arrow functions are — we can shrink a chunk of code down to one line, and it just looks slick.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br><br><span class="hljs-comment">// traditional style</span><br>array.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">item</span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);<br>&#125;);<br><br><span class="hljs-comment">// arrow function</span><br>array.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item))<br></code></pre></td></tr></table></figure>
+
+<p>Basically, once you know that with an arrow function the <code>this</code> inside almost always refers to the parent’s <code>this</code>, you can usually figure out where <code>this</code> points. But with the traditional function style the result is completely different — that’s where a simple call forms.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>    array.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>    &#125;);<br>  &#125;<br>&#125;<br><br>obj.<span class="hljs-title function_">fn</span>(); <span class="hljs-comment">// oh No! * 3</span><br></code></pre></td></tr></table></figure>
+
+<p>Now suppose you don’t want to use <code>call()</code>, <code>apply()</code>, or <code>bind()</code> to force-bind <code>this</code>, and you don’t want to switch to an arrow function either. You can consider <strong>passing a second argument to these loops</strong>.</p>
+<p>That’s right, you read that correctly!</p>
+<p>Most loops actually accept a second argument, and that second argument also sets where <code>this</code> points.</p>
+<p>For example:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> myName = <span class="hljs-string">&#x27;oh No!&#x27;</span>;<br><br><span class="hljs-keyword">var</span> obj = &#123;<br>  <span class="hljs-attr">myName</span>: <span class="hljs-string">&#x27;Ray&#x27;</span>,<br>  <span class="hljs-attr">fn</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">const</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br>    array.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">myName</span>);<br>    &#125;, <span class="hljs-variable language_">this</span>);<br>  &#125;<br>&#125;<br><br>obj.<span class="hljs-title function_">fn</span>(); <span class="hljs-comment">// Ray * 3</span><br></code></pre></td></tr></table></figure>
+
+<p>According to the current MDN docs, all of these have a second argument for setting where <code>this</code> points:</p>
+<ol>
+<li><code>forEach</code></li>
+<li><code>filter</code></li>
+<li><code>map</code></li>
+<li><code>some</code></li>
+<li><code>every</code></li>
+<li><code>find</code></li>
+</ol>
+<p>Apart from <code>reduce</code>, which doesn’t have a <code>this</code> argument, most of them take a second argument to set <code>this</code>.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators">MDN</a></content>
+</invoke></li>
+</ul>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/misc/2021/04/08/change-slack-ui-language/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            How to Change Slack's UI Language
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/javascript/2021/03/28/javascript-core-53-inheritance-prototype-chain-exercise/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            JavaScript Core (53) - Inheritance & the Prototype Chain - Chapter Exercise
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/javascript/2021/09/14/javascript-self-vs-this/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                self in JavaScript: What Is It, and How's It Different from this?
+              </h4>
+              <time datetime="2021-09-14" title="Published: 2021-09-14" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2021-09-14
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/javascript/2026/03/10/web-crypto-api-encryption-guide/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                No crypto Package, No Node.js — The Web Crypto API Does It All in the Browser
+              </h4>
+              <time datetime="2026-03-10" title="Published: 2026-03-10" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-10
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/javascript/2025/12/08/jquery-why-it-declined/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                jQuery Was Once King — So Why Did It Fall Off?
+              </h4>
+              <time datetime="2025-12-09" title="Published: 2025-12-09" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-12-09
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/javascript/2025/12/05/javascript-generator-functions/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                What Are JavaScript Generator Functions (function*)? The Function You Can Pause and Resume
+              </h4>
+              <time datetime="2025-12-05" title="Published: 2025-12-05" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2025-12-05
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/" data-title="A Deep Dive Into JavaScript&#39;s this: Every Way It Bites You" data-hashtags="JavaScript,this" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/javascript/2021/04/03/javascript-this-keyword-deep-dive/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#this"><span class="toc-text">this</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Global-environment"><span class="toc-text">Global environment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Function-environment"><span class="toc-text">Function environment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Object-methods"><span class="toc-text">Object methods</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#new-constructor"><span class="toc-text">new constructor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DOM"><span class="toc-text">DOM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#arrow-function-expression"><span class="toc-text">arrow function expression</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Force-binding-this"><span class="toc-text">Force-binding this</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Another-way-to-bind-this"><span class="toc-text">Another way to bind this</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1577 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準 | 是 Ray 不是 Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/ai/20260429/8473628195/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20260429/8473628195/">
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2026/04/29/claude-code-built-in-tools-explained/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20260429/8473628195/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="這一篇稍微來聊一下 Claude Code 的內建 Tools。如果你有用過 Claude Code 應該會發現一件事，有時候你叫它讀一個檔案它直接 Read 打開，有時候你問它「這個專案有哪些 component」它跑去 Glob、Grep，可是偶爾它會繞遠路跑去用 Bash 的 cat、grep，讓人很困惑為什麼不直接用內建工具。其實 Claude 是有一套自己的工具選擇邏輯的，這篇就來聊一下 Claude Code 有哪些內建 Tools、它怎麼決定要用哪個、以及怎麼從工具使用模式反推回去調 Prompt。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準 | 是 Ray 不是 Array">
+  <meta property="og:url" content="https://israynotarray.com/ai/20260429/8473628195/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這一篇稍微來聊一下 Claude Code 的內建 Tools。如果你有用過 Claude Code 應該會發現一件事，有時候你叫它讀一個檔案它直接 Read 打開，有時候你問它「這個專案有哪些 component」它跑去 Glob、Grep，可是偶爾它會繞遠路跑去用 Bash 的 cat、grep，讓人很困惑為什麼不直接用內建工具。其實 Claude 是有一套自己的工具選擇邏輯的，這篇就來聊一下 Claude Code 有哪些內建 Tools、它怎麼決定要用哪個、以及怎麼從工具使用模式反推回去調 Prompt。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/claude-tools-agens/Gemini_Generated_Image_kwkdeakwkdeakwkd.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-04-29T06:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-04-29T06:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="Claude Code">
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="AI Agent">
+      
+        <meta property="article:tag" content="AI 開發">
+      
+        <meta property="article:tag" content="Claude Code Tools">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準 | 是 Ray 不是 Array">
+  <meta name="twitter:description" content="這一篇稍微來聊一下 Claude Code 的內建 Tools。如果你有用過 Claude Code 應該會發現一件事，有時候你叫它讀一個檔案它直接 Read 打開，有時候你問它「這個專案有哪些 component」它跑去 Glob、Grep，可是偶爾它會繞遠路跑去用 Bash 的 cat、grep，讓人很困惑為什麼不直接用內建工具。其實 Claude 是有一套自己的工具選擇邏輯的，這篇就來聊一下 Claude Code 有哪些內建 Tools、它怎麼決定要用哪個、以及怎麼從工具使用模式反推回去調 Prompt。">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/claude-tools-agens/Gemini_Generated_Image_kwkdeakwkdeakwkd.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"是 Ray 不是 Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"是 Ray 不是 Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"zh-TW","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"是 Ray 不是 Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/ai/20260429/8473628195/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/ai/20260429/8473628195/"},"headline":"Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準","url":"https://israynotarray.com/ai/20260429/8473628195/","datePublished":"2026-04-29T06:00:00.000Z","dateModified":"2026-04-29T06:00:00.000Z","description":"這一篇稍微來聊一下 Claude Code 的內建 Tools。如果你有用過 Claude Code 應該會發現一件事，有時候你叫它讀一個檔案它直接 Read 打開，有時候你問它「這個專案有哪些 component」它跑去 Glob、Grep，可是偶爾它會繞遠路跑去用 Bash 的 cat、grep，讓人很困惑為什麼不直接用內建工具。其實 Claude 是有一套自己的工具選擇邏輯的，這篇就來聊一下 Claude Code 有哪些內建 Tools、它怎麼決定要用哪個、以及怎麼從工具使用模式反推回去調 Prompt。","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"zh-TW","wordCount":8327,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/ai/claude-tools-agens/Gemini_Generated_Image_kwkdeakwkdeakwkd.png","width":1200,"height":630}],"articleSection":["AI"],"keywords":"Claude Code, AI, AI Agent, AI 開發, Claude Code Tools"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/ai/20260429/8473628195/#breadcrumb","name":"Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          是 Ray 不是 Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>首頁</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>標籤</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>分類</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>歸檔</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>更多</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="開啟搜尋"
+              title="開啟搜尋"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/en/ai/2026/04/29/claude-code-built-in-tools-explained/"
+         title="English"
+         aria-label="Switch language to English"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">是 Ray 不是 Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              首頁
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              標籤
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              分類
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              歸檔
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              更多
+            </a>
+          </li>
+        
+        <li>
+          <a href="/en/ai/2026/04/29/claude-code-built-in-tools-explained/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            English
+          </a>
+        </li>
+        <li>
+          <a href="/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1035 篇文章
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1031 個標籤
+      </span>
+    </div>
+    <a href="/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      訂閱 RSS
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-04-29" title="發布日期: 2026-04-29" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-04-29
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Claude-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code
+            </a>
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/AI-Agent/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Agent
+            </a>
+          
+            <a href="/tags/AI-%E9%96%8B%E7%99%BC/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI 開發
+            </a>
+          
+            <a href="/tags/Claude-Code-Tools/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code Tools
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/claude-tools-agens/Gemini_Generated_Image_kwkdeakwkdeakwkd.png" data-fancybox="gallery" data-caption="Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/claude-tools-agens/Gemini_Generated_Image_kwkdeakwkdeakwkd.png" alt="Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這一篇稍微來聊一下 Claude Code 的內建 Tools。如果你有用過 Claude Code 應該會發現一件事，有時候你叫它讀一個檔案它直接 Read 打開，有時候你問它「這個專案有哪些 component」它跑去 Glob、Grep，可是偶爾它會繞遠路跑去用 Bash 的 <code>cat</code>、<code>grep</code>，讓人很困惑為什麼不直接用內建工具。其實 Claude 是有一套自己的工具選擇邏輯的，這篇就來聊一下 Claude Code 有哪些內建 Tools、它怎麼決定要用哪個、以及怎麼從工具使用模式反推回去調 Prompt。</p>
+<blockquote>
+<p><strong>Note</strong><br>如果你還不熟悉 Claude Code 的基本操作，可以先去看 <a href="https://israynotarray.com/ai/20260128/374686091/">想用 Claude Code 開發？這篇帶你從入門到進階</a>，裡面有很完整的入門介紹。本篇所有工具名稱都對照官方的 <a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/tools-reference">Tools reference</a>。</p>
+</blockquote>
+<h2 id="為什麼要搞懂內建-Tools"><a href="#為什麼要搞懂內建-Tools" class="headerlink" title="為什麼要搞懂內建 Tools"></a>為什麼要搞懂內建 Tools</h2><p>你可能會想說：我又不是 Claude 本人，幹嘛搞懂它用什麼工具？</p>
+<p>簡單來講，當你看得懂 Claude 選了什麼工具，你就反推得出來你的 Prompt 哪裡沒講清楚。</p>
+<p>舉個實際的例子，假設你叫 Claude「幫我看一下登入邏輯」，結果它連續開了七八個 Glob 都沒找到，最後才用 Grep 搜到。如果你看不懂它在做什麼那只會覺得「怎麼這麼慢」，可是如果你知道 Glob 是用檔名 pattern、Grep 是用內容字串搜，你就會發現問題出在你的描述「登入邏輯」是個抽象概念，檔名根本不會直接寫 <code>login</code>，下次你就會直接給它 <code>src/auth/</code> 這個路徑，事情瞬間變快。</p>
+<p>另外一個原因是 Claude Code 的 Hook、Skill 的 <code>allowed-tools</code>、permissions 的 deny 規則這些設定，全部都是建立在工具名稱上面的，你如果不知道哪些工具存在、各自做什麼，那這些進階設定根本沒辦法寫對。</p>
+<h2 id="Claude-Code-有哪些內建-Tools"><a href="#Claude-Code-有哪些內建-Tools" class="headerlink" title="Claude Code 有哪些內建 Tools"></a>Claude Code 有哪些內建 Tools</h2><p>先快速看一下整體有哪些，後面會挑常用的展開講。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>分類</th>
+<th>工具名稱</th>
+<th>主要用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>讀檔</td>
+<td>Read</td>
+<td>讀取檔案內容</td>
+</tr>
+<tr>
+<td>讀檔</td>
+<td>Glob</td>
+<td>用檔名 pattern 找檔案</td>
+</tr>
+<tr>
+<td>讀檔</td>
+<td>Grep</td>
+<td>用內容搜尋（底層是 ripgrep）</td>
+</tr>
+<tr>
+<td>改檔</td>
+<td>Edit</td>
+<td>對檔案做精確的字串替換</td>
+</tr>
+<tr>
+<td>改檔</td>
+<td>Write</td>
+<td>整個檔案覆寫</td>
+</tr>
+<tr>
+<td>改檔</td>
+<td>NotebookEdit</td>
+<td>修改 Jupyter Notebook 的 cell</td>
+</tr>
+<tr>
+<td>執行</td>
+<td>Bash</td>
+<td>跑 Shell 指令</td>
+</tr>
+<tr>
+<td>執行</td>
+<td>PowerShell</td>
+<td>跑 PowerShell 指令（Windows 為主）</td>
+</tr>
+<tr>
+<td>執行</td>
+<td>Monitor</td>
+<td>背景執行指令並把每行輸出回傳給 Claude</td>
+</tr>
+<tr>
+<td>委派</td>
+<td>Agent</td>
+<td>派出 Subagent 處理任務</td>
+</tr>
+<tr>
+<td>程式碼</td>
+<td>LSP</td>
+<td>透過 Language Server 做型別檢查、跳轉、找參考</td>
+</tr>
+<tr>
+<td>任務</td>
+<td>TaskCreate &#x2F; TaskUpdate &#x2F; TaskList</td>
+<td>管理任務清單</td>
+</tr>
+<tr>
+<td>互動</td>
+<td>AskUserQuestion</td>
+<td>主動問使用者多選題問題</td>
+</tr>
+<tr>
+<td>計畫</td>
+<td>EnterPlanMode &#x2F; ExitPlanMode</td>
+<td>進入或離開 Plan Mode</td>
+</tr>
+<tr>
+<td>排程</td>
+<td>CronCreate &#x2F; CronDelete &#x2F; CronList</td>
+<td>session 內的排程任務</td>
+</tr>
+<tr>
+<td>網路</td>
+<td>WebFetch</td>
+<td>抓網頁內容</td>
+</tr>
+<tr>
+<td>網路</td>
+<td>WebSearch</td>
+<td>搜尋網路</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>Skill</td>
+<td>執行 Skill</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>ToolSearch</td>
+<td>載入延遲載入的工具定義</td>
+</tr>
+</tbody></table></div>
+<p>看起來很多，可是日常你會大量看到的就是 Read、Glob、Grep、Edit、Write、Bash、Agent 這幾個，其他比較偶爾才會出現。接下來會挑這幾個重點工具來聊，最後再補充幾個值得認識的。</p>
+<h2 id="讀檔三劍客：Read、Glob、Grep"><a href="#讀檔三劍客：Read、Glob、Grep" class="headerlink" title="讀檔三劍客：Read、Glob、Grep"></a>讀檔三劍客：Read、Glob、Grep</h2><p>很多人剛開始用 Claude Code 都會搞不懂為什麼讀檔需要三個工具，明明就是讀檔不是嗎？其實這三個東西在做的事情完全不一樣，搞混了 Claude 就會選錯。</p>
+<h3 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h3><p>Read 是最直接的讀檔工具，給它一個絕對路徑就會把檔案內容回傳，而且回傳的時候會自動帶行號，長得像這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">1    function login(email, password) &#123;<br>2      // ...<br>3    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>這個行號不是裝飾，後面 Edit 工具會用到，因為 Edit 需要精確的行內容才有辦法做替換。</p>
+<p>Read 還有幾個特性要注意：</p>
+<ul>
+<li>一次最多讀 2000 行，超過要用 <code>offset</code> 跟 <code>limit</code> 分段讀</li>
+<li>可以讀圖片、PDF、Jupyter Notebook，圖片會用視覺方式呈現給 Claude</li>
+<li>路徑必須是絕對路徑，不能寫相對路徑</li>
+</ul>
+<p>那為什麼有些時候 Claude 不直接用 Bash 的 <code>cat</code>？因為 <code>cat</code> 不會給行號，後續做 Edit 就會卡住，而且 <code>cat</code> 一次回所有內容沒辦法分段，大檔案直接灌爆 Context。所以官方的系統提示有特別寫「能用 Read 就不要用 cat」這條規則。</p>
+<h3 id="Glob"><a href="#Glob" class="headerlink" title="Glob"></a>Glob</h3><p>Glob 是用檔名 pattern 找檔案，支援星號的通配符，像是這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">**/*.tsx          # 所有 tsx 檔<br>src/**/index.ts   # src 底下任何 index.ts<br>*.config.&#123;js,ts&#125;  # 根目錄的 config 檔<br></code></pre></td></tr></table></figure>
+
+<p>回傳結果會按照檔案的修改時間排序，最近改的會在前面。這個排序其實很實用，因為當你在 debug 某個功能的時候，最近改過的檔案通常就是你要排查的對象。</p>
+<p>簡單來講 Glob 是你已經知道檔名長什麼樣子的時候用的。如果你要找的是包含某段內容的檔案，那就要用 Grep 了。</p>
+<h3 id="Grep"><a href="#Grep" class="headerlink" title="Grep"></a>Grep</h3><p>Grep 底層是包裝 <a target="_blank" rel="noopener" href="https://github.com/BurntSushi/ripgrep">ripgrep</a>，所以速度比 Bash 的 <code>grep</code> 快很多，而且支援完整的 Regex。</p>
+<p>它有三種輸出模式：</p>
+<ul>
+<li><code>files_with_matches</code>（預設）：只回傳有符合的檔案路徑</li>
+<li><code>content</code>：回傳實際匹配到的那幾行內容</li>
+<li><code>count</code>：回傳每個檔案匹配到幾次</li>
+</ul>
+<p>以我自己來講最常用的是 <code>content</code> 模式搭配 <code>-n</code>（顯示行號）跟 <code>-C</code>（前後 context），這樣 Claude 一眼就能看到搜尋結果跟前後幾行的脈絡，不用再多開一次 Read 確認。</p>
+<blockquote>
+<p><strong>Note</strong><br>Grep 預設只搜單行，如果你要搜跨行的 pattern（像是「一個 function 開頭到第一個 return」這種），要設 <code>multiline: true</code>。這個常被忽略，所以 Claude 在搜跨行結構時偶爾會找不到，記得提醒它一下。</p>
+</blockquote>
+<h3 id="三個工具的差異"><a href="#三個工具的差異" class="headerlink" title="三個工具的差異"></a>三個工具的差異</h3><p>聊完這三個工具後簡單總結一下時機：</p>
+<ul>
+<li>你已經知道路徑：用 Read 直接打開</li>
+<li>你知道檔名 pattern 但不知道在哪：用 Glob 找</li>
+<li>你只知道內容裡有某些字串：用 Grep 搜</li>
+</ul>
+<p>如果你下指令的時候直接點明這件事，例如「Grep 一下整個專案有沒有 <code>LEGACY_AUTH</code> 這個常數」，Claude 就不會浪費時間先 Glob 一輪，直接 Grep 出結果。</p>
+<h2 id="改檔的-Edit-跟-Write-不是同一件事"><a href="#改檔的-Edit-跟-Write-不是同一件事" class="headerlink" title="改檔的 Edit 跟 Write 不是同一件事"></a>改檔的 Edit 跟 Write 不是同一件事</h2><p>讀完接下來就是改了。Claude Code 提供兩個改檔的工具：Edit 跟 Write，很多人會以為這兩個差不多，其實差很多。</p>
+<h3 id="Edit-是精確替換"><a href="#Edit-是精確替換" class="headerlink" title="Edit 是精確替換"></a>Edit 是精確替換</h3><p>Edit 的運作方式是傳入一段 <code>old_string</code> 跟一段 <code>new_string</code>，Claude Code 會去檔案裡面找出 <code>old_string</code> 完全一致的位置然後換掉。重點在『完全一致』這四個字，連空白、縮排、換行符都要對。</p>
+<p>也因為這樣 Edit 有一個重要的限制：<strong>你必須先 Read 過那個檔案才能 Edit</strong>。沒讀過直接 Edit 會被擋掉，這是為了避免 Claude 用過時的記憶亂改檔案。</p>
+<p>如果同樣的字串在檔案裡面出現多次，Edit 預設會直接報錯叫你提供更多上下文讓字串唯一。如果你就是想全部改掉，可以加 <code>replace_all: true</code>。</p>
+<h3 id="Write-是整檔覆寫"><a href="#Write-是整檔覆寫" class="headerlink" title="Write 是整檔覆寫"></a>Write 是整檔覆寫</h3><p>Write 就是直接把整個檔案重寫，路徑存在的話會把舊內容全部蓋掉。</p>
+<p>聽起來很方便對吧？可是這個工具其實滿危險的，因為它會把你手動改過 Claude 沒讀到的內容全部清空。假設你開兩個視窗一邊在 Claude Code 一邊在 VSCode 改檔案，結果 Claude 用 Write 覆蓋，你剛剛在 VSCode 改的東西就直接消失了。</p>
+<p>所以官方的系統提示會強烈建議「能用 Edit 就不要用 Write」，Write 大部分只用在「建立全新檔案」這個場景。</p>
+<p>如果你發現 Claude 一直在用 Write 而不是 Edit，通常是因為它記憶中的檔案內容跟磁碟上的不一致（你中間自己改過），導致 Edit 怎麼配對都失敗，最後 fallback 到 Write。這時候叫它先重新 Read 一次再 Edit 通常就會好。</p>
+<h2 id="Bash：什麼時候-Claude-會繞道用它"><a href="#Bash：什麼時候-Claude-會繞道用它" class="headerlink" title="Bash：什麼時候 Claude 會繞道用它"></a>Bash：什麼時候 Claude 會繞道用它</h2><p>Bash 工具就是你想的那樣，跑 Shell 指令。可是 Claude Code 的系統提示會特別提醒它：能用內建工具就不要用 Bash。原因主要是 <code>cat</code>、<code>grep</code>、<code>find</code> 這類指令都有對應的內建版本，內建工具的 UX 會比較好，使用者要審查跟授權也比較直覺，回傳格式對 Claude 後續處理也更友善。</p>
+<p>那 Claude 什麼時候還是會用 Bash 呢？大概有以下幾種情況：</p>
+<ul>
+<li>你叫它跑測試 or 建置：例如 <code>pnpm test</code>、<code>pnpm build</code></li>
+<li>操作 Git：<code>git status</code>、<code>git diff</code>、<code>git log</code> 這類（Claude Code 把唯讀的 git 指令直接列為免授權）</li>
+<li>啟動 dev server：例如 <code>pnpm dev</code></li>
+<li>跑套件管理指令：<code>pnpm install</code></li>
+<li>處理一些內建工具沒有的東西：例如複雜的 pipe（找出最大的五個檔案之類的）</li>
+</ul>
+<p>Bash 還有一個 <code>run_in_background</code> 參數可以讓指令背景執行，這個對長時間任務很有用，像是跑 dev server or 長時間的 build，Claude 不需要呆等就可以繼續做別的事，背景指令完成之後它會被自動通知。</p>
+<blockquote>
+<p><strong>Note</strong><br>這邊有一個有趣的細節：<code>Read</code> 跟 <code>Edit</code> 的 deny 規則只會擋內建工具，不會擋 Bash 子進程。也就是說你寫 <code>Read(./.env)</code> 進 deny，Claude 用 Read 讀 <code>.env</code> 會被擋掉，可是它跑 <code>cat .env</code> 還是會通過。如果要從 OS 層面真的擋住，需要去設 sandboxing。</p>
+</blockquote>
+<h2 id="Agent：把任務丟給-Subagent"><a href="#Agent：把任務丟給-Subagent" class="headerlink" title="Agent：把任務丟給 Subagent"></a>Agent：把任務丟給 Subagent</h2><p>這是最多人不懂、用了威力卻最大的工具。</p>
+<h3 id="Subagent-跟主對話差在哪"><a href="#Subagent-跟主對話差在哪" class="headerlink" title="Subagent 跟主對話差在哪"></a>Subagent 跟主對話差在哪</h3><p>簡單來講，Agent 工具會開一個全新的 Subagent 去處理某個任務，這個 Subagent 有幾個特點：</p>
+<ul>
+<li>有自己獨立的 Context Window，跟主對話完全不共享</li>
+<li>完成任務後只回傳一個摘要結果給主對話</li>
+<li>它看不到主對話的歷史，所以你要給它的指令必須完整自包含</li>
+<li>每個 Subagent 都繼承父對話的權限再加上額外的工具限制</li>
+<li>可以指定 Subagent 類型，後面會講</li>
+</ul>
+<p>如果用比較生活面的例子來講的話，Subagent 就像你叫實習生去做事，你只給他任務描述跟所需的背景資料，他做完之後只回報結論給你，中間翻過幾本書、查過什麼資料你完全不會看到。</p>
+<h3 id="內建的三種-Subagent"><a href="#內建的三種-Subagent" class="headerlink" title="內建的三種 Subagent"></a>內建的三種 Subagent</h3><p>Claude Code 預設提供三種內建 Subagent，每種的設計用途不太一樣：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Subagent</th>
+<th>模型</th>
+<th>工具權限</th>
+<th>適合的場景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Explore</td>
+<td>Haiku（速度快）</td>
+<td>唯讀（不能 Write&#x2F;Edit）</td>
+<td>大範圍搜檔、理解 codebase</td>
+</tr>
+<tr>
+<td>Plan</td>
+<td>跟主對話相同</td>
+<td>唯讀（不能 Write&#x2F;Edit）</td>
+<td>Plan Mode 用來研究專案的小幫手</td>
+</tr>
+<tr>
+<td>general-purpose</td>
+<td>跟主對話相同</td>
+<td>全部工具</td>
+<td>複雜任務需要邊讀邊改</td>
+</tr>
+</tbody></table></div>
+<p>從這張表可以看出來 Explore 是最常被自動觸發的，因為它便宜又快，而且只負責探索不會亂改檔案。Claude 在派 Explore 的時候還會指定一個 thoroughness 等級（quick、medium、very thorough），Prompt 越具體它就越能用低 thoroughness 完成任務、省更多 Token。</p>
+<p>除了內建的之外你也可以在 <code>.claude/agents/</code> 底下定義自己的 Subagent，這就比較進階了，這篇就不展開講。</p>
+<h3 id="什麼任務適合丟-Agent"><a href="#什麼任務適合丟-Agent" class="headerlink" title="什麼任務適合丟 Agent"></a>什麼任務適合丟 Agent</h3><p>需要讀很多檔案才能得出結論的任務最適合丟 Agent：</p>
+<ul>
+<li>「掃描整個專案，告訴我有沒有用到舊版的某個 API」</li>
+<li>「分析這個功能的實作流程，從 router 一路追到 service」</li>
+<li>「這個 codebase 哪裡有測試、哪裡沒測試」</li>
+</ul>
+<p>如果這種任務你直接讓主對話做，那讀過的所有檔案都會塞到主 Context 裡面，後面的工作 Token 就所剩無幾。改用 Agent 派出 Subagent 之後，主對話只會收到一個精簡的摘要，Context 就保得住。</p>
+<p>之前在 <a href="https://israynotarray.com/ai/20260409/1057131696/">你的 Claude Code Context 是不是都被吃光了？AGENTS.md 與 Context 管控全攻略</a> 這篇我也有提到這個技巧，這邊再多補充一個觀念：你可以一次叫 Claude 派出多個 Agent 平行跑，例如「同時找出所有 API endpoint 跟所有 React component」，兩個 Subagent 會同時運作，比一個一個慢慢做快很多。</p>
+<h3 id="什麼任務不要丟-Agent"><a href="#什麼任務不要丟-Agent" class="headerlink" title="什麼任務不要丟 Agent"></a>什麼任務不要丟 Agent</h3><p>可是 Agent 也不是萬能的，有些情況不適合用：</p>
+<ul>
+<li><strong>需要來回討論的任務</strong>：Subagent 看不到主對話歷史，每次派任務都要把背景重打一次，需要反覆討論的事情用 Subagent 反而拖時間</li>
+<li><strong>目標已經很明確的單檔修改</strong>：直接 Read 跟 Edit 就好，丟給 Subagent 反而是繞遠路</li>
+<li><strong>任務本身需要主對話的脈絡</strong>：你又懶得把背景重打一次的話就直接讓主對話做，省事</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong><br>如果你不希望 Claude 自動派某種 Subagent，可以在 <code>permissions.deny</code> 加上 <code>Agent(Explore)</code> 這種規則來擋掉它，這個語法只會擋對應的 Subagent，其他 Subagent 還是能用。</p>
+</blockquote>
+<h2 id="其他偶爾會用到的"><a href="#其他偶爾會用到的" class="headerlink" title="其他偶爾會用到的"></a>其他偶爾會用到的</h2><p>前面講的是日常會大量看到的，這邊再補幾個比較少出現可是值得知道的。</p>
+<h3 id="WebFetch-跟-WebSearch"><a href="#WebFetch-跟-WebSearch" class="headerlink" title="WebFetch 跟 WebSearch"></a>WebFetch 跟 WebSearch</h3><p>兩個工具名稱看起來很像可是用途不同。WebFetch 是給定一個 URL 把網頁抓下來轉成 Markdown，適合用在「我有一個官方文件 URL，請你照著做」這種場景。WebSearch 則是真的去搜尋關鍵字，適合用在「最新版本的某個 API 怎麼用」這種需要找資訊的場景。</p>
+<p>如果你叫 Claude「查一下 Vue 3.5 的最新功能」，它通常會先用 WebSearch 找出官方文件的 URL，然後再用 WebFetch 把詳細內容抓下來，這是滿常見的組合技。</p>
+<h3 id="AskUserQuestion"><a href="#AskUserQuestion" class="headerlink" title="AskUserQuestion"></a>AskUserQuestion</h3><p>當 Claude 遇到不確定的選擇時，它有時候會主動跳出來問你問題，這時候用的就是 AskUserQuestion 工具。它是多選題形式的，比如你叫它建立一個專案可是沒講要用 React 還是 Vue，它就可能會先停下來給你幾個選項而不是自己猜。</p>
+<p>如果你不希望它常常停下來問，可以在 CLAUDE.md 裡面寫清楚預設的選擇，這樣它就會自己決定不再彈出來問。</p>
+<h3 id="LSP"><a href="#LSP" class="headerlink" title="LSP"></a>LSP</h3><p>LSP 是比較新的工具（透過 Language Server Protocol），適合做程式碼智慧的事情，像是跳轉到函式定義、找出某個 symbol 在哪裡被引用、列出某個 interface 的實作等等。比較有感的一點是 Claude 每次 Edit 完之後 LSP 會自動回報那個檔案的型別錯誤跟警告，所以 Claude 不需要再特別跑一次 build 就知道有沒有打錯字。</p>
+<p>不過這個工具要先安裝對應語言的 Code Intelligence Plugin 才會啟用，沒裝的話 Claude 是看不到的。</p>
+<h3 id="Monitor"><a href="#Monitor" class="headerlink" title="Monitor"></a>Monitor</h3><p>Monitor 是讓 Claude 在背景跑一個指令，把每一行輸出即時回傳給它，適合用來：</p>
+<ul>
+<li>盯著一個 log 檔，遇到 error 就跳出來提醒</li>
+<li>監控 CI 任務的狀態變化</li>
+<li>看某個資料夾有沒有新檔案產生</li>
+</ul>
+<p>跟 <code>Bash</code> 的 <code>run_in_background</code> 差別在於 Monitor 是「持續餵資料給 Claude」，Bash background 則是「跑完才通知一次」。</p>
+<h3 id="TaskCreate-TaskUpdate-TaskList"><a href="#TaskCreate-TaskUpdate-TaskList" class="headerlink" title="TaskCreate &#x2F; TaskUpdate &#x2F; TaskList"></a>TaskCreate &#x2F; TaskUpdate &#x2F; TaskList</h3><p>這幾個工具是 Claude 自己用來管理任務清單的，當任務比較複雜的時候它會先建立一份待辦，然後一項一項標記完成。你會在 Claude Code 介面看到 Claude 在拉清單，背後就是這幾個工具在運作。</p>
+<p>這邊有個小細節：互動式 session（你日常用的 <code>claude</code> 指令）用的是 TaskCreate &#x2F; TaskUpdate &#x2F; TaskList 這組，至於 Headless 模式跟 Agent SDK 用的則是另一個叫做 TodoWrite 的舊工具，兩個概念上是同一件事不同實作。</p>
+<h2 id="Claude-怎麼決定要用哪個工具"><a href="#Claude-怎麼決定要用哪個工具" class="headerlink" title="Claude 怎麼決定要用哪個工具"></a>Claude 怎麼決定要用哪個工具</h2><p>聊完工具本身，那 Claude 到底是怎麼決定要用哪個的呢？</p>
+<p>簡單來講有兩個來源：</p>
+<p>第一個是<strong>系統提示（System Prompt）</strong>。Claude Code 啟動時會載入一份很長的系統提示，裡面就明確寫了哪些工具優先、哪些工具有什麼限制，例如「能用內建工具就不要用 Bash」、「Edit 之前必須先 Read」這類規則。所以你可以理解成 Claude 的工具選擇邏輯有一部分是事先被教好的。</p>
+<p>第二個是 <strong>Claude 自己的判斷</strong>。模型會根據你的請求內容、目前對話的脈絡、Context 中的檔案資訊來推測哪個工具最適合。這部分就比較吃 Prompt 寫得清不清楚，Prompt 越模糊 Claude 越容易繞遠路。</p>
+<p>舉個實際的例子比較好懂：</p>
+<ul>
+<li>你說「打開 <code>src/auth/login.ts</code>」 → Claude 直接 Read，因為路徑明確</li>
+<li>你說「找一下登入邏輯」 → Claude 可能會先 Glob 找 <code>**/login*</code> or <code>**/auth/**</code>，找不到再 Grep</li>
+<li>你說「掃整個專案找用到 deprecated API 的地方」 → Claude 比較聰明的話會直接派 Explore Subagent</li>
+</ul>
+<p>從這個角度看，<strong>Prompt 給得越具體 Claude 用工具就越精準</strong>，這也是為什麼前面要建議大家學會看工具使用模式。</p>
+<h2 id="從工具使用模式反推-Prompt-哪裡寫差了"><a href="#從工具使用模式反推-Prompt-哪裡寫差了" class="headerlink" title="從工具使用模式反推 Prompt 哪裡寫差了"></a>從工具使用模式反推 Prompt 哪裡寫差了</h2><p>這部分是這篇最核心的東西，前面講的一堆工具其實都是為了讓你看懂這個。</p>
+<h3 id="Claude-一直-Read-不同檔案找不到目標"><a href="#Claude-一直-Read-不同檔案找不到目標" class="headerlink" title="Claude 一直 Read 不同檔案找不到目標"></a>Claude 一直 Read 不同檔案找不到目標</h3><p>通常代表你給的描述太抽象，它在猜檔案位置。例如你說「修一下首頁」，可是它根本不知道首頁是哪個檔案，就一直 Read 各種看起來像首頁的東西。</p>
+<p>解法是 Prompt 直接給路徑 or 精確的描述，例如「修一下 <code>src/pages/Home.vue</code> 裡面的搜尋邏輯」。</p>
+<h3 id="Claude-一直-Glob-都找不到"><a href="#Claude-一直-Glob-都找不到" class="headerlink" title="Claude 一直 Glob 都找不到"></a>Claude 一直 Glob 都找不到</h3><p>代表你描述的關鍵字跟實際檔名對不起來。例如你說「找登入相關的檔案」，可是專案實際是用 <code>Auth*</code> 命名的，Glob 一輪都找不到 <code>*login*</code>。</p>
+<p>解法是直接告訴它命名慣例，or 改用 Grep 搜 import 的字串會比較準。</p>
+<h3 id="Claude-Edit-一直失敗回去用-Write"><a href="#Claude-Edit-一直失敗回去用-Write" class="headerlink" title="Claude Edit 一直失敗回去用 Write"></a>Claude Edit 一直失敗回去用 Write</h3><p>如果你看到 Claude 試了幾次 Edit 都報找不到 <code>old_string</code>，最後改用 Write，通常有兩個原因：</p>
+<ol>
+<li>你中間用 IDE 自己改過檔案，Claude 記憶中的內容跟磁碟不一致</li>
+<li>縮排 or trailing whitespace 不一致（特別是 tab vs space）</li>
+</ol>
+<p>解法是叫它先重新 Read 一次再 Edit，or 你直接點明「請先 Read 一次最新內容再改」。</p>
+<h3 id="Claude-不用-Subagent-自己硬讀很多檔"><a href="#Claude-不用-Subagent-自己硬讀很多檔" class="headerlink" title="Claude 不用 Subagent 自己硬讀很多檔"></a>Claude 不用 Subagent 自己硬讀很多檔</h3><p>如果任務本來該用 Agent 派出去（例如全專案掃描），結果 Claude 自己一個一個 Read，那是因為它沒判斷出這是個大任務。</p>
+<p>解法是你直接在 Prompt 裡面寫「請用 Explore subagent 幫我掃整個專案」，明確要求它派 Agent。</p>
+<h3 id="Claude-一直繞道用-Bash"><a href="#Claude-一直繞道用-Bash" class="headerlink" title="Claude 一直繞道用 Bash"></a>Claude 一直繞道用 Bash</h3><p>如果該用 Read 它跑去 <code>cat</code>、該用 Grep 它跑去 <code>grep</code>，多半是因為以下幾個原因：</p>
+<ul>
+<li><code>permissions.deny</code> 把內建工具擋掉了，逼 Claude fallback 到 Bash（前面有提過 deny 規則只擋內建工具不擋 Bash）</li>
+<li>CLAUDE.md 裡面有不必要的引導指令</li>
+<li>它要做的事情真的需要 pipe 組合，例如「找出最大的五個 log 檔」</li>
+</ul>
+<p>前兩個情況用 <code>/permissions</code> 跟檢查 CLAUDE.md 就能修，第三個是合理的不用管。</p>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>最後整理一下這篇的重點：</p>
+<ul>
+<li>Claude Code 內建 Tools 主要分成讀檔（Read、Glob、Grep）、改檔（Edit、Write）、執行（Bash）、委派（Agent）這四類，外加 LSP、Monitor、TaskCreate 等比較新的工具</li>
+<li>Read 必看行號，Edit 必先 Read，Write 盡量少用，免得蓋掉手動改的東西</li>
+<li>Glob 是找檔名 pattern，Grep 是找內容字串，搞清楚才不會選錯</li>
+<li>Agent 是最強大也最被忽略的工具，Claude Code 內建 Explore、Plan、general-purpose 三種 Subagent，需要讀很多檔案的任務丟給 Explore 最划算</li>
+<li><code>permissions.deny</code> 的 Read&#x2F;Edit 規則只擋內建工具，不擋 Bash 子進程，要從 OS 層擋要走 sandboxing</li>
+<li>看懂 Claude 用什麼工具，就能反推你的 Prompt 哪裡沒講清楚</li>
+</ul>
+<p>希望這一篇有讓你對 Claude Code 的內建 Tools 有更近一步的認識，下次它選錯工具的時候你就知道該怎麼調 Prompt 了哩～</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/other/20260502/1592048371/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            手機摔壞照片就沒了？拜託先去開 Google 相簿備份（iPhone 完整設定教學）
+          </span>
+        </a>
+      
+
+      
+        <a href="/ai/20260427/1657384902/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            想開始 Vibe Coding？新手推薦先搞懂的這些基礎知識
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/ai/20260531/2738461950/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Hooks 是什麼？自動跑 Lint、擋 rm -rf、SessionStart 注入 Context 完整教學
+              </h4>
+              <time datetime="2026-05-31" title="發布日期: 2026-05-31" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-31
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260128/374686091/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code 教學｜從安裝、設定到第一個任務的完整實作筆記（2026 版）
+              </h4>
+              <time datetime="2026-01-28" title="發布日期: 2026-01-28" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-01-28
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260602/4582937160/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Auto Memory 一直佔用記憶體？清理與檢查完整教學
+              </h4>
+              <time datetime="2026-06-02" title="發布日期: 2026-06-02" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-02
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260525/1843702956/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Claude Code Routines 排程怎麼設？/schedule 完整教學與 main 分支推錯解法
+              </h4>
+              <time datetime="2026-05-25" title="發布日期: 2026-05-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-25
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/ai/20260429/8473628195/" data-title="Claude Code 內建 Tools 在做什麼？看懂它怎麼選工具，Prompt 才寫得準" data-hashtags="Claude Code,AI,AI Agent,AI 開發,Claude Code Tools" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/ai/20260429/8473628195/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/ai/20260429/8473628195/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/ai/20260429/8473628195/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A6%81%E6%90%9E%E6%87%82%E5%85%A7%E5%BB%BA-Tools"><span class="toc-text">為什麼要搞懂內建 Tools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Claude-Code-%E6%9C%89%E5%93%AA%E4%BA%9B%E5%85%A7%E5%BB%BA-Tools"><span class="toc-text">Claude Code 有哪些內建 Tools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%80%E6%AA%94%E4%B8%89%E5%8A%8D%E5%AE%A2%EF%BC%9ARead%E3%80%81Glob%E3%80%81Grep"><span class="toc-text">讀檔三劍客：Read、Glob、Grep</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Read"><span class="toc-text">Read</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Glob"><span class="toc-text">Glob</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Grep"><span class="toc-text">Grep</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E5%80%8B%E5%B7%A5%E5%85%B7%E7%9A%84%E5%B7%AE%E7%95%B0"><span class="toc-text">三個工具的差異</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E6%AA%94%E7%9A%84-Edit-%E8%B7%9F-Write-%E4%B8%8D%E6%98%AF%E5%90%8C%E4%B8%80%E4%BB%B6%E4%BA%8B"><span class="toc-text">改檔的 Edit 跟 Write 不是同一件事</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Edit-%E6%98%AF%E7%B2%BE%E7%A2%BA%E6%9B%BF%E6%8F%9B"><span class="toc-text">Edit 是精確替換</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Write-%E6%98%AF%E6%95%B4%E6%AA%94%E8%A6%86%E5%AF%AB"><span class="toc-text">Write 是整檔覆寫</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bash%EF%BC%9A%E4%BB%80%E9%BA%BC%E6%99%82%E5%80%99-Claude-%E6%9C%83%E7%B9%9E%E9%81%93%E7%94%A8%E5%AE%83"><span class="toc-text">Bash：什麼時候 Claude 會繞道用它</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Agent%EF%BC%9A%E6%8A%8A%E4%BB%BB%E5%8B%99%E4%B8%9F%E7%B5%A6-Subagent"><span class="toc-text">Agent：把任務丟給 Subagent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Subagent-%E8%B7%9F%E4%B8%BB%E5%B0%8D%E8%A9%B1%E5%B7%AE%E5%9C%A8%E5%93%AA"><span class="toc-text">Subagent 跟主對話差在哪</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A7%E5%BB%BA%E7%9A%84%E4%B8%89%E7%A8%AE-Subagent"><span class="toc-text">內建的三種 Subagent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E4%BB%BB%E5%8B%99%E9%81%A9%E5%90%88%E4%B8%9F-Agent"><span class="toc-text">什麼任務適合丟 Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E4%BB%BB%E5%8B%99%E4%B8%8D%E8%A6%81%E4%B8%9F-Agent"><span class="toc-text">什麼任務不要丟 Agent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%81%B6%E7%88%BE%E6%9C%83%E7%94%A8%E5%88%B0%E7%9A%84"><span class="toc-text">其他偶爾會用到的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WebFetch-%E8%B7%9F-WebSearch"><span class="toc-text">WebFetch 跟 WebSearch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AskUserQuestion"><span class="toc-text">AskUserQuestion</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LSP"><span class="toc-text">LSP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Monitor"><span class="toc-text">Monitor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TaskCreate-TaskUpdate-TaskList"><span class="toc-text">TaskCreate &#x2F; TaskUpdate &#x2F; TaskList</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Claude-%E6%80%8E%E9%BA%BC%E6%B1%BA%E5%AE%9A%E8%A6%81%E7%94%A8%E5%93%AA%E5%80%8B%E5%B7%A5%E5%85%B7"><span class="toc-text">Claude 怎麼決定要用哪個工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%9E%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E6%A8%A1%E5%BC%8F%E5%8F%8D%E6%8E%A8-Prompt-%E5%93%AA%E8%A3%A1%E5%AF%AB%E5%B7%AE%E4%BA%86"><span class="toc-text">從工具使用模式反推 Prompt 哪裡寫差了</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-%E4%B8%80%E7%9B%B4-Read-%E4%B8%8D%E5%90%8C%E6%AA%94%E6%A1%88%E6%89%BE%E4%B8%8D%E5%88%B0%E7%9B%AE%E6%A8%99"><span class="toc-text">Claude 一直 Read 不同檔案找不到目標</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-%E4%B8%80%E7%9B%B4-Glob-%E9%83%BD%E6%89%BE%E4%B8%8D%E5%88%B0"><span class="toc-text">Claude 一直 Glob 都找不到</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-Edit-%E4%B8%80%E7%9B%B4%E5%A4%B1%E6%95%97%E5%9B%9E%E5%8E%BB%E7%94%A8-Write"><span class="toc-text">Claude Edit 一直失敗回去用 Write</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-%E4%B8%8D%E7%94%A8-Subagent-%E8%87%AA%E5%B7%B1%E7%A1%AC%E8%AE%80%E5%BE%88%E5%A4%9A%E6%AA%94"><span class="toc-text">Claude 不用 Subagent 自己硬讀很多檔</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-%E4%B8%80%E7%9B%B4%E7%B9%9E%E9%81%93%E7%94%A8-Bash"><span class="toc-text">Claude 一直繞道用 Bash</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B8%BD%E7%B5%90"><span class="toc-text">總結</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">關閉</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> 按 Esc 關閉
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> 按 Cmd K 開啟
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

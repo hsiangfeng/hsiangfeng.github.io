@@ -1,0 +1,1485 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格 | 是 Ray 不是 Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/ai/20260609/4628193507/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20260609/4628193507/">
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2026/06/09/how-much-ai-search-grabs-claude-websearch-webfetch/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20260609/4628193507/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="這篇來聊一下 AI 在做網路搜尋時實際撈走你部落格多少內容，把 Anthropic 官方的 web_search 跟 web_fetch tool 規格翻出來看，拆解搜尋階段只回傳 title 加 URL、cited_text 150 字元上限、Claude Code 內建 WebFetch 用 Haiku 3.5 摘要 + 100 KB 截斷的設計，再拿自己的部落格實測一輪，最後整理對 AEO 寫作的四個可操作建議：標題自帶語境、首段先給答案、設計可獨立引用的單句、結構化內容當 chunk 航標。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格 | 是 Ray 不是 Array">
+  <meta property="og:url" content="https://israynotarray.com/ai/20260609/4628193507/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="這篇來聊一下 AI 在做網路搜尋時實際撈走你部落格多少內容，把 Anthropic 官方的 web_search 跟 web_fetch tool 規格翻出來看，拆解搜尋階段只回傳 title 加 URL、cited_text 150 字元上限、Claude Code 內建 WebFetch 用 Haiku 3.5 摘要 + 100 KB 截斷的設計，再拿自己的部落格實測一輪，最後整理對 AEO 寫作的四個可操作建議：標題自帶語境、首段先給答案、設計可獨立引用的單句、結構化內容當 chunk 航標。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%889%E6%97%A5%20%E4%B8%8A%E5%8D%8810_09_47.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-06-09T02:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-06-09T02:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="Claude Code">
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="Claude">
+      
+        <meta property="article:tag" content="AEO">
+      
+        <meta property="article:tag" content="WebSearch">
+      
+        <meta property="article:tag" content="WebFetch">
+      
+        <meta property="article:tag" content="AI Search">
+      
+        <meta property="article:tag" content="robots.txt">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格 | 是 Ray 不是 Array">
+  <meta name="twitter:description" content="這篇來聊一下 AI 在做網路搜尋時實際撈走你部落格多少內容，把 Anthropic 官方的 web_search 跟 web_fetch tool 規格翻出來看，拆解搜尋階段只回傳 title 加 URL、cited_text 150 字元上限、Claude Code 內建 WebFetch 用 Haiku 3.5 摘要 + 100 KB 截斷的設計，再拿自己的部落格實測一輪，最後整理對 AEO 寫作的四個可操作建議：標題自帶語境、首段先給答案、設計可獨立引用的單句、結構化內容當 chunk 航標。">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%889%E6%97%A5%20%E4%B8%8A%E5%8D%8810_09_47.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"是 Ray 不是 Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"是 Ray 不是 Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"zh-TW","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"是 Ray 不是 Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/ai/20260609/4628193507/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/ai/20260609/4628193507/"},"headline":"AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格","url":"https://israynotarray.com/ai/20260609/4628193507/","datePublished":"2026-06-09T02:00:00.000Z","dateModified":"2026-06-09T02:00:00.000Z","description":"這篇來聊一下 AI 在做網路搜尋時實際撈走你部落格多少內容，把 Anthropic 官方的 web_search 跟 web_fetch tool 規格翻出來看，拆解搜尋階段只回傳 title 加 URL、cited_text 150 字元上限、Claude Code 內建 WebFetch 用 Haiku 3.5 摘要 + 100 KB 截斷的設計，再拿自己的部落格實測一輪，最後整理對 AEO 寫作的四個可操作建議：標題自帶語境、首段先給答案、設計可獨立引用的單句、結構化內容當 chunk 航標。","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"zh-TW","wordCount":7425,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%889%E6%97%A5%20%E4%B8%8A%E5%8D%8810_09_47.png","width":1200,"height":630}],"articleSection":["AI"],"keywords":"Claude Code, AI, Claude, AEO, WebSearch, WebFetch, AI Search, robots.txt"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/ai/20260609/4628193507/#breadcrumb","name":"AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          是 Ray 不是 Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>首頁</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>標籤</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>分類</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>歸檔</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>更多</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="開啟搜尋"
+              title="開啟搜尋"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/en/ai/2026/06/09/how-much-ai-search-grabs-claude-websearch-webfetch/"
+         title="English"
+         aria-label="Switch language to English"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">是 Ray 不是 Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              首頁
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              標籤
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              分類
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              歸檔
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              更多
+            </a>
+          </li>
+        
+        <li>
+          <a href="/en/ai/2026/06/09/how-much-ai-search-grabs-claude-websearch-webfetch/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            English
+          </a>
+        </li>
+        <li>
+          <a href="/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1035 篇文章
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1031 個標籤
+      </span>
+    </div>
+    <a href="/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      訂閱 RSS
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-06-09" title="發布日期: 2026-06-09" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-06-09
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Claude-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code
+            </a>
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/Claude/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude
+            </a>
+          
+            <a href="/tags/AEO/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AEO
+            </a>
+          
+            <a href="/tags/WebSearch/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #WebSearch
+            </a>
+          
+            <a href="/tags/WebFetch/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #WebFetch
+            </a>
+          
+            <a href="/tags/AI-Search/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI Search
+            </a>
+          
+            <a href="/tags/robots-txt/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #robots.txt
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%889%E6%97%A5%20%E4%B8%8A%E5%8D%8810_09_47.png" data-fancybox="gallery" data-caption="AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%889%E6%97%A5%20%E4%B8%8A%E5%8D%8810_09_47.png" alt="AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前寫過一篇 <a href="https://israynotarray.com/ai/3734112946/">SEO 已經不夠了嗎？認識 AEO 答案引擎優化</a> ，寫完之後我突然有一個想法，也就是：AI 在做網路搜尋的時候，到底會撈走我部落格多少內容？整篇一字不漏？前面 500 字？還是只看到標題就跳走？所以就稍微研究一下，然後這篇就把 Anthropic 官方的 <code>web_search</code> 跟 <code>web_fetch</code> tool 文件翻一遍，順便拿自己的部落格實測一輪，最後整理這對怎麼寫文章、寫文案有什麼具體的影響吧。</p>
+<h2 id="先講清楚，「搜尋」跟「撈取」是兩件事"><a href="#先講清楚，「搜尋」跟「撈取」是兩件事" class="headerlink" title="先講清楚，「搜尋」跟「撈取」是兩件事"></a>先講清楚，「搜尋」跟「撈取」是兩件事</h2><p>在我們開始往下之前，我認為必須要先把一件事情講清楚，也就是 AI 在做查詢時，<strong>「搜尋」</strong> 跟 <strong>「撈取網頁內文」</strong> 不是同一件事，它是兩件事情，而且是分層了兩階段來處理。</p>
+<ul>
+<li>第一階段 <strong>（WebSearch）</strong>：AI 拿著你的問題去呼叫 WebSearch 工具（去查搜尋引擎），這時候回來的會是一份搜尋結果清單，每一筆資料都有網址、標題之類的資訊，可是不包含網頁的整篇內文。</li>
+<li>第二階段 <strong>（WebFetch）</strong>：AI 看完搜尋結果清單之後，開始決定哪幾筆是它值得深入去看，接著再對那幾個網址各使用 WebFetch 工具發一次「把這個頁面的內文給我」的請求，這時候才會真的把內文撈回來。</li>
+</ul>
+<p>嗯？你是不是好奇為什麼它不是直接在搜尋階段就把內文一起撈回來？</p>
+<p>其實最大問題還是在於 Context （上下文）的限制上，你可以思考一下，如果它每次搜尋就把 10 筆的搜尋結果＋內文都塞進來，那想當然你可以使用的 Context 就很容易爆掉，然後接著你就會開始抱怨 AI 很笨、不記得剛剛的提問（畢竟 Context 爆掉了）。所以它才會把這兩件事分成兩階段，先搜尋拿到一個「清單」，然後再決定要從清單裡面挑哪幾筆去撈內文。</p>
+<p>這邊我也順手畫一張流程圖，把兩階段的時序串起來看一眼會更直觀：</p>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/diagram%20(1).png" data-fancybox="gallery" data-caption="AI 搜尋流程圖"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-websearch-webfetch/diagram%20(1).png" alt="AI 搜尋流程圖"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">AI 搜尋流程圖</figcaption></figure>
+<p>了解兩階段的差異之後，接下來就分別來看每個階段實際撈到了什麼。</p>
+<h2 id="WebSearch-撈到了什麼？"><a href="#WebSearch-撈到了什麼？" class="headerlink" title="WebSearch 撈到了什麼？"></a>WebSearch 撈到了什麼？</h2><p>直接看 Anthropic 官方 web_search tool 文件，每筆搜尋結果裡面只有四個欄位：</p>
+<ul>
+<li><code>url</code>：網頁的網址</li>
+<li><code>title</code>：網頁的標題</li>
+<li><code>page_age</code>：網頁上次更新時間</li>
+<li><code>encrypted_content</code>：加密內容，這個不是給 AI 讀文章用的，是多輪對話時拿回來做 citation 用的</li>
+</ul>
+<p>是的，就這樣，就這四個。</p>
+<p>AI 在搜尋階段（WebSearch）看到的就是「網址、標題、上次更新時間」這三筆人類可讀的資訊，沒有任何內文。</p>
+<p>那如果 AI 引用你的內容呢？也有上限</p>
+<blockquote>
+<p>每個 <code>web_search_result_location</code> 的 <code>cited_text</code> 最多是 <strong>up to 150 characters of the cited content</strong></p>
+</blockquote>
+<p>簡單來講就是：最多 150 個字元的引用文字。而這些還只是 API 層級的規格而已。</p>
+<p>Claude Code 內建的 WebSearch 又再砍一刀，根據 Mikhail Shilkov 拆解 Claude Code 內部行為的<a target="_blank" rel="noopener" href="https://mikhail.io/2025/10/claude-code-web-tools/">這篇文章</a> 裡面有提到…Claude Code 連 <code>page_age</code> 跟 <code>encrypted_content</code> 都丟掉了，只保留 <code>title</code> 跟 <code>url</code>。</p>
+<p>所以簡單來講…在搜尋這個階段 AI 看到你網站的東西就是只有 <strong>一個標題加一個網址</strong> 沒了。</p>
+<h2 id="WebFetch-撈到了什麼？"><a href="#WebFetch-撈到了什麼？" class="headerlink" title="WebFetch 撈到了什麼？"></a>WebFetch 撈到了什麼？</h2><p>那接下來就要來聊一下，內文何時會被撈出來了，也就是前面有提到的，第二階段 WebFetch。</p>
+<p>AI 看完搜尋結果之後，如果決定點開某幾筆，會對每個網址發一次 WebFetch 請求，這時候才會把整篇內文撈回來。那撈取範圍多大？</p>
+<p>這邊需要分成兩層來說明，因為 API 跟 Claude Code 的設計不太一樣。</p>
+<blockquote>
+<p><strong>Note</strong><br>這邊講的 API 是指 Anthropic API 的 web_fetch tool，Claude Code 是指 Anthropic 自己的產品線裡面內建的 WebFetch 功能，兩者的規格跟流程不太一樣。</p>
+</blockquote>
+<h3 id="API-層級的-web-fetch"><a href="#API-層級的-web-fetch" class="headerlink" title="API 層級的 web_fetch"></a>API 層級的 web_fetch</h3><p>Anthropic API 的 web_fetch tool 有一個叫 <code>max_content_tokens</code> 的參數，可以由開發者自己設定，雖然官方文件範例用的是 10 萬 tokens。</p>
+<p>但官方文件上也有給參考換算：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>內容大小</th>
+<th>估算 Token 數</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>平均網頁 10 KB</td>
+<td>約 2,500 tokens</td>
+</tr>
+<tr>
+<td>大型文件頁 100 KB</td>
+<td>約 25,000 tokens</td>
+</tr>
+<tr>
+<td>研究論文 PDF 500 KB</td>
+<td>約 125,000 tokens</td>
+</tr>
+</tbody></table></div>
+<p>由此可知，一篇中長度的中文部落格文章純文字通常 1~2000 tokens 就非常足夠了，遠遠低於 10 萬的上限。所以不太會發生「內文被截斷」的問題，除非你寫了一篇五萬字的超長文章（紅樓夢之類？）。</p>
+<p>但這邊要特別注意，web_fetch tool 的 citation 跟 web_search 的設計不太一樣，它是使用 <code>start_char_index</code> &#x2F; <code>end_char_index</code> 選出文章中的特定位置（雖然文件沒寫死字元上限就是了）。</p>
+<h3 id="Claude-Code-內建的-WebFetch"><a href="#Claude-Code-內建的-WebFetch" class="headerlink" title="Claude Code 內建的 WebFetch"></a>Claude Code 內建的 WebFetch</h3><p>Claude Code 內建的 WebFetch 走的是另一個方式。</p>
+<p>依照 Mikhail Shilkov 的拆解， WebFetch 它的流程會是這樣的：</p>
+<ol>
+<li>把 HTML 用 Turndown 套件轉成 Markdown</li>
+<li>擷取內文的 100 KB 純文字</li>
+<li>把這 100 KB 丟給 Haiku 3.5 模型</li>
+<li>Haiku 根據你給它的 prompt 摘要出答案，再把摘要回傳給主模型</li>
+</ol>
+<p>這邊其實真正的關鍵還是在第三步驟，你會發現我們主模型（也就是我們當前使用的 Claude 模型）並不會直接看到網頁的原文，它都是看到 Haiku 摘要過的版本。也就是說，<strong>你寫的東西最後變成什麼樣回到主模型，是 Haiku 怎麼讀的決定，不是你寫了多少的決定</strong>。</p>
+<p>而且引用部分也有限制，Mikhail 從 Claude Code 內部 prompt 抓到的規則是 <strong>Enforce a strict 125-character maximum for quotes from any source document</strong>，也就是說引用的部分最多只能有 125 個字元。</p>
+<p>這時候應該又有一個疑問了，所以 100 KB 的純文字大概是多少呢？<br>假設以中文來說，每個字算 3 bytes 的話，100 KB 大概可以裝 3 萬多字；如果是英文，每個字算 1 byte 的話，可以裝十幾萬字。對於一個普通部落格文章來講，再長也撐不到這個量了。所以真正該關注的點應該是「怎麼讓 Haiku 摘到我想被引用的內容」，而不是「我寫了多少內容給 Haiku 看」。</p>
+<h2 id="拿我的部落格實測一輪"><a href="#拿我的部落格實測一輪" class="headerlink" title="拿我的部落格實測一輪"></a>拿我的部落格實測一輪</h2><p>講了那麼多，這邊我們就來實際測試一下吧！</p>
+<p>我這邊是直接請 Claude 呼叫 WebFetch 工具，然後把我部落格首頁（<code>israynotarray.com</code>）的 URL 給它，讓它去抓內文。</p>
+<p>那麼該怎麼實際測試呢？我們可以善加利用 <a href="https://israynotarray.com/ai/20260531/2738461950/">Hook</a> 的特性，將每一個階段的輸入輸出都記錄下來，這樣就能清楚看到 AI 在每個階段實際撈到了什麼內容。</p>
+<p>底下是我的 Hook 設定，這樣每次 WebSearch 跟 WebFetch 的輸入輸出都會被記錄下來：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;PostToolUse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;matcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;WebSearch|WebFetch&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/claude-tools/hooks/log-web-tool.sh&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;SessionEnd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;hooks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;command&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/claude-tools/hooks/dump-transcript.sh&quot;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>這邊我提示詞（Prompt）是以下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">請你幫我用 WebFetch 工具抓一下 israynotarray.com 首頁的內容，然後告訴我你從這個頁面摘了什麼內容回來。<br></code></pre></td></tr></table></figure>
+
+<p>實際 Input 內容如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://israynotarray.com&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;prompt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;請告訴我這個首頁的主要內容：站名、站長介紹、最新文章列表（標題與簡介）、分類、以及任何導覽列或側邊欄資訊。&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>接著跑完之後，你可以看到 WebFetch 的結果裡面，AI 摘要回來的內容大概是這樣的：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;bytes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1068</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">200</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;codeText&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;OK&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;result&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;# 網頁內容分析\n\n基於提供的內容片段，我能提供以下資訊：\n\n## 站點結構\n- **主要分類**：AI 相關內容，包括 Gemini 和 Gemini Omni 產品\n\n## 最新文章\n**標題**：「Gemini Omni 影片生成怎麼用？30 個 Reels、產品 Demo、Logo Reveal 提示詞模板」\n\n**簡介摘要**：\n本文介紹了 Google 在 2026 年 5 月 I/O 發布的 Gemini Omni 影片生成功能，說明其如何取代先前的 Veo 3.1。文章涵蓋「一次 10 秒短片、原生同步音訊、中文文字渲染」等新功能，並提供 30 個實用提示詞模板，適用於 Instagram Reels、產品演示、Logo 動畫、B-roll、轉場效果、引言卡片、生活風格與美食旅遊等多種場景。\n\n**發布日期**：2026-06-06  \n**閱讀時間**：約 23 分鐘\n\n## 限制\n提供的內容片段不含站長介紹或完整導覽列資訊。&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;durationMs&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">4603</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://israynotarray.com&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>發現了嗎？你真正被 AI 撈走的內容其實只有這一小段 1000 字以內的摘要而已，一個網站裡面根本不可能只有這麼一小段內容，剩下的部分根本沒有被 AI 看到。也就是說中介層的 Haiku 模型看完之後，只挑了它認為跟我 prompt 相關的部分摘給我。同樣的頁面如果我用瀏覽器打開，看到的會是一整列文章卡片加 sidebar，可是 Haiku 不會把整列丟回來。</p>
+<p>我順便試了一篇舊文，故意把 URL 路徑的某段寫錯，它就只會回傳這樣：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;bytes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">404</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;codeText&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Not Found&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;result&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;The server returned HTTP 404 Not Found.\n\nThe response body was not retrieved. If this URL requires authentication, use an authenticated tool (e.g. `gh` for GitHub, or an MCP-provided fetch tool) instead of WebFetch.&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;durationMs&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">588</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://israynotarray.com/dqwdqwdqwd&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>你會發現連你寫在 404 頁面的內容都撈不到，因為 WebFetch 直接回報了 404 Not Found 的錯誤，AI 根本沒辦法看到你 404 頁面上寫了什麼內容。也就是說，如果你的網站有任何路徑問題、重構過 URL、或者只有前端路由沒有實體頁面，AI 就撈不到內容了。</p>
+<p>順帶一提，這部分跟 Claude 官方文件裡的注意事項也對得起來：</p>
+<blockquote>
+<p>The web fetch tool currently does not support websites dynamically rendered with JavaScript.</p>
+</blockquote>
+<p>如果你的部落格是用前端 SPA 撐起來、內容完全靠 JavaScript runtime 渲染的話，那 AI 撈到的可能只是空殼 HTML，看不到任何文章。因此使用靜態產生器（像 Hexo、Astro、Next.js 的 SSG 模式）相對安全，因為 build 出來的就是完整 HTML，AI 一抓就有東西看（歡迎加入 Hexo 行列）。</p>
+<h2 id="robots-txt-那層也別忘了"><a href="#robots-txt-那層也別忘了" class="headerlink" title="robots.txt 那層也別忘了"></a>robots.txt 那層也別忘了</h2><p>接下來還有一個重點，AI 撈不撈得到你的網站，有一個大前提，也就是 robots.txt。</p>
+<p>AI 爬蟲基本上分兩種：搜尋型（會引用 + 連回你網站）跟訓練型（吃內容餵模型，不一定有回引）。常見的對應大概長這樣：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>爬蟲</th>
+<th>類型</th>
+<th>行為</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude-SearchBot &#x2F; Claude-User</td>
+<td>搜尋</td>
+<td>Claude 回答時即時抓取，會引用</td>
+</tr>
+<tr>
+<td>ClaudeBot</td>
+<td>訓練</td>
+<td>抓內容餵 Claude 訓練</td>
+</tr>
+<tr>
+<td>OAI-SearchBot &#x2F; ChatGPT-User</td>
+<td>搜尋</td>
+<td>ChatGPT 回答時即時抓取，會引用</td>
+</tr>
+<tr>
+<td>GPTBot</td>
+<td>訓練</td>
+<td>抓內容餵 GPT 訓練</td>
+</tr>
+<tr>
+<td>PerplexityBot</td>
+<td>搜尋</td>
+<td>Perplexity 引擎用，會引用</td>
+</tr>
+<tr>
+<td>Google-Extended</td>
+<td>訓練</td>
+<td>Gemini 訓練用</td>
+</tr>
+<tr>
+<td>CCBot</td>
+<td>訓練</td>
+<td>Common Crawl 公開資料集</td>
+</tr>
+</tbody></table></div>
+<p>如果你希望被 AI 引用、可是不想被拿去訓練，最常見的策略就是「搜尋型放行、訓練型擋掉」。</p>
+<p>這邊我也給你一個可以直接複製貼上使用的 robots.txt 範例：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs txt"># 搜尋型 AI 爬蟲：放行（會回引）<br>User-agent: OAI-SearchBot<br>Allow: /<br><br>User-agent: ChatGPT-User<br>Allow: /<br><br>User-agent: Claude-SearchBot<br>Allow: /<br><br>User-agent: Claude-User<br>Allow: /<br><br>User-agent: PerplexityBot<br>Allow: /<br><br># 訓練型 AI 爬蟲：擋下（吃資料不回引）<br>User-agent: GPTBot<br>Disallow: /<br><br>User-agent: ClaudeBot<br>Disallow: /<br><br>User-agent: Google-Extended<br>Disallow: /<br><br>User-agent: CCBot<br>Disallow: /<br><br>User-agent: Bytespider<br>Disallow: /<br><br># 內容信號：可被搜尋索引、不可訓練、不直接餵 AI 當輸入<br>Content-Signal: ai-train=no, search=yes, ai-input=no<br></code></pre></td></tr></table></figure>
+
+<p>robots.txt 的詳細寫法可以看我之前寫的 <a href="https://israynotarray.com/other/20210627/3588736352/">快速掌握 robots.txt 用途</a>，整套 Agent Readiness 的滿分設定可以看 <a href="https://israynotarray.com/ai/2847193056/">從 3 分到滿分！讓你的網站通過 isitagentready AI Agent Readiness 完整攻略</a>。</p>
+<h2 id="這對寫文章有什麼具體影響？"><a href="#這對寫文章有什麼具體影響？" class="headerlink" title="這對寫文章有什麼具體影響？"></a>這對寫文章有什麼具體影響？</h2><p>那講完了這些東西，所以這件事情對於寫文章有什麼具體影響呢？答案是有的，你只要理解上面的限制跟細節之後，寫文章就可以針對這四件事情多下功夫。</p>
+<h3 id="標題要能獨立成立"><a href="#標題要能獨立成立" class="headerlink" title="標題要能獨立成立"></a>標題要能獨立成立</h3><p>搜尋階段 AI 看到你的文章，就只有 title 跟 URL 兩個欄位。</p>
+<p>如果你的標題需要副標 or 上下文才看得懂，AI 把它跟其他十幾筆結果排在一起時就會被略過。</p>
+<p>舉個對照：</p>
+<ul>
+<li>比較弱的標題：「實作筆記」</li>
+<li>比較強的標題：「Cloudflare Worker 把 HTML 轉 Markdown 的內容協商完整實作筆記」</li>
+</ul>
+<p>後者把「主題、工具、做什麼事、文章類型」都塞進去了，AI 不用點開頁面就知道值不值得撈。</p>
+<h3 id="首段就直接給答案"><a href="#首段就直接給答案" class="headerlink" title="首段就直接給答案"></a>首段就直接給答案</h3><p>WebFetch 階段，中介的 Haiku 模型是從上往下讀的，前 300 到 500 字決定它摘什麼回去。如果你的開頭是「在我們聊 X 之前，先來回顧一下歷史…」，Haiku 讀到一半發現都是背景沒答案，就直接摘背景了。</p>
+<p>正確的寫法是每個 H2 段落開頭第一句話就直接給結論，後面再補脈絡。這個原則我在 <a href="https://israynotarray.com/ai/3734112946/">SEO 已經不夠了嗎？認識 AEO 答案引擎優化</a> 那篇也有提過，可以一起看。</p>
+<h3 id="設計可獨立引用的單句"><a href="#設計可獨立引用的單句" class="headerlink" title="設計可獨立引用的單句"></a>設計可獨立引用的單句</h3><p>cited_text 在 web_search 是 150 字元、Claude Code 內建 WebFetch 是 125 字元。這代表 AI 引用你的時候，能塞的就是一段「沒有上下文也能成立」的短句。</p>
+<p>寫作的時候有意識地去設計這種句子，例如：</p>
+<ul>
+<li>比較弱：「這個跟前面提到的那個方法不太一樣，主要差別在…」（沒有上下文看不懂）</li>
+<li>比較強：「llms.txt 是 Answer.AI 共同創辦人 Jeremy Howard 在 2024 年提出的，目的是主動告訴 AI 網站有什麼重要內容。」（不需要前後文就成立）</li>
+</ul>
+<p>寫完一段之後可以自己挑一句出來看，如果單獨拿出來給沒看過全文的人都看得懂，那這句就有機會被引用。</p>
+<h3 id="結構化內容當-Haiku-的航標"><a href="#結構化內容當-Haiku-的航標" class="headerlink" title="結構化內容當 Haiku 的航標"></a>結構化內容當 Haiku 的航標</h3><p>H2、H3、<code>-</code> 列表、表格、<code>```js</code> 程式碼區塊，這些 Markdown 結構對中介摘要層特別有用。Haiku 讀 HTML 轉出來的 Markdown 時，會把標題當「這段在講什麼」的索引，把列表當「主要要點」的訊號，把表格當「資料佐證」的單位。</p>
+<p>如果你整篇文章都是純散文段落，Haiku 沒有航標只能靠語意硬讀，摘出來的東西就會偏散；如果你有清楚的結構，Haiku 摘的時候可以直接照航標走，得到的摘要會跟你想被引用的重點對齊。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>最後總結一下吧。</p>
+<p>所以 AI 搜尋時，實際撈走你部落格多少呢？</p>
+<p>我認為答案可以分成三層：</p>
+<ul>
+<li><strong>搜尋階段：</strong> 只有 title 加 URL</li>
+<li><strong>撈內文階段：</strong> API 預設裝得下你整篇，可是 Claude Code 走 Haiku 中介摘要 + 100 KB 截斷</li>
+<li><strong>引用階段：</strong> web_search 是 150 字元，Claude Code WebFetch 是 125 字元</li>
+</ul>
+<p>寫文章針對的就是這三道閘門，不是讓 AI 把你整篇背起來。</p>
+<p>希望這篇有讓你對 AI 搜尋實際撈走多少內容這件事有更具體的概念哩～</p>
+<p>如果你的部落格還沒做 AI bot 分流，可以參考前面那段 robots.txt 範例先把基礎建設起來，剩下的就交給內容慢慢累積了。</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/ai/20260616/3947261580/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            AI 是不是偷偷變笨了？AIStupidLevel：24 小時監測 AI 模型退化的評測網站
+          </span>
+        </a>
+      
+
+      
+        <a href="/ai/20260606/3560206475/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Gemini Omni 影片生成怎麼用？30 個 Reels、產品 Demo、Logo Reveal 提示詞模板
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/ai/20260408/3734112946/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                SEO 已經不夠了嗎？認識 AEO 答案引擎優化，讓 AI 搜尋找到你
+              </h4>
+              <time datetime="2026-04-08" title="發布日期: 2026-04-08" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-08
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260629/2995176290/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                新版 Claude Code 終端機攔截滑鼠點擊超煩！用 CLAUDE_CODE_DISABLE_MOUSE_CLICKS 環境變數把它關掉
+              </h4>
+              <time datetime="2026-06-29" title="發布日期: 2026-06-29" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-29
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260627/1947382651/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                design.md？如果你使用 AI 畫面總是跑掉，那肯定是因為你沒導入 Google 的 design.md
+              </h4>
+              <time datetime="2026-06-27" title="發布日期: 2026-06-27" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-27
+              </time>
+            </div>
+          </a>
+        
+          <a href="/ai/20260622/4283716095/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                讓 gh-pages 的 /llms.txt 回傳 text/markdown：Cloudflare 回應標頭轉換規則教學
+              </h4>
+              <time datetime="2026-06-22" title="發布日期: 2026-06-22" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-22
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/ai/20260609/4628193507/" data-title="AI 搜尋實際撈走你文章的多少內容？拆 Claude 的 WebSearch 與 WebFetch 規格" data-hashtags="Claude Code,AI,Claude,AEO,WebSearch,WebFetch,AI Search,robots.txt" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/ai/20260609/4628193507/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/ai/20260609/4628193507/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/ai/20260609/4628193507/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E8%AC%9B%E6%B8%85%E6%A5%9A%EF%BC%8C%E3%80%8C%E6%90%9C%E5%B0%8B%E3%80%8D%E8%B7%9F%E3%80%8C%E6%92%88%E5%8F%96%E3%80%8D%E6%98%AF%E5%85%A9%E4%BB%B6%E4%BA%8B"><span class="toc-text">先講清楚，「搜尋」跟「撈取」是兩件事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebSearch-%E6%92%88%E5%88%B0%E4%BA%86%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="toc-text">WebSearch 撈到了什麼？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebFetch-%E6%92%88%E5%88%B0%E4%BA%86%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="toc-text">WebFetch 撈到了什麼？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#API-%E5%B1%A4%E7%B4%9A%E7%9A%84-web-fetch"><span class="toc-text">API 層級的 web_fetch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Claude-Code-%E5%85%A7%E5%BB%BA%E7%9A%84-WebFetch"><span class="toc-text">Claude Code 內建的 WebFetch</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%BF%E6%88%91%E7%9A%84%E9%83%A8%E8%90%BD%E6%A0%BC%E5%AF%A6%E6%B8%AC%E4%B8%80%E8%BC%AA"><span class="toc-text">拿我的部落格實測一輪</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#robots-txt-%E9%82%A3%E5%B1%A4%E4%B9%9F%E5%88%A5%E5%BF%98%E4%BA%86"><span class="toc-text">robots.txt 那層也別忘了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%99%E5%B0%8D%E5%AF%AB%E6%96%87%E7%AB%A0%E6%9C%89%E4%BB%80%E9%BA%BC%E5%85%B7%E9%AB%94%E5%BD%B1%E9%9F%BF%EF%BC%9F"><span class="toc-text">這對寫文章有什麼具體影響？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%99%E9%A1%8C%E8%A6%81%E8%83%BD%E7%8D%A8%E7%AB%8B%E6%88%90%E7%AB%8B"><span class="toc-text">標題要能獨立成立</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A6%96%E6%AE%B5%E5%B0%B1%E7%9B%B4%E6%8E%A5%E7%B5%A6%E7%AD%94%E6%A1%88"><span class="toc-text">首段就直接給答案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E8%A8%88%E5%8F%AF%E7%8D%A8%E7%AB%8B%E5%BC%95%E7%94%A8%E7%9A%84%E5%96%AE%E5%8F%A5"><span class="toc-text">設計可獨立引用的單句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B5%90%E6%A7%8B%E5%8C%96%E5%85%A7%E5%AE%B9%E7%95%B6-Haiku-%E7%9A%84%E8%88%AA%E6%A8%99"><span class="toc-text">結構化內容當 Haiku 的航標</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AA%9E"><span class="toc-text">結語</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">關閉</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> 按 Esc 關閉
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> 按 Cmd K 開啟
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

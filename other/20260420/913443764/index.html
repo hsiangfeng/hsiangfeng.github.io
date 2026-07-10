@@ -1,0 +1,1432 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄 | 是 Ray 不是 Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/other/20260420/913443764/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/other/20260420/913443764/">
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/misc/2026/04/20/migrating-from-firebase-storage-to-cloudflare-r2/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/other/20260420/913443764/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="之前寫了一篇用 Cloudflare Workers 快取 Firebase Storage 圖片的文章，但後來想想快取終究只是在前面擋一層，Firebase 那邊的圖片還是在，帳單還是會跑，所以最後決定直接把兩個 Firebase Storage 的圖片全部搬到 Cloudflare R2，將近 4800 張圖片、2200 多個文章連結一次搞定，這篇就來記錄整個遷移過程，包含踩到的坑跟最終的架構。">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄 | 是 Ray 不是 Array">
+  <meta property="og:url" content="https://israynotarray.com/other/20260420/913443764/">
+  <meta property="og:site_name" content="是 Ray 不是 Array">
+  <meta property="og:description" content="之前寫了一篇用 Cloudflare Workers 快取 Firebase Storage 圖片的文章，但後來想想快取終究只是在前面擋一層，Firebase 那邊的圖片還是在，帳單還是會跑，所以最後決定直接把兩個 Firebase Storage 的圖片全部搬到 Cloudflare R2，將近 4800 張圖片、2200 多個文章連結一次搞定，這篇就來記錄整個遷移過程，包含踩到的坑跟最終的架構。">
+  <meta property="og:locale" content="zh-TW">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-r2/Gemini_Generated_Image_m1an7wm1an7wm1an.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-04-20T15:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-04-20T15:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="雜談">
+      
+    
+    
+      
+        <meta property="article:tag" content="Node.js">
+      
+        <meta property="article:tag" content="Firebase">
+      
+        <meta property="article:tag" content="Cloudflare">
+      
+        <meta property="article:tag" content="Cloudflare R2">
+      
+        <meta property="article:tag" content="Cloudflare Workers">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄 | 是 Ray 不是 Array">
+  <meta name="twitter:description" content="之前寫了一篇用 Cloudflare Workers 快取 Firebase Storage 圖片的文章，但後來想想快取終究只是在前面擋一層，Firebase 那邊的圖片還是在，帳單還是會跑，所以最後決定直接把兩個 Firebase Storage 的圖片全部搬到 Cloudflare R2，將近 4800 張圖片、2200 多個文章連結一次搞定，這篇就來記錄整個遷移過程，包含踩到的坑跟最終的架構。">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-r2/Gemini_Generated_Image_m1an7wm1an7wm1an.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"是 Ray 不是 Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"是 Ray 不是 Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"zh-TW","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"是 Ray 不是 Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/other/20260420/913443764/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/other/20260420/913443764/"},"headline":"從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄","url":"https://israynotarray.com/other/20260420/913443764/","datePublished":"2026-04-20T15:00:00.000Z","dateModified":"2026-04-20T15:00:00.000Z","description":"之前寫了一篇用 Cloudflare Workers 快取 Firebase Storage 圖片的文章，但後來想想快取終究只是在前面擋一層，Firebase 那邊的圖片還是在，帳單還是會跑，所以最後決定直接把兩個 Firebase Storage 的圖片全部搬到 Cloudflare R2，將近 4800 張圖片、2200 多個文章連結一次搞定，這篇就來記錄整個遷移過程，包含踩到的坑跟最終的架構。","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"zh-TW","wordCount":10556,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/other/firebase-to-cloudflare-r2/Gemini_Generated_Image_m1an7wm1an7wm1an.png","width":1200,"height":630}],"articleSection":["雜談"],"keywords":"Node.js, Firebase, Cloudflare, Cloudflare R2, Cloudflare Workers"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/other/20260420/913443764/#breadcrumb","name":"從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄 | 是 Ray 不是 Array","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"雜談","item":"https://israynotarray.com/categories/other/"},{"@type":"ListItem","position":3,"name":"從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          是 Ray 不是 Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>首頁</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>標籤</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>分類</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>歸檔</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>更多</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="開啟搜尋"
+              title="開啟搜尋"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/en/misc/2026/04/20/migrating-from-firebase-storage-to-cloudflare-r2/"
+         title="English"
+         aria-label="Switch language to English"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="是 Ray 不是 Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">是 Ray 不是 Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              首頁
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              標籤
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              分類
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              歸檔
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              更多
+            </a>
+          </li>
+        
+        <li>
+          <a href="/en/misc/2026/04/20/migrating-from-firebase-storage-to-cloudflare-r2/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            English
+          </a>
+        </li>
+        <li>
+          <a href="/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">經典青</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">琥珀橘</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">靛藍紫</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">玫瑰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">火焰紅</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1035 篇文章
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1031 個標籤
+      </span>
+    </div>
+    <a href="/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      訂閱 RSS
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-04-20" title="發布日期: 2026-04-20" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-04-20
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/other/" class="hover:text-primary-500 transition-colors">雜談</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Node-js/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Node.js
+            </a>
+          
+            <a href="/tags/Firebase/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Firebase
+            </a>
+          
+            <a href="/tags/Cloudflare/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cloudflare
+            </a>
+          
+            <a href="/tags/Cloudflare-R2/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cloudflare R2
+            </a>
+          
+            <a href="/tags/Cloudflare-Workers/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cloudflare Workers
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-r2/Gemini_Generated_Image_m1an7wm1an7wm1an.png" data-fancybox="gallery" data-caption="從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-r2/Gemini_Generated_Image_m1an7wm1an7wm1an.png" alt="從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄</figcaption></figure>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前陣子寫了一篇<a href="/post/830271645">用 Cloudflare Workers 快取 Firebase Storage 圖片</a>的文章，當時的想法是在 Firebase Storage 前面擋一層 Cloudflare CDN 來減少流量費用。</p>
+<p>但用了一陣子之後發現一個問題，快取終究只是快取，cache miss 的時候還是會打到 Firebase Storage，而且 Firebase 從 2026 年 2 月開始強制所有專案升級到 Blaze（付費）方案，等於免費保護傘沒了，超過免費額度就是直接扣錢，更恐怖的是沒有任何提醒，帳單就這樣默默長上去。</p>
+<p>我的部落格有兩個 Firebase Storage bucket，裡面加起來將近 4800 張圖片，分散在兩份帳單裡，每次查看帳單都要開兩個 Firebase Console，想想就覺得麻煩，所以最後就決定一不做二不休，直接把所有圖片搬到 Cloudflare R2。</p>
+<h2 id="為什麼選-Cloudflare-R2？"><a href="#為什麼選-Cloudflare-R2？" class="headerlink" title="為什麼選 Cloudflare R2？"></a>為什麼選 Cloudflare R2？</h2><p>在決定搬家之前，我先比較了一下兩邊的費用：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th></th>
+<th>Firebase Storage (Blaze)</th>
+<th>Cloudflare R2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>儲存</td>
+<td>$0.026&#x2F;GB&#x2F;月</td>
+<td>$0.015&#x2F;GB&#x2F;月</td>
+</tr>
+<tr>
+<td>下載流量</td>
+<td>$0.12 ~ $0.15&#x2F;GB</td>
+<td>$0（免費）</td>
+</tr>
+<tr>
+<td>免費額度</td>
+<td>5GB 儲存（限特定 region）</td>
+<td>10GB 儲存 + 每月 1000 萬次讀取</td>
+</tr>
+</tbody></table></div>
+<p>最關鍵的差異就是<strong>下載流量</strong>，Firebase 每 GB 下載要收 $0.12 到 $0.15 美金，而 R2 是<strong>零出口流量費</strong>，不管你的圖片被讀幾次都不收錢。</p>
+<p>部落格圖片就是典型的「寫一次，讀很多次」的場景，每篇文章被瀏覽一次，裡面的圖片就被下載一次，如果哪天某篇文章被大量轉發，Firebase 的流量費用會瞬間爆衝，但 R2 完全不會有這個問題。</p>
+<p>以我的 4800 張圖片來說，大概 10GB 左右，剛好完全落在 R2 的免費額度內，也就是說搬過去之後<strong>月費是 $0</strong>。</p>
+<h2 id="整體架構"><a href="#整體架構" class="headerlink" title="整體架構"></a>整體架構</h2><p>搬完之後的架構長這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs txt">使用者瀏覽文章<br>    ↓<br>images.israynotarray.com（Cloudflare Worker）<br>    ↓<br>檢查 Referer（防盜連）<br>    ↓<br>從 R2 Bucket 讀取圖片<br>    ↓<br>回傳圖片（帶快取 header）<br></code></pre></td></tr></table></figure>
+
+<p>跟之前用 Workers 快取 Firebase 的架構很像，差別只在於後面從 Firebase 換成了 R2，但因為 R2 跟 Workers 都是 Cloudflare 的服務，整合起來更簡單，而且不需要經過外部網路，速度更快。</p>
+<h2 id="遷移步驟"><a href="#遷移步驟" class="headerlink" title="遷移步驟"></a>遷移步驟</h2><p>接下來就來聊聊整個遷移的過程。</p>
+<h3 id="步驟一：從-Firebase-Storage-下載所有圖片"><a href="#步驟一：從-Firebase-Storage-下載所有圖片" class="headerlink" title="步驟一：從 Firebase Storage 下載所有圖片"></a>步驟一：從 Firebase Storage 下載所有圖片</h3><p>第一步當然是要先把圖片從 Firebase Storage 全部下載下來。4800 張圖片不可能手動下載，所以我寫了一個 Node.js 腳本來處理。</p>
+<p>要跑這個腳本需要 Firebase 的服務帳戶金鑰，到 Firebase Console → 專案設定 → 服務帳戶 → 產生新的私密金鑰，就能下載一個 JSON 檔。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pnpm install @google-cloud/storage<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; <span class="hljs-title class_">Storage</span> &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@google-cloud/storage&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; dirname, join &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;path&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; mkdirSync, existsSync, writeFileSync, readFileSync &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;fs&#x27;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">BUCKET_NAME</span> = <span class="hljs-string">&#x27;your-project.appspot.com&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">DOWNLOAD_DIR</span> = <span class="hljs-string">&#x27;./firebase-images&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">KEY_FILE</span> = <span class="hljs-string">&#x27;./your-service-account-key.json&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PROGRESS_FILE</span> = <span class="hljs-string">&#x27;./firebase-images/.progress.json&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CONCURRENCY</span> = <span class="hljs-number">10</span>;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">loadProgress</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">existsSync</span>(<span class="hljs-variable constant_">PROGRESS_FILE</span>)) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-title function_">readFileSync</span>(<span class="hljs-variable constant_">PROGRESS_FILE</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>));<br>  &#125;<br>  <span class="hljs-keyword">return</span> &#123; <span class="hljs-attr">downloaded</span>: [] &#125;;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">saveProgress</span>(<span class="hljs-params">progress</span>) &#123;<br>  <span class="hljs-title function_">writeFileSync</span>(<span class="hljs-variable constant_">PROGRESS_FILE</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(progress, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>));<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">downloadWithRetry</span>(<span class="hljs-params">file, destPath, retries = <span class="hljs-number">3</span></span>) &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; retries; i++) &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">await</span> file.<span class="hljs-title function_">download</span>(&#123; <span class="hljs-attr">destination</span>: destPath &#125;);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>      <span class="hljs-keyword">if</span> (i === retries - <span class="hljs-number">1</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`下載失敗: <span class="hljs-subst">$&#123;file.name&#125;</span> - <span class="hljs-subst">$&#123;err.message&#125;</span>`</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>      &#125;<br>      <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> <span class="hljs-built_in">setTimeout</span>(r, <span class="hljs-number">1000</span> * (i + <span class="hljs-number">1</span>)));<br>    &#125;<br>  &#125;<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">const</span> storage = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Storage</span>(&#123; <span class="hljs-attr">keyFilename</span>: <span class="hljs-variable constant_">KEY_FILE</span> &#125;);<br>  <span class="hljs-keyword">const</span> bucket = storage.<span class="hljs-title function_">bucket</span>(<span class="hljs-variable constant_">BUCKET_NAME</span>);<br><br>  <span class="hljs-keyword">const</span> [files] = <span class="hljs-keyword">await</span> bucket.<span class="hljs-title function_">getFiles</span>();<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`共找到 <span class="hljs-subst">$&#123;files.length&#125;</span> 個檔案`</span>);<br><br>  <span class="hljs-keyword">const</span> progress = <span class="hljs-title function_">loadProgress</span>();<br>  <span class="hljs-keyword">const</span> alreadyDownloaded = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(progress.<span class="hljs-property">downloaded</span>);<br>  <span class="hljs-keyword">const</span> remaining = files.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> !alreadyDownloaded.<span class="hljs-title function_">has</span>(f.<span class="hljs-property">name</span>));<br><br>  <span class="hljs-keyword">let</span> completed = alreadyDownloaded.<span class="hljs-property">size</span>;<br>  <span class="hljs-keyword">const</span> total = files.<span class="hljs-property">length</span>;<br><br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; remaining.<span class="hljs-property">length</span>; i += <span class="hljs-variable constant_">CONCURRENCY</span>) &#123;<br>    <span class="hljs-keyword">const</span> batch = remaining.<span class="hljs-title function_">slice</span>(i, i + <span class="hljs-variable constant_">CONCURRENCY</span>);<br><br>    <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(<br>      batch.<span class="hljs-title function_">map</span>(<span class="hljs-title function_">async</span> (file) =&gt; &#123;<br>        <span class="hljs-keyword">const</span> destPath = <span class="hljs-title function_">join</span>(<span class="hljs-variable constant_">DOWNLOAD_DIR</span>, file.<span class="hljs-property">name</span>);<br>        <span class="hljs-keyword">const</span> destDir = <span class="hljs-title function_">dirname</span>(destPath);<br><br>        <span class="hljs-keyword">if</span> (!<span class="hljs-title function_">existsSync</span>(destDir)) &#123;<br>          <span class="hljs-title function_">mkdirSync</span>(destDir, &#123; <span class="hljs-attr">recursive</span>: <span class="hljs-literal">true</span> &#125;);<br>        &#125;<br><br>        <span class="hljs-keyword">const</span> ok = <span class="hljs-keyword">await</span> <span class="hljs-title function_">downloadWithRetry</span>(file, destPath);<br>        <span class="hljs-keyword">if</span> (ok) &#123;<br>          completed++;<br>          progress.<span class="hljs-property">downloaded</span>.<span class="hljs-title function_">push</span>(file.<span class="hljs-property">name</span>);<br>          <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[<span class="hljs-subst">$&#123;completed&#125;</span>/<span class="hljs-subst">$&#123;total&#125;</span>] <span class="hljs-subst">$&#123;file.name&#125;</span>`</span>);<br>        &#125;<br>      &#125;)<br>    );<br><br>    <span class="hljs-title function_">saveProgress</span>(progress);<br>  &#125;<br><br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`完成！成功下載 <span class="hljs-subst">$&#123;completed&#125;</span> 個檔案`</span>);<br>&#125;<br><br><span class="hljs-title function_">main</span>();<br></code></pre></td></tr></table></figure>
+
+<p>這個腳本有幾個重點：</p>
+<ul>
+<li><strong>10 條並行下載</strong>：不會太快被限流，也不會太慢</li>
+<li><strong>斷點續傳</strong>：進度會存在 <code>.progress.json</code> 裡，中斷後重跑不會重複下載</li>
+<li><strong>自動重試</strong>：每個檔案失敗會重試 3 次</li>
+</ul>
+<p>跑完之後我看了一下結果，3920 個檔案下載成功，48 個失敗。但仔細看失敗清單，全部都是像 <code>blogImg/Git/</code> 這樣結尾帶 <code>/</code> 的路徑，根本不是檔案，而是 Firebase Storage 在建立資料夾時產生的佔位物件，所以實際上是<strong>全數下載成功</strong>，不用擔心。</p>
+<blockquote>
+<p><strong>Note</strong><br>從 Firebase Storage 下載圖片會產生下載流量費用，但以 4800 張圖片大約 10GB 來算，費用大概是 $0.12&#x2F;GB × 10GB &#x3D; $1.2 美金，不到台幣 40 塊，不用擔心。</p>
+</blockquote>
+<h3 id="步驟二：上傳到-Cloudflare-R2"><a href="#步驟二：上傳到-Cloudflare-R2" class="headerlink" title="步驟二：上傳到 Cloudflare R2"></a>步驟二：上傳到 Cloudflare R2</h3><p>下載完之後，接下來就是上傳到 R2。R2 是 S3 相容的，所以可以用 AWS SDK 來操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pnpm install @aws-sdk/client-s3<br></code></pre></td></tr></table></figure>
+
+<p>先到 Cloudflare Dashboard 建好 R2 bucket，然後到 R2 → 管理 R2 API 權限 → 建立 API Token，拿到 Access Key ID 跟 Secret Access Key。</p>
+<p>建一個 <code>.env.r2</code>：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">CLOUDFLARE_ACCOUNT_ID=你的帳戶ID<br>R2_ACCESS_KEY_ID=存取金鑰識別碼<br>R2_SECRET_ACCESS_KEY=秘密存取金鑰<br>R2_BUCKET_NAME=你的bucket名稱<br></code></pre></td></tr></table></figure>
+
+<p>上傳腳本：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; S3Client, <span class="hljs-title class_">PutObjectCommand</span> &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@aws-sdk/client-s3&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; readFileSync, existsSync, readdirSync, statSync &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;fs&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; join, extname &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;path&#x27;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MIME_TYPES</span> = &#123;<br>  <span class="hljs-string">&#x27;.png&#x27;</span>: <span class="hljs-string">&#x27;image/png&#x27;</span>,<br>  <span class="hljs-string">&#x27;.jpg&#x27;</span>: <span class="hljs-string">&#x27;image/jpeg&#x27;</span>,<br>  <span class="hljs-string">&#x27;.jpeg&#x27;</span>: <span class="hljs-string">&#x27;image/jpeg&#x27;</span>,<br>  <span class="hljs-string">&#x27;.gif&#x27;</span>: <span class="hljs-string">&#x27;image/gif&#x27;</span>,<br>  <span class="hljs-string">&#x27;.webp&#x27;</span>: <span class="hljs-string">&#x27;image/webp&#x27;</span>,<br>  <span class="hljs-string">&#x27;.svg&#x27;</span>: <span class="hljs-string">&#x27;image/svg+xml&#x27;</span>,<br>&#125;;<br><br><span class="hljs-comment">// 讀取 .env.r2</span><br><span class="hljs-keyword">const</span> env = &#123;&#125;;<br><span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">&#x27;.env.r2&#x27;</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>  .<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;\n&#x27;</span>)<br>  .<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">line</span>) =&gt;</span> line.<span class="hljs-title function_">trim</span>() &amp;&amp; !line.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&#x27;#&#x27;</span>))<br>  .<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">line</span>) =&gt;</span> &#123;<br>    <span class="hljs-keyword">const</span> [key, ...rest] = line.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;=&#x27;</span>);<br>    env[key.<span class="hljs-title function_">trim</span>()] = rest.<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;=&#x27;</span>).<span class="hljs-title function_">trim</span>();<br>  &#125;);<br><br><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title function_">S3Client</span>(&#123;<br>  <span class="hljs-attr">region</span>: <span class="hljs-string">&#x27;auto&#x27;</span>,<br>  <span class="hljs-attr">endpoint</span>: <span class="hljs-string">`https://<span class="hljs-subst">$&#123;env.CLOUDFLARE_ACCOUNT_ID&#125;</span>.r2.cloudflarestorage.com`</span>,<br>  <span class="hljs-attr">credentials</span>: &#123;<br>    <span class="hljs-attr">accessKeyId</span>: env.<span class="hljs-property">R2_ACCESS_KEY_ID</span>,<br>    <span class="hljs-attr">secretAccessKey</span>: env.<span class="hljs-property">R2_SECRET_ACCESS_KEY</span>,<br>  &#125;,<br>&#125;);<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getAllFiles</span>(<span class="hljs-params">dir</span>) &#123;<br>  <span class="hljs-keyword">const</span> files = [];<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> entry <span class="hljs-keyword">of</span> <span class="hljs-title function_">readdirSync</span>(dir)) &#123;<br>    <span class="hljs-keyword">const</span> fullPath = <span class="hljs-title function_">join</span>(dir, entry);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">statSync</span>(fullPath).<span class="hljs-title function_">isDirectory</span>()) &#123;<br>      files.<span class="hljs-title function_">push</span>(...<span class="hljs-title function_">getAllFiles</span>(fullPath));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      files.<span class="hljs-title function_">push</span>(fullPath);<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> files;<br>&#125;<br><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">UPLOAD_DIR</span> = <span class="hljs-string">&#x27;./firebase-images&#x27;</span>;<br><span class="hljs-keyword">const</span> allFiles = <span class="hljs-title function_">getAllFiles</span>(<span class="hljs-variable constant_">UPLOAD_DIR</span>);<br><br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> filePath <span class="hljs-keyword">of</span> allFiles) &#123;<br>  <span class="hljs-comment">// 重點：去掉本地目錄前綴，只保留實際路徑</span><br>  <span class="hljs-keyword">const</span> key = filePath.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^\.?\/?firebase-images\//</span>, <span class="hljs-string">&#x27;&#x27;</span>);<br>  <span class="hljs-keyword">const</span> ext = <span class="hljs-title function_">extname</span>(filePath).<span class="hljs-title function_">toLowerCase</span>();<br>  <span class="hljs-keyword">const</span> contentType = <span class="hljs-variable constant_">MIME_TYPES</span>[ext] || <span class="hljs-string">&#x27;application/octet-stream&#x27;</span>;<br><br>  <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">send</span>(<br>    <span class="hljs-keyword">new</span> <span class="hljs-title class_">PutObjectCommand</span>(&#123;<br>      <span class="hljs-title class_">Bucket</span>: env.<span class="hljs-property">R2_BUCKET_NAME</span>,<br>      <span class="hljs-title class_">Key</span>: key,<br>      <span class="hljs-title class_">Body</span>: <span class="hljs-title function_">readFileSync</span>(filePath),<br>      <span class="hljs-title class_">ContentType</span>: contentType,<br>      <span class="hljs-title class_">CacheControl</span>: <span class="hljs-string">&#x27;public, max-age=31536000, immutable&#x27;</span>,<br>    &#125;)<br>  );<br><br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`上傳: <span class="hljs-subst">$&#123;key&#125;</span>`</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>這邊有一個坑等一下會講到。</p>
+<h3 id="步驟三：設定-Cloudflare-Worker"><a href="#步驟三：設定-Cloudflare-Worker" class="headerlink" title="步驟三：設定 Cloudflare Worker"></a>步驟三：設定 Cloudflare Worker</h3><p>上傳完之後，需要一個 Worker 來代理 R2 的圖片存取。到 Cloudflare Dashboard 建一個 Worker，然後到 Settings → Bindings 加上 R2 Bucket binding，Variable name 填 <code>BUCKET</code>，選你建的 bucket。</p>
+<p>Worker 程式碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;<br>  <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">request, env</span>) &#123;<br>    <span class="hljs-keyword">const</span> url = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(request.<span class="hljs-property">url</span>);<br><br>    <span class="hljs-keyword">if</span> (url.<span class="hljs-property">pathname</span> === <span class="hljs-string">&#x27;/&#x27;</span> || url.<span class="hljs-property">pathname</span> === <span class="hljs-string">&#x27;&#x27;</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Response</span>.<span class="hljs-title function_">redirect</span>(<span class="hljs-string">&#x27;https://yourdomain.com/&#x27;</span>, <span class="hljs-number">301</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (request.<span class="hljs-property">method</span> !== <span class="hljs-string">&#x27;GET&#x27;</span> &amp;&amp; request.<span class="hljs-property">method</span> !== <span class="hljs-string">&#x27;HEAD&#x27;</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(<span class="hljs-string">&#x27;Method Not Allowed&#x27;</span>, &#123; <span class="hljs-attr">status</span>: <span class="hljs-number">405</span> &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">// 防盜連</span><br>    <span class="hljs-keyword">const</span> allowedOrigins = [<br>      <span class="hljs-string">&#x27;https://yourdomain.com&#x27;</span>,<br>      <span class="hljs-string">&#x27;https://www.yourdomain.com&#x27;</span>,<br>      <span class="hljs-string">&#x27;http://localhost:4000&#x27;</span>,<br>    ];<br><br>    <span class="hljs-keyword">const</span> referer = request.<span class="hljs-property">headers</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;Referer&#x27;</span>) || <span class="hljs-string">&#x27;&#x27;</span>;<br>    <span class="hljs-keyword">const</span> origin = request.<span class="hljs-property">headers</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;Origin&#x27;</span>) || <span class="hljs-string">&#x27;&#x27;</span>;<br><br>    <span class="hljs-keyword">const</span> isAllowed =<br>      (!referer &amp;&amp; !origin) ||<br>      allowedOrigins.<span class="hljs-title function_">some</span>(<span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> referer.<span class="hljs-title function_">startsWith</span>(o) || origin.<span class="hljs-title function_">startsWith</span>(o));<br><br>    <span class="hljs-keyword">if</span> (!isAllowed) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Response</span>.<span class="hljs-title function_">redirect</span>(<span class="hljs-string">&#x27;https://yourdomain.com&#x27;</span>, <span class="hljs-number">302</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">const</span> path = <span class="hljs-built_in">decodeURIComponent</span>(url.<span class="hljs-property">pathname</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">1</span>));<br><br>    <span class="hljs-keyword">const</span> object = <span class="hljs-keyword">await</span> env.<span class="hljs-property">BUCKET</span>.<span class="hljs-title function_">get</span>(path);<br><br>    <span class="hljs-keyword">if</span> (!object) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(<span class="hljs-string">&#x27;Not Found&#x27;</span>, &#123; <span class="hljs-attr">status</span>: <span class="hljs-number">404</span> &#125;);<br>    &#125;<br><br>    <span class="hljs-keyword">const</span> headers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Headers</span>();<br>    object.<span class="hljs-title function_">writeHttpMetadata</span>(headers);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;etag&#x27;</span>, object.<span class="hljs-property">httpEtag</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;public, max-age=31536000, immutable&#x27;</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;CDN-Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;max-age=31536000&#x27;</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="hljs-string">&#x27;*&#x27;</span>);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(object.<span class="hljs-property">body</span>, &#123; headers &#125;);<br>  &#125;,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>跟之前快取 Firebase 的 Worker 相比，最大的差別就是後面從 <code>fetch(firebaseUrl)</code> 變成了 <code>env.BUCKET.get(path)</code>，直接從 R2 讀取，不再經過外部網路。</p>
+<h3 id="步驟四：批次替換文章-URL"><a href="#步驟四：批次替換文章-URL" class="headerlink" title="步驟四：批次替換文章 URL"></a>步驟四：批次替換文章 URL</h3><p>Worker 部署完、確認圖片可以正常存取之後，最後一步就是把文章裡所有的舊 URL 替換成新的。</p>
+<p>原本的 Firebase Storage URL 長這樣：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://firebasestorage.googleapis.com/v0/b/your-project.appspot.com/o/blogImg%2FGit%2F202107092329.png?alt=media&amp;token=xxx<br></code></pre></td></tr></table></figure>
+
+<p>要替換成：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/blogImg/Git/202107092329.png<br></code></pre></td></tr></table></figure>
+
+<p>我寫了一個腳本來處理：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; readFileSync, writeFileSync &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;fs&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; execSync &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;child_process&#x27;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">NEW_BASE</span> = <span class="hljs-string">&#x27;https://images.yourdomain.com&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">FIREBASE_PATTERN</span> =<br>  <span class="hljs-regexp">/https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/your-project\.appspot\.com\/o\/([^?]+)\?alt=media&amp;token=[a-f0-9-]+/g</span>;<br><br><span class="hljs-keyword">const</span> files = <span class="hljs-title function_">execSync</span>(<br>  <span class="hljs-string">&#x27;grep -rl &quot;firebasestorage.googleapis.com/v0/b/your-project&quot; source/&#x27;</span>,<br>  &#123; <span class="hljs-attr">encoding</span>: <span class="hljs-string">&#x27;utf-8&#x27;</span> &#125;<br>)<br>  .<span class="hljs-title function_">trim</span>()<br>  .<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;\n&#x27;</span>)<br>  .<span class="hljs-title function_">filter</span>(<span class="hljs-title class_">Boolean</span>);<br><br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> file <span class="hljs-keyword">of</span> files) &#123;<br>  <span class="hljs-keyword">let</span> content = <span class="hljs-title function_">readFileSync</span>(file, <span class="hljs-string">&#x27;utf-8&#x27;</span>);<br><br>  <span class="hljs-keyword">const</span> newContent = content.<span class="hljs-title function_">replace</span>(<span class="hljs-variable constant_">FIREBASE_PATTERN</span>, <span class="hljs-function">(<span class="hljs-params">match, encodedPath</span>) =&gt;</span> &#123;<br>    <span class="hljs-comment">// 只把 %2F 轉成 /，其他編碼保持不動</span><br>    <span class="hljs-keyword">const</span> urlPath = encodedPath.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/%2F/gi</span>, <span class="hljs-string">&#x27;/&#x27;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">$&#123;NEW_BASE&#125;</span>/<span class="hljs-subst">$&#123;urlPath&#125;</span>`</span>;<br>  &#125;);<br><br>  <span class="hljs-title function_">writeFileSync</span>(file, newContent, <span class="hljs-string">&#x27;utf-8&#x27;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我的部落格總共有 289 個檔案、1436 個 URL 需要替換，加上第二個 bucket 的 154 個檔案、835 個 URL，合計 <strong>443 個檔案、2271 個 URL</strong>，全部由腳本自動完成。</p>
+<h2 id="踩到的坑"><a href="#踩到的坑" class="headerlink" title="踩到的坑"></a>踩到的坑</h2><p>整個遷移過程看起來很順利，但其實踩了不少坑，這邊記錄一下，希望能幫到之後也想搬家的人。</p>
+<h3 id="坑一：URL-編碼問題"><a href="#坑一：URL-編碼問題" class="headerlink" title="坑一：URL 編碼問題"></a>坑一：URL 編碼問題</h3><p>這是最痛的一個坑。</p>
+<p>Firebase Storage 的 URL 裡，路徑中的 <code>/</code> 是用 <code>%2F</code> 編碼的，中文字和空格也都是 percent-encoded。替換的時候我一開始用了 <code>decodeURIComponent</code> 把整個路徑都解碼了，結果 URL 裡面就出現了空格和中文字：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.israynotarray.com/blogImg/Hexo/試著學 Hexo 系列/截圖 2020-07-11 16.15.43.png<br></code></pre></td></tr></table></figure>
+
+<p>Markdown 的圖片語法 <code>![](url)</code> 遇到空格就會斷掉，所有包含中文或空格的圖片全部壞了。</p>
+<p>正確的做法是<strong>只把 <code>%2F</code> 轉成 <code>/</code></strong>，其他編碼保持不動：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// 錯誤做法</span><br><span class="hljs-keyword">const</span> decodedPath = <span class="hljs-built_in">decodeURIComponent</span>(encodedPath);<br><br><span class="hljs-comment">// 正確做法</span><br><span class="hljs-keyword">const</span> urlPath = encodedPath.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/%2F/gi</span>, <span class="hljs-string">&#x27;/&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="坑二：上傳路徑前綴問題"><a href="#坑二：上傳路徑前綴問題" class="headerlink" title="坑二：上傳路徑前綴問題"></a>坑二：上傳路徑前綴問題</h3><p>上傳到 R2 時，檔案的 key 應該是 <code>blogImg/Git/202107092329.png</code>，但因為本地目錄前綴的字串替換沒對上（<code>./firebase-images/</code> vs <code>firebase-images/</code>），導致 key 變成了 <code>firebase-images/blogImg/Git/202107092329.png</code>，多了一層目錄。</p>
+<p>這個問題在 Worker 端可以修，但很不乾淨。比較好的做法是在上傳腳本裡用正規表示式來處理：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// 不要用字串替換，用正規表示式比較保險</span><br><span class="hljs-keyword">const</span> key = filePath.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^\.?\/?firebase-images\//</span>, <span class="hljs-string">&#x27;&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="坑三：Google-Analytics-追蹤參數"><a href="#坑三：Google-Analytics-追蹤參數" class="headerlink" title="坑三：Google Analytics 追蹤參數"></a>坑三：Google Analytics 追蹤參數</h3><p>有些圖片 URL 後面莫名其妙多了 <code>&amp;_gl=1*5qrrwu*_ga*...</code> 這一串東西，這是從 Firebase Console 複製 URL 時不小心帶進來的 Google Analytics 跨域追蹤參數，會導致圖片載入失敗。</p>
+<p>清理方式很簡單：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">content = content.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&amp;_gl=[^\s)&quot;&#x27;]*/g</span>, <span class="hljs-string">&#x27;&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>我的部落格裡有 20 個檔案、55 個 URL 帶了這個參數，全部清掉之後就正常了。</p>
+<h2 id="搬完之後"><a href="#搬完之後" class="headerlink" title="搬完之後"></a>搬完之後</h2><p>搬完之後整理一下前後差異：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th></th>
+<th>搬家前</th>
+<th>搬家後</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>儲存位置</td>
+<td>2 個 Firebase Storage bucket</td>
+<td>1 個 Cloudflare R2 bucket</td>
+</tr>
+<tr>
+<td>管理介面</td>
+<td>要開 2 個 Firebase Console</td>
+<td>只需要 1 個 Cloudflare Dashboard</td>
+</tr>
+<tr>
+<td>下載流量費</td>
+<td>$0.12&#x2F;GB，沒有上限</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>月費</td>
+<td>看流量，不可預測</td>
+<td>$0（在免費額度內）</td>
+</tr>
+<tr>
+<td>圖片域名</td>
+<td>2 個不同的域名</td>
+<td>統一 <code>images.israynotarray.com</code></td>
+</tr>
+<tr>
+<td>流量暴衝風險</td>
+<td>有，帳單直接飆</td>
+<td>沒有，流量永遠免費</td>
+</tr>
+</tbody></table></div>
+<p>最大的改變就是再也不用擔心流量費用了，不管哪篇文章被多少人看、圖片被下載多少次，費用就是 $0，我終於可以安心睡覺了（笑）。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>整個遷移過程大概花了一個下午，主要時間都在等圖片下載和上傳，腳本跑起來之後基本上就是等它跑完而已。踩的坑大部分都是 URL 編碼相關的問題，但只要知道「只轉 <code>%2F</code>，其他不動」這個原則，就不太會出問題。</p>
+<p>如果你也在用 Firebase Storage 存圖片，而且不想再看到那個流量帳單的話，搬到 R2 真的是目前最划算的方案哩～</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      你的支持會直接轉換成更多技術筆記
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        如果我的筆記讓你少踩一個坑、節省 Debug 的時間，<br />也許你可以請我喝杯咖啡，讓我繼續當個不是 Array 的 Ray ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/ai/20260421/2847193056/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> 上一篇
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            從 3 分到滿分！讓你的網站通過 isitagentready AI Agent Readiness 完整攻略
+          </span>
+        </a>
+      
+
+      
+        <a href="/other/20260417/830271645/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            下一篇 <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            用 Cloudflare Workers 快取 Firebase Storage 圖片，完全免費降低流量費用
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        相關文章
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/other/20260417/830271645/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                用 Cloudflare Workers 快取 Firebase Storage 圖片，完全免費降低流量費用
+              </h4>
+              <time datetime="2026-04-17" title="發布日期: 2026-04-17" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-17
+              </time>
+            </div>
+          </a>
+        
+          <a href="/nodejs/20221225/1867465275/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                一步一步帶你用 Node.js 上傳檔案到 Firebase Storage
+              </h4>
+              <time datetime="2022-12-25" title="發布日期: 2022-12-25" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2022-12-25
+              </time>
+            </div>
+          </a>
+        
+          <a href="/firebase/20190703/1943261649/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                FIREBASE WARNING: Exception was thrown by user callback.
+              </h4>
+              <time datetime="2019-07-03" title="發布日期: 2019-07-03" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2019-07-03
+              </time>
+            </div>
+          </a>
+        
+          <a href="/firebase/20190601/401111983/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                規則不公開狀態下控制 firestore
+              </h4>
+              <time datetime="2019-06-01" title="發布日期: 2019-06-01" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2019-06-01
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      分享這篇文章
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/other/20260420/913443764/" data-title="從 Firebase Storage 搬家到 Cloudflare R2，完整遷移紀錄" data-hashtags="Node.js,Firebase,Cloudflare,Cloudflare R2,Cloudflare Workers" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/other/20260420/913443764/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/other/20260420/913443764/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/other/20260420/913443764/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>複製連結</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">留言</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> 目錄
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E9%81%B8-Cloudflare-R2%EF%BC%9F"><span class="toc-text">為什麼選 Cloudflare R2？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E9%AB%94%E6%9E%B6%E6%A7%8B"><span class="toc-text">整體架構</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%B7%E7%A7%BB%E6%AD%A5%E9%A9%9F"><span class="toc-text">遷移步驟</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%A9%9F%E4%B8%80%EF%BC%9A%E5%BE%9E-Firebase-Storage-%E4%B8%8B%E8%BC%89%E6%89%80%E6%9C%89%E5%9C%96%E7%89%87"><span class="toc-text">步驟一：從 Firebase Storage 下載所有圖片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%A9%9F%E4%BA%8C%EF%BC%9A%E4%B8%8A%E5%82%B3%E5%88%B0-Cloudflare-R2"><span class="toc-text">步驟二：上傳到 Cloudflare R2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%A9%9F%E4%B8%89%EF%BC%9A%E8%A8%AD%E5%AE%9A-Cloudflare-Worker"><span class="toc-text">步驟三：設定 Cloudflare Worker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%A9%9F%E5%9B%9B%EF%BC%9A%E6%89%B9%E6%AC%A1%E6%9B%BF%E6%8F%9B%E6%96%87%E7%AB%A0-URL"><span class="toc-text">步驟四：批次替換文章 URL</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E5%88%B0%E7%9A%84%E5%9D%91"><span class="toc-text">踩到的坑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E4%B8%80%EF%BC%9AURL-%E7%B7%A8%E7%A2%BC%E5%95%8F%E9%A1%8C"><span class="toc-text">坑一：URL 編碼問題</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E4%BA%8C%EF%BC%9A%E4%B8%8A%E5%82%B3%E8%B7%AF%E5%BE%91%E5%89%8D%E7%B6%B4%E5%95%8F%E9%A1%8C"><span class="toc-text">坑二：上傳路徑前綴問題</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91%E4%B8%89%EF%BC%9AGoogle-Analytics-%E8%BF%BD%E8%B9%A4%E5%8F%83%E6%95%B8"><span class="toc-text">坑三：Google Analytics 追蹤參數</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AC%E5%AE%8C%E4%B9%8B%E5%BE%8C"><span class="toc-text">搬完之後</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-text">結論</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          整理這些技術筆記真的很花時間，如果你願意 <strong>關閉 Adblock</strong> 支持我，我會把這份感謝轉換成更多「踩坑轉避坑」的內容給你！ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                搜尋文章
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">關閉</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> 按 Esc 關閉
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> 按 Cmd K 開啟
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

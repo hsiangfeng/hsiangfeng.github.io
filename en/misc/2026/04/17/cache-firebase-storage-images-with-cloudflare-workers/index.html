@@ -1,0 +1,1449 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/other/20260417/830271645/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/other/20260417/830271645/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="If you&#39;re using Firebase Storage to host blog images like I was, you&#39;ve probably noticed bandwidth costs creeping up — every article view pulls the images straight from Firebase Storage, and all of it lands on your Firebase bill. This post walks through how to use Cloudflare Workers plus a custom subdomain to cache those images. The whole setup is free and doesn&#39;t require a credit card.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="If you&#39;re using Firebase Storage to host blog images like I was, you&#39;ve probably noticed bandwidth costs creeping up — every article view pulls the images straight from Firebase Storage, and all of it lands on your Firebase bill. This post walks through how to use Cloudflare Workers plus a custom subdomain to cache those images. The whole setup is free and doesn&#39;t require a credit card.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-workers/Gemini_Generated_Image_tlv3s5tlv3s5tlv3_2816x1536_1280x698.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-04-17T10:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-04-17T10:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="Misc">
+      
+    
+    
+      
+        <meta property="article:tag" content="Firebase">
+      
+        <meta property="article:tag" content="Cloudflare">
+      
+        <meta property="article:tag" content="CDN">
+      
+        <meta property="article:tag" content="Cache">
+      
+        <meta property="article:tag" content="Cloudflare Workers">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings | Is Ray, Not Array">
+  <meta name="twitter:description" content="If you&#39;re using Firebase Storage to host blog images like I was, you&#39;ve probably noticed bandwidth costs creeping up — every article view pulls the images straight from Firebase Storage, and all of it lands on your Firebase bill. This post walks through how to use Cloudflare Workers plus a custom subdomain to cache those images. The whole setup is free and doesn&#39;t require a credit card.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-workers/Gemini_Generated_Image_tlv3s5tlv3s5tlv3_2816x1536_1280x698.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/"},"headline":"Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings","url":"https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/","datePublished":"2026-04-17T10:00:00.000Z","dateModified":"2026-04-17T10:00:00.000Z","description":"If you're using Firebase Storage to host blog images like I was, you've probably noticed bandwidth costs creeping up — every article view pulls the images straight from Firebase Storage, and all of it lands on your Firebase bill. This post walks through how to use Cloudflare Workers plus a custom subdomain to cache those images. The whole setup is free and doesn't require a credit card.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":9993,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/other/firebase-to-cloudflare-workers/Gemini_Generated_Image_tlv3s5tlv3s5tlv3_2816x1536_1280x698.png","width":1200,"height":630}],"articleSection":["Misc"],"keywords":"Firebase, Cloudflare, CDN, Cache, Cloudflare Workers"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/#breadcrumb","name":"Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"Misc","item":"https://israynotarray.com/categories/Misc/"},{"@type":"ListItem","position":3,"name":"Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/other/20260417/830271645/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/other/20260417/830271645/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-04-17" title="Published: 2026-04-17" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-04-17
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/Misc/" class="hover:text-primary-500 transition-colors">Misc</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Firebase/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Firebase
+            </a>
+          
+            <a href="/tags/Cloudflare/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cloudflare
+            </a>
+          
+            <a href="/tags/CDN/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #CDN
+            </a>
+          
+            <a href="/tags/Cache/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cache
+            </a>
+          
+            <a href="/tags/Cloudflare-Workers/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cloudflare Workers
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-workers/Gemini_Generated_Image_tlv3s5tlv3s5tlv3_2816x1536_1280x698.png" data-fancybox="gallery" data-caption="Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/other/firebase-to-cloudflare-workers/Gemini_Generated_Image_tlv3s5tlv3s5tlv3_2816x1536_1280x698.png" alt="Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings</figcaption></figure>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>If you’re using Firebase Storage to host blog images like I was, you’ve probably noticed bandwidth costs creeping up. Every time someone visits an article, the images load straight from Firebase Storage, and all of that bandwidth lands on your Firebase bill. The more articles and readers you have, the worse the bandwidth bill gets.</p>
+<p>Is there a way to put a cache layer in front so images don’t get fetched from Firebase Storage every time? Yes — and <strong>completely free</strong>. This post walks through how to use <strong>Cloudflare Workers</strong> with a custom subdomain to cache Firebase Storage images, letting Cloudflare’s global CDN absorb most of the traffic.</p>
+<h2 id="How-does-this-work"><a href="#How-does-this-work" class="headerlink" title="How does this work?"></a>How does this work?</h2><p>Before getting into the implementation, let’s cover the principle. Otherwise you won’t know why it works.</p>
+<p>In short, we’re going to put Cloudflare in front of Firebase Storage as a “middleman” that caches the images:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">User → images.yourdomain.com → Cloudflare CDN (cache layer) → Firebase Storage<br>                                      ↑<br>                              If cached, return directly — never touch Firebase<br></code></pre></td></tr></table></figure>
+
+<p>The first time someone requests an image, Cloudflare fetches it from Firebase Storage and stashes a copy at the edge. Every subsequent request goes straight from the edge — <strong>Firebase doesn’t get hit</strong>, which means no bandwidth charge on the Firebase side.</p>
+<h2 id="Is-this-really-free"><a href="#Is-this-really-free" class="headerlink" title="Is this really free?"></a>Is this really free?</h2><p>Before we go any further, let me cover the cost — that’s probably what most people care about anyway:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cloudflare account</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Cloudflare DNS hosting</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Cloudflare Workers</td>
+<td>Free (100,000 requests&#x2F;day, no credit card)</td>
+</tr>
+<tr>
+<td>Cloudflare CDN cached traffic</td>
+<td>Free (no bandwidth cap)</td>
+</tr>
+<tr>
+<td>Custom domain for Worker</td>
+<td>Supported on the free plan</td>
+</tr>
+</tbody></table></div>
+<p>All of it free. Cloudflare is one of the few CDNs that doesn’t bill on bandwidth, and people have run 5–9 TB&#x2F;month on the free plan without trouble.</p>
+<p>And once a request hits cache, it doesn’t go through the Worker at all — so it doesn’t consume your daily 100k Worker invocation quota either. For blog images, this is more than enough.</p>
+<blockquote>
+<p><strong>Note</strong><br>The one requirement is that you own a domain and host its DNS with Cloudflare (which is also free).</p>
+</blockquote>
+<h3 id="Watch-out-for-the-paid-traps"><a href="#Watch-out-for-the-paid-traps" class="headerlink" title="Watch out for the paid traps"></a>Watch out for the paid traps</h3><p>The Workers free plan doesn’t require a credit card, but the dashboard has features (Durable Objects, Workers AI, etc.) that might nudge you toward the $5&#x2F;month paid plan. <strong>Don’t click any “upgrade” button</strong> — we only need basic Worker functionality, none of those advanced features.</p>
+<h2 id="Why-a-subdomain"><a href="#Why-a-subdomain" class="headerlink" title="Why a subdomain?"></a>Why a subdomain?</h2><p>You might be thinking: “why not just use <code>yourdomain.com/images/...</code>?”</p>
+<p>Simple — if your main domain is already running a blog or another project, the paths can collide easily. A subdomain (like <code>images.yourdomain.com</code>) is fully isolated and won’t interfere with anything on the main site. And the final image URL ends up looking like:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/blog2/ai/my-post/screenshot.png<br></code></pre></td></tr></table></figure>
+
+<p>Way cleaner than the long Firebase Storage URL.</p>
+<h2 id="Let’s-build-it"><a href="#Let’s-build-it" class="headerlink" title="Let’s build it"></a>Let’s build it</h2><p>Now that we’ve covered the principle and cost, on to the implementation.</p>
+<h3 id="Step-1-Host-your-domain-DNS-on-Cloudflare"><a href="#Step-1-Host-your-domain-DNS-on-Cloudflare" class="headerlink" title="Step 1: Host your domain DNS on Cloudflare"></a>Step 1: Host your domain DNS on Cloudflare</h3><p>If your domain isn’t on Cloudflare yet:</p>
+<ol>
+<li>Sign up for a <a target="_blank" rel="noopener" href="https://dash.cloudflare.com/sign-up">Cloudflare</a> account (free).</li>
+<li>Click <strong>Add a site</strong> → enter your domain.</li>
+<li>Pick the <strong>Free</strong> plan.</li>
+<li>Cloudflare gives you two nameservers.</li>
+<li>At your domain registrar, change nameservers to the ones Cloudflare gave you.</li>
+<li>Back in Cloudflare, click confirm, wait for DNS to propagate (usually minutes to hours).</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong><br>If your domain’s already on Cloudflare, skip to Step 2.</p>
+</blockquote>
+<h3 id="Step-2-Create-a-Cloudflare-Worker"><a href="#Step-2-Create-a-Cloudflare-Worker" class="headerlink" title="Step 2: Create a Cloudflare Worker"></a>Step 2: Create a Cloudflare Worker</h3><ol>
+<li>Cloudflare dashboard → left sidebar → <strong>Workers &amp; Pages</strong>.</li>
+<li>Click <strong>Create</strong> → <strong>Create Worker</strong>.</li>
+<li>Pick <strong>“Start from Hello World!”</strong>.</li>
+<li>Give it a name, e.g. <code>image-proxy</code>.</li>
+<li>Click <strong>Deploy</strong> to create it, then <strong>Edit code</strong>.</li>
+<li>Delete the default code and paste this:</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;<br>  <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">request</span>) &#123;<br>    <span class="hljs-comment">// Restrict allowed origins</span><br>    <span class="hljs-keyword">const</span> allowedOrigins = [<br>      <span class="hljs-string">&#x27;https://yourdomain.com&#x27;</span>,<br>      <span class="hljs-string">&#x27;https://www.yourdomain.com&#x27;</span>,<br>      <span class="hljs-string">&#x27;http://localhost&#x27;</span>, <span class="hljs-comment">// for local dev</span><br>    ];<br><br>    <span class="hljs-keyword">const</span> referer = request.<span class="hljs-property">headers</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;Referer&#x27;</span>) || <span class="hljs-string">&#x27;&#x27;</span>;<br>    <span class="hljs-keyword">const</span> origin = request.<span class="hljs-property">headers</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;Origin&#x27;</span>) || <span class="hljs-string">&#x27;&#x27;</span>;<br><br>    <span class="hljs-keyword">const</span> isAllowed =<br>      (!referer &amp;&amp; !origin) || <span class="hljs-comment">// allow direct browser address-bar access</span><br>      allowedOrigins.<span class="hljs-title function_">some</span>(<span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> referer.<span class="hljs-title function_">startsWith</span>(o) || origin.<span class="hljs-title function_">startsWith</span>(o));<br><br>    <span class="hljs-keyword">if</span> (!isAllowed) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(<span class="hljs-string">&#x27;Forbidden&#x27;</span>, &#123; <span class="hljs-attr">status</span>: <span class="hljs-number">403</span> &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">// Build the Firebase Storage URL from the path</span><br>    <span class="hljs-keyword">const</span> url = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(request.<span class="hljs-property">url</span>);<br>    <span class="hljs-keyword">const</span> path = <span class="hljs-built_in">encodeURIComponent</span>(url.<span class="hljs-property">pathname</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">1</span>));<br>    <span class="hljs-keyword">const</span> firebaseUrl = <span class="hljs-string">`https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/<span class="hljs-subst">$&#123;path&#125;</span>?alt=media`</span>;<br><br>    <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(firebaseUrl);<br><br>    <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(<span class="hljs-string">&#x27;Not Found&#x27;</span>, &#123; <span class="hljs-attr">status</span>: <span class="hljs-number">404</span> &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">// Set cache headers</span><br>    <span class="hljs-keyword">const</span> headers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Headers</span>(response.<span class="hljs-property">headers</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;public, max-age=31536000, immutable&#x27;</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;CDN-Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;max-age=31536000&#x27;</span>);<br>    headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Access-Control-Allow-Origin&#x27;</span>, <span class="hljs-string">&#x27;*&#x27;</span>);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Response</span>(response.<span class="hljs-property">body</span>, &#123;<br>      <span class="hljs-attr">status</span>: response.<span class="hljs-property">status</span>,<br>      headers,<br>    &#125;);<br>  &#125;,<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>Remember to replace <code>YOUR_PROJECT.appspot.com</code> with your actual Firebase project name, and <code>allowedOrigins</code> with your own domain.</p>
+</blockquote>
+<ol start="7">
+<li>Click <strong>Save and Deploy</strong>.</li>
+</ol>
+<h3 id="What-does-this-code-do"><a href="#What-does-this-code-do" class="headerlink" title="What does this code do?"></a>What does this code do?</h3><p>In case you’re wondering what’s actually happening — three things:</p>
+<ol>
+<li><strong>Domain restriction</strong>: checks the request origin and only allows your own domain and local dev. Stops other people from hotlinking your image proxy.</li>
+<li><strong>Reverse proxy</strong>: builds the Firebase Storage URL from the request path, fetches from Firebase.</li>
+<li><strong>Cache headers</strong>: adds cache-control headers on the response, telling the Cloudflare CDN and the browser to cache the image for a year.</li>
+</ol>
+<p>The <code>localhost</code> entry exists so local development still shows images. Since we’re using <code>startsWith</code> for matching, any port (4000, 3000, 8080…) works fine.</p>
+<h3 id="Step-3-Bind-a-subdomain"><a href="#Step-3-Bind-a-subdomain" class="headerlink" title="Step 3: Bind a subdomain"></a>Step 3: Bind a subdomain</h3><ol>
+<li>In the Worker → <strong>Settings</strong> → <strong>Domains &amp; Routes</strong>.</li>
+<li>Click <strong>Add</strong> → <strong>Custom Domain</strong>.</li>
+<li>Enter <code>images.yourdomain.com</code>.</li>
+<li>Cloudflare creates the DNS record for you, click confirm.</li>
+</ol>
+<h3 id="Step-4-Configure-Firebase-Storage-Rules"><a href="#Step-4-Configure-Firebase-Storage-Rules" class="headerlink" title="Step 4: Configure Firebase Storage Rules"></a>Step 4: Configure Firebase Storage Rules</h3><p>Because our Worker requests Firebase Storage without a token, the images need to be publicly readable.</p>
+<p>Firebase Console → Storage → Rules:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs txt">rules_version = &#x27;2&#x27;;<br>service firebase.storage &#123;<br>  match /b/&#123;bucket&#125;/o &#123;<br>    match /blog2/&#123;allPaths=**&#125; &#123;<br>      allow read;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>This only opens up <code>blog2/</code> for public read — other paths are unaffected.</p>
+<p>You might be worried about the security implications, but consider: these images were already public via blog articles — anyone could see them. The original token was sitting in your HTML for anyone who opens devtools to grab anyway. Switching to public read doesn’t actually add any new risk.</p>
+<h3 id="Step-5-Verify"><a href="#Step-5-Verify" class="headerlink" title="Step 5: Verify"></a>Step 5: Verify</h3><p>Open a browser and type in:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/blog2/your-folder/your-image.png<br></code></pre></td></tr></table></figure>
+
+<p>If you see the image, you’re good.</p>
+<h2 id="Updating-image-links"><a href="#Updating-image-links" class="headerlink" title="Updating image links"></a>Updating image links</h2><p>Now you need to replace all the Firebase Storage image URLs in your blog with the new format.</p>
+<p>Original looks like:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/blog2%2Ffolder%2Fimage.png?alt=media&amp;token=xxx<br></code></pre></td></tr></table></figure>
+
+<p>Becomes:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/blog2/folder/image.png<br></code></pre></td></tr></table></figure>
+
+<p>The rules:</p>
+<ol>
+<li>Swap the Firebase domain for <code>images.yourdomain.com</code>.</li>
+<li>Drop the <code>?alt=media&amp;token=xxx</code>.</li>
+<li>Convert <code>%2F</code> to <code>/</code>.</li>
+</ol>
+<p>If you have lots of articles, doing it by hand isn’t realistic. Bulk replace with <code>sed</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Step 1: replace domain and strip token</span><br>grep -rl <span class="hljs-string">&quot;firebasestorage\.googleapis\.com/v0/b/YOUR_PROJECT\.appspot\.com&quot;</span> <span class="hljs-built_in">source</span>/ | \<br><span class="hljs-keyword">while</span> IFS= <span class="hljs-built_in">read</span> -r f; <span class="hljs-keyword">do</span><br>  sed -i <span class="hljs-string">&#x27;&#x27;</span> <span class="hljs-string">&#x27;s|https://firebasestorage\.googleapis\.com/v0/b/YOUR_PROJECT\.appspot\.com/o/\([^?]*\)?alt=media&amp;token=[a-f0-9\-]*|https://images.yourdomain.com/\1|g&#x27;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$f</span>&quot;</span><br><span class="hljs-keyword">done</span><br><br><span class="hljs-comment"># Step 2: replace %2F with /</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> $(<span class="hljs-built_in">seq</span> 1 5); <span class="hljs-keyword">do</span><br>  grep -rl <span class="hljs-string">&quot;images\.yourdomain\.com/[^)]*%2F&quot;</span> <span class="hljs-built_in">source</span>/ 2&gt;/dev/null | \<br>  <span class="hljs-keyword">while</span> IFS= <span class="hljs-built_in">read</span> -r f; <span class="hljs-keyword">do</span><br>    sed -i <span class="hljs-string">&#x27;&#x27;</span> <span class="hljs-string">&#x27;s|\(images\.yourdomain\.com/[^)]*\)%2F|\1/|g&#x27;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$f</span>&quot;</span><br>  <span class="hljs-keyword">done</span><br><span class="hljs-keyword">done</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Note</strong><br>Step 2 needs to run multiple times because <code>sed</code> only replaces one <code>%2F</code> per pass — the loop ensures all of them get converted. Also, if you have images from multiple Firebase projects, double-check you’re only replacing URLs from the target project so you don’t accidentally touch other projects’ image URLs.</p>
+</blockquote>
+<h3 id="Important-use-instead-of-2F-in-URL-paths"><a href="#Important-use-instead-of-2F-in-URL-paths" class="headerlink" title="Important: use / instead of %2F in URL paths"></a>Important: use <code>/</code> instead of <code>%2F</code> in URL paths</h3><p>One detail worth highlighting.</p>
+<p>Firebase Storage’s URL format uses <code>%2F</code> to separate paths (because the whole file path is treated as a single URL segment), but on our own subdomain, <strong>you must use a regular <code>/</code></strong>:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs txt">❌ https://images.yourdomain.com/blog2%2Fai%2Fmy-post%2Fimage.png<br>✅ https://images.yourdomain.com/blog2/ai/my-post/image.png<br></code></pre></td></tr></table></figure>
+
+<p>Why? Because Cloudflare doesn’t handle <code>%2F</code> correctly in this context — you’ll get 404s. The Worker internally converts <code>/</code> back to Firebase’s <code>%2F</code> format (via <code>encodeURIComponent</code>), so on your end you just use normal paths and don’t need to worry about encoding.</p>
+<h2 id="Getting-URLs-for-new-images"><a href="#Getting-URLs-for-new-images" class="headerlink" title="Getting URLs for new images"></a>Getting URLs for new images</h2><p>How do you get URLs for new images going forward? The rule is just:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/ + the path in Firebase Storage<br></code></pre></td></tr></table></figure>
+
+<p>For example, if you upload an image to <code>blog2/ai/my-post/screenshot.png</code> in Firebase Storage, the URL is:</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">https://images.yourdomain.com/blog2/ai/my-post/screenshot.png<br></code></pre></td></tr></table></figure>
+
+<p>No more tokens. Just concatenate the path. Way more convenient.</p>
+<h2 id="How-the-caching-works"><a href="#How-the-caching-works" class="headerlink" title="How the caching works"></a>How the caching works</h2><p>Last bit: let’s cover how the caching actually flows, so you can feel more confident about the setup.</p>
+<p>The Worker sets two key headers:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs js">headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;public, max-age=31536000, immutable&#x27;</span>);<br>headers.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;CDN-Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;max-age=31536000&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>These set up <strong>two cache layers</strong>.</p>
+<h3 id="Layer-1-Cloudflare-CDN-edge-cache"><a href="#Layer-1-Cloudflare-CDN-edge-cache" class="headerlink" title="Layer 1: Cloudflare CDN edge cache"></a>Layer 1: Cloudflare CDN edge cache</h3><p><code>CDN-Cache-Control</code> tells Cloudflare’s edge nodes: “cache this for a year”. On the first request, Cloudflare fetches from Firebase and stores a copy at the edge closest to the user. After that, anyone requesting the same image gets it straight from the edge — <strong>no Worker invocation, no Firebase hit</strong>.</p>
+<h3 id="Layer-2-Browser-local-cache"><a href="#Layer-2-Browser-local-cache" class="headerlink" title="Layer 2: Browser local cache"></a>Layer 2: Browser local cache</h3><p><code>Cache-Control: public, max-age=31536000, immutable</code> tells the browser: “cache this locally for a year, and it won’t change”. So when the same user visits the same post again, the browser uses its local copy — <strong>doesn’t even hit Cloudflare</strong>.</p>
+<h3 id="Overall-flow"><a href="#Overall-flow" class="headerlink" title="Overall flow"></a>Overall flow</h3><p><strong>First request (cold cache):</strong></p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">User → Cloudflare edge (no cache) → Worker → Firebase Storage<br>                ↓<br>        Store copy at edge + return to user<br></code></pre></td></tr></table></figure>
+
+<p><strong>Second request (CDN hit):</strong></p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">User → Cloudflare edge (cached) → return directly<br></code></pre></td></tr></table></figure>
+
+<p><strong>Same user revisiting (browser cache hit):</strong></p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">User → browser local cache → render directly<br></code></pre></td></tr></table></figure>
+
+<p>Since blog images don’t change after upload, setting a 1-year cache with <code>immutable</code> is totally reasonable.</p>
+<h2 id="Closing-thoughts"><a href="#Closing-thoughts" class="headerlink" title="Closing thoughts"></a>Closing thoughts</h2><p>With Cloudflare Workers + CDN caching, you can dramatically cut Firebase Storage bandwidth — for $0. Setup doesn’t take much time, but the savings are long-term.</p>
+<p>Recap of the benefits:</p>
+<ul>
+<li><strong>Completely free</strong>: no credit card, no paid plan needed.</li>
+<li><strong>Global acceleration</strong>: Cloudflare has 300+ edge nodes worldwide; images come from the closest one.</li>
+<li><strong>Reduced bandwidth</strong>: cache hits never touch Firebase, bandwidth goes to zero.</li>
+<li><strong>Domain restriction</strong>: only your own site can access — stops hotlinking.</li>
+<li><strong>Shorter URLs</strong>: from long Firebase URLs to clean subdomain paths.</li>
+</ul>
+<p>If you’re also using Firebase Storage for images, this approach is worth trying.</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/misc/2026/04/20/migrating-from-firebase-storage-to-cloudflare-r2/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Migrating from Firebase Storage to Cloudflare R2 — the Full Move
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/ai/2026/04/12/llm-parameters-quantization-guide/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Want to Run Your Own LLM? Understanding Model Parameters and Quantization
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/misc/2026/04/20/migrating-from-firebase-storage-to-cloudflare-r2/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Migrating from Firebase Storage to Cloudflare R2 — the Full Move
+              </h4>
+              <time datetime="2026-04-21" title="Published: 2026-04-21" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-21
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/22/llms-txt-cloudflare-transform-rule-markdown-content-type/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Make /llms.txt Return text/markdown on GitHub Pages: A Cloudflare Transform Rule Guide
+              </h4>
+              <time datetime="2026-06-22" title="Published: 2026-06-22" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-22
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/misc/2026/05/13/cloudflare-pages-preview-urls-stay-forever-lock-with-access/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Cloudflare Pages Preview URLs Stay Live Forever? Lock Them Down with Cloudflare Access
+              </h4>
+              <time datetime="2026-05-13" title="Published: 2026-05-13" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-05-13
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/04/21/from-3-to-100-isitagentready-readiness-guide/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                From 3 to 100: Passing isitagentready's AI Agent Readiness Test
+              </h4>
+              <time datetime="2026-04-22" title="Published: 2026-04-22" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-22
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/" data-title="Cache Firebase Storage Images with Cloudflare Workers — Completely Free Bandwidth Savings" data-hashtags="Firebase,Cloudflare,CDN,Cache,Cloudflare Workers" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/misc/2026/04/17/cache-firebase-storage-images-with-cloudflare-workers/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-does-this-work"><span class="toc-text">How does this work?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Is-this-really-free"><span class="toc-text">Is this really free?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Watch-out-for-the-paid-traps"><span class="toc-text">Watch out for the paid traps</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-a-subdomain"><span class="toc-text">Why a subdomain?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Let%E2%80%99s-build-it"><span class="toc-text">Let’s build it</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-1-Host-your-domain-DNS-on-Cloudflare"><span class="toc-text">Step 1: Host your domain DNS on Cloudflare</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-2-Create-a-Cloudflare-Worker"><span class="toc-text">Step 2: Create a Cloudflare Worker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#What-does-this-code-do"><span class="toc-text">What does this code do?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-3-Bind-a-subdomain"><span class="toc-text">Step 3: Bind a subdomain</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-4-Configure-Firebase-Storage-Rules"><span class="toc-text">Step 4: Configure Firebase Storage Rules</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Step-5-Verify"><span class="toc-text">Step 5: Verify</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Updating-image-links"><span class="toc-text">Updating image links</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Important-use-instead-of-2F-in-URL-paths"><span class="toc-text">Important: use &#x2F; instead of %2F in URL paths</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Getting-URLs-for-new-images"><span class="toc-text">Getting URLs for new images</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-the-caching-works"><span class="toc-text">How the caching works</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Layer-1-Cloudflare-CDN-edge-cache"><span class="toc-text">Layer 1: Cloudflare CDN edge cache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Layer-2-Browser-local-cache"><span class="toc-text">Layer 2: Browser local cache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Overall-flow"><span class="toc-text">Overall flow</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-text">Closing thoughts</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>

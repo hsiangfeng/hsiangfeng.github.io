@@ -1,0 +1,1479 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>design.md: If Your AI-Generated UI Keeps Drifting, You're Missing Google's design.md | Is Ray, Not Array</title>
+
+  
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  
+  <link rel="canonical" href="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/">
+
+  
+  
+  
+
+  
+  <link rel="alternate" hreflang="en" href="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/">
+  <link rel="alternate" hreflang="zh-TW" href="https://israynotarray.com/ai/20260627/1947382651/">
+  <link rel="alternate" hreflang="x-default" href="https://israynotarray.com/ai/20260627/1947382651/">
+  
+
+  
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (繁體中文)" href="/atom.xml" hreflang="zh-TW">
+  <link rel="alternate" type="application/atom+xml" title="RSS Feed (English)" href="/en/atom.xml" hreflang="en">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (繁體中文)" href="/llms.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (繁體中文)" href="/llms-full.txt" hreflang="zh-TW">
+  <link rel="alternate" type="text/markdown" title="llms.txt — site index for AI agents (English)" href="/en/llms.txt" hreflang="en">
+  <link rel="alternate" type="text/markdown" title="llms-full.txt — full content for AI agents (English)" href="/en/llms-full.txt" hreflang="en">
+
+  
+  <meta name="description" content="design.md is a format spec that Google Labs incubated from their AI design tool Stitch and then open-sourced. The goal is to make AI Coding tools like Claude Code, Cursor, and GitHub Copilot actually understand your design system. This post covers what design.md is, how it&#39;s different from rules files like CLAUDE.md / AGENTS.md, what the mixed YAML Token + Markdown rationale structure looks like, a real example (Heritage), and what the built-in CLI can do (lint with WCAG contrast checks, diff, export to Tailwind v3/v4 or W3C DTCG, spec) — plus how to wire it into your AI Coding tool of choice.">
+  <meta name="author" content="Ray">
+  <meta name="keywords" content="前端, 後端, 全端, 網頁, 開發, 技術, 網頁開發, 前端開發, 後端開發, 全端開發, JavaScript, HTML, CSS, 經驗分享, 手札, 筆記">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="design.md: If Your AI-Generated UI Keeps Drifting, You&#39;re Missing Google&#39;s design.md | Is Ray, Not Array">
+  <meta property="og:url" content="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/">
+  <meta property="og:site_name" content="Is Ray, Not Array">
+  <meta property="og:description" content="design.md is a format spec that Google Labs incubated from their AI design tool Stitch and then open-sourced. The goal is to make AI Coding tools like Claude Code, Cursor, and GitHub Copilot actually understand your design system. This post covers what design.md is, how it&#39;s different from rules files like CLAUDE.md / AGENTS.md, what the mixed YAML Token + Markdown rationale structure looks like, a real example (Heritage), and what the built-in CLI can do (lint with WCAG contrast checks, diff, export to Tailwind v3/v4 or W3C DTCG, spec) — plus how to wire it into your AI Coding tool of choice.">
+  <meta property="og:locale" content="en">
+  
+  
+    <meta property="og:image" content="https://images.israynotarray.com/blog/ai/ai-desgin-md/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8825%E6%97%A5%20%E4%B8%8A%E5%8D%8810_42_14.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  
+
+  
+    
+    <meta property="article:published_time" content="2026-06-27T12:00:00.000Z">
+    
+      <meta property="article:modified_time" content="2026-06-27T12:00:00.000Z">
+    
+    
+      <meta property="article:author" content="Ray">
+    
+    
+      
+        <meta property="article:section" content="AI">
+      
+    
+    
+      
+        <meta property="article:tag" content="Claude Code">
+      
+        <meta property="article:tag" content="AI">
+      
+        <meta property="article:tag" content="Cursor">
+      
+        <meta property="article:tag" content="design.md">
+      
+        <meta property="article:tag" content="Google Stitch">
+      
+        <meta property="article:tag" content="Stitch">
+      
+        <meta property="article:tag" content="Design System">
+      
+        <meta property="article:tag" content="Tailwind">
+      
+    
+  
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="design.md: If Your AI-Generated UI Keeps Drifting, You&#39;re Missing Google&#39;s design.md | Is Ray, Not Array">
+  <meta name="twitter:description" content="design.md is a format spec that Google Labs incubated from their AI design tool Stitch and then open-sourced. The goal is to make AI Coding tools like Claude Code, Cursor, and GitHub Copilot actually understand your design system. This post covers what design.md is, how it&#39;s different from rules files like CLAUDE.md / AGENTS.md, what the mixed YAML Token + Markdown rationale structure looks like, a real example (Heritage), and what the built-in CLI can do (lint with WCAG contrast checks, diff, export to Tailwind v3/v4 or W3C DTCG, spec) — plus how to wire it into your AI Coding tool of choice.">
+  
+    <meta name="twitter:image" content="https://images.israynotarray.com/blog/ai/ai-desgin-md/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8825%E6%97%A5%20%E4%B8%8A%E5%8D%8810_42_14.png">
+  
+  
+    <meta name="twitter:site" content="@israynotarray">
+    <meta name="twitter:creator" content="@israynotarray">
+  
+
+  
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://israynotarray.com/#org","name":"Is Ray, Not Array","url":"https://israynotarray.com","logo":{"@id":"https://israynotarray.com/#logo"},"sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"Person","@id":"https://israynotarray.com/#ray","name":"Ray","url":"https://israynotarray.com","jobTitle":"Software Engineer","sameAs":["https://israynotarray.com","https://israynotarray.dev","https://tools.israynotarray.dev","https://labor.israynotarray.dev","https://galaxy.israynotarray.dev","https://gems.israynotarray.dev","https://skills.israynotarray.dev","https://line-analysis.israynotarray.dev","https://calculator.israynotarray.dev","https://github.com/hsiangfeng","https://www.facebook.com/israynotarray","https://www.youtube.com/@IsRayNotArray"]},{"@type":"WebSite","@id":"https://israynotarray.com/#website","url":"https://israynotarray.com","name":"Is Ray, Not Array","description":"👨‍💻 嗨！我是 Ray，一個不想被當成 Array 的軟體工程師。這裡匯集了我的技術筆記與實戰心得。我相信透過分享不僅能幫助他人，也能讓自己在軟體開發的路上更加堅定。","publisher":{"@id":"https://israynotarray.com/#org"},"inLanguage":"en","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://israynotarray.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://israynotarray.com/#logo","url":"https://israynotarray.com/images/logo.png","caption":"Is Ray, Not Array"},{"@type":["BlogPosting","TechArticle"],"@id":"https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/#article","mainEntityOfPage":{"@id":"https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/"},"headline":"design.md: If Your AI-Generated UI Keeps Drifting, You're Missing Google's design.md","url":"https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/","datePublished":"2026-06-27T12:00:00.000Z","dateModified":"2026-06-27T12:00:00.000Z","description":"design.md is a format spec that Google Labs incubated from their AI design tool Stitch and then open-sourced. The goal is to make AI Coding tools like Claude Code, Cursor, and GitHub Copilot actually understand your design system. This post covers what design.md is, how it's different from rules files like CLAUDE.md / AGENTS.md, what the mixed YAML Token + Markdown rationale structure looks like, a real example (Heritage), and what the built-in CLI can do (lint with WCAG contrast checks, diff, export to Tailwind v3/v4 or W3C DTCG, spec) — plus how to wire it into your AI Coding tool of choice.","author":{"@id":"https://israynotarray.com/#ray"},"publisher":{"@id":"https://israynotarray.com/#org"},"isPartOf":{"@id":"https://israynotarray.com/#website"},"inLanguage":"en","wordCount":11311,"speakable":{"@type":"SpeakableSpecification","cssSelector":[".prose h1",".prose > p:first-of-type",".prose h2",".prose h3"]},"image":[{"@type":"ImageObject","url":"https://images.israynotarray.com/blog/ai/ai-desgin-md/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8825%E6%97%A5%20%E4%B8%8A%E5%8D%8810_42_14.png","width":1200,"height":630}],"articleSection":["AI"],"keywords":"Claude Code, AI, Cursor, design.md, Google Stitch, Stitch, Design System, Tailwind"},{"@type":"BreadcrumbList","@id":"https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/#breadcrumb","name":"design.md: If Your AI-Generated UI Keeps Drifting, You're Missing Google's design.md | Is Ray, Not Array","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://israynotarray.com"},{"@type":"ListItem","position":2,"name":"AI","item":"https://israynotarray.com/categories/ai/"},{"@type":"ListItem","position":3,"name":"design.md: If Your AI-Generated UI Keeps Drifting, You're Missing Google's design.md"}]}]}
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=optional" rel="stylesheet"></noscript>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=optional" rel="stylesheet"></noscript>
+
+  
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  
+  
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var isLight = savedTheme === 'light';
+
+      if (isLight) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#fafafa';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+
+      // Apply saved color palette immediately to prevent color flash
+      var palette = localStorage.getItem('color-palette');
+      if (palette) {
+        document.documentElement.setAttribute('data-palette', palette);
+      }
+    })();
+  </script>
+
+  
+  
+    
+<link rel="stylesheet" href="/css/css-post-Bxw5fxnw.css">
+
+  
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.documentElement.style.backgroundColor = '';
+    });
+  </script>
+  
+  
+  <script type="module" src="/js/main-BGqGskvA.js"></script>
+  
+  
+  
+    <script>
+      (function() {
+        var loaded = false;
+        function loadAdSense() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4319471747130190';
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAdSense, { timeout: 3000 });
+        } else {
+          window.addEventListener('load', function() { setTimeout(loadAdSense, 1500); });
+        }
+      })();
+    </script>
+  
+
+  
+  
+    
+    
+      
+      <script>
+        (function() {
+          // Check for Do Not Track setting
+          const dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+          const doNotTrack = (dnt === "1" || dnt === "yes");
+          
+          if (!doNotTrack) {
+            // Load GA4 script
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FC8R6QFRC3';
+            document.head.appendChild(script);
+            
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FC8R6QFRC3', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+            
+            // Store gtag function globally
+            window.gtag = gtag;
+          } else {
+            console.log('Google Analytics disabled due to Do Not Track setting');
+          }
+        })();
+      </script>
+    
+  
+
+  
+  
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "h46z900dov");
+    </script>
+  
+
+  
+  
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1745337330229450');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1745337330229450&ev=PageView&noscript=1"
+    /></noscript>
+  
+
+  
+  
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/algoliasearch@4.20.0/dist/algoliasearch-lite.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.60.0/dist/instantsearch.production.min.js"></script>
+
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+  
+<div class="sticky top-3 z-30">
+  <header id="site-navbar" class="max-w-[1600px] mx-3 lg:mx-auto h-14 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg">
+  <div class="h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+
+    
+    <div class="flex items-center gap-2 min-w-0">
+      <button id="nav-drawer-toggle"
+              type="button"
+              aria-label="Open menu"
+              aria-controls="nav-drawer"
+              aria-expanded="false"
+              class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+
+      <a href="/en/" class="flex items-center gap-2 min-w-0 group">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain flex-shrink-0">
+        <span class="font-bold text-gray-900 dark:text-white truncate transition-colors group-hover:text-primary-500 group-hover:underline decoration-primary-500 underline-offset-4">
+          Is Ray, Not Array
+        </span>
+      </a>
+    </div>
+
+    
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+      
+        
+        
+        
+        
+        <a href="/en/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Home</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/tags/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Tags</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/categories/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Categories</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/archives/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Archives</span>
+          
+        </a>
+      
+        
+        
+        
+        
+        <a href="/en/links/"
+           class="relative inline-flex items-center px-3 h-14 text-sm font-medium transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500">
+          <span>Links</span>
+          
+        </a>
+      
+    </nav>
+
+    
+    <div class="flex items-center gap-1">
+
+      
+      <button id="navbar-search-trigger"
+              data-search-trigger
+              type="button"
+              aria-label="Open search"
+              title="Open search"
+              class="inline-flex items-center justify-center lg:justify-start gap-2 w-9 lg:w-auto h-9 lg:px-2.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-search text-base"></i>
+        <kbd class="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+          <span class="kbd-modifier">⌘</span>K
+        </kbd>
+      </button>
+
+      
+      <a href="/ai/20260627/1947382651/"
+         title="中文"
+         aria-label="Switch language to 中文"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-globe2 text-base"></i>
+      </a>
+
+      
+      <div class="palette-selector relative hidden lg:block">
+        <button data-palette-select
+                type="button"
+                aria-label="Select color palette"
+                title="Theme palette"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+          <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+          <span class="palette-label sr-only">Theme</span>
+        </button>
+        <div class="palette-dropdown hidden absolute right-0 top-full mt-2 w-44 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+
+      
+      <button id="theme-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+              title="Toggle dark mode"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border-none bg-transparent">
+        <i class="theme-switch-icon bi bi-moon-stars-fill text-base"></i>
+      </button>
+
+      
+      <a href="/en/atom.xml"
+         target="_blank"
+         rel="noopener"
+         title="RSS"
+         aria-label="RSS feed"
+         class="hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+        <i class="bi bi-rss-fill text-base"></i>
+      </a>
+
+    </div>
+  </div>
+  </header>
+</div>
+
+
+<div id="nav-drawer-overlay" class="lg:hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+<aside id="nav-drawer"
+       class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+       aria-hidden="true">
+    <div class="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800">
+      <a href="/en/" class="flex items-center gap-2 min-w-0">
+        <img src="/images/favicon.png" alt="Is Ray, Not Array" class="w-8 h-8 object-contain">
+        <span class="font-bold text-gray-900 dark:text-white truncate">Is Ray, Not Array</span>
+      </a>
+      <button id="nav-drawer-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="px-2 py-3 flex-1 overflow-y-auto" aria-label="Mobile">
+      <ul class="space-y-0.5">
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-house-fill w-5 text-center mr-2 text-xs"></i>
+              Home
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/tags/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-tags-fill w-5 text-center mr-2 text-xs"></i>
+              Tags
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/categories/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-grid-fill w-5 text-center mr-2 text-xs"></i>
+              Categories
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/archives/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-archive-fill w-5 text-center mr-2 text-xs"></i>
+              Archives
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          <li>
+            <a href="/en/links/"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500">
+              <i class="bi bi-link-45deg w-5 text-center mr-2 text-xs"></i>
+              Links
+            </a>
+          </li>
+        
+        <li>
+          <a href="/ai/20260627/1947382651/" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-globe2 w-5 text-center mr-2 text-xs"></i>
+            中文
+          </a>
+        </li>
+        <li>
+          <a href="/en/atom.xml" target="_blank" rel="noopener" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-primary-500 transition-colors">
+            <i class="bi bi-rss-fill w-5 text-center mr-2 text-xs"></i>
+            RSS
+          </a>
+        </li>
+      </ul>
+
+      <div class="palette-selector relative mt-4 px-1">
+        <span class="block text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-1">Palette</span>
+        <button data-palette-select type="button" aria-label="Select color palette" aria-expanded="false" aria-haspopup="listbox" class="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer border-none text-left">
+          <span class="flex items-center gap-2">
+            <span class="palette-swatch w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: rgb(var(--palette-primary-500))"></span>
+            <span class="palette-label text-sm text-gray-700 dark:text-gray-300">Theme</span>
+          </span>
+          <i class="bi bi-chevron-down text-xs text-gray-400"></i>
+        </button>
+        <div class="palette-dropdown hidden absolute left-1 right-1 top-full mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 py-1" role="listbox" aria-label="Color palette options">
+          <button data-palette-value="teal" role="option" aria-selected="true" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #2da39e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Classic Teal</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check"></i>
+          </button>
+          <button data-palette-value="amber" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #d97706"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Amber Orange</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="indigo" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #6366f1"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Indigo Violet</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="rose" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #f43f5e"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Rose Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+          <button data-palette-value="ember" role="option" aria-selected="false" tabindex="-1" class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 focus:bg-gray-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors text-left cursor-pointer border-none bg-transparent">
+            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: #e93118"></span>
+            <span class="palette-option-label text-sm text-gray-700 dark:text-gray-300 flex-1">Ember Red</span>
+            <i class="bi bi-check2 text-sm text-primary-500 palette-check invisible"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+</aside>
+
+<script>
+  {
+    const toggle = document.getElementById('nav-drawer-toggle');
+    const closeBtn = document.getElementById('nav-drawer-close');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-drawer-overlay');
+
+    if (toggle && drawer && overlay) {
+      const open = () => {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      toggle.addEventListener('click', open);
+      overlay.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('-translate-x-full')) {
+          close();
+        }
+      });
+    }
+  }
+  {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+    if (!isMac) {
+      document.querySelectorAll('.kbd-modifier').forEach((el) => {
+        el.textContent = 'Ctrl+';
+      });
+    }
+  }
+</script>
+
+
+  <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+    
+    <aside class="hidden lg:flex lg:flex-col w-full lg:w-1/5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+      <div class="p-6">
+        
+
+
+<div class="flex flex-col items-center lg:items-start space-y-4">
+
+  <div class="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+    <a href="/en/" class="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <img src="/images/octocat.webp" alt="Ray"
+           width="64" height="64" fetchpriority="high" decoding="async"
+           class="w-16 h-16 rounded-full mx-auto border-2 border-primary-100 dark:border-primary-900 object-cover">
+    </a>
+    <a href="/en/" class="block mt-2 text-base font-bold text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      Ray
+    </a>
+    <p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">I&#39;m a Software Engineer, and blogger.</p>
+    <div class="flex items-center justify-center gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px] text-gray-500 dark:text-gray-400">
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-pencil-square text-primary-500"></i>
+        1034 posts
+      </span>
+      <span class="inline-flex items-center gap-1">
+        <i class="bi bi-tags text-primary-500"></i>
+        1067 tags
+      </span>
+    </div>
+    <a href="/en/atom.xml" target="_blank" rel="noopener"
+       class="inline-flex items-center justify-center gap-1.5 w-full mt-3 px-3 py-2 text-xs font-medium rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900">
+      <i class="bi bi-rss-fill"></i>
+      Subscribe
+    </a>
+  </div>
+
+  <div class="w-full rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="w-full bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4559796060"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </aside>
+
+    
+    <main class="w-full lg:w-3/5 px-4 lg:px-8 py-8 min-h-screen">
+      
+
+  <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="4381452921"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+<article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 overflow-hidden">
+  <div class="p-6">
+    
+    <header class="mb-8 text-center">
+      <div class="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
+        <time datetime="2026-06-27" title="Published: 2026-06-27" class="flex items-center">
+          <i class="bi bi-calendar3 w-4 text-center mr-2"></i>
+          2026-06-27
+        </time>
+        
+        
+          <span class="flex items-center">
+            <i class="bi bi-folder w-4 text-center mr-2"></i>
+            
+              <a href="/categories/ai/" class="hover:text-primary-500 transition-colors">AI</a>
+              
+            
+          </span>
+        
+      </div>
+
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+        design.md: If Your AI-Generated UI Keeps Drifting, You're Missing Google's design.md
+      </h1>
+
+      
+      
+        <div class="flex flex-wrap justify-center gap-2">
+          
+            <a href="/tags/Claude-Code/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Claude Code
+            </a>
+          
+            <a href="/tags/AI/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #AI
+            </a>
+          
+            <a href="/tags/Cursor/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Cursor
+            </a>
+          
+            <a href="/tags/design-md/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #design.md
+            </a>
+          
+            <a href="/tags/Google-Stitch/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Google Stitch
+            </a>
+          
+            <a href="/tags/Stitch/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Stitch
+            </a>
+          
+            <a href="/tags/Design-System/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Design System
+            </a>
+          
+            <a href="/tags/Tailwind/" class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-xs rounded-full text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors">
+              #Tailwind
+            </a>
+          
+        </div>
+      
+    </header>
+
+    
+    <div class="prose prose-lg prose-slate dark:prose-invert max-w-none">
+      
+
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-desgin-md/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8825%E6%97%A5%20%E4%B8%8A%E5%8D%8810_42_14.png" data-fancybox="gallery" data-caption="What is design.md? Google Labs&#39; format that makes AI understand your design system"><img fetchpriority="high" class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-desgin-md/ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8825%E6%97%A5%20%E4%B8%8A%E5%8D%8810_42_14.png" alt="What is design.md? Google Labs&#39; format that makes AI understand your design system"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">What is design.md? Google Labs&#39; format that makes AI understand your design system</figcaption></figure>
+<blockquote>
+<p><strong>Note</strong><br>design.md is a format spec released by Google Labs that splits a design system into two layers — “YAML design Tokens” and “Markdown design rationale” — so that AI Coding tools like Claude Code and Cursor see more than just hex codes and font sizes; they actually understand the design intent behind them. The built-in CLI handles lint (including WCAG contrast checks), diff, and export to Tailwind or W3C DTCG. It’s currently in alpha.</p>
+</blockquote>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>Have you ever done some Vibe Coding and noticed the AI’s layout is always a little off, and no matter how many times you say “the spacing is wrong here, the colour is inconsistent there”, it still produces a slightly broken screen? If yes, it’s because you haven’t given the AI the rules of your design system properly.</p>
+<p>To solve exactly this, this post walks through design.md, an AI design system spec released by Google Labs. The goal is to let AI Coding tools like Claude Code, Cursor, and GitHub Copilot actually read your design system and produce consistent UI, so you don’t have to keep repeating “wrong colour, wrong font size” over and over.</p>
+<blockquote>
+<p><strong>Note</strong><br>If you’re not familiar yet with rules files for AI like CLAUDE.md &#x2F; AGENTS.md, take a look at <a href="/en/ai/2026/03/10/claude-md-rules-for-ai-writing-tips/">CLAUDE.md and Rules for AI: Writing Tips That Make AI Understand Your Project</a> and <a href="/en/ai/2026/01/20/agent-skills-vs-mcp-token-efficient/">Agent Skills: More Token-Efficient Than MCP</a> first — it’ll make a lot more sense why design.md exists.</p>
+</blockquote>
+<h2 id="Where-design-md-came-from-incubated-from-Stitch"><a href="#Where-design-md-came-from-incubated-from-Stitch" class="headerlink" title="Where design.md came from: incubated from Stitch"></a>Where design.md came from: incubated from Stitch</h2><p>As always, let’s do a quick history detour first.</p>
+<p>design.md actually comes out of Stitch, Google’s AI design tool (first shown at Google I&#x2F;O 2025). Stitch is a UI design tool powered by Google Gemini — you give it a text Prompt or upload a sketch, and it quickly generates a UI screen (frontend code included).</p>
+<p>So when it launched, it was honestly pretty wild.</p>
+<p>Then somewhere around 2026, Google released the design.md format itself under Apache 2.0 on GitHub (<a target="_blank" rel="noopener" href="https://github.com/google-labs-code/design.md">google-labs-code&#x2F;design.md</a>).</p>
+<p>What does that mean? It basically means they’re trying to “standardise” Stitch’s design system rules.</p>
+<p>After all, the most common pain point for Vibe Coding developers is inconsistent UI and inconsistent style. But if you open-source this design spec, the business value gets pretty huge — whether you use Claude Code, Cursor, GitHub Copilot, or any other AI Coding tool, you can use this spec to produce consistent UI.</p>
+<p>Wait, you’re wondering what business value open-sourcing brings?</p>
+<p>A few examples:</p>
+<ul>
+<li><strong>Becoming the industry standard means owning the definition.</strong> Think of it like OpenAPI or Kubernetes back in the day — when they were first open-sourced they looked harmless, but once everyone started using them, Google’s voice became the loudest about where the spec should go, what fields to add, what Token types to support. Because they’re the one in charge.</li>
+<li><strong>Other AI tools voluntarily become allies.</strong> Once Claude Code, Cursor, and Copilot start marketing “we support design.md” as a selling point, those competitor tools are basically promoting Google’s format for free. Google doesn’t even need to spend marketing budget — super cheap.</li>
+<li><strong>The training data flywheel.</strong> Once it’s open-sourced, people will put their own project’s design.md in public GitHub repos. Google can then use those files to train “AI that generates UI” — structured design Tokens plus human-written design rationale is honestly the perfect combo for AI training data. Future Gemini gets to use this public data to become stronger <del>and get a better excuse to charge more per Token</del>.</li>
+<li><strong>Stitch’s free marketing funnel.</strong> Once developers get used to design.md, when they need a “design tool that speaks design.md”, the first thing they think of is Stitch — because Stitch is the source.</li>
+</ul>
+<p>So when big companies open-source things and it looks like they’re losing money, they’re often trading time for ecosystem. Chromium, Kubernetes, TensorFlow all played this game — on the surface it’s a community contribution, but in reality it’s using “free” to lock in the standard early.</p>
+<h2 id="What-problem-is-design-md-actually-solving"><a href="#What-problem-is-design-md-actually-solving" class="headerlink" title="What problem is design.md actually solving?"></a>What problem is design.md actually solving?</h2><p>So… what problem does design.md actually solve? Basically just this:</p>
+<blockquote>
+<p><strong>Making sure the UI that AI generates uses the same colours, font sizes, and corner radii every time.</strong></p>
+</blockquote>
+<p>This is really, really important. I’m sure everyone Vibe Coding has run into this — you ask the AI to make a Button, and then…</p>
+<ul>
+<li>The first time it gives you <code>#3B82F6</code></li>
+<li>The second time <code>#2563EB</code></li>
+<li>The third time straight up <code>bg-blue-500</code></li>
+</ul>
+<p>The screen looks fine, all blue. But they’re not actually the same blue, so your project ends up with a whole watercolour palette of “blues”. Font sizes have the same issue — sometimes <code>1.25rem</code>, sometimes <code>20px</code>, sometimes <code>text-xl</code>.</p>
+<p>This kind of inconsistency makes the UI feel disjointed, which makes the user experience inconsistent, which hurts the brand.</p>
+<p>So why does this happen? The main reason is you haven’t given the AI a “design system rules” document.</p>
+<p>Someone might say: “Can’t I just put it in CLAUDE.md?”</p>
+<p>You can. But you have to know that CLAUDE.md (and AGENTS.md) are “natural-language rules” for the AI — there’s no structured colour palette or Token system. After reading, the AI still has to guess “which hex is Primary” or “which corner radius should this button use”, and it ends up guessing in the end anyway.</p>
+<p>So design.md is basically turning that “design system rules” document into a file that <strong>machines can parse precisely + humans can understand the reasoning behind</strong>.</p>
+<h2 id="So-what-does-design-md-actually-look-like"><a href="#So-what-does-design-md-actually-look-like" class="headerlink" title="So what does design.md actually look like?"></a>So what does design.md actually look like?</h2><p>We’ve kept saying “machines can parse precisely + humans can understand the reasoning behind”, so what does this file actually look like? Pretty simple — design.md is just a Markdown file.</p>
+<p>The structure splits into two parts:</p>
+<ul>
+<li><strong>YAML Front Matter</strong>: the precise design Tokens (colours, typography, spacing, corner radius, components).</li>
+<li><strong>Markdown body</strong>: the design rationale — why this colour, when to use it, when not to use it.</li>
+</ul>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-desgin-md/20260625102119.png" data-fancybox="gallery" data-caption="YAML Front Matter (top)"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-desgin-md/20260625102119.png" alt="YAML Front Matter (top)"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">YAML Front Matter (top)</figcaption></figure>
+<figure class="my-4"><a target="_blank" rel="noopener" href="https://images.israynotarray.com/blog/ai/ai-desgin-md/20260625102151.png" data-fancybox="gallery" data-caption="+ Markdown body (bottom) structure"><img class="cursor-zoom-in !mb-0" src="https://images.israynotarray.com/blog/ai/ai-desgin-md/20260625102151.png" alt="+ Markdown body (bottom) structure"></a><figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">+ Markdown body (bottom) structure</figcaption></figure>
+<p>By splitting the file this way, the AI doesn’t just know “Primary is <code>#1A1C1E</code>“ — it also knows “Primary is the deep ink used for headlines and core text”. So when it produces UI, it’s a lot less likely to use the wrong colour for a button or the wrong size for a piece of text.</p>
+<h3 id="YAML-Token-block"><a href="#YAML-Token-block" class="headerlink" title="YAML Token block"></a>YAML Token block</h3><p>The YAML block looks roughly like this:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-attr">name:</span> <span class="hljs-string">Heritage</span><br><span class="hljs-attr">colors:</span><br>  <span class="hljs-attr">primary:</span> <span class="hljs-string">&quot;#1A1C1E&quot;</span><br>  <span class="hljs-attr">secondary:</span> <span class="hljs-string">&quot;#6C7278&quot;</span><br>  <span class="hljs-attr">tertiary:</span> <span class="hljs-string">&quot;#B8422E&quot;</span><br>  <span class="hljs-attr">neutral:</span> <span class="hljs-string">&quot;#F7F5F2&quot;</span><br><span class="hljs-attr">typography:</span><br>  <span class="hljs-attr">h1:</span><br>    <span class="hljs-attr">fontFamily:</span> <span class="hljs-string">Public</span> <span class="hljs-string">Sans</span><br>    <span class="hljs-attr">fontSize:</span> <span class="hljs-string">3rem</span><br>  <span class="hljs-attr">body-md:</span><br>    <span class="hljs-attr">fontFamily:</span> <span class="hljs-string">Public</span> <span class="hljs-string">Sans</span><br>    <span class="hljs-attr">fontSize:</span> <span class="hljs-string">1rem</span><br><span class="hljs-attr">rounded:</span><br>  <span class="hljs-attr">sm:</span> <span class="hljs-string">4px</span><br>  <span class="hljs-attr">md:</span> <span class="hljs-string">8px</span><br><span class="hljs-attr">spacing:</span><br>  <span class="hljs-attr">sm:</span> <span class="hljs-string">8px</span><br>  <span class="hljs-attr">md:</span> <span class="hljs-string">16px</span><br><span class="hljs-attr">components:</span><br>  <span class="hljs-attr">button-primary:</span><br>    <span class="hljs-attr">backgroundColor:</span> <span class="hljs-string">&quot;&#123;colors.tertiary&#125;&quot;</span><br>    <span class="hljs-attr">textColor:</span> <span class="hljs-string">&quot;&#123;colors.on-tertiary&#125;&quot;</span><br>    <span class="hljs-attr">rounded:</span> <span class="hljs-string">&quot;&#123;rounded.sm&#125;&quot;</span><br><span class="hljs-meta">---</span><br></code></pre></td></tr></table></figure>
+
+<p>A few key points:</p>
+<ul>
+<li><code>colors</code>, <code>typography</code>, <code>rounded</code>, <code>spacing</code>, <code>components</code> are the five main Token categories.</li>
+<li>Tokens can reference each other — for example, <code>button-primary</code>‘s <code>backgroundColor</code> is written as <code>&quot;{colors.tertiary}&quot;</code>, so when you change the <code>tertiary</code> colour later, everything using it updates automatically.</li>
+<li>Colours support any valid CSS colour string: hex, rgb, hsl, oklch — all good.</li>
+</ul>
+<p>If you’ve used Tailwind’s <code>tailwind.config.js</code> or the W3C Design Tokens Format Module (DTCG), this’ll feel really familiar.</p>
+<h3 id="Markdown-body-block"><a href="#Markdown-body-block" class="headerlink" title="Markdown body block"></a>Markdown body block</h3><p>After the closing <code>---</code> of the YAML, you get the design reasoning written for humans (and AI) to read.</p>
+<p>Here’s the officially recommended section order:</p>
+<ul>
+<li>Overview</li>
+<li>Colors</li>
+<li>Typography</li>
+<li>Layout</li>
+<li>Elevation &amp; Depth</li>
+<li>Shapes</li>
+<li>Components</li>
+<li>Do’s and Don’ts</li>
+</ul>
+<p>Only <code>Colors</code> (and the primary colour inside it) is <strong>required</strong>. The other sections are optional — write them only if your design system has that piece.</p>
+<p>A concrete example — the Colors block might look like this:</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-section">## Colors</span><br><br>Primary (#1A1C1E): Deep ink for headlines and core text.<br>Use on light surfaces to maximize legibility.<br><br>Tertiary (#B8422E): Warm rust accent reserved for primary actions<br>and brand moments. Avoid using as body text colour due to contrast.<br></code></pre></td></tr></table></figure>
+
+<p>This is basically telling the AI “this colour is called Tertiary, use it for primary action buttons, don’t use it for body text”.</p>
+<h2 id="Wait-—-there’s-a-CLI"><a href="#Wait-—-there’s-a-CLI" class="headerlink" title="Wait — there’s a CLI!?"></a>Wait — there’s a CLI!?</h2><p>Yep, design.md also ships with some really handy tools. Mostly they do four things:</p>
+<ul>
+<li><code>lint</code></li>
+<li><code>diff</code></li>
+<li><code>export</code></li>
+<li><code>spec</code></li>
+</ul>
+<p>Installation and usage is super simple:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @google/design.md<br>npx @google/design.md lint DESIGN.md<br></code></pre></td></tr></table></figure>
+
+<p>ps. If you’re on Windows, the <code>.md</code> extension might get eaten by file association, so you’ll need the <code>designmd</code> alias:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npx -p @google/design.md designmd lint DESIGN.md<br></code></pre></td></tr></table></figure>
+
+<p>So let’s go through what each tool does.</p>
+<h3 id="lint-validate-the-DESIGN-md-structure"><a href="#lint-validate-the-DESIGN-md-structure" class="headerlink" title="lint: validate the DESIGN.md structure"></a>lint: validate the DESIGN.md structure</h3><p>I’m pretty sure <code>lint</code> will feel familiar to any developer — it’s the same concept as ESLint, Stylelint, Prettier.</p>
+<p>In short, <code>lint</code> checks the following:</p>
+<ul>
+<li>Whether the YAML schema is correct</li>
+<li>Whether Token references are broken (e.g. you wrote <code>{colors.tertiery}</code>, missing an a?!)</li>
+<li>Whether there’s a primary colour</li>
+<li>Whether WCAG AA contrast passes (I think this one’s the killer feature)</li>
+<li>Whether there are orphan Tokens that are defined but never used</li>
+<li>Whether the section order matches the recommendation</li>
+</ul>
+<p>For the WCAG AA rule, it’ll straight up tell you “<code>on-secondary</code> against <code>secondary</code> only hits X.X:1 contrast, doesn’t pass AA”. So accessibility checks are baked right into the design system file.</p>
+<h3 id="diff-compare-two-versions"><a href="#diff-compare-two-versions" class="headerlink" title="diff: compare two versions"></a>diff: compare two versions</h3><p>This one is honestly pretty fun — just like <code>git diff</code>, you can compare two versions of DESIGN.md. Usage is simple:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npx @google/design.md diff old/DESIGN.md new/DESIGN.md<br></code></pre></td></tr></table></figure>
+
+<p>It’ll tell you which Tokens changed, which were deleted, which were added.</p>
+<p>The main use case: when you’re doing a version bump on your design system, swapping <code>primary</code> from <code>#1A1C1E</code> to <code>#0A0A0A</code>, and you want to know “how many components in the project are going to change colour because of this” — diff lists every affected Token so you can quickly see what needs updating.</p>
+<h3 id="export-convert-to-other-formats"><a href="#export-convert-to-other-formats" class="headerlink" title="export: convert to other formats"></a>export: convert to other formats</h3><p>The <code>export</code> tool is genuinely impressive in my opinion, especially if you want to treat design.md as the “upstream” source and convert it into Tailwind &#x2F; CSS &#x2F; DTCG formats that the frontend actually uses.</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>json-tailwind</code></td>
+<td>Converts to a Tailwind v3 config object</td>
+</tr>
+<tr>
+<td><code>css-tailwind</code></td>
+<td>Converts to a Tailwind v4 <code>@theme</code> CSS block</td>
+</tr>
+<tr>
+<td><code>dtcg</code></td>
+<td>Converts to the W3C Design Tokens Format Module</td>
+</tr>
+</tbody></table></div>
+<p>Usage:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">npx @google/design.md <span class="hljs-built_in">export</span> DESIGN.md --format json-tailwind &gt; tailwind.config.js<br>npx @google/design.md <span class="hljs-built_in">export</span> DESIGN.md --format css-tailwind &gt; tailwind.css<br>npx @google/design.md <span class="hljs-built_in">export</span> DESIGN.md --format dtcg &gt; design-tokens.json<br></code></pre></td></tr></table></figure>
+
+<p>The upside here is you only have to focus on design.md, then export to Tailwind &#x2F; CSS &#x2F; DTCG. Frontend, designers, and AI Coding tools all use the same source of truth.</p>
+<p>(This one’s seriously powerful.)</p>
+<h3 id="spec-hand-the-spec-to-the-AI"><a href="#spec-hand-the-spec-to-the-AI" class="headerlink" title="spec: hand the spec to the AI"></a>spec: hand the spec to the AI</h3><p>Last one is <code>spec</code>, also dead simple to use:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npx @google/design.md spec<br></code></pre></td></tr></table></figure>
+
+<p>This command outputs design.md’s own format spec.</p>
+<p>After that, you can hand the spec to your AI Coding tool of choice (Claude Code, Cursor, Copilot) and tell it “please follow this spec when reading my DESIGN.md”. The AI then knows how to parse the YAML schema, that Token references use <code>{path.to.token}</code> syntax, what’s required, what’s optional.</p>
+<p>Add <code>--rules</code> and it’ll output the linting rules as well.</p>
+<h2 id="So-how-do-you-get-a-DESIGN-md-in-the-first-place"><a href="#So-how-do-you-get-a-DESIGN-md-in-the-first-place" class="headerlink" title="So how do you get a DESIGN.md in the first place?"></a>So how do you get a DESIGN.md in the first place?</h2><p>In case you’re wondering where DESIGN.md actually comes from, there are basically two ways:</p>
+<ol>
+<li>Write one by hand, following the YAML + Markdown structure above.</li>
+<li>Pick a style you like from <a target="_blank" rel="noopener" href="https://github.com/VoltAgent/awesome-design-md">VoltAgent&#x2F;awesome-design-md</a>, drop its <code>DESIGN.md</code> straight into your project root, then tell the AI:</li>
+</ol>
+<blockquote>
+<p><code>Please generate UI following the spec in DESIGN.md</code></p>
+</blockquote>
+<p>That’s it. Pretty simple, right?</p>
+<h2 id="How-do-you-use-it-with-AI-Coding-tools"><a href="#How-do-you-use-it-with-AI-Coding-tools" class="headerlink" title="How do you use it with AI Coding tools?"></a>How do you use it with AI Coding tools?</h2><p>Now that we’ve covered design.md’s structure and CLI tools, let’s talk about how to use it with AI Coding tools.</p>
+<p>Since design.md’s whole design goal is “turn the UI design system into something that can be continuously understood by AI”, the usage is pretty simple:</p>
+<ol>
+<li>Put <code>DESIGN.md</code> in your project root.</li>
+<li>In <code>CLAUDE.md</code> &#x2F; <code>AGENTS.md</code> &#x2F; <code>.cursor/rules/*.mdc</code>, add a line: “For UI-related tasks, please read <code>DESIGN.md</code> first and strictly follow the Tokens and design rationale inside.”</li>
+</ol>
+<p>Yep, that’s it. Super easy.</p>
+<p>One small reminder at the end, though, and it’s kind of an old chestnut at this point:</p>
+<blockquote>
+<p><strong>Don’t stuff design.md with irrelevant junk.</strong></p>
+</blockquote>
+<p>The whole design philosophy is to give the AI a “distilled” version of your design knowledge — same direction as <a href="/en/ai/2026/01/20/agent-skills-vs-mcp-token-efficient/">Agent Skills</a> that I shared before. Give the AI the key points, not everything.</p>
+<blockquote>
+<p><strong>Note</strong><br>Right now, design.md doesn’t ship with official integration examples for Claude Code &#x2F; Cursor &#x2F; Copilot — only the CLI and TypeScript API. So you need to guide the AI to read design.md via your CLAUDE.md &#x2F; AGENTS.md &#x2F; rules file.</p>
+</blockquote>
+<h2 id="Wrap-up"><a href="#Wrap-up" class="headerlink" title="Wrap-up"></a>Wrap-up</h2><p>Let me wrap this up.</p>
+<p>So what exactly is design.md?</p>
+<ul>
+<li>A design system document for AI Coding tools, in a “YAML Token + Markdown design rationale” format.</li>
+<li>The pain point it solves is AI-generated UI having inconsistent colours, font sizes, and spacing.</li>
+<li>The built-in CLI can lint (with WCAG contrast checks), diff, export to Tailwind &#x2F; DTCG, and output a spec for the AI.</li>
+</ul>
+<p>Hope this post helps you fix the “AI generates UI with inconsistent colours, font sizes, and spacing” pain so your AI Coding workflow goes a lot more smoothly.</p>
+
+    </div>
+
+    
+    
+  <div class="space-y-8 mt-12">
+
+    
+    
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+      <i class="bi bi-heart-fill w-5 text-center text-red-500"></i>
+      Your support fuels more tech notes
+    </div>
+    <div class="border-2 border-dashed border-primary-300 dark:border-primary-800 rounded-xl p-6 bg-primary-50/50 dark:bg-primary-900/10">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        If my notes saved you from a pitfall or cut your debug time,<br />maybe you can buy me a coffee — and keep this not-an-Array Ray going ☕
+      </p>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        
+        
+        
+          
+          
+            <a href="https://www.buymeacoffee.com/israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="buymeacoffee" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://store.line.me/search/zh-Hant?q=israynotarray" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/line-images.png" alt="line" class="no-fancybox h-[50px] w-auto object-contain">
+            </a>
+            
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+            
+          
+        
+          
+          
+            <a href="https://portaly.cc/israynotarray/support" target="_blank" class="hover:opacity-90 transition-opacity">
+              <img src="/images/logo.b91a6dbf.webp" alt="portaly" class="no-fancybox h-[50px] w-auto object-contain bg-white rounded p-2">
+            </a>
+            
+          
+        
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white mb-4" role="heading" aria-level="4">
+          <i class="bi bi-terminal-fill w-5 text-center text-gray-700 dark:text-gray-300"></i>
+          Terminal
+        </div>
+        
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+
+        <div id="terminal-container" class="w-full max-w-3xl mx-auto bg-[#1a1b26] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden text-left border border-gray-800/50 font-['VT323',monospace] text-xl md:text-2xl tracking-wide hidden">
+  
+  <div class="bg-[#1a1b26] px-4 py-3 flex items-center gap-2 border-b border-[#1f2335]">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56] hover:bg-[#ff5f56]/80 transition-colors shadow-sm border border-[#e0443e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e] hover:bg-[#ffbd2e]/80 transition-colors shadow-sm border border-[#dea123]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f] hover:bg-[#27c93f]/80 transition-colors shadow-sm border border-[#1aab29]"></div>
+    </div>
+    <div class="flex-1 text-center text-gray-400 text-xs font-medium font-sans select-none">ray — -zsh — 80x24</div>
+  </div>
+  
+  
+  <div class="p-6 text-[#a9b1d6] space-y-2 leading-relaxed min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-hide" id="terminal-output">
+    
+    
+      
+        <div class="text-[#c0caf5]">Welcome to Ray Terminal v1.0.0</div>
+      
+        <div class="text-[#c0caf5]">Type &#34;help&#34; to see available commands.</div>
+      
+        <div class="text-[#c0caf5]">------------------------------------</div>
+      
+    
+    
+    
+    <div class="flex flex-wrap gap-2 items-center mt-4">
+      <span class="text-[#7aa2f7]">➜</span>
+      <span class="text-[#7dcfff]">~</span>
+      <input type="text" 
+             id="terminal-input" 
+             class="bg-transparent border-none outline-none text-[#c0caf5] flex-1 caret-[#7aa2f7] p-0 font-inherit focus:ring-0" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="Type &#39;help&#39; for available commands..."
+             style="min-width: 200px;">
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pass configuration to the Terminal class
+  window.terminalConfig = {
+    quotes: ["Ray 不是 Array，但我常被 push 到極限。","今天的我，不是 new Ray()，是 new Content().","Debug 是我的 cardio。","我不是 Array，但人生一直在 map、filter、reduce。","Bug 不是問題，找到 Bug 才是問題。","我寫程式不是因為喜歡，是因為它比我還固執。","人生如果能 npm update，我早就 v99.0.0 了。","前端 build 的速度比我思考還快。","async/await 是人生寫照：一直在等，結果還是報錯。","不是我吹，Ray 的人生最近有點 undefined。","CSS 不聽話？正常，它從來沒想聽。","Figma 說「微調一下」= 工程師損失三天壽命。","部落格文章不是寫出來的，是 debug 出來的。","commit message 越亂，代表人生越真實。","我的 KPI 跟 Lighthouse 分數一樣：能看但不想看。","今天的腦容量已滿，請明天再 throw error。","前端工程師最可怕的敵人：設計師的 iPhone 型號。","我不是 Array，但我也很常 out of index。","生活沒有 default value，所以每天都在 try/catch。","無法重現的 bug，永遠是最想殺死你的 bug。","UI 說「更圓一點」時，我的心也跟著更累一點。","Ray 不是 Array，但我常被 join 到各種需求裡。","如果工程師有天使，那祂一定是自動儲存。","我不是寫 code，是被 code 寫。","鍵盤敲太多，講話會變成 async function。","人生也是 SPA：路由亂跳、狀態難控、cache 會壞。","Margin 只是調一點，結果整個版面爆炸。","你看起來需要的是咖啡，不是 console.log。","我不是 Array，但我也很想被 deep clone 到馬爾地夫。","Debug 不存在時間限制，它只存在精神限制。"],
+    commands: {"about":["Ray (是 Ray 不是 Array)","Frontend Developer | Tech Blogger","Loves: TypeScript, Vue, React, and Coffee ☕"],"contact":["GitHub: https://github.com/hsiangfeng","Facebook：https://www.facebook.com/israynotarray","Instagram：https://www.instagram.com/isray_notarray/","Threads：https://www.threads.com/@isray_notarray","Email: israynotarray@gmail.com"]}
+  };
+</script>
+
+      </div>
+    
+
+  </div>
+
+
+
+    
+    
+    <nav class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 border-t border-primary-100 dark:border-primary-900/30">
+      
+        <a href="/en/ai/2026/06/29/claude-code-disable-mouse-clicks-env-var/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i> Previous post
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            New Claude Code Hijacks Mouse Clicks in Your Terminal? Kill It with CLAUDE_CODE_DISABLE_MOUSE_CLICKS
+          </span>
+        </a>
+      
+
+      
+        <a href="/en/misc/2026/06/23/mac-stats-menu-bar-system-monitor/" class="group flex flex-col p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 text-right">
+          <span class="text-xs text-gray-400 mb-1 group-hover:text-primary-500 transition-colors">
+            Next post <i class="bi bi-arrow-right ml-1"></i>
+          </span>
+          <span class="text-gray-700 dark:text-gray-300 font-medium line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            Stats — The Free Open-Source macOS Menu Bar System Monitor I Use Every Day (CPU, GPU, Temperature, Network)
+          </span>
+        </a>
+      
+    </nav>
+  </div>
+
+</article>
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" style="height: 280px; max-height: 280px;">
+    <div class="w-full h-[280px] bg-gray-50 dark:bg-gray-900 p-4 text-center overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[260px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:280px;max-height:280px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="5156296783"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  
+  
+  
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <i class="bi bi-journals text-primary-500"></i>
+        Related posts
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+          <a href="/en/ai/2026/04/10/coding-agent-vs-ai-agent-differences/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                AI Agent Isn't One Thing Anymore — Understanding Coding Agents and Other AI Agent Types
+              </h4>
+              <time datetime="2026-04-10" title="Published: 2026-04-10" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-04-10
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/03/26/2026-ai-coding-tools-comparison/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                Which AI Coding Tool Should You Pick in 2026? Copilot vs Cursor vs Claude Code vs Kiro vs Antigravity
+              </h4>
+              <time datetime="2026-03-26" title="Published: 2026-03-26" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-03-26
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/29/claude-code-disable-mouse-clicks-env-var/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                New Claude Code Hijacks Mouse Clicks in Your Terminal? Kill It with CLAUDE_CODE_DISABLE_MOUSE_CLICKS
+              </h4>
+              <time datetime="2026-06-30" title="Published: 2026-06-30" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-30
+              </time>
+            </div>
+          </a>
+        
+          <a href="/en/ai/2026/06/09/how-much-ai-search-grabs-claude-websearch-webfetch/" class="related-post-card group">
+            <div class="h-full bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 transition-all hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-md">
+              <h4 class="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-primary-500 transition-colors">
+                How Much of Your Post Does AI Search Actually Grab? Breaking Down Claude's WebSearch and WebFetch
+              </h4>
+              <time datetime="2026-06-09" title="Published: 2026-06-09" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <i class="bi bi-calendar3"></i>
+                2026-06-09
+              </time>
+            </div>
+          </a>
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <i class="bi bi-share-fill text-primary-500"></i>
+      Share this post
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      
+      
+      
+        <button data-share="twitter" data-url="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/" data-title="design.md: If Your AI-Generated UI Keeps Drifting, You&#39;re Missing Google&#39;s design.md" data-hashtags="Claude Code,AI,Cursor,design.md,Google Stitch,Stitch,Design System,Tailwind" class="share-btn share-twitter">
+          <i class="bi bi-twitter"></i>
+          <span>Twitter</span>
+        </button>
+      
+      
+        <button data-share="facebook" data-url="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/" class="share-btn share-facebook">
+          <i class="bi bi-facebook"></i>
+          <span>Facebook</span>
+        </button>
+      
+      
+        <button data-share="linkedin" data-url="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/" class="share-btn share-linkedin">
+          <i class="bi bi-linkedin"></i>
+          <span>LinkedIn</span>
+        </button>
+      
+      
+        <button data-share="copy" data-url="https://israynotarray.com/en/ai/2026/06/27/design-md-google-design-system-for-ai-coding/" class="share-btn share-copy">
+          <i class="bi bi-link-45deg"></i>
+          <span>Copy link</span>
+        </button>
+      
+    </div>
+  </div>
+
+
+
+
+<div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-primary-100 dark:border-primary-900/30 p-6">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Comments</h3>
+  <div id="comments" class="min-h-[300px]">
+    
+    
+      <script src="https://utteranc.es/client.js"
+        repo="hsiangfeng/hsiangfeng.github.io"
+        issue-term="pathname"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <script>
+        // 移除預留高度，避免 iframe 載入後留白過多
+        (function() {
+          var c = document.getElementById('comments');
+          if (!c) return;
+          var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              if (c.querySelector('iframe')) {
+                c.classList.remove('min-h-[300px]');
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(c, { childList: true, subtree: true });
+        })();
+      </script>
+    
+  </div>
+</div>
+
+      <div class="mt-16">
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
+  
+  
+  
+  <p>&copy; 2026 Ray. All rights reserved.</p>
+  
+  
+  
+  <p class="mt-2">
+    Powered by 
+    
+    
+    
+      
+      <a href="https://israynotarray.com/" target="_blank" rel="noopener" class="hover:text-primary-500">Ray Theme</a>
+      
+    
+  </p>
+  
+</footer>
+
+      </div>
+    </main>
+
+    
+    <aside class="w-full lg:w-1/5 p-5 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 hidden lg:flex flex-col overflow-y-auto border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+      <div class="space-y-6">
+
+  
+  
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-primary-100 dark:border-primary-900/30">
+      <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center text-base">
+        <i class="bi bi-list-ul w-5 text-center mr-2 text-primary-500"></i> Table of contents
+      </h3>
+      <div class="toc-content text-sm text-gray-600 dark:text-gray-400 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Intro"><span class="toc-text">Intro</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Where-design-md-came-from-incubated-from-Stitch"><span class="toc-text">Where design.md came from: incubated from Stitch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-problem-is-design-md-actually-solving"><span class="toc-text">What problem is design.md actually solving?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#So-what-does-design-md-actually-look-like"><span class="toc-text">So what does design.md actually look like?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#YAML-Token-block"><span class="toc-text">YAML Token block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Markdown-body-block"><span class="toc-text">Markdown body block</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wait-%E2%80%94-there%E2%80%99s-a-CLI"><span class="toc-text">Wait — there’s a CLI!?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lint-validate-the-DESIGN-md-structure"><span class="toc-text">lint: validate the DESIGN.md structure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#diff-compare-two-versions"><span class="toc-text">diff: compare two versions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#export-convert-to-other-formats"><span class="toc-text">export: convert to other formats</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spec-hand-the-spec-to-the-AI"><span class="toc-text">spec: hand the spec to the AI</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#So-how-do-you-get-a-DESIGN-md-in-the-first-place"><span class="toc-text">So how do you get a DESIGN.md in the first place?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-do-you-use-it-with-AI-Coding-tools"><span class="toc-text">How do you use it with AI Coding tools?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wrap-up"><span class="toc-text">Wrap-up</span></a></li></ol>
+      </div>
+    </div>
+  
+
+  
+  
+    
+    <div class="rounded-xl border border-gray-100 dark:border-gray-700" style="height: 600px; max-height: 600px; overflow: hidden;">
+    <div class="bg-white dark:bg-gray-800 p-4 shadow-sm h-[600px] overflow-hidden relative" style="contain: layout style paint;">
+      
+      <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          Putting these tech notes together takes real time. If you'd <strong>disable AdBlock</strong> to support me, I'll turn that gratitude into more "stepping-on-landmines turned avoiding-them" content for you! ヽ(・∀・)ﾉ
+        </p>
+      </div>
+      
+      <div class="relative z-10 w-full h-[580px]">
+        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-2">Advertisement</span>
+        
+        <ins class="adsbygoogle"
+             style="display:block;min-width:300px;width:100%;min-height:600px;max-height:600px;"
+             data-ad-client="ca-pub-4319471747130190"
+             data-ad-slot="9970366113"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  <div class="text-center mt-8 pb-4">
+    <a href="#" id="fake-login-trigger" class="text-[10px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors font-mono tracking-widest hover:opacity-100">
+      ADMIN_ACCESS
+    </a>
+  </div>
+
+</div>
+
+    </aside>
+
+  </div>
+
+
+
+  
+  <div id="search-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div id="search-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none"></div>
+
+    
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20">
+        <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl transition-all border border-gray-100 dark:border-gray-800">
+          
+          
+          <div class="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-search text-primary-500"></i>
+                Search articles
+              </h3>
+              <button id="close-search" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span class="sr-only">Close</span>
+                <i class="bi bi-x-lg text-lg"></i>
+              </button>
+            </div>
+            <div id="search-box" class="w-full"></div>
+          </div>
+
+          
+          <div class="px-6 py-4 min-h-[300px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
+            <div id="hits" class="space-y-4"></div>
+            <div id="pagination" class="mt-8 flex justify-center pb-4"></div>
+          </div>
+          
+          
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-800">
+            <div id="stats" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Esc</span> to close
+                <span class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">Cmd K</span> to open
+              </div>
+              <div class="flex items-center gap-1 text-xs text-gray-400">
+                <span>Powered by</span>
+                <i class="bi bi-algolia text-blue-500"></i>
+                <span>Algolia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    
+    window.algoliaConfig = {
+      appId: '9V77W8W4CP',
+      apiKey: 'b76f913b7dec4859aba810200c677a01',
+      indexName: 'blog'
+    };
+    
+    
+    window.themeConfig = {
+      reading_progress: {
+        enable: true,
+        position: 'top',
+        color: '#37c6c0',
+        height: '3px'
+      },
+      back2top: {
+        enable: true,
+        scrollpercent: true
+      }
+    };
+  </script>
+  
+  <script type="module" src="/js/search-BQabQj0b.js"></script>
+  
+
+
+<script>
+if (navigator.modelContext) {
+  navigator.modelContext.provideContext({
+    tools: [
+      {
+        name: "search-articles",
+        description: "Search technical articles on isRayNotArray blog. Topics include JavaScript, TypeScript, Vue.js, React, Node.js, CSS, Git, Docker, and more.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for finding articles"
+            }
+          },
+          required: ["query"]
+        },
+        execute: async ({ query }) => {
+          window.location.href = `/?s=${encodeURIComponent(query)}`;
+          return { status: "redirecting", query };
+        }
+      },
+      {
+        name: "get-site-info",
+        description: "Get information about the isRayNotArray blog, including the author, topics covered, and site structure.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        },
+        execute: async () => {
+          return {
+            name: "isRayNotArray",
+            author: "Ray",
+            description: "A Traditional Chinese technical blog covering frontend development, JavaScript, TypeScript, Vue.js, React, and more.",
+            url: "https://israynotarray.com",
+            feed: "https://israynotarray.com/atom.xml",
+            sitemap: "https://israynotarray.com/sitemap.xml"
+          };
+        }
+      }
+    ]
+  });
+}
+</script>
+
+</body>
+</html>
