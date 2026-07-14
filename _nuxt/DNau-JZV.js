@@ -1,0 +1,1 @@
+import{d as t,m as s,n as a,o as c,j as p,p as _}from"./DN4S0S39.js";const i=t({__name:"404-page",setup(m){const n=s().site;return a({title:`404 - 找不到頁面 | ${n.name}`,meta:[{name:"robots",content:"noindex"}]}),(r,f)=>{const o=_;return c(),p(o)}}}),e={};typeof e=="function"&&e(i);export{i as default};
