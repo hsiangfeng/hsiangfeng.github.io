@@ -1,1 +1,0 @@
-import{_ as s}from"./BcuCe28T.js";import{k as c,v as r,f as n}from"./D4s3uoA7.js";import"./Dx-gr_IY.js";const o={},e={},l={class:"prose-blockquote min-w-0 max-w-full"};function a(t,f){return c(),r("blockquote",l,[n(t.$slots,"default")])}typeof o=="function"&&o(e);const u=Object.assign(s(e,[["render",a]]),{__name:"ProseBlockquote"});export{u as default};
