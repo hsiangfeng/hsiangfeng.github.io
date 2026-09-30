@@ -5,12 +5,111 @@
   <subtitle>Software Engineer</subtitle>
   <link href="https://israynotarray.com/atom.xml" rel="self"/>
   <link href="https://israynotarray.com/"/>
-  <updated>2026-09-30T01:00:00.000Z</updated>
+  <updated>2026-10-01T01:00:00.000Z</updated>
   <id>https://israynotarray.com/</id>
   <author>
     <name>Ray</name>
   </author>
   <generator uri="https://nuxt.com/">Nuxt 4</generator>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 18：第一個 Skill，從 SKILL.md 從零開始</title>
+    <link href="https://israynotarray.com/ai/20261001/write-your-first-claude-code-skill/"/>
+    <id>https://israynotarray.com/ai/20261001/write-your-first-claude-code-skill/</id>
+    <published>2026-10-01T01:00:00.000Z</published>
+    <updated>2026-10-01T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 18：第一個 Skill——SKILL.md 從零開始" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-18-cover.png"></p><h2 id="前言">前言</h2><p>前面章節我們一直都是使用別人所做好的東西（官方），實際上有可能官方的東西可以滿足我們的需求嗎？其實很難。</p><p>這一篇我們將會來試著建立屬於自己的 Skill，依照個人需求去建立一個專屬的 Skill，讓我們的工作流程更順暢。</p><h2 id="回憶一下-skill-結構">回憶一下 SKILL 結構</h2><p>那麼前面我們有快速介紹過 SKILL，以及認識它的結構：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code=".claude/
+└── skills/
+    └── commit-message/   ← 這個資料夾的名字就是 SKILL 的名字
+        └── SKILL.md
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>.claude/
+</span></span><span class="line" line="2"><span>└── skills/
+</span></span><span class="line" line="3"><span>    └── commit-message/   ← 這個資料夾的名字就是 SKILL 的名字
+</span></span><span class="line" line="4"><span>        └── SKILL.md
+</span></span></code></pre><p>所以 SKILL 本質就是一個資料夾 ＋ 一個 Markdown 檔案，資料夾的名稱就是這個 Skill 的名稱，而 Markdown 檔案就是這個 Skill 的內容。</p><p>那這個 SKILL 你可以自己建立，也可以請 AI 幫你建立，但要怎麼建立就又是另一回事了，所以我將會深入解析 SKILL.md 的結構，讓你可以自己建立一個專屬的 Skill。</p><p>需要注意不同 AI 廠商所放置 Skill 的位置可能不同，Claude Code 是放在專案的 <code>.claude/skills/</code>，但 Codex 是放在專案的 <code>.agents/skills/</code>，所以要依照不同的 AI 廠商去放置 Skill 的位置。</p><h2 id="做一個-commit-message-skill">做一個 commit-message SKILL</h2><p>目前我們的 <code>money-note</code> 專案一個 SKILL 都沒有，這邊我們就要來從零建立一個 SKILL。</p><p>那......我們要建立什麼 SKILL 呢？其實我們可以來建立一個「自動觸發」撰寫 Commit 訊息的 SKILL。</p><p>那我們該怎麼寫呢？基本上一個 SKILL 的呼叫方式會有兩種，分別是：</p><ul><li>一種是自動觸發。</li><li>一種是手動觸發。</li></ul><p>那這邊我們先不講手動觸發的部分，先講自動觸發的原因，基本上自動觸發依賴於 SKILL.md 的 <code>frontmatter</code> 裡的 <code>description</code>，所以這個 <code>description</code> 的寫法就非常重要。</p><p><code>frontmatter</code> 指的就是 SKILL 最上方用兩個 <code>---</code> 包起來的區塊，你可以想像成履歷最上面的個人資料，那部分專門放「關於這份檔案的資訊」，其中部落格文章常拿它放標題、作者、日期（包含我撰寫 這篇文章的 metadata 也是放在 frontmatter 裡）。</p><p>那 <code>description</code> 到底要怎麼寫呢？基本上我認為，<code>description</code> 的寫法要包含三個重點：</p><ul><li><strong>觸發時機：</strong> 什麼時候要觸發這個 SKILL。</li><li><strong>它會做什麼：</strong> 這個 SKILL 會做什麼事情。</li><li><strong>重要邊界：</strong> 這個 SKILL 的重要限制。</li></ul><p>有點難懂吧？所以這邊我們就來實際建立一個 commit-message SKILL，並且拆解它的內容吧！</p><p>首先請你在你的專案根目錄，以我們的 <code>money-note</code> 專案為例，建立一個 <code>.claude/skills/commit-message/</code> 資料夾，然後在裡面建立一個 <code>SKILL.md</code>，並且把下面這份第一版貼進去：</p><pre className="language-markdown shiki shiki-themes github-light github-light github-dark-high-contrast" code="---
+name: commit-message
+description: 當使用者要求 commit、提交或存檔變更時使用。先檢查變更範圍，依本專案格式提出繁體中文 commit 訊息，取得使用者確認後才提交。
+---
+
+# commit 訊息規範
+
+格式：`&lt;型別&gt;: &lt;一句話描述做了什麼&gt;`
+
+## 型別
+
+- feat：新功能
+- fix：修 bug
+- style：視覺調整（不動邏輯）
+- docs：文件（SPEC、DESIGN、CLAUDE.md 等）
+- refactor：重構（行為不變）
+- test：測試
+- chore：雜務（設定、套件等）
+
+## 規則
+
+- 先讀 git status 與 diff，列出預計提交的檔案；不要自動把所有未追蹤檔加入
+- 看到 `.env`、金鑰、憑證或無法判斷的檔案就停下來提醒
+- 先提出 commit 訊息與範圍，取得使用者確認後才執行 git add 與 git commit
+- 描述用繁體中文，講「做了什麼」，不是「改了哪個檔案」
+- fix 的描述要帶出原因，方便日後翻歷史
+- 一次 commit 對應一件事，混了就先拆
+
+## 範例
+
+- feat: 新增支出統計頁與圓餅圖
+- fix: 刪除改用 id 避免排序後 index 錯位
+" language="markdown" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>---
+</span></span><span class="line" line="2"><span>name: commit-message
+</span></span><span class="line" line="3"><span>description: 當使用者要求 commit、提交或存檔變更時使用。先檢查變更範圍，依本專案格式提出繁體中文 commit 訊息，取得使用者確認後才提交。
+</span></span><span class="line" line="4"><span>---
+</span></span><span class="line" line="5"><span emptyLinePlaceholder>
+</span></span><span class="line" line="6"><span># commit 訊息規範
+</span></span><span class="line" line="7"><span emptyLinePlaceholder>
+</span></span><span class="line" line="8"><span>格式：`&lt;型別&gt;: &lt;一句話描述做了什麼&gt;`
+</span></span><span class="line" line="9"><span emptyLinePlaceholder>
+</span></span><span class="line" line="10"><span>## 型別
+</span></span><span class="line" line="11"><span emptyLinePlaceholder>
+</span></span><span class="line" line="12"><span>- feat：新功能
+</span></span><span class="line" line="13"><span>- fix：修 bug
+</span></span><span class="line" line="14"><span>- style：視覺調整（不動邏輯）
+</span></span><span class="line" line="15"><span>- docs：文件（SPEC、DESIGN、CLAUDE.md 等）
+</span></span><span class="line" line="16"><span>- refactor：重構（行為不變）
+</span></span><span class="line" line="17"><span>- test：測試
+</span></span><span class="line" line="18"><span>- chore：雜務（設定、套件等）
+</span></span><span class="line" line="19"><span emptyLinePlaceholder>
+</span></span><span class="line" line="20"><span>## 規則
+</span></span><span class="line" line="21"><span emptyLinePlaceholder>
+</span></span><span class="line" line="22"><span>- 先讀 git status 與 diff，列出預計提交的檔案；不要自動把所有未追蹤檔加入
+</span></span><span class="line" line="23"><span>- 看到 `.env`、金鑰、憑證或無法判斷的檔案就停下來提醒
+</span></span><span class="line" line="24"><span>- 先提出 commit 訊息與範圍，取得使用者確認後才執行 git add 與 git commit
+</span></span><span class="line" line="25"><span>- 描述用繁體中文，講「做了什麼」，不是「改了哪個檔案」
+</span></span><span class="line" line="26"><span>- fix 的描述要帶出原因，方便日後翻歷史
+</span></span><span class="line" line="27"><span>- 一次 commit 對應一件事，混了就先拆
+</span></span><span class="line" line="28"><span emptyLinePlaceholder>
+</span></span><span class="line" line="29"><span>## 範例
+</span></span><span class="line" line="30"><span emptyLinePlaceholder>
+</span></span><span class="line" line="31"><span>- feat: 新增支出統計頁與圓餅圖
+</span></span><span class="line" line="32"><span>- fix: 刪除改用 id 避免排序後 index 錯位
+</span></span></code></pre><p>那目前來講，你的專案結構應該會長的像這樣：</p><p><img alt="專案結構圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260829223037.png"></p><p>當然，你也可以直接把上面這些丟給 AI 讓 它幫你建立，這樣就不用自己手動建立了。</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請在專案根目錄建立 `.claude/skills/commit-message/SKILL.md`，內容如下：
+---
+name: commit-message
+description: 當使用者要求 commit、提交或存檔變更時使用。
+
+......略過
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請在專案根目錄建立 `.claude/skills/commit-message/SKILL.md`，內容如下：
+</span></span><span class="line" line="2"><span>---
+</span></span><span class="line" line="3"><span>name: commit-message
+</span></span><span class="line" line="4"><span>description: 當使用者要求 commit、提交或存檔變更時使用。
+</span></span><span class="line" line="5"><span emptyLinePlaceholder>
+</span></span><span class="line" line="6"><span>......略過
+</span></span></code></pre><p>那這邊我所提供的範例 SKILL 就是一個最基本的 commit-message SKILL，只要當使用者要求 commit、提交或存檔變更時，AI 就會呼叫這個 SKILL，然後會依照 SKILL 的規則，先檢查變更範圍，依本專案格式提出繁體中文 commit 訊息，取得使用者確認後才提交。</p><p>因此 <code>description</code> 類似於 Google 搜尋的關鍵字，Claude 會依照使用者的需求去比對 <code>description</code>，如果符合就會自動觸發這個 SKILL，而這邊解釋的就是「自動觸發」。</p><p>那「手動觸發」呢？其實手動觸發很簡單，手動觸發會基於你的資料夾名稱而來，舉例來講我們資料夾就叫做 <code>commit-message</code>，所以手動觸發的指令就是 <code>/commit-message</code>，這樣就可以直接叫用這個 SKILL。</p><p>那為什麼不一開始就直接把整份 SKILL 掛進來呢？反而是透過 <code>description</code> 去比對使用者的需求呢？有些人可能會有這樣的疑問，其實原因很簡單</p><blockquote><p>因為這樣可以避免 context 被灌爆</p></blockquote><p>因此 AI 平常不會把每個 skill 全文攤在桌上（那太佔 context），它只看得到名稱跟描述，靠這段資訊判斷「現在的任務用不用得上」，對上了才展開全部內容。</p><p>而 SKILL 的撰寫方式也有一定推薦的格式，也就是：</p><ol><li><strong>格式：</strong> 一眼看懂的骨架，讓人知道這個 SKILL 的結構。</li><li><strong>規則：</strong> 判斷的依據，讓人知道這個 SKILL 的規則。</li><li><strong>範例：</strong> 模仿的樣板，讓人知道這個 SKILL 的範例。</li></ol><p>有發現嗎？我把 AI 當作人來教，這個三段結構跟我們前面講的「教人 SOP」的方式是一模一樣的，因為對 AI 來講，範例特別有效，它照著樣板寫比照著規則推理穩得多，所以寫 skill 的時候範例永遠不要省。</p><p><img alt="SKILL.md 的三段結構" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8829%E6%97%A5%20%E4%B8%8A%E5%8D%8809_35_46.png"></p><p>但我自己來講，我的實際應用 SKILL 還會有底下資訊：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="metadata:
+  author: Ray
+  version: &quot;2026/09/01&quot;
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>metadata:
+</span></span><span class="line" line="2"><span>  author: Ray
+</span></span><span class="line" line="3"><span>  version: &quot;2026/09/01&quot;
+</span></span></code></pre><p>這個 <code>metadata</code> 並非是 SKILL 硬性規定，SKILL 只有硬性要求要有 <code>name</code> 與 <code>description</code>，而 <code>metadata</code> 是官方提供的欄位，並不是我亂掰的，但 AI 並不會拿它做任何事，所以我就拿來放作者跟版本啦～</p><p>那什麼時候可以封裝成 SKILL 呢？基本上我認為同一件事講三遍以上，就可以寫成 SKILL，這樣就不用每次都要重複講了。</p><p>當然 SKILL 裡面還有很多其他的設定可以調整，像是限制這個 SKILL 只能用哪些工具的 <code>allowed-tools</code>、不讓 AI 自動觸發、只准你手動呼叫的 <code>disable-model-invocation</code>，甚至可以讓 SKILL 像斜線指令一樣接收參數。這些今天先不展開，等你的 SKILL 越寫越多自然會遇到，需要的時候翻<a href="https://code.claude.com/docs/en/skills" rel="nofollow">官方文件</a>就有。</p><h2 id="結語">結語</h2><p>那麼這一篇也差不多到這邊結束了，一樣來收尾一下吧～</p><ul><li>SKILL 可以基於專案或個人偏好去建立，專案使用放 <code>.claude/skills/</code>，個人使用放 <code>~/.claude/skills/</code></li><li><code>description</code> 是自動觸發的核心，撰寫方式很簡單，越像是「當使用者要求某某時使用」就越容易被自動觸發</li><li>SKILL 核心內容為三段：
+<ol><li>格式。</li><li>規則。</li><li>範例，尤其是範例千萬不要省。</li></ol></li><li>什麼時候要封裝成 SKILL？同一件事講三遍以上就可以</li></ul><p>那我們明天見啦～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
+  </entry>
   <entry>
     <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 17：畫面好看（下）之用設計文件鎖住風格</title>
     <link href="https://israynotarray.com/ai/20260930/lock-ui-style-with-design-md/"/>
@@ -1224,19 +1323,5 @@ done | sort
 </span></span><span class="line" line="2"><span class="sWTrB">  &quot;model&quot;</span><span class="s8XSl">: </span><span class="sWayO">&quot;claude-opus-4-8&quot;
 </span></span><span class="line" line="3"><span class="s8XSl">}
 </span></span></code></pre><p>需要注意 settings.json 的權重，系統設定 &gt; 使用者設定。</p><p>那麼以上就是幫你固定的一個小技巧哩～</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .sWTrB, html code.shiki .sWTrB{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#72F088}]]></content>
-  </entry>
-  <entry>
-    <title>AI 明明在雲端，為什麼開越多 Agent 電腦越 Lag？</title>
-    <link href="https://israynotarray.com/ai/20260714/5005075303/"/>
-    <id>https://israynotarray.com/ai/20260714/5005075303/</id>
-    <published>2026-07-14T14:29:13.000Z</published>
-    <updated>2026-07-14T23:19:40.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="AI 模型在遠端，但 Coding Agent 的工具可能在本機執行" src="https://images.israynotarray.com/blog/ai/where-ai-runs/cover-1200.webp"></p><h2 id="前言">前言</h2><p>今天公司在進行內訓時，同事問了幾個讓我印象很深刻的問題：</p><blockquote><p>Claude 是不是跑在我的電腦裡？不然它為什麼可以找到我的專案、修改檔案，甚至自己執行指令？</p></blockquote><p>我覺得這個問題其實滿合理的，畢竟我們看著 Claude Code、Codex CLI、Gemini CLI 這類 AI Agent 工具可以自己讀取檔案、寫/改程式、跑測試時，這眼裡看來真的很像有一個 AI 住在電腦裡。</p><p>但其實這個真正的答案本質要拆分成兩個部分，你看到的事情只是其中一部分在本機跑，另一部分則是在遠端伺服器上運算（如：Claude 公司的模型通常在遠端資料中心）。</p><p>那這一篇就是要解決你這個疑慮，然後定位會是以小白也能懂的範疇，所以並不會從複雜的 API 或 JSON 開始講。</p><p>只要區分清楚「模型」和「Coding Agent」，那這個問題就很好理解啦～</p><h2 id="模型是大腦coding-agent-是雙手">模型是大腦，Coding Agent 是雙手</h2><p>首先使用 Claude Code 的時候，你可以區分三件事：</p><ol><li><strong>Claude 的模型在遠端資料中心：</strong> 模型主要負責理解需求、閱讀收到的內容，以及決定下一步該做麼。</li><li><strong>Claude Code 是安裝在你電腦上的應用程式：</strong> 負責跟遠端模型溝通、管理權限與執行工具的應用程式</li><li><strong>讀檔、改檔、跑測試等動作，是真的會在你的電腦執行：</strong> 實際動手的是安裝在你電腦上的 Claude Code，不是遠端模型</li></ol><p>如果上面不好理解的話...你可以把它想成底下個比喻：</p><ul><li>遠端模型是大腦，本機 Coding Agent 是雙手。</li><li>大腦負責想下一步，雙手才真的去碰檔案和執行指令。</li></ul><p><img alt="Claude 模型與本機 Coding Agent 的分工" src="https://images.israynotarray.com/blog/ai/where-ai-runs/how-agent-works.png"></p><p>所以我們安裝 Claude Code 時，並不是下載一個完整的 Claude 模型到電腦裡，而是一個可以跟模型溝通並使用本機工具的應用程式。</p><p>Codex CLI、Gemini CLI 等 Coding Agent 也有類似的核心概念，不過不同的產品能使用哪些工具、在哪裡執行工具，以及什麼時候需要你的允許，還是有所不同。</p><h2 id="那當你說幫我修好這個-bug中間發生了什麼">那當你說「幫我修好這個 Bug」，中間發生了什麼？</h2><p>這邊我們假設一下情境，也就是你在 Claude Code 對話視窗輸入以下：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我修好 XXX.js 的 Bug，然後跑測試。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我修好 XXX.js 的 Bug，然後跑測試。
-</span></span></code></pre><p>其實背後大概是這樣的流程：</p><ol><li>本機 Claude Code 收到你的需求（文字，或稱為 <strong>Prompt</strong>）</li><li>Claude Code 把需求與目前需要的資訊送給遠端（也就是 Claude 公司的模型）</li><li>遠端接收到資訊後，判定認為要先讀取 <code>XXX.js</code></li><li>模型回傳一個「請讀取 XXX.js」的工具呼叫</li><li>本機 Claude Code 檢查權限後，真的去讀取這個檔案（如果沒有權限也會跳出詢問是否要授權）</li><li>Claude Code 把讀到的內容交給遠端模型</li><li>模型看完內容後，再決定如何修改，以及要執行哪個測試</li></ol><p>這個過程不會只跑一次。</p><p>因為模型會先讀檔、再搜尋其他程式、接著修改內容、執行測試；如果測試失敗，它又會根據錯誤訊息決定下一步。</p><p>而這個「模型決定下一步 → 工具執行 → 結果交回模型 → 模型再決定下一步」的循環，就叫做 <strong>Agentic Loop（代理迴圈）</strong>。</p><p><img alt="Claude Code 修復 Bug 時，本機工具與遠端模型持續往返的 Agentic Loop" src="https://images.israynotarray.com/blog/ai/where-ai-runs/agentic-loop-bug-fix.png"></p><h2 id="什麼是工具呼叫tools-call">什麼是工具呼叫（Tools Call）？</h2><p>工具呼叫呢...稍微有點難懂，簡單來講，你安裝 Claude Code 的時候，裡面會有一隻程式，這些程式有很多，像是有...</p><ul><li>讀檔工具（File Reader）</li><li>改檔工具（File Writer）</li><li>刪除工具（File Deleter）</li></ul><p>諸如此類，因此遠端模型並不會直接伸手進入你的電腦，它只會告訴 Claude Code：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="我下一步想使用「讀檔工具」，目標是 XXX.js。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>我下一步想使用「讀檔工具」，目標是 XXX.js。
-</span></span></code></pre><p>Claude Code 收到要求後，才會根據目前的權限設定決定：</p><ul><li>這個工具能不能使用？</li><li>它可以讀取哪個資料夾？</li><li>這次操作需不需要先詢問使用者？</li><li>執行成功後，要把什麼結果交回模型？</li></ul><p>所以「模型想要使用工具」和「工具真的執行成功」是兩件不同的事。</p><blockquote><p>模型負責提出下一步，真正執行是外部程式或執行環境的事</p></blockquote><p>除此之外，工具也不一定都在你的電腦執行，有些工具會在服務商的伺服器或雲端沙盒裡執行，例如 Codex cloud task、Code Interpreter、Web Search 等功能。</p><h2 id="但遠端模型為什麼看得到我的程式碼">但...遠端模型為什麼看得到我的程式碼？</h2><p>這很有趣，其實這個牽扯到前面的問題，也就是「讀取檔案」的部分。</p><p>遠端模型並不會直接看見你的整顆硬碟，也不會自己在你的資料夾裡亂逛。</p><p>它能看見 <code>XXX.js</code>，通常是因為本機 Coding Agent 使用讀檔工具取得內容，再把完成任務所需的內容交給模型。</p><p>除了檔案內容，模型每次處理任務時還可能取得：</p><ul><li>你目前提出的需求</li><li>先前的對話內容</li><li>專案規則與操作限制</li><li>模型可以使用哪些工具</li><li>指令輸出、錯誤訊息與測試結果</li></ul><p>這些東西合起來我們稱為 <strong>上下文（Context）</strong>。</p><p>模型必須看足夠的上下文，才有辦法知道自己前面做過什麼，以及接下來應該要做什麼跟該怎麼處理。</p><p>當對話太長時，Coding Agent 可能只保留相關內容，或把較舊的內容摘要、壓縮。</p><p>你可以把它想成：桌面放不下所有資料時，就把不重要的文件收起來，只留下目前工作需要的部分，所以他的專業術語就是「Auto Compact（自動壓縮）」。</p><p>指令雖然在本機執行，但這並不代表資料都不會離開電腦。
-Coding Agent 為了讓遠端模型理解專案，是會傳送檔案內容、錯誤訊息與工具結果。
-所以實際會傳送哪些資料，仍然要看產品設計、設定與服務條款。</p><h2 id="為什麼-agent-開越多電腦越容易-lag">為什麼 Agent 開越多，電腦越容易 Lag？</h2><p>講了那麼多，終於可以聊聊文章標題了，畢竟要聊這個就需要先解釋一下前面的運作流程。</p><p>當 Coding Agent 等待遠端模型回覆時，你的電腦就只是單純等待跟維持應用程式、畫面與網路連線而已，這過程並不會造成什麼負擔、負荷。</p><p>而真正容易讓電腦變慢的，是多個 Agent 同時在本機執行工作，例如...</p><ul><li>同時搜尋或讀取大量專案檔案</li><li>同時執行測試、Lint、型別檢查或完整建置</li><li>啟動多個開發伺服器與瀏覽器</li><li>安裝套件、解壓縮檔案或建立快取</li><li>同時讀寫大量檔案或操作不同的 Git worktree</li></ul><p><img alt="多個 Agent 同時執行本機工作，造成 CPU、RAM 與磁碟負擔疊加" src="https://images.israynotarray.com/blog/ai/where-ai-runs/why-agents-lag.png"></p><p>假設你同時讓三個 Agent 各跑一次完整測試，本質上就和你自己開三個終端機同時跑測試差不多。</p><p>這些工作會一起使用本機的 <strong>CPU、RAM 與磁碟</strong>，那你電腦當然可能變慢啦～</p><p>所以這個更正確來講的話：</p><blockquote><p>Agent 開越多，就有可能同時執行很多本機工作，而讓電腦變 Lag 的主要原因是工作量疊加，不是遠端模型隔空吃掉你的本機 GPU。</p></blockquote><p>當然，開三個 Agent 不代表電腦一定會變成三倍慢（如果會這樣，那這件事情多可怕，電腦效能要多好）。</p><p>當三個 Agent 都在等待遠端回覆，和三個 Agent 同時建置大型專案，對電腦造成的負擔完全是不同的事情。</p><h2 id="那為什麼大家都說-ai-很吃-gpu-跟記憶體">那為什麼大家都說 AI 很吃 GPU 跟記憶體？</h2><p>這個答案本質是 <strong>模型本身</strong>，畢竟模型很需要大量運算與記憶體，當你只是單純的使用雲端模型時，主要消耗的是遠端資料中心的硬體，不是你的筆電、桌機或伺服器。</p><p>這邊我也換個方式比喻：</p><ul><li><strong>模型權重就像一整套超大型參考書：</strong> 模型要使用學到的能力，就必須讓這些資料可以被系統存取。</li><li><strong>記憶體像工作桌：</strong> 桌面越大，可以同時攤開的模型資料、對話內容與暫存結果就越多。</li><li><strong>GPU 像一大群可以同時計算的工作人員：</strong> 模型需要進行大量運算，GPU 就很適合一起處理這些重複而龐大的計算。</li></ul><p><img alt="模型權重像參考書、記憶體像工作桌、GPU 像同時進行計算的大量工作人員" src="https://images.israynotarray.com/blog/ai/where-ai-runs/weights-memory-gpu-analogy.webp"></p><p>所以當模型執行時，記憶體主要會放：</p><ul><li>模型本身的權重</li><li>目前對話與輸入需要的 KV Cache</li><li>推論過程中的中間結果與執行框架</li></ul><p>通常我們講記憶體，是泛指 CPU 記憶體（RAM）與 GPU 記憶體（VRAM），而不是指 HDD 或 SSD 的儲存空間。</p><p>舉例來說，使用 7B 的模型時，光是模型權重粗略估算就約需要 14 GB，實際執行還要再加上 KV Cache 與其他開銷，雖然量化可以把模型壓小，但也可能帶來品質、速度或相容性的取捨。</p><p>大型雲端模型還可能把權重分散在多張 GPU 或多台機器上，所以你不能把它想成「整個模型一定塞在同一張顯示卡裡」。</p><h2 id="簡單一張表看懂模型">簡單一張表看懂模型</h2><p>接下來，我準備了一張表格讓你看懂「模型在哪裡運算」和「工具在哪裡執行」的差別：</p><table><thead><tr><th>使用情況</th><th>模型在哪裡運算</th><th>工具在哪裡執行</th><th>你的電腦主要負責什麼</th></tr></thead><tbody><tr><td>一般雲端聊天，沒有使用工具</td><td>遠端資料中心</td><td>沒有額外工具</td><td>顯示畫面、傳送需求與接收回覆</td></tr><tr><td>Claude Code、Codex CLI 等本機 Coding Agent</td><td>模型通常在遠端</td><td>讀檔、改檔、終端機等工具常在本機</td><td>執行 Agent 與工具，使用 CPU、RAM、磁碟</td></tr><tr><td>Codex cloud task 等雲端 Agent</td><td>遠端資料中心</td><td>雲端容器或沙盒</td><td>送出任務、查看結果與套用變更</td></tr><tr><td>Ollama、LM Studio 等本地模型</td><td>你的電腦</td><td>通常也在你的電腦</td><td>連模型推論都自己負責，可能大量使用 GPU／統一記憶體</td></tr></tbody></table><p>而這張表最重要的地方是：<strong>模型在哪裡運算，和工具在哪裡執行，是兩個不同的問題。</strong></p><p>同一個 AI 產品也可能同時提供本機工具與遠端工具。例如資料分析、Code Interpreter、Web Search 或伺服器端 Code Execution。</p><p>所以看到「AI 幫我執行程式」時，並不能直接判斷程式一定跑在自己的電腦。</p><p>最終還是回歸到你是使用哪個功能，以及那個工具的執行環境。</p><h2 id="本機工具真的會動你的電腦權限真的很重要">本機工具真的會動你的電腦，權限真的很重要</h2><p>模型雖然通常在遠端，在傳送資料過去時，模型商也會做基本敏感資訊過濾，但本機 Coding Agent 執行的動作就可能對你電腦造成影響。</p><p>畢竟它真的會...</p><ul><li>修改或建立檔案</li><li>刪除內容</li><li>安裝套件</li><li>執行測試或啟動伺服器</li><li>在權限允許時連線到外部系統</li></ul><p>Claude Code、Codex 等 Coding Agent 會透過權限、核准規則或沙盒限制能夠操作的範圍，但你必須清楚知道並不是每一個動作都一定會先詢問你，而是完全取決於你選擇的模式（Auto Mode）、工作區邊界與操作類型。</p><p>如果你是第一次使用 Coding Agent 的話，我會強烈建議你先使用較保守的權限，Code Agent 跳出詢問權限畫面時，也要確認它準備讀寫刪哪裡、是否需要連網，以及動作有沒有破壞性等行為。</p><p>如果你無腦按下 Yes，那估計你的隱私、電腦都有可能受到外流或破壞。</p><h2 id="結論">結論</h2><p>最後來總結一下重點：</p><ol><li>Claude、GPT 等雲端模型通常在遠端資料中心做演算、推論</li><li>Claude Code、Codex CLI 是在本機執行的 Coding Agent 應用程式</li><li>模型只負責提出內容與下一步，真正動手的是本機、雲端或第三方的工具</li><li>多開 Agent 會不會 Lag，要看它們同時在本機執行多少工作。</li><li>只有使用本地模型時，模型推論才會直接大量使用你自己的 GPU／統一記憶體，但本機工具也可能因工作內容而使用 GPU。</li></ol><p>所以回到最開始的問題：「Claude 是不是跑在我的電腦裡？」</p><p>關於這問題我相信你已經有一個明確答案了，畢竟你只要把「模型在哪裡算」和「工具在哪裡跑」分開看，就不會再把 AI 需要大量 GPU，和 Coding Agent 讓本機變慢，誤認為是同一件事了。</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
   </entry>
 </feed>
