@@ -5,12 +5,113 @@
   <subtitle>Software Engineer</subtitle>
   <link href="https://israynotarray.com/atom.xml" rel="self"/>
   <link href="https://israynotarray.com/"/>
-  <updated>2026-10-01T01:00:00.000Z</updated>
+  <updated>2026-10-02T01:00:00.000Z</updated>
   <id>https://israynotarray.com/</id>
   <author>
     <name>Ray</name>
   </author>
   <generator uri="https://nuxt.com/">Nuxt 4</generator>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 19：Subagents 之來請一個 Code Review 副手</title>
+    <link href="https://israynotarray.com/ai/20261002/claude-code-subagents-code-review/"/>
+    <id>https://israynotarray.com/ai/20261002/claude-code-subagents-code-review/</id>
+    <published>2026-10-02T01:00:00.000Z</published>
+    <updated>2026-10-02T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 19：Subagents——請一個 Code Review 副手" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-19-cover.png"></p><h2 id="前言">前言</h2><p>前面我們學了不少東西，尤其是 SKILL 的部分，但......你有沒有想過一個問題呢？</p><p>「當所有東西都往當前 AI 塞，難道 Context 會是足夠的嗎？」</p><p>畢竟實務開發上內容是非常龐大的，那這樣不是就很容易 Context 爆掉嗎？</p><p>所以今天要介紹的 Subagent，也就是請「另一個人」的機制，讓你可以把一些工作外包給另一個獨立的 AI 分身，這樣就不會把你的主對話塞爆了。</p><h2 id="為什麼需要-subagent">為什麼需要 Subagent？</h2><p>在這邊我們要先理解一個概念，也就是「主要 Agent」與「子 Agent」的差別。</p><p>首先，這邊我們所講的「主要 Agent」就是你平常在對話的 AI 對話視窗，而「子 Agent」就是你另外請的一名 AI 分身，但它不會跟你在同一個對話視窗裡，它有自己的獨立 context、獨立的世界，它只會把做完的事帶回來（結論）。</p><p>所以這邊有一個問題可以讓你思考一下：</p><blockquote><p>主對話的 AI 明明可以自己讀取程式碼，那為什麼 Code Review（程式碼檢查/審查）還要特地外包給另一個人？</p></blockquote><p>其實原因很簡單，跟 Context 有非常大的關聯。</p><p>什麼意思呢？</p><p>Context 在前面的章節中，我們知道如果塞到超出一定程度，甚至一旦觸發 Auto Compact（Day 6 講的自動壓縮）的話，它就會喪失核心關鍵的重點，所以 Context 的多寡管控非常重要，但實際開發上我們常常會跨非常多檔案，甚至是跨專案，這時候 Context 就會變得非常大，甚至可能超過 AI 的記憶上限，自然而然就會變得很臃腫進而影響判斷力，這就是所謂的「上下文混淆（Context Confusion）」，裡面塞了太多無意義的資訊，反而會讓 AI 做出錯誤的判斷。</p><p>「上下文混淆（Context Confusion）」更白話一點解釋就是上傳了 N 份檔案給它參考，但裡面真正需要的只有 1 份，其他的都是干擾資訊，這樣就會讓 AI 做出錯誤的判斷。</p><p>所以 Subagent 的設計就是為了解決這個問題，它的出現就會有以下優勢：</p><ul><li><strong>乾淨的主 Agent</strong>：主對話的 AI 不會被先前的對話或是其他檔案的資訊干擾，讓它可以專注在當前的任務上，而子 Agent 只會專注於你給它的任務去做，做完後只回傳結論給主對話的 AI。</li><li><strong>省下當前 Context 的使用量</strong>：因為子 Agent 有自己的獨立 context，所以主對話的 AI 不需要再去讀取所有的檔案，這樣就可以省下很多 Context 的使用量，讓主對話的 AI 可以專注在當前的任務上。</li></ul><p>整體運作流程就會像是這樣：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="sequenceDiagram
+    participant U as 你
+    participant M as 主要 Agent（你的對話視窗）
+    participant S as 子 Agent（獨立 context）
+    U-&gt;&gt;M: 幫我 Code Review 整個專案的程式碼
+    M-&gt;&gt;S: 把 Code Review 工作外包給子 Agent
+    Note over S: 在自己的世界裡&lt;br&gt;翻檔案、讀程式碼、慢慢查&lt;br&gt;這些通通不佔主對話的 context
+    S-&gt;&gt;M: 只回傳 Review 結果
+    M-&gt;&gt;U: 把結果整理給你
+" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>sequenceDiagram
+</span></span><span class="line" line="2"><span>    participant U as 你
+</span></span><span class="line" line="3"><span>    participant M as 主要 Agent（你的對話視窗）
+</span></span><span class="line" line="4"><span>    participant S as 子 Agent（獨立 context）
+</span></span><span class="line" line="5"><span>    U-&gt;&gt;M: 幫我 Code Review 整個專案的程式碼
+</span></span><span class="line" line="6"><span>    M-&gt;&gt;S: 把 Code Review 工作外包給子 Agent
+</span></span><span class="line" line="7"><span>    Note over S: 在自己的世界裡&lt;br&gt;翻檔案、讀程式碼、慢慢查&lt;br&gt;這些通通不佔主對話的 context
+</span></span><span class="line" line="8"><span>    S-&gt;&gt;M: 只回傳 Review 結果
+</span></span><span class="line" line="9"><span>    M-&gt;&gt;U: 把結果整理給你
+</span></span></code></pre><p><img alt="Subagent 的運作流程" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8829%E6%97%A5%20%E4%B8%8A%E5%8D%8809_43_43.png"></p><p>那這個跟 SKILL 有什麼關係嗎？當然有，而且關係可大囉～</p><p>但是這邊要先打破一個常見的誤會：</p><blockquote><p>子 Agent 是一個全新的獨立 context，昨天寫好的那些 SKILL 它不一定拿得到，所以如果你以為子 Agent 會自動把 SKILL 撿去用，答案是不一定。</p></blockquote><p>為什麼說「不一定」呢？因為這件事是由你決定的。子 Agent 本身是有能力去叫用你專案裡的 SKILL 沒錯，但等一下我們要建立的這位審查者，會被我們限制成只能讀檔跟搜尋，連叫用 SKILL 的能力都沒給它，所以它真的碰不到昨天那份 SKILL。</p><p>那......如果它用不到 SKILL 的話，那它該怎麼知道「怎麼做事」呢？這個其實完全依賴於它的定義檔，等一下我們也會來體驗它的建立過程，建立過程也非常簡單，就只是單純的一份 markdown 檔案，而那份檔案的內容就是它的工作說明書（SOP），你必須把角色、步驟、回報格式寫清楚，其實就跟 SKILL 一樣。</p><p>依照前面這樣講，是不是就代表 SKILL 跟子 Agent 完全無關呢？也無法使用呢？也不是，其實在 Subagent 的定義上有一個 <code>skills</code> 欄位，可以把現成的 SKILL 預先載入給子 Agent，這樣它就可以使用你之前寫好的 SKILL 去做事了。</p><p>所以你可以這樣想：</p><ul><li><strong>SKILL</strong>：教方法，讓 AI 學會怎麼依照你的規則去做事。</li><li><strong>Subagent</strong>：請專人，讓 AI 幫你做事，並且不佔用主對話的 context。</li><li><strong>Agent</strong>：主對話的 AI，負責指派任務給子 Agent，並且整理回傳的結果給你。</li></ul><p>理解之後，我們也會來實際建立一個 Code Review 的 Subagent 唷。</p><h2 id="做一個-code-reviewer-subagent">做一個 code-reviewer Subagent</h2><p>那 Subagent 要怎麼建立呢？基本上跟昨天的 SKILL 非常像，只是位置換成了 <code>.claude/agents/</code>，而且它更簡單，不需要像 SKILL 一樣，每個技能都用資料夾去區分，因為一個 Subagent 就直接對應一個 markdown 檔案。</p><p>首先請你在專案根目錄，一樣以我們的 <code>money-note</code> 專案為例，建立一個 <code>.claude/agents/</code> 資料夾，然後在裡面建立一份 <code>code-reviewer.md</code>，並且把下面這份第一版貼進去：</p><pre className="language-markdown shiki shiki-themes github-light github-light github-dark-high-contrast" code="---
+name: code-reviewer
+description: 審查程式碼品質。當使用者要求 code review、審查、檢查程式碼時使用。只讀不改。
+tools: Read, Grep, Glob
+---
+
+你是 money-note 專案的資深前端審查者。收到審查任務時：
+
+1. 先讀 SPEC.md、CLAUDE.md、DESIGN.md 了解專案的規則
+2. 審查指定範圍的程式碼，聚焦：
+   - bug 風險：邊界情況、資料驗證漏洞、狀態不同步
+   - 重複邏輯：同樣的事寫了兩遍以上
+   - 違反專案規則：金額沒轉 number、樣式寫死顏色不用變數
+   - 命名與可讀性
+3. 你只能讀，不能改任何檔案
+
+回報格式：每個問題一條，包含
+- 嚴重度：紅（必修）/ 黃（建議）
+- 位置：檔案與行數
+- 問題描述與建議修法（一句話）
+
+沒有問題就明說沒有問題，不要硬湊。
+" language="markdown" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>---
+</span></span><span class="line" line="2"><span>name: code-reviewer
+</span></span><span class="line" line="3"><span>description: 審查程式碼品質。當使用者要求 code review、審查、檢查程式碼時使用。只讀不改。
+</span></span><span class="line" line="4"><span>tools: Read, Grep, Glob
+</span></span><span class="line" line="5"><span>---
+</span></span><span class="line" line="6"><span emptyLinePlaceholder>
+</span></span><span class="line" line="7"><span>你是 money-note 專案的資深前端審查者。收到審查任務時：
+</span></span><span class="line" line="8"><span emptyLinePlaceholder>
+</span></span><span class="line" line="9"><span>1. 先讀 SPEC.md、CLAUDE.md、DESIGN.md 了解專案的規則
+</span></span><span class="line" line="10"><span>2. 審查指定範圍的程式碼，聚焦：
+</span></span><span class="line" line="11"><span>   - bug 風險：邊界情況、資料驗證漏洞、狀態不同步
+</span></span><span class="line" line="12"><span>   - 重複邏輯：同樣的事寫了兩遍以上
+</span></span><span class="line" line="13"><span>   - 違反專案規則：金額沒轉 number、樣式寫死顏色不用變數
+</span></span><span class="line" line="14"><span>   - 命名與可讀性
+</span></span><span class="line" line="15"><span>3. 你只能讀，不能改任何檔案
+</span></span><span class="line" line="16"><span emptyLinePlaceholder>
+</span></span><span class="line" line="17"><span>回報格式：每個問題一條，包含
+</span></span><span class="line" line="18"><span>- 嚴重度：紅（必修）/ 黃（建議）
+</span></span><span class="line" line="19"><span>- 位置：檔案與行數
+</span></span><span class="line" line="20"><span>- 問題描述與建議修法（一句話）
+</span></span><span class="line" line="21"><span emptyLinePlaceholder>
+</span></span><span class="line" line="22"><span>沒有問題就明說沒有問題，不要硬湊。
+</span></span></code></pre><p>是不是看到熟悉的 frontmatter 了呢？但，除了 <code>name</code> 跟 <code>description</code>，這次多了一個 <code>tools</code> 欄位，這個欄位是用來限制這個 Subagent 可以使用哪些工具的。</p><p>而 <code>tools</code> 欄位的值是 <code>Read, Grep, Glob</code>，這代表這個 Subagent 只能做以下事情：</p><ul><li>讀檔</li><li>搜尋檔案</li><li>不能改檔或執行指令</li></ul><p>這是刻意設計的，因為我們希望這個 Subagent 只負責審查程式碼，而不是修改程式碼。</p><p><code>Read</code> 是用來讀取檔案內容
+<code>Grep</code> 是用來搜尋檔案內容
+<code>Glob</code> 是用來搜尋檔案路徑</p><p>而這個內文也是一樣，你要把它的角色、任務步驟、回報格式寫清楚，這樣它才知道自己該怎麼做事。</p><h2 id="讓-subagent-開工">讓 Subagent 開工</h2><p>別忘了，建立好 Subagent 之後要重新啟動一下，這樣它才會被載入，否則主對話的 AI 是找不到它的。這邊補充一下，只有「第一次建立 <code>.claude/agents/</code> 這個資料夾」需要重啟，之後在裡面新增或修改檔案，跟 SKILL 一樣是存檔即生效。</p><p>那這邊我們先小試身手一下，一樣使用 <code>money-note</code> 專案來示範，請你在 Claude Code 的對話視窗輸入以下：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請 Code Review 這幾個檔案：
+
+- src/App.vue
+- src/components/
+- src/assets/main.css
+
+請依照 DESIGN.md 內容去檢查是否遵守、375px 可能的跑版、表單 label、鍵盤 focus、按鈕是否至少 44px 這幾個區塊。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請 Code Review 這幾個檔案：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>- src/App.vue
+</span></span><span class="line" line="4"><span>- src/components/
+</span></span><span class="line" line="5"><span>- src/assets/main.css
+</span></span><span class="line" line="6"><span emptyLinePlaceholder>
+</span></span><span class="line" line="7"><span>請依照 DESIGN.md 內容去檢查是否遵守、375px 可能的跑版、表單 label、鍵盤 focus、按鈕是否至少 44px 這幾個區塊。
+</span></span></code></pre><p><code>src/assets/main.css</code> 這是我刻意打不存在的檔案。</p><p>接著你應該會遇到一個問題，你會看到主 Agent 自己開始做事情了？！</p><p><img alt="主 Agent 自己開始 Code Review" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260830232117.png"></p><p>ㄟ？主 Agent 怎麼自己開始做 Code Review 了？！怎麼不是呼叫子 Agent 來做呢？難道它壞掉了嗎？</p><p>不，不對，其實是主 Agent 自己判斷覺得可以自己處理，所以就乾脆自己處理了，這種狀況下，你 <code>description</code> 寫得再漂亮也沒用，因為它覺得自己可以做（固執）。</p><p>那我們到底該怎麼做呢？其實很簡單，直接把 <code>code-reviewer</code> 這個名字點名進去就好，像這樣：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請使用 code-reviewer 來檢查這幾個檔案：
+
+- src/App.vue
+- src/components/
+- src/assets/main.css
+
+請依照 DESIGN.md 內容去檢查是否遵守、375px 可能的跑版、表單 label、鍵盤 focus、按鈕是否至少 44px 這幾個區塊。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請使用 code-reviewer 來檢查這幾個檔案：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>- src/App.vue
+</span></span><span class="line" line="4"><span>- src/components/
+</span></span><span class="line" line="5"><span>- src/assets/main.css
+</span></span><span class="line" line="6"><span emptyLinePlaceholder>
+</span></span><span class="line" line="7"><span>請依照 DESIGN.md 內容去檢查是否遵守、375px 可能的跑版、表單 label、鍵盤 focus、按鈕是否至少 44px 這幾個區塊。
+</span></span></code></pre><p>接下來，你就會看到對話視窗下面多了一個 <code>code-reviewer</code> 的區塊，這其實就代表主 Agent 已經把這個任務派給子 Agent 了。</p><p><img alt="主 Agent 派工作給子 Agent" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260830232806.png"></p><p>對了，還記得我剛剛刻意打錯的 <code>src/assets/main.css</code> 嗎？你可以看到主 Agent 在派工之前先翻了一下資料夾，發現這個檔案根本不存在，然後自己對照 CLAUDE.md 找出這個專案真正的樣式檔是 <code>src/style.css</code>，直接換成那一份送審，中間完全沒有停下來問我。</p><p>如果你連「主 Agent 會不會自己做掉」都不想賭，還有一招更保險：在輸入框打一個 <code>@</code>，選單就會跳出來，裡面可以選到 <code>code-reviewer (agent)</code>，選下去就是保證派給它。</p><p>過段時間之後，你就可以看到子 Agent 回報的 Review 結果：</p><p><img alt="子 Agent 結果" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260830233611.png"></p><p>那這個「<code>code-reviewer</code>」是來自於檔案名稱（<code>.md</code>）呢？還是 frontmatter 的 <code>name</code> 呢？其實 AI 認的是 frontmatter 的 <code>name</code>，所以你可以把檔案名稱改成 <code>code-reviewer-1.md</code>，但只要 frontmatter 的 <code>name</code> 還是 <code>code-reviewer</code>，它還是會認得唷！</p><p>所以接下來拿到這份 Code Review 報告之後你可以怎麼做呢？大致上做法就跟 Day 12 差不多，你必須要親自去了解這份 Code Review 的報告內容，反正只要有看不懂，搞懂它就對了。</p><h2 id="結語">結語</h2><p>那也差不多到結尾了，這邊也幫你簡單的整理一下今天的重點：</p><ul><li>Subagent = 獨立 context 的分身：
+<ul><li>活在在自己的世界</li><li>只把結論帶回來</li><li>避免 Context 污染</li></ul></li><li>Subagent 定義檔放 <code>.claude/agents/</code>，寫法跟 SKILL 類似，透過 <code>description</code> 撰寫觸發時機，並透過 <code>tools</code> 做權限控制。</li><li>分配工作出去要講清楚，使用 <code>@</code> 選單可以保證分配出去。</li></ul><p>那麼我們下一篇見。</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
+  </entry>
   <entry>
     <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 18：第一個 Skill，從 SKILL.md 從零開始</title>
     <link href="https://israynotarray.com/ai/20261001/write-your-first-claude-code-skill/"/>
@@ -1307,21 +1408,5 @@ done | sort
 " language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">rm</span><span class="stw71"> -f</span><span class="sWayO"> ~/.claude.json.tmp.</span><span class="stw71">*
 </span></span></code></pre><p>這個萬用字元只會吃到 <code>.claude.json.tmp.</code> 開頭的檔案，<code>~/.claude.json</code> 本身跟 <code>~/.claude.json.backup</code> 都不在範圍內。
 不過官方文件也有特別提醒不要刪掉 <code>~/.claude.json</code>，因為你的登入狀態跟偏好設定都在裡面，所以自己手動下指令的時候還是看清楚再按 Enter 比較保險。</p><p>刪完之後 Claude Code 基本上是不會受影響的。</p><h2 id="順便認識旁邊那幾個親戚">順便認識旁邊那幾個親戚</h2><p>Home 目錄跟 <code>~/.claude/</code> 底下還有幾個名字長得很像的檔案，一起講清楚比較不會搞混：</p><table><thead><tr><th>名字</th><th>它在管什麼</th><th>可以刪嗎</th></tr></thead><tbody><tr><td><code>~/.claude.json</code></td><td>全域設定檔本體，登入狀態、偏好、個人 MCP 伺服器都在這</td><td>不要刪</td></tr><tr><td><code>~/.claude.json.tmp.&lt;PID&gt;.&lt;時間戳&gt;</code></td><td>這篇的主角，原子寫入沒收尾留下的殘骸</td><td>可以</td></tr><tr><td><code>~/.claude.json.lock</code></td><td>同一套寫入流程用的鎖檔，避免多個 session 同時寫壞設定</td><td>正常會自己消失，看到殘留的可以刪</td></tr><tr><td><code>~/.claude.json.backup</code></td><td>舊版本留在 Home 目錄根的設定備份</td><td>可以</td></tr><tr><td><code>~/.claude/backups/.claude.json.backup.&lt;時間戳&gt;</code></td><td>現在的備份機制，設定檔遷移前的快照</td><td>可以，官方文件把它歸在刪掉不會損失任何使用者看得到的東西那一類</td></tr></tbody></table><p>希望這一篇有幫助你認識與了解 claude 設定檔的原子寫入流程，知道它為什麼會留下暫存檔殘骸、為什麼自動清理掃不到它們、以及怎麼安全地清理掉～</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .sGBqm, html code.shiki .sGBqm{--shiki-light:#6A737D;--shiki-default:#6A737D;--shiki-dark:#BDC4CC}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sOudu, html code.shiki .sOudu{--shiki-light:#D73A49;--shiki-default:#D73A49;--shiki-dark:#FF9492}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}]]></content>
-  </entry>
-  <entry>
-    <title>Claude Code 中輸入 /model 找不到你要的模型？試試這小技巧吧！</title>
-    <link href="https://israynotarray.com/ai/20260727/3871780834/"/>
-    <id>https://israynotarray.com/ai/20260727/3871780834/</id>
-    <published>2026-07-27T02:18:28.000Z</published>
-    <updated>2026-07-27T02:18:28.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="Claude Code /model 找不到模型？直接輸入完整模型 ID 切換" src="https://images.israynotarray.com/blog/ai/claude-code-toggle-model/claude-code-model-switch-1200.jpg"></p><h2 id="前言">前言</h2><p>出了新模型但你不想要使用？可是 /model 指令找不到你要的模型？所以這邊就來教你一個小技巧，讓你可以在 Claude Code 中使用你想要的模型。</p><h2 id="claude-code-中的-model-指令">Claude Code 中的 /model 指令</h2><p>有在使用 Claude Code 的讀者大概都知道可以使用 <code>/model</code> 指令來切換模型</p><p><img alt="切換模型" src="https://images.israynotarray.com/blog/ai/claude-code-toggle-model/20260727102039.png"></p><p>透過這個列表我們通常會有這些可以選：</p><ol><li>Default（recommended）： Opus5</li><li>Opus（1M context）： Opus5</li><li>Fable</li><li>Sonnet</li><li>Opus 4.8</li></ol><p>基本上大多人都會使用 <code>Default（recommended）： Opus5</code>，但是如果你想要使用其他模型的話就會遇到一個問題，那就是 <code>/model</code> 指令找不到你想要的模型。</p><p><code>/model</code>  指令只會列出官方推薦的模型，其他模型就不會列出來。</p><p>所以為什麼會有這個問題呢？其實很簡單，模型商會希望你直接使用他們推薦的模型，因為這樣可以確保你使用的模型是最穩定、最適合的版本，所以他們就把其他模型隱藏起來了。</p><p>但這也延伸一些問題，最常見的大概是...</p><blockquote><p>新模型沒有想像中好用。</p></blockquote><p>以之前的案例來講，當時的 Opus 4.8，一直被說 Opus 4.8 不如 Opus 4.6～4.7，大家都會只想用 Opus 4.6～4.7。</p><h2 id="小技巧使用-model-指令切換模型">小技巧：使用 /model 指令切換模型</h2><p>沒錯，我們還是要使用 <code>/model</code> 指令來切換模型，這邊就來教你一個小技巧，讓你可以在 Claude Code 中使用你想要的模型。</p><p>假設你還是想要使用 Opus 4.8 的話，你可以先進入 Claude Code 中，然後在對話視窗中輸入...</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="/model claude-opus-4-8
-" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">/model</span><span class="sWayO"> claude-opus-4-8
-</span></span></code></pre><p><img alt="切換模型" src="https://images.israynotarray.com/blog/ai/claude-code-toggle-model/20260727103450.png"></p><p><img alt="切換模型" src="https://images.israynotarray.com/blog/ai/claude-code-toggle-model/20260727103457.png"></p><p>而這些模型名稱你必須正確的去輸入，這些都在官方文件的「<a href="https://platform.claude.com/docs/en/about-claude/model-deprecations#model-status" rel="nofollow">Model Status</a>」中可以找到。</p><p>上面也都有明確寫清楚這些模型什麼時候會停止支援，所以如果你想要使用的模型已經停止支援的話，那就建議找別的使用。</p><p><img alt="Model Status" src="https://images.israynotarray.com/blog/ai/claude-code-toggle-model/20260727103344.png"></p><p>如果你不希望每次 Claude Code 更新就偷偷把你的模型更新的話，你可以在你的 <code>.claude/settings.json</code> 中加入以下設定：</p><pre className="language-json shiki shiki-themes github-light github-light github-dark-high-contrast" code="{
-  &quot;model&quot;: &quot;claude-opus-4-8&quot;
-}
-" language="json" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="s8XSl">{
-</span></span><span class="line" line="2"><span class="sWTrB">  &quot;model&quot;</span><span class="s8XSl">: </span><span class="sWayO">&quot;claude-opus-4-8&quot;
-</span></span><span class="line" line="3"><span class="s8XSl">}
-</span></span></code></pre><p>需要注意 settings.json 的權重，系統設定 &gt; 使用者設定。</p><p>那麼以上就是幫你固定的一個小技巧哩～</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .sWTrB, html code.shiki .sWTrB{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#72F088}]]></content>
   </entry>
 </feed>
