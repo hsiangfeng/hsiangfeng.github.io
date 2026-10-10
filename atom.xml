@@ -5,12 +5,261 @@
   <subtitle>Software Engineer</subtitle>
   <link href="https://israynotarray.com/atom.xml" rel="self"/>
   <link href="https://israynotarray.com/"/>
-  <updated>2026-10-06T01:00:00.000Z</updated>
+  <updated>2026-10-11T01:00:00.000Z</updated>
   <id>https://israynotarray.com/</id>
   <author>
     <name>Ray</name>
   </author>
   <generator uri="https://nuxt.com/">Nuxt 4</generator>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 28：Week 4 收尾之 Token 怎麼省</title>
+    <link href="https://israynotarray.com/ai/20261011/claude-code-save-token-cost/"/>
+    <id>https://israynotarray.com/ai/20261011/claude-code-save-token-cost/</id>
+    <published>2026-10-11T01:00:00.000Z</published>
+    <updated>2026-10-11T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 28：Week 4 收尾之 Token 怎麼省" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-28-cover.png"></p><h2 id="前言">前言</h2><p>嗯...我們到了 Week4 最後一週了，也是整個系列的最後一次收尾。</p><p>那這邊的收尾就來聊聊「額度」吧。</p><p>相信你至今 Vibe Coding 開發到現在，應該遇過不少次用量上限的問題，所以這一篇就來集中這個吧。</p><p>這邊先補一個小知識，Pro 跟 Max 方案的額度是 claude.ai 聊天跟 Claude Code 共用的，而且上限分成兩種，一種是五小時的 session 上限，另一種是每週的上限。</p><h2 id="先搞懂-ai-額度是怎麼被吃掉的">先搞懂 AI 額度是怎麼被吃掉的？</h2><p>一路學到現在，我相信你應該非常清楚使用 AI 最大的問題就是有 Token 的限制，而 Token 的消耗主要就跟「Context」的大小有關。</p><p>核心重點就一句話：</p><blockquote><p>Context 就是桌面上所有的東西，這些東西越多，每一輪消耗的 Token 就越多越貴。</p></blockquote><p>而 Context 大多都是被以下給佔用：</p><ul><li><strong>對話紀錄</strong>：這是最大宗，還記得前面 Day 6 我舉例的那張桌子嗎？AI 基本上每一次回覆你都要把整個 Context Window（桌面）重新看一遍，所以聊得越久，花費的 Token 就越多了。</li><li><strong>讀進來的檔案跟指令輸出</strong>：AI 每讀一個檔案、每跑一次 <code>npm test</code>，那些內容跟結果都會被放在 Context 裡，下一輪回話就會被重新讀一次。</li><li><strong>CLAUDE.md</strong>：每次開新對話都會自動載入，包含 Day 17 用 <code>@DESIGN.md</code> 掛進去的檔案，所以寫得越肥每一輪就越貴，官方也建議 CLAUDE.md 控制在 200 行以內。</li><li><strong>SKILL</strong>：依照我教學經驗，許多 Vibe Coding 新手很容易掛一大堆 SKILL，但每一個裝好的 SKILL，它的描述都會一直放在桌面上，而被叫過的 SKILL 內文也會一直留在對話裡直到你 <code>/clear</code>。</li><li><strong>MCP</strong>：MCP 的工具名稱一直都在桌面上，這部分還算小，真正佔用最多的是觸發之後，MCP 會把找回來的東西丟進 Context 裡。</li><li><strong>Subagent</strong>：Day 19 講過它有自己的 Context Windows，不會跟你的主對話混在一起，但每開一個 Subagent，它的 Context 也會被算進你的額度裡。</li></ul><p>所以你會發現很多 Token 的消耗其實是「不知不覺」的，因為你可能只是想查個文件、跑個測試、掛個 SKILL，結果桌面就被養得很肥。</p><p>這也是為什麼我會一開始就建議你先從 20 美金開始訂閱，因為才知道自己需要用的額度範圍到底是到哪邊，避免過度浪費。</p><h2 id="該怎麼省">該怎麼省？</h2><p>其實很單純，把握幾個大原則即可：</p><ul><li><strong>Context 越小越省</strong>：做完就 <code>/clear</code>，不要通通放在桌上。</li><li><strong>外部工具（MCP、SKILL）不要亂掛</strong>：不需要的外部工具就不要掛，因為它們會常駐在桌面上吃 Context，儘管佔用量不多，但如果不小心觸發就會佔用非常多。</li><li><strong>重工最貴</strong>：大改動可以先跑 Plan Mode，方向錯了重工最貴。</li></ul><p>有趣的是 Claude Code 團隊的人曾公開說過，現在的 AI 已經足夠聰明，不太需要再依賴 Plan Mode 了（但也說了 Plan Mode 不會被移除），不過我覺得這個功能還是很有用，因為它可以幫你在大改動前先檢查方向，避免重工。</p><h2 id="week-4-動手檢查清單">Week 4 動手檢查清單</h2><p>跟前三週一樣，收尾也給你一份檢查清單，逐條對照自己有沒有真的做過：</p><ul className="contains-task-list"><li className="task-list-item"> 專案掛著至少一個 Hook（Day 22）。</li><li className="task-list-item"> 核心的算錢邏輯有測試，試著讓它變失敗再變成功（Day 23）。</li><li className="task-list-item"> 用 Plan Mode 盤點整體技術債（Day 24）。</li><li className="task-list-item"> 做過一次上線後的改版，先改 SPEC 再動手（Day 26）。</li><li className="task-list-item"> 新增、編輯都從 develop 開分支、走 PR，並透過 CodeRabbit 的建議修正相關事項（Day 27）。</li><li className="task-list-item"> 試著使用 <code>/usage</code> 看自己的用量，並用 <code>/context</code> 看桌面上有什麼東西。</li></ul><h2 id="結語">結語</h2><p>那時間也差不多到結尾了，這邊也幫你總結一下：</p><ul><li>Pro 跟 Max 的額度是 claude.ai 聊天跟 Claude Code 共用的，上限分成五小時的 session 上限跟每週的上限。</li><li>Token 的消耗主要跟 Context 的大小有關，對話紀錄、讀進來的檔案跟指令輸出、CLAUDE.md、SKILL、MCP、Subagent 都會吃額度，而且很多都是不知不覺吃掉的。</li><li>省額度就三個原則：做完就 <code>/clear</code> 讓 Context 越小越好、用不到的 MCP 跟 SKILL 不要亂掛、大改動先跑 Plan Mode 避免重工。</li><li>一開始先從 20 美金的方案開始，摸清楚自己需要多少額度再決定要不要升級。</li></ul><p>四個完整的週到此結束，明天我們要把這 30 天的做法整理成一套 SOP，附上一份值得收藏的資源清單。</p><p>希望這一篇有讓你把額度花在刀口上哩～我們明天見囉～</p>]]></content>
+  </entry>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 27：PR 流程與 CodeRabbit 自動審查</title>
+    <link href="https://israynotarray.com/ai/20261010/github-pull-request-coderabbit-ai-code-review/"/>
+    <id>https://israynotarray.com/ai/20261010/github-pull-request-coderabbit-ai-code-review/</id>
+    <published>2026-10-10T01:00:00.000Z</published>
+    <updated>2026-10-10T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 27：PR 流程與 CodeRabbit 自動審查" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-27-cover.png"></p><h2 id="前言">前言</h2><p>昨天我們快速複習了一下把「預算提醒」這個功能從原本的「不做清單」移出來，然後用 Plan Mode 做了計畫、實作，最後 push 到 main 讓 GitHub Actions 自動部署上線。</p><p>但接下來我要來聊一下更正式的一套開發流程，也就是所謂的 PR（Pull Request）流程。</p><p>簡單來講，讓我們的系統上傳到 main 被部署之前，可以先經過一些方式來檢查這次的改動，確保不會把線上弄壞，而且這過程是自動的。</p><h2 id="什麼是-pr">什麼是 PR？</h2><p>Day 25 的時候我有稍微提到分支（Branch），當時儘管我說先不用理解，但這邊我們就要來花點時間理解一下了。</p><p>首先在一個正確開發的流程中，我們會把正式環境與開發環境分開：</p><ul><li><strong>正式環境：</strong> 就是 main 分支，這個分支一 push 就會自動部署到正式網址，也就是對外公開的環境，所以一旦公開就是面向使用者。</li><li><strong>開發環境：</strong> 就是 develop 分支，這個分支不會自動部署到正式網址，主要是給開發者做測試、驗收、修 bug 的地方。</li><li><strong>分支（Branch）：</strong> 就是從 main 或 develop 分出來的一個副本/草稿，這個草稿可以讓你在上面做改動、測試、驗收，而不會影響到 main 或 develop，常見有 feature 分支、bugfix 分支、hotfix 分支等等。</li></ul><p>所以今天開始也會把記帳 App 依照這個流程跑，每次要改任何東西都要從 develop 開一個分支出來，改完先合併回 develop，再測試機測試都沒問題了，再從 develop 合併到 main 上線。</p><p>那...什麼是 PR（Pull Request）呢？</p><p>簡單來講，你把它理解成一張申請單，意思是我想把這份草稿（feature branch）合併進 develop（或是把 develop 合併進 main），然後這個申請單可能會有一些檢查項目，例如：</p><ul><li>自動測試：這次的改動有沒有破壞到原本的功能。</li><li>AI 審查：這次的改動有沒有安全疑慮、程式碼品質有沒有問題。</li><li>人工審查：這次的改動有沒有符合團隊的規範、程式碼風格有沒有問題。</li></ul><p>所以我們這邊就是要加上這一個流程，而加上這個流程後，整體就會像這樣：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TB
+    subgraph G1[&quot;功能分支 → develop&quot;]
+        direction LR
+        A[&quot;從 develop 開分支&lt;br&gt;在分支上改&quot;] --&gt; B[&quot;開 PR&lt;br&gt;到 develop&quot;]
+        B --&gt; C[&quot;自動檢查&lt;br&gt;通過才合併&quot;]
+    end
+    subgraph G2[&quot;develop → main&quot;]
+        direction LR
+        D[&quot;develop 確認&lt;br&gt;都沒問題&quot;] --&gt; E[&quot;開 PR&lt;br&gt;到 main&quot;]
+        E --&gt; F[&quot;自動檢查&lt;br&gt;通過才合併&quot;]
+    end
+    G1 --&gt; G2
+    G2 --&gt; H[&quot;main 更新&lt;br&gt;自動部署上線&quot;]
+" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TB
+</span></span><span class="line" line="2"><span>    subgraph G1[&quot;功能分支 → develop&quot;]
+</span></span><span class="line" line="3"><span>        direction LR
+</span></span><span class="line" line="4"><span>        A[&quot;從 develop 開分支&lt;br&gt;在分支上改&quot;] --&gt; B[&quot;開 PR&lt;br&gt;到 develop&quot;]
+</span></span><span class="line" line="5"><span>        B --&gt; C[&quot;自動檢查&lt;br&gt;通過才合併&quot;]
+</span></span><span class="line" line="6"><span>    end
+</span></span><span class="line" line="7"><span>    subgraph G2[&quot;develop → main&quot;]
+</span></span><span class="line" line="8"><span>        direction LR
+</span></span><span class="line" line="9"><span>        D[&quot;develop 確認&lt;br&gt;都沒問題&quot;] --&gt; E[&quot;開 PR&lt;br&gt;到 main&quot;]
+</span></span><span class="line" line="10"><span>        E --&gt; F[&quot;自動檢查&lt;br&gt;通過才合併&quot;]
+</span></span><span class="line" line="11"><span>    end
+</span></span><span class="line" line="12"><span>    G1 --&gt; G2
+</span></span><span class="line" line="13"><span>    G2 --&gt; H[&quot;main 更新&lt;br&gt;自動部署上線&quot;]
+</span></span></code></pre><p><img alt="PR 流程示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8828%E6%97%A5%20%E4%B8%8A%E5%8D%8812_26_50.png"></p><p>初步了解之後，我們就要來導入 CodeRabbit 這個 AI Code Review 服務，讓 PR 一開就自動審查並用中文留言給我們～</p><h2 id="coderabbit">CodeRabbit</h2><p>前面所講的 <a href="https://www.coderabbit.ai/" rel="nofollow">CodeRabbit</a>（程式碼兔子）是什麼呢？簡單來講，它是一個 AI Code Review 的服務，只要你把它安裝到你的 GitHub 儲存庫之後，之後特定 PR 被開啟，那 CodeRabbit 就會自動幫你審查這次的改動，並且直接在 PR 上面留言。</p><p>那......CodeRabbit 身為一個 AI Code Review 服務，不可能是完全免費的吧？畢竟我們前面一直有提到過 AI 最貴的就是「算力」。</p><p>所以一點也沒有錯，CodeRabbit 是有付費方案的，而且是依照開發者人數並按月計算，而 Essentials（基本） 方案是每人每月 30 美元（年繳的話是 24 美元）。</p><p>不過它對公開的儲存庫是非常大方的，只要你的儲存庫是公開儲存庫，安裝之後就可以免費使用 PR Code Review，也不需要綁定信用卡，但反之，如果是私人的儲存庫，免費方案就只會幫你做 PR 摘要，真正的逐行 Review 就要付費了。</p><p>剛好，我們這個 <code>money-note</code> 專案是屬於公開性質，所以就可以直接示範使用。</p><p>許多服務免費方案都是建立在開源專案的基礎上，因為開源專案對社群有正面貢獻，所以才會有免費方案，這也是我們這個專案選擇公開儲存庫的原因之一。
+而廠商主要賺取的使用者則是付費方案的私人儲存庫，因為這些私人儲存庫通常是商業用途，對廠商來說才有價值，也比較願意付費。</p><p>那為什麼 Day 19 已經有 code-reviewer 這個指令了但我們卻還需要使用 CodeRabbit 呢？</p><p>因為 code-reviewer 必須你去叫它才會做事，而 CodeRabbit 是掛在 GitHub 上的，只要開 PR 就會自動跑，所以一整套開發流程並搭配前面學的 Hook、CLAUDE.md 之後留成就會有這每一段流程：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TB
+    subgraph L[&quot;本機（Claude Code）&quot;]
+        direction TB
+        A[&quot;AI 照 CLAUDE.md 的規則&lt;br&gt;在 feature 分支上改程式&quot;] --&gt; B[&quot;PostToolUse Hook&lt;br&gt;自動跑 Prettier 排版&quot;]
+        B --&gt; C[&quot;npm test&lt;br&gt;本機跑測試&quot;]
+        C -.-&gt;|&quot;需要時自己叫&quot;| D[&quot;code-reviewer&lt;br&gt;本機審查&quot;]
+        C --&gt; E[&quot;commit&lt;br&gt;push feature 分支&quot;]
+        D -.-&gt; E
+    end
+    subgraph G[&quot;GitHub&quot;]
+        direction TB
+        F[&quot;開 PR&lt;br&gt;feature → develop&quot;] --&gt; H[&quot;GitHub Actions 跑測試&lt;br&gt;CodeRabbit 自動審查&quot;]
+        H --&gt; I[&quot;合併進 develop&quot;]
+        I --&gt; J[&quot;開 PR&lt;br&gt;develop → main&quot;]
+        J --&gt; K[&quot;GitHub Actions 跑測試&lt;br&gt;CodeRabbit 自動審查&quot;]
+        K --&gt; M[&quot;合併進 main&quot;]
+        M --&gt; N[&quot;deploy.yml 自動部署&lt;br&gt;GitHub Pages 上線&quot;]
+    end
+    E --&gt; F
+" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TB
+</span></span><span class="line" line="2"><span>    subgraph L[&quot;本機（Claude Code）&quot;]
+</span></span><span class="line" line="3"><span>        direction TB
+</span></span><span class="line" line="4"><span>        A[&quot;AI 照 CLAUDE.md 的規則&lt;br&gt;在 feature 分支上改程式&quot;] --&gt; B[&quot;PostToolUse Hook&lt;br&gt;自動跑 Prettier 排版&quot;]
+</span></span><span class="line" line="5"><span>        B --&gt; C[&quot;npm test&lt;br&gt;本機跑測試&quot;]
+</span></span><span class="line" line="6"><span>        C -.-&gt;|&quot;需要時自己叫&quot;| D[&quot;code-reviewer&lt;br&gt;本機審查&quot;]
+</span></span><span class="line" line="7"><span>        C --&gt; E[&quot;commit&lt;br&gt;push feature 分支&quot;]
+</span></span><span class="line" line="8"><span>        D -.-&gt; E
+</span></span><span class="line" line="9"><span>    end
+</span></span><span class="line" line="10"><span>    subgraph G[&quot;GitHub&quot;]
+</span></span><span class="line" line="11"><span>        direction TB
+</span></span><span class="line" line="12"><span>        F[&quot;開 PR&lt;br&gt;feature → develop&quot;] --&gt; H[&quot;GitHub Actions 跑測試&lt;br&gt;CodeRabbit 自動審查&quot;]
+</span></span><span class="line" line="13"><span>        H --&gt; I[&quot;合併進 develop&quot;]
+</span></span><span class="line" line="14"><span>        I --&gt; J[&quot;開 PR&lt;br&gt;develop → main&quot;]
+</span></span><span class="line" line="15"><span>        J --&gt; K[&quot;GitHub Actions 跑測試&lt;br&gt;CodeRabbit 自動審查&quot;]
+</span></span><span class="line" line="16"><span>        K --&gt; M[&quot;合併進 main&quot;]
+</span></span><span class="line" line="17"><span>        M --&gt; N[&quot;deploy.yml 自動部署&lt;br&gt;GitHub Pages 上線&quot;]
+</span></span><span class="line" line="18"><span>    end
+</span></span><span class="line" line="19"><span>    E --&gt; F
+</span></span></code></pre><p><img alt="PR 流程示意圖（含 CodeRabbit）" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B410%E6%9C%889%E6%97%A5%20%E4%B8%8B%E5%8D%8811_40_49.png"></p><p>你可以看到 Review 這件事情一直在我們的流程中，從本機的 code-reviewer 到 GitHub 上的 CodeRabbit 都有，這樣就可以確保每一次改動都經過檢查。</p><p>所以講了那麼多，我們該怎麼做呢？很簡單：</p><ol><li>打開 <a href="https://www.coderabbit.ai/" rel="nofollow">CodeRabbit 官網</a>，點選 Log In，然後點選 Login with GitHub，接著按下 Authorize coderabbitai 授權。</li><li>選擇要安裝到哪個帳號，這邊選你自己的 GitHub 帳號。</li><li>按下 Install &amp; Authorize 就完成了。</li></ol><p><img alt="CodeRabbit 畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260928123815.png"></p><h2 id="請-ai-加上設定">請 AI 加上設定</h2><p>接下來呢？我們試著開一個 PR，看看 CodeRabbit 會不會自動審查。</p><p>但開始之前，我們要來做一些事情，也就是把 .coderabbit.yaml 這個設定檔加到專案裡，這個檔案主要是設定 CodeRabbit 的審查語言、要審查哪些分支等等。</p><p>一樣交給 AI 就可以了，請你輸入 <code>/clear</code> 清空對話，接著輸入以下 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="我要幫這個專案加上 PR 流程，main 是正式環境，develop 是開發環境，請幫我做四件事：
+
+1. 新增 .github/workflows/test.yml，有 PR 要合併進 develop 或 main 的時候，自動跑 npm ci、npm test、npm run build。
+2. 新增 .coderabbit.yaml，把審查的語言設定成 zh-TW，並且讓 PR 合併進 develop 的時候也會自動審查。
+3. 在 CLAUDE.md 補上規則：以後的改動一律從 develop 開分支、push 分支、開 PR 合併回 develop；要上線時再開 develop → main 的 PR；不要直接 push 到 develop 或 main。
+4. 以上做完請 commit 並 push 到 main，這是最後一次直接 push；接著從 main 建立 develop 分支並 push 上去。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>我要幫這個專案加上 PR 流程，main 是正式環境，develop 是開發環境，請幫我做四件事：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>1. 新增 .github/workflows/test.yml，有 PR 要合併進 develop 或 main 的時候，自動跑 npm ci、npm test、npm run build。
+</span></span><span class="line" line="4"><span>2. 新增 .coderabbit.yaml，把審查的語言設定成 zh-TW，並且讓 PR 合併進 develop 的時候也會自動審查。
+</span></span><span class="line" line="5"><span>3. 在 CLAUDE.md 補上規則：以後的改動一律從 develop 開分支、push 分支、開 PR 合併回 develop；要上線時再開 develop → main 的 PR；不要直接 push 到 develop 或 main。
+</span></span><span class="line" line="6"><span>4. 以上做完請 commit 並 push 到 main，這是最後一次直接 push；接著從 main 建立 develop 分支並 push 上去。
+</span></span></code></pre><p><img alt="AI 新增 PR 流程設定的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260928124452.png"></p><p>接著就可以試著建立一個 PR 看看啦～</p><h2 id="第一個-pr">第一個 PR</h2><p>CodeRabbit 準備好了，當然要來試著觸發看看，請你輸入 <code>/clear</code> 清空對話，接著輸入以下 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請從 docs/TODO.md 挑一個最小、風險最低的需求來做。
+
+製作時，務必遵守 CLAUDE.md 的新規則，從 develop 開一個新的分支來做，做完跑過 npm test 之後 commit，然後 push 這個分支，不要動 develop 跟 main。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請從 docs/TODO.md 挑一個最小、風險最低的需求來做。
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>製作時，務必遵守 CLAUDE.md 的新規則，從 develop 開一個新的分支來做，做完跑過 npm test 之後 commit，然後 push 這個分支，不要動 develop 跟 main。
+</span></span></code></pre><p>push 完之後回到 GitHub 的儲存庫頁面，建立一個 PR，然後稍微等一下你就可以看到 CodeRabbit 自動跑測試、審查，並且在 PR 上留言了～</p><p><img alt="GitHub 上建立 PR 的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260928125619.png"></p><p>這邊也提供範例 PR 給你參考：<a href="https://github.com/hsiangfeng/money-note/pull/1" rel="nofollow">範例 PR</a></p><p>除此之外，GitHub 本身也有提供額外免費的 Code Review 服務，你只需要在 PR 旁邊的 <code>Reviewers</code> 欄位加上 Copilot 就可以了，這樣 Copilot 也會幫你審查程式碼～</p><p><img alt="GitHub 上加 Copilot 做 Code Review 的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260928130018.png"></p><h2 id="試試看actions-亮紅燈的時候怎麼辦">試試看：Actions 亮紅燈的時候怎麼辦？</h2><p>那......到現在基本上都是示範，成功的案例，這樣其實很難看出到底這些東西有沒有效果。</p><p>所以我想留個小功課給你，讓你自己試著回去觸發這些 Actions 的錯誤。</p><p>你只需要請 AI 在分支上把 <code>formatAmount</code> 輸出的 <code>$</code> 拿掉，不跑測試直接 push，就可以能看到 Actions 失敗狀況了，這部分我就不示範了，就讓你回家試試看囉～～</p><h2 id="coderabbit-的留言怎麼處理">CodeRabbit 的留言怎麼處理？</h2><p>測試過了，那 CodeRabbit 留的那些言呢？</p><p>給你一個核心大方向，CodeRabbit 在給建議時，會給高、中、低三個等級的建議，你主要需要專注的點是高跟中，低的部分則可以跟 AI 討論看看是否為必要修正。</p><p>因為有些時候 AI 會太過敏感，像是你在程式碼裡面有一個 <code>console.log</code>，CodeRabbit 可能就會建議你把它拿掉，但這個 <code>console.log</code> 可能是你在做測試時需要的，所以這種情況就可以不用理會。</p><p>那要怎麼給 AI 去修正 CodeRabbit 的建議呢？幾種方式：</p><ul><li>手動複製 CodeRabbit 留言的內容，貼給 AI，請它幫你修正。</li><li>叫 AI 直接去看 CodeRabbit 留言的內容，要搭配 Claude in Chrome 套件。</li></ul><p>以我自己來講，我就比較常用後者。</p><h2 id="結語">結語</h2><p>那這一篇也差不多了，也來總結一下：</p><ul><li>正式環境（main）跟開發環境（develop）要分開，每次改動都從 develop 開分支，先合併回 develop，確認沒問題再從 develop 合併到 main 上線。</li><li>PR 就是一張申請單，改動要進 develop 或 main 之前，都要先經過自動測試跟 AI 審查這些檢查。</li><li>CodeRabbit 對公開儲存庫是免費的，而且它掛在 GitHub 上，只要開 PR 就會自動審查，不像 code-reviewer 要你記得去叫它。</li><li>除了 CodeRabbit，GitHub 也可以在 PR 的 Reviewers 加上 Copilot，多一個 AI 幫你看程式碼。</li><li>CodeRabbit 的建議不用全部照修，主要專注在高跟中等級的建議，低等級的可以跟 AI 討論看看是不是真的需要修。</li></ul><p>最後也別忘了回去做一下小功課，親手讓 Actions 亮一次紅燈唷。</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
+  </entry>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 26：上線後的第一次改版</title>
+    <link href="https://israynotarray.com/ai/20261009/claude-code-add-feature-after-launch/"/>
+    <id>https://israynotarray.com/ai/20261009/claude-code-add-feature-after-launch/</id>
+    <published>2026-10-09T01:00:00.000Z</published>
+    <updated>2026-10-09T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 26：上線後的第一次改版" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-26-cover.png"></p><h2 id="前言">前言</h2><p>當系統上線之後就不會再變動了嗎？</p><p>不，你錯了。</p><p>系統上線之後反而更會變動，畢竟會需要依照使用者的需求、市場的變化、競爭對手的動作，甚至是法規的改變來做調整。</p><p>那在 Vibe Coding 的世界裡，上線之後要加新功能該怎麼做呢？</p><p>這一篇就來聊聊該怎麼做比較好。</p><h2 id="先改規格再動手">先改規格再動手</h2><p>假設你還有一點印象的話，Day 10 我們其實做過一次範圍控制的練習，我們刻意設計了一句要加預算提醒跟記錄收入，結果 AI 拿出 SPEC.md 裡面的不做清單把我們這個需求給擋了下來。</p><p>那......假設現在系統上線了，你又想加這個功能，該怎麼辦呢？其實很簡單，當我們要開始做需求擴充時，請一樣保持一個大原則：</p><blockquote><p>規則文件先更新，再動手。</p></blockquote><p>千萬千萬不要先改程式碼，這種習慣非常不好，很容易變成文件跟不上程式碼，接著就無法對照功能，接著往後的更新都像疊床架屋一樣。</p><p>所以我們現在該怎麼做呢？其實很簡單，請你先進入 Claude Code 之後，輸入 <code>/clear</code> 清空對話（確保 Context 乾淨），接著輸入以下 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請你閱讀 @SPEC.md 之後，裡面有一個「### 不做（v1 明確排除）」的清單，我要請你把「預算與超支提醒」從不做清單裡移出來。
+因為我現在要來製作「預算與超支提醒」這個功能，所以移出後，你要切換成「產品顧問」的身分。
+針對我這個功能進行需求訪談一次問我一個問題，把需求釐清。
+問到你覺得足夠具體之後，跟我說可以整理成 SPEC.md，並請我確認。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請你閱讀 @SPEC.md 之後，裡面有一個「### 不做（v1 明確排除）」的清單，我要請你把「預算與超支提醒」從不做清單裡移出來。
+</span></span><span class="line" line="2"><span>因為我現在要來製作「預算與超支提醒」這個功能，所以移出後，你要切換成「產品顧問」的身分。
+</span></span><span class="line" line="3"><span>針對我這個功能進行需求訪談一次問我一個問題，把需求釐清。
+</span></span><span class="line" line="4"><span>問到你覺得足夠具體之後，跟我說可以整理成 SPEC.md，並請我確認。
+</span></span></code></pre><p>這時候你應該會好奇，這邊我們該不該切換成 Plan Mode 模式呢？</p><p>來，我們複習一下：</p><ul><li><strong><code>Plan Mode</code>：</strong> 是以規劃完畢就<strong>開工</strong>為導向，它會產出一份實作計畫（要動哪些檔案、步驟怎麼走），然後問你要不要照著做，雖然遇到模糊的地方也會反問你，但問的目的都是「為了把計畫定下來並開始實作」所需要的事。</li><li><strong>訪談式 Prompt：</strong> 是以 <strong>釐清需求</strong> 為導向，它不以動工為目標，所以主要是產出一份需求規格書，先搞清楚 <strong>what（要做什麼）</strong> 就好，至於 <strong>how（怎麼做）</strong> 那是之後 Plan Mode 的事，而且這個提問的節奏是在你手上的，畢竟你規定它一次一題慢慢挖，而不是讓它自己決定問夠了沒。</li></ul><p>再更簡化一點理解就是：</p><ul><li>訪談問的是 what（要做什麼）</li><li>Plan Mode 問的是 how（怎麼做）</li></ul><p>所以我們目前連預算長怎麼樣、超支提醒要怎麼顯示都還沒釐清，這時候就不適合開 Plan Mode，因為 Plan Mode 只會急著幫你排實作步驟，可是需求根本還沒對齊，所以這邊只需要切換到 <code>manual mode on</code> 模式即可，接下來你就接受一個一個拷問吧。</p><p><img alt="拷問式訪談的對話畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260923153834.png"></p><p>以我自己來講，我大約被拷問了至少 8 個問題左右（每個人不同）。</p><p><img alt="預算提醒的需求對齊對話" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260923154633.png"></p><h2 id="用-plan-mode-把功能做出來">用 Plan Mode 把功能做出來</h2><p>接下來呢？其實就相對單純了，跟前面都差不多，你只需要切換到 <code>Plan Mode</code> 模式，然後輸入以下 Prompt 就可以了：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請依照更新後的 @SPEC.md 去製作預算提醒功能。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請依照更新後的 @SPEC.md 去製作預算提醒功能。
+</span></span></code></pre><p><img alt="Plan Mode 產出的預算提醒計畫" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260923160455.png"></p><p>計畫沒問題讓 AI 下去做，做完之後一樣要做一些驗收，你可以設計一些邊界來做驗收，像是：</p><ol><li>本月總額先刻意弄到 1000，預算改成 1000，然後這時候預期是不能提醒。</li><li>再新增 1 元，要顯示超出 1 元。</li><li>重新整理，預算跟提醒都還在。</li><li>把預算清成 0，提醒消失。</li></ol><p><img alt="預算提醒的邊界驗收畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260927230205.png"></p><p>這邊你可以把上面的邊界問題丟給 AI 讓 AI 使用 Claude in Chrome 套件自己操控畫面去測試。</p><p>接下來就簡單很多了，只要請 AI 進行 push 上線就好，因為 Day 25 我們已經設定好 GitHub Actions 自動部署了。</p><h2 id="結語">結語</h2><p>這一篇相對單純很多，畢竟很多地方在前面章節都有說明過，所以這一章節比較面向複習，讓你知道未來上線之後要加新功能該怎麼做。</p><p>所以這邊也替你總結一下：</p><ul><li>上線之後要加新功能，先改規格再動手，千萬不要先改程式碼。</li><li>釐清需求用訪談式 Prompt 問 what，需求對齊了才進 Plan Mode 問 how，兩個不要搞混。</li><li>小功能的訪談跟計畫都可以很小，但驗收條件不能省，動工前可以先想好幾個邊界情況。</li></ul><p>那這一篇就簡單到這邊結束，我們明天見囉～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
+  </entry>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 25：部署上線 GitHub Pages</title>
+    <link href="https://israynotarray.com/ai/20261008/deploy-vite-app-to-github-pages/"/>
+    <id>https://israynotarray.com/ai/20261008/deploy-vite-app-to-github-pages/</id>
+    <published>2026-10-08T01:00:00.000Z</published>
+    <updated>2026-10-08T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 25：部署上線 GitHub Pages" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-25-cover.png"></p><h2 id="前言">前言</h2><p>「沒辦法公開的東西終究只是自嗨而已。」</p><p>對，你至今練習製作到現在的專案，再好用也只是 <code>localhost:5173</code>，一個只有你的電腦認識的地址。</p><p>所以今天我要來介紹使用 GitHub Pages 的方式，讓你的專案可以被公開給外人觀看並使用。</p><h2 id="為什麼選擇-github-pages">為什麼選擇 GitHub Pages？</h2><p>相信很多人會有第一個直覺是：「為什麼要選 GitHub Pages？」</p><p>其實很簡單，因為我們的專案是前端專案，沒有後端、沒有資料庫、沒有登入，所以只要能放靜態檔案的地方都可以。</p><p>而選擇 GitHub Pages 的理由有三個：</p><ol><li>只要有 GitHub 帳號就可以使用，不用再多開一個服務。</li><li>GitHub Pages 一個月大約有 100GB 的流量額度，對於小型專案來說已經足夠。</li><li>GitHub Actions 可以自動化部署，push 之後就會自動 build、上傳、部署，省掉手動上傳的麻煩。</li></ol><p>整體來講你不用額外再花時間學習 Cloudflare Pages 或 Vercel，一套 GitHub 就能滿足我們的需求。</p><p>另外等一下你會一直看到一個字叫 build，簡單來講就是把我們的 App 打包成一包純靜態的檔案（HTML、CSS、JS），打包好的東西會放在 <code>dist/</code> 這個資料夾裡，而所謂的部署，其實就只是把這個資料夾放到 GitHub Pages 上面而已。</p><p>所以我們後面跑起來的流程就會是這樣：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart LR
+    A[&quot;git push&quot;] --&gt; B[&quot;GitHub Actions 啟動&quot;]
+    B --&gt; C[&quot;npm test&lt;br&gt;npm run build&quot;]
+    C --&gt; D[&quot;把 dist 交給 GitHub Pages&quot;]
+    D --&gt; E[&quot;公開網址自動更新&quot;]
+" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart LR
+</span></span><span class="line" line="2"><span>    A[&quot;git push&quot;] --&gt; B[&quot;GitHub Actions 啟動&quot;]
+</span></span><span class="line" line="3"><span>    B --&gt; C[&quot;npm test&lt;br&gt;npm run build&quot;]
+</span></span><span class="line" line="4"><span>    C --&gt; D[&quot;把 dist 交給 GitHub Pages&quot;]
+</span></span><span class="line" line="5"><span>    D --&gt; E[&quot;公開網址自動更新&quot;]
+</span></span></code></pre><p><img alt="GitHub Actions 部署流程圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B410%E6%9C%887%E6%97%A5%20%E4%B8%8B%E5%8D%8810_48_15.png"></p><p>接著你就會取得一個專屬於這個專案的公開網址，像是 <code>https://你的帳號.github.io/repo名/</code>，這樣你就可以分享出去啦～</p><p>而這過程基本上只需要設定一次就可以了，之後只要 push 到 main 分支就會自動部署。</p><p>GitHub 是一個第三方的程式碼託管平台，雖然它的 Pages 功能是免費的，但它不是專門給你放網站的，所以如果你的專案有商業用途或是流量很大，建議還是要找專門的服務，這邊文章僅適合用於練習或是個人專案。</p><h2 id="等等不是說不走-github-pages">等等，不是說不走 GitHub Pages？</h2><p>如果你有點印象的話，在 Day 9 的時候並沒有特別指定要用 GitHub Pages，而這部份是給 AI 幫我們做決定的。</p><p>不相信嗎？以我這邊來講，打開 CLAUDE.md 裡面就有一段寫著：</p><pre className="language-md shiki shiki-themes github-light github-light github-dark-high-contrast" code="## 部署
+
+Build 產物是純靜態檔，目標是 Cloudflare Pages 或 Vercel，**不需要設 `vite.config.js` 的 `base`**。若改走 GitHub Pages 才需要（monorepo 子路徑），但已在 TECH_CHOICE.md 決定不走。
+" language="md" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="sjWgA">## 部署
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span class="s8XSl">Build 產物是純靜態檔，目標是 Cloudflare Pages 或 Vercel，</span><span class="s7cdV">**不需要設 </span><span class="sjWgA">`vite.config.js`</span><span class="s7cdV"> 的 </span><span class="sjWgA">`base`</span><span class="s7cdV">**</span><span class="s8XSl">。若改走 GitHub Pages 才需要（monorepo 子路徑），但已在 TECH_CHOICE.md 決定不走。
+</span></span></code></pre><p>每個人的 AI 寫出來的內容不一定一樣，如果你的 CLAUDE.md 跟 TECH_CHOICE.md 裡面沒有提到是正常的。</p><p>那這時候剛好我們就要來改變這個決定，畢竟實務上時常會突然需求變更，所以接下來請你一樣打開 Claude Code 並輸入 <code>/clear</code> 清空對話，接著輸入以下 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="部署改走 GitHub Pages，不走 Cloudflare Pages / Vercel。
+
+請在 SPEC.md 第 10 節的決策紀錄補一列（日期、決策、理由）。
+
+CLAUDE.md 跟 TECH_CHOICE.md 部署那一段也一起改成一致。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>部署改走 GitHub Pages，不走 Cloudflare Pages / Vercel。
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>請在 SPEC.md 第 10 節的決策紀錄補一列（日期、決策、理由）。
+</span></span><span class="line" line="4"><span emptyLinePlaceholder>
+</span></span><span class="line" line="5"><span>CLAUDE.md 跟 TECH_CHOICE.md 部署那一段也一起改成一致。
+</span></span></code></pre><p>對，就這麼簡單，AI 會幫你把三個檔案都改好，這就是 Vibe Coding 的威力。</p><p>但到目前為止，我們都還沒有開始實作，因為我們要先把文件對齊，這樣之後才不會出現「文件寫得跟實作不一樣」的情況。</p><h2 id="把專案推上-github">把專案推上 GitHub</h2><p>接下來有件事情要請你先確認一下，如果你沒有 GitHub 帳號的話，請先去註冊一個唷。</p><p>註冊完畢後，會請你到 GitHub 首頁點選右上角的 + → New repository，接著輸入 Repository name（這邊我建議就叫 <code>money-note</code>，跟專案名稱一致），其他選項全部不要勾選，然後按下 Create repository。</p><p><img alt="GitHub 新增 repo 的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921091508.png"></p><p>接下來下方會有一大串指令：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="git remote add origin git@github.com:hsiangfeng/money-note.git
+git branch -M main
+git push -u origin main
+" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">git</span><span class="sWayO"> remote</span><span class="sWayO"> add</span><span class="sWayO"> origin</span><span class="sWayO"> git@github.com:hsiangfeng/money-note.git
+</span></span><span class="line" line="2"><span class="smYoP">git</span><span class="sWayO"> branch</span><span class="stw71"> -M</span><span class="sWayO"> main
+</span></span><span class="line" line="3"><span class="smYoP">git</span><span class="sWayO"> push</span><span class="stw71"> -u</span><span class="sWayO"> origin</span><span class="sWayO"> main
+</span></span></code></pre><p><img alt="GitHub repo 指令畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921091614.png"></p><p>請你把這一串指令複製下來，並貼以下 Prompt 給 AI，讓 AI 幫你代勞（指令的部分記得換成 GitHub 給你的那一組，不要直接複製我的唷）：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="我已經在 GitHub 上開好一個新的 repo，底下是 GitHub 給我的指令：
+
+git remote add origin git@github.com:hsiangfeng/money-note.git
+git branch -M main
+git push -u origin main
+
+新增完畢後請不要馬上 push，先幫我檢查一下目前的 commit 歷史跟檔案，有沒有不該公開的東西：金鑰、密碼、.env、個人資料，同時也要跑 `npm test`、`npm run build`、`git status`，確認都沒問題之後再幫我 push。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>我已經在 GitHub 上開好一個新的 repo，底下是 GitHub 給我的指令：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>git remote add origin git@github.com:hsiangfeng/money-note.git
+</span></span><span class="line" line="4"><span>git branch -M main
+</span></span><span class="line" line="5"><span>git push -u origin main
+</span></span><span class="line" line="6"><span emptyLinePlaceholder>
+</span></span><span class="line" line="7"><span>新增完畢後請不要馬上 push，先幫我檢查一下目前的 commit 歷史跟檔案，有沒有不該公開的東西：金鑰、密碼、.env、個人資料，同時也要跑 `npm test`、`npm run build`、`git status`，確認都沒問題之後再幫我 push。
+</span></span></code></pre><p>你可能會好奇為什麼我不乾脆一次就把整個專案推上去，這是因為我們要先檢查 commit 歷史裡有沒有不該公開的東西，同時也請 AI 做一下檢查：</p><p><img alt="請 AI 檢查 commit 歷史有沒有不該公開的東西" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921092413.png"></p><p>到這邊為止把該修正的都修正後，你回到 GitHub 的 repo 頁面就可以看到專案上來啦～</p><p><img alt="GitHub repo 首頁畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921092530.png"></p><h2 id="github-actions-自動部署">GitHub Actions 自動部署</h2><p>這樣就完了嗎？就結束了嗎？</p><p>不，其實我們只是把程式碼「託管」到 GitHub 上而已，還沒有真正部署到 GitHub Pages。</p><p>所以確認專案推上去之後，我們就要來請 AI 幫我們建立一個 GitHub Actions 的 workflow，讓它自動幫我們做部署。</p><p>正常的開發狀況下，我們會區分分支（Branch），像是開發分支、測試分支、正式分支等等，大多正式專案都是 Main 分支（或叫 Master 分支）才會部署到正式環境，其他分支都是測試環境。</p><p>那我們呢？需要嗎？先不用，除非你對這件事情很感興趣，所以我們這邊就以預設分支（Main）為主，push 到 Main 就會自動部署。</p><p>接下來你只要跟 AI 講以下即可：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="幫我加 GitHub Pages 的自動部署，這一步只新增 .github/workflows/deploy.yml：
+
+- push 到 main 時觸發
+- Node 用最新的 LTS，先跑 npm ci、npm test、npm run build
+- 用 GitHub 官方的 Pages actions 上傳 dist 並部署
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>幫我加 GitHub Pages 的自動部署，這一步只新增 .github/workflows/deploy.yml：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>- push 到 main 時觸發
+</span></span><span class="line" line="4"><span>- Node 用最新的 LTS，先跑 npm ci、npm test、npm run build
+</span></span><span class="line" line="5"><span>- 用 GitHub 官方的 Pages actions 上傳 dist 並部署
+</span></span></code></pre><p>正常來講，如果你的 AI 足夠聰明的話（笑），應該會發現一個雷點：</p><p><img alt="雷點" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921093302.png"></p><p>這個 <code>base: '/money-note/'</code> 的雷點算是新手最常見的雷點，因為 GitHub Pages 的網址通常是以下：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="https://帳號.github.io/repo名/
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>https://帳號.github.io/repo名/
+</span></span></code></pre><p>所以如果你的 <code>base</code> 沒有設定的話，那麼就必定會出現白畫面的情況，因為程式碼中的 CSS、JS 以及圖片等，在編譯後的路徑都是從根目錄 <code>/</code> 開始找，然後就出現白畫面了。</p><p>因此如果你有發現這問題，往 <code>vite.config.js</code> 裡面加上 <code>base: '/repo名/'</code> 就可以解決這個問題。</p><p>不過在 push 之前還有一個地方要先調整，請到 GitHub repo → Settings → Pages → Build and deployment → Source 選擇 GitHub Actions，因為新的儲存庫預設是沒有開啟 Pages 的，沒調整的話等一下 Actions 就會出現錯誤。</p><p><img alt="GitHub Pages Source 設定畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921100308.png"></p><p>到這邊如果沒太大問題，你就可以請 AI 將當前進度 commit 並 push 到 GitHub，然後就可以看到 Actions 開始跑了。</p><p><img alt="GitHub Actions 開始跑的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260921100155.png"></p><p>如果過程有出現 Actions 錯誤，基本上會是你儲存庫忘記調整 Pages Source，回頭把上面的設定調整好，然後再重新 push 一次就可以了。</p><p>到這邊為止，如果沒問題的話，你就可以看到你的專案正式對外公開啦～</p><p>底下我給參考示範網址： <a href="https://israynotarray.com/money-note/" rel="nofollow">https://israynotarray.com/money-note/</a></p><p>由於我有自訂網域，所以網域不會是 <code>https://帳號.github.io/repo名/</code> 這種。</p><h2 id="結語">結語</h2><p>時間也差不多了，這邊我也來幫你做一下最後總結：</p><ul><li>部署其實就是把 App build 成靜態檔（<code>dist/</code>）再放到 GitHub Pages 上，而 GitHub Actions 會幫你把這件事自動化，設定一次之後 push 到 main 就會自動部署。</li><li>儘管一開始需求是不走 GitHub Pages，但變更決定時，也要將相關文件對齊修改，避免實作與文件不統一問題。</li><li>專案推上公開的 repo 之前，先請 AI 檢查 commit 歷史跟檔案有沒有不該公開的東西，同時也跑一次 <code>npm test</code> 跟 <code>npm run build</code>。</li><li>GitHub Pages 的網址會多一層 <code>/repo名/</code>，所以 <code>vite.config.js</code> 要記得設定 <code>base</code>，沒設定就會出現白畫面。</li><li>push 之前記得先到 Settings → Pages 把 Source 選成 GitHub Actions，不然 Actions 會出現錯誤。</li></ul><p>那希望這一篇已經讓你成功取得你想要的對外專案公開網址啦～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sjWgA, html code.shiki .sjWgA{--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-default:#005CC5;--shiki-default-font-weight:bold;--shiki-dark:#91CBFF;--shiki-dark-font-weight:bold}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .s7cdV, html code.shiki .s7cdV{--shiki-light:#24292E;--shiki-light-font-weight:bold;--shiki-default:#24292E;--shiki-default-font-weight:bold;--shiki-dark:#F0F3F6;--shiki-dark-font-weight:bold}html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}]]></content>
+  </entry>
+  <entry>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 24：Refactor 還技術債</title>
+    <link href="https://israynotarray.com/ai/20261007/refactor-ai-generated-code/"/>
+    <id>https://israynotarray.com/ai/20261007/refactor-ai-generated-code/</id>
+    <published>2026-10-07T01:00:00.000Z</published>
+    <updated>2026-10-07T01:00:00.000Z</updated>
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 24：Refactor 還技術債" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-24-cover.png"></p><h2 id="前言">前言</h2><p>ㄟ...？AI 寫的程式碼也會有技術債？</p><p>當然！就算是 AI 也是會有技術債的好嗎？</p><p>儘管前面我們用了很多方式去避免欠債，像是...一次盡可能保持一個功能、做完就驗收、commit，甚至還有單元測試，但還是會有一些不可避免的技術債，所以這一篇我們就會來聊一下 AI 技術債的部分。</p><h2 id="所以什麼技術債">所以，什麼技術債？</h2><p>有些人可能不太確定什麼是技術債，所以前面這邊讓我花一點時間稍微解釋以及說明一下。</p><p>所謂的技術債呢...簡單來講就是趕工的產物。</p><p>什麼意思呢？通常我們在開發一個專案的時候，會為了搶佔市場、趕上 deadline，或者是先把功能做出來，可能會先寫一些不夠乾淨、不夠一致的程式碼，或者是沒有做好測試、文件不完整等等，這些都是為了快速交付而暫時犧牲的品質。</p><p>而這個品質就是我們所說的「技術債」。</p><p>如果以比較生活面的例子來講，假設我們買了一棟房子，東西都很快的進駐、放置，但紙箱我們都先丟到角落，反正可以開始住、開始用就好，但過了一段時間後，你會發現你要找一條充電線可能就要翻三～五個箱子，因為你當初搬進來的時候根本沒有好好考慮東西的擺放位置導致。</p><p>將這件事情放眼程式碼也是一樣，同樣的程式碼，同樣的邏輯兩份，時常改 A 檔案忘了改 B 檔案，或者是文件跟程式碼講的不一樣，雖然當下並不會影響功能的運作，但當你要做維護、擴充時，就會開始需要支付利息，這就是技術債的概念。</p><p>那為什麼會提到這件事情呢？因為 Vibe Coding 的開發模式，反而容易產生大量的技術債。</p><p>以傳統快速開發來講，我們每次開發可能就只是留下一點點屎（意指不好的程式碼），但是 Vibe Coding 開發的模式讓開發速度除了加速之外，也加速了大量的屎。</p><h2 id="先釐清不急著重構">先釐清，不急著重構</h2><p>那要清理技術債這個過程我們稱為「重構」，重構的定義是「改結構不改行為」，也就是說，重構的目的是讓程式碼更乾淨、更一致、更容易維護，但不會改變程式的功能，這也是為什麼前面會規劃一個測試章節了。</p><p>畢竟重構雖然可以讓程式碼更乾淨、更一致、更容易維護，但是終究還是會更改到程式碼，難保你更改之後的結果跟原本的結果是一樣的，所以也會稱測試是一個「安全網」概念。</p><p>那我們該怎麼開始動作呢？其實就兩個字「盤點」。</p><p>所以一樣打開我們的練習專案，接著進入 Claude Code 並在對話框中輸入 <code>/clear</code>，確保清除對話框的內容，然後按 Shift+Tab 切到 Plan Mode（看到 <code>plan mode on</code> 就對了），接著輸入：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請盤點這個專案的技術債：
+
+- 重複的邏輯
+- 過大的元件（超過 300 行）
+- 不一致的寫法
+
+以及與 CLAUDE.md 或既有文件講的不一樣的地方。
+
+這次我只要清單，不用給我修改計畫，每一條附嚴重程度跟建議。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請盤點這個專案的技術債：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>- 重複的邏輯
+</span></span><span class="line" line="4"><span>- 過大的元件（超過 300 行）
+</span></span><span class="line" line="5"><span>- 不一致的寫法
+</span></span><span class="line" line="6"><span emptyLinePlaceholder>
+</span></span><span class="line" line="7"><span>以及與 CLAUDE.md 或既有文件講的不一樣的地方。
+</span></span><span class="line" line="8"><span emptyLinePlaceholder>
+</span></span><span class="line" line="9"><span>這次我只要清單，不用給我修改計畫，每一條附嚴重程度跟建議。
+</span></span></code></pre><p>接下來你應該會看到修改建議，而這就是我們請 AI 盤點出來的技術債清單。</p><p>但，你會發現我這邊使用的 Plan Mode 來做盤點，而不是直接在 Accept Edits Mode 下請 AI 盤點，為什麼呢？</p><p>其實你就把 AI 當作一個很雞婆的人，盤點著...盤點著，就不知道哪根筋不對就直接順便開始改了，接著就出現一大堆 Diff（修改記錄），你根本來不及判斷哪些該改、哪些不該改，所以這邊才會使用 Plan Mode 來做盤點，等你看完清單之後再決定要不要改。</p><p>我相信你一定會講：「直接 Prompt 裡面寫一句『先不要改』不就好了？」</p><p>老實講也沒有錯，但如果他的 Context 爆掉的話，終究還是會忘記這件事情，所以我才會建議你使用 Plan Mode 來做盤點。</p><p><img alt="AI 盤點出來的技術債清單" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260919214858.png"></p><p>很方便吧？透過這個方式，我們可以很快的找出專案中存在的技術債，並且可以依照嚴重程度來決定要不要改。</p><p>但開始之前，你務必要確認當前測試都是正常的（全綠），否則你根本分不出來是原本就壞的，還是你剛剛改壞的唷！</p><h2 id="ai-最常欠的四種債">AI 最常欠的四種債</h2><p>那這邊我想特別拉出來講一件事情回顧一下剛剛的 Prompt，因為我在 Prompt 裡面特別點名了四種東西，分別是：</p><ul><li><strong>重複的邏輯：</strong> 同樣功能與事情寫了兩次以上。</li><li><strong>過大的元件：</strong> 一個檔案塞了太多事情，超過 N 行。</li><li><strong>不一致的寫法：</strong> 同一件事情在不同地方有不同的寫法。</li><li><strong>文件跟程式碼講的不一樣：</strong> CLAUDE.md、SPEC.md 與程式碼不一致。</li></ul><p>ㄟ...為什麼我會特別點名這四種呢？因為這四種是 AI 最常欠的債。</p><p>這個根本原因其實還是圍繞在我們前面一直在講的 Context 有關係，每一次的使用 AI 其實都是從零開始，除非你有特別把這些東西寫在特定的檔案裡面，然後搭配 CLAUDE.md 或 SPEC.md 來引導 AI 閱讀，否則它根本不會知道你之前的程式碼是怎麼寫的。</p><h2 id="分析的內容很多要一次還嗎">分析的內容很多，要一次還嗎？</h2><p>老實講，不用，但也不能忽視。</p><p>你應該要先挑出影響程度比較高的功能來實作，先做修正並逐步去更新，並非一次到位。</p><p>當然這邊我還是要交代一件事情：</p><blockquote><p>AI 給的高、中、低只是它的意見，並不是聖旨，你才是這個專案的主人，所以你要自己判斷哪些債是你要先還的。</p></blockquote><p>如果沒想法，你可以回顧一下前面章節所說的 MVP，先把最重要的功能做好，其他的就慢慢來，畢竟一個記帳軟體最核心的就是「計算」絕對不能出錯，其他功能只要不影響操作都可以往後排。</p><p>那因為 Plan Mode 出來的結果別忘記叫 AI 儲存下來，所以你可以輸入以下：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請把剛剛那份技術債清單完整存成 docs/TODO.md，每一條保留嚴重程度跟建議，先不要處理任何一條。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請把剛剛那份技術債清單完整存成 docs/TODO.md，每一條保留嚴重程度跟建議，先不要處理任何一條。
+</span></span></code></pre><p>接下來你就慢慢閱讀這份 TODO.md 即可。</p><h2 id="試試看還一些技術債">試試看還一些技術債</h2><p>這邊我們就來實際還一下技術債，以我這邊來講，AI 掃出來的其中一條是 Day 22 掛上去的排版 Hook 沒有 Prettier 設定檔，所以它一直都是拿 Prettier 自己的預設值在排版（雙引號、加分號），可是專案原本的程式碼是單引號、不加分號。</p><p>也就是說，之後 AI 每改一個檔案，那個檔案就會被排成另一種風格，這就是前面講的不一致的寫法，也算是技術債的一種，另外當時拿來測試 Hook 的 <code>src/hook-test.js</code> 也還留在專案裡沒有刪。</p><p>那這個其實相對比較小，不太需要特別開到 Plan Mode，直接在 Accept Edits Mode 下請 AI 幫你做就可以了。</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我新增 Prettier 設定檔 .prettierrc，規則請依照專案現有程式碼的風格來訂（引號、分號、一行的寬度），不要用 Prettier 的預設值。
+
+加完之後跑一次 npx prettier --check src，確認現有的檔案幾乎都不需要變動，順便把之前測試 Hook 留下來的 src/hook-test.js 刪掉。
+
+做完請跑一次 npm test，並把 docs/TODO.md 裡「沒有 Prettier 設定檔」這一條標註為已完成。
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我新增 Prettier 設定檔 .prettierrc，規則請依照專案現有程式碼的風格來訂（引號、分號、一行的寬度），不要用 Prettier 的預設值。
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>加完之後跑一次 npx prettier --check src，確認現有的檔案幾乎都不需要變動，順便把之前測試 Hook 留下來的 src/hook-test.js 刪掉。
+</span></span><span class="line" line="4"><span emptyLinePlaceholder>
+</span></span><span class="line" line="5"><span>做完請跑一次 npm test，並把 docs/TODO.md 裡「沒有 Prettier 設定檔」這一條標註為已完成。
+</span></span></code></pre><p>.prettierrc 是一個 Prettier 的設定檔，裡面可以設定程式碼的格式化規則，例如使用單引號還是雙引號、是否加分號、每行的最大長度等等。</p><p>這邊我並沒有告訴它要用單引號還是雙引號，而是請它自己去看現有的程式碼風格。</p><p><img alt="請 AI 補上 .prettierrc 並刪掉 hook-test.js 的對話" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260920151543.png"></p><h2 id="驗收重構要驗的是什麼都沒變">驗收：重構要驗的是什麼都沒變</h2><p>那麼最後假設你已經重構完畢了，接著你務必要讓 AI 跑以下指令：</p><ul><li><strong><code>npm test</code>：</strong> 確認算錢的邏輯沒有被動到，Day 23 花時間寫的那些測試今天會成為你的防護網。</li><li><strong><code>npm run build</code>：</strong> 確認專案可以正常打包運作，畢竟重構後許多檔案可能會被搬移。</li><li><strong>自己走一遍畫面：</strong> 儘管可以透過一些自動化測試工具來驗證畫面，但我們主要是針對功能的正確性來驗收，所以這一層只能靠你自己。</li></ul><p>跑的方式也很簡單，只需要給以下 Prompt 即可：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我跑以下指令，並把結果回報給我：
+
+1. npm test
+2. npm run build
+" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我跑以下指令，並把結果回報給我：
+</span></span><span class="line" line="2"><span emptyLinePlaceholder>
+</span></span><span class="line" line="3"><span>1. npm test
+</span></span><span class="line" line="4"><span>2. npm run build
+</span></span></code></pre><p><img alt="重構完成後 npm test 依然全部通過" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260920152202.png"></p><p>剩下的部分就留給你自己試著重構看看囉。</p><h2 id="多久該盤點一次">多久該盤點一次？</h2><p>這個我認為滿沒有標準答案的，你可以依照專案的大小、複雜度以及開發進度來決定盤點的頻率。</p><p>例如...以我們這個記帳 App 來講，從開工到現在為止，中間一次都沒有盤點過，結果今天一盤就是 30 條，這個數量雖然不多，但還是建議趁早處理。</p><p>所以如果真的要講一個標準的話，與其用「多久」來算，我會建議你改用「時機」來判斷，只要遇到下面這幾個時機就盤一次：</p><ul><li><strong>大改版之後：</strong> 像前面章節我們針對畫面做了修正，這時候就可以順便調整一下。</li><li><strong>AI 開始出現怪怪的行為：</strong> 例如改 A 壞 B、同樣的東西它又寫了一份。</li><li><strong>上線前：</strong> 這時候不管怎樣都會建議檢查一下，畢竟牽扯到給使用者使用。</li></ul><p>這邊我也順手把今天的流程畫成一張圖：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
+    A[&quot;確認測試全綠&lt;br&gt;git status 乾淨&quot;] --&gt; B[&quot;Plan Mode 盤點&lt;br&gt;只要清單，不要修改計畫&quot;]
+    B --&gt; C[&quot;清單存成 docs/TODO.md&quot;]
+    C --&gt; D{&quot;挑影響最大的先還&lt;br&gt;要動幾個檔案？&quot;}
+    D --&gt;|&quot;補設定、改文件&quot;| F[&quot;直接請 AI 做&quot;]
+    D --&gt;|&quot;要動好幾個檔案&quot;| G[&quot;Plan Mode&lt;br&gt;一次只還一條&quot;]
+    F --&gt; H{&quot;驗收&lt;br&gt;測試、build、畫面都沒變？&quot;}
+    G --&gt; H
+    H --&gt;|&quot;過&quot;| I[&quot;commit，一刀一個&quot;]
+    H --&gt;|&quot;沒過&quot;| J[&quot;退回上一個 commit&lt;br&gt;範圍切小再來&quot;]
+" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TD
+</span></span><span class="line" line="2"><span>    A[&quot;確認測試全綠&lt;br&gt;git status 乾淨&quot;] --&gt; B[&quot;Plan Mode 盤點&lt;br&gt;只要清單，不要修改計畫&quot;]
+</span></span><span class="line" line="3"><span>    B --&gt; C[&quot;清單存成 docs/TODO.md&quot;]
+</span></span><span class="line" line="4"><span>    C --&gt; D{&quot;挑影響最大的先還&lt;br&gt;要動幾個檔案？&quot;}
+</span></span><span class="line" line="5"><span>    D --&gt;|&quot;補設定、改文件&quot;| F[&quot;直接請 AI 做&quot;]
+</span></span><span class="line" line="6"><span>    D --&gt;|&quot;要動好幾個檔案&quot;| G[&quot;Plan Mode&lt;br&gt;一次只還一條&quot;]
+</span></span><span class="line" line="7"><span>    F --&gt; H{&quot;驗收&lt;br&gt;測試、build、畫面都沒變？&quot;}
+</span></span><span class="line" line="8"><span>    G --&gt; H
+</span></span><span class="line" line="9"><span>    H --&gt;|&quot;過&quot;| I[&quot;commit，一刀一個&quot;]
+</span></span><span class="line" line="10"><span>    H --&gt;|&quot;沒過&quot;| J[&quot;退回上一個 commit&lt;br&gt;範圍切小再來&quot;]
+</span></span></code></pre><p><img alt="流程圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B410%E6%9C%887%E6%97%A5%20%E4%B8%8A%E5%8D%8812_05_15.png"></p><h2 id="結語">結語</h2><p>那時間也差不多到結尾了，這邊也幫你總結一下：</p><ul><li>技術債不是 Bug，而是現在不痛、以後才痛的東西，AI 一次只看一個任務，所以回頭整理這件事要由你發起。</li><li>AI 最常欠四種債：重複的邏輯、過大的元件、不一致的寫法、文件跟程式碼不一致。</li><li>盤點用 Plan Mode，清單存進專案，先挑影響最大的還，小事直接做、要動刀的走 Plan Mode 一次只還一條。</li><li>重構驗的是什麼都沒變，測試、build、畫面三層都過才 commit，沒過就直接退回去，不要硬修。</li></ul><p>債盤點過了、測試也是全綠的，所以明天我們就直接把 App 部署上線，讓它有一個真正的公開網址。</p><p>希望這一篇有讓你把債還乾淨哩～我們明天見囉～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
+  </entry>
   <entry>
     <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 23：測試安全網</title>
     <link href="https://israynotarray.com/ai/20261006/claude-code-vitest-unit-tests/"/>
@@ -69,7 +318,7 @@ v1 完成的定義：
 </span></span><span class="line" line="14"><span class="s8XSl">   且月份切換列的左右箭頭位置不位移
 </span></span><span class="line" line="15"><span class="syBk-">10.</span><span class="s7cdV"> **新增一筆支出後切到統計頁，總支出、記帳筆數與圓餅圖都反映最新資料**
 </span></span><span class="line" line="16"><span class="syBk-">11.</span><span class="s8XSl"> 在統計頁切換月份，三個數字與圓餅圖同步換成該月；切分頁不會把月份重置回本月
-</span></span></code></pre><p>這邊就可以讓你想想甚至請 AI 參考去怎麼寫成測試案例，而不是讓 AI 自己去腦補，這也是為什麼我會在前面章節花了很多時間介紹 SPEC.md 的重要性，因為它就是你跟 AI 的合約（當然你也可以去翻 <code>docs/plans</code> 看當初的計畫）。</p><p>接著它會裝 Vitest、生出測試檔，接著會跟你講結果：</p><p><img alt="安裝測試以及測試結果" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260915101258.png"></p><p>你可以看到我的 AI 產出了三個測試檔案，並且了 57 個案例，你會發現它寫的量遠比你想像的還要多。</p><p>你如果去翻一下測試檔案（*.test.js），你會發現 <code>stats.test.js</code>、<code>format.test.js</code> 以及 <code>useRecords.test.js</code> 都有測到，這三個檔案分別對應到算錢、格式化以及資料篩選的邏輯。</p><p>通常測試檔案都會加上 <code>.test</code> 這是一個慣例，有些也會放在 <code>src/__tests__</code> 這個資料夾裡，這些都是為了開發者快速辨識這個檔案是測試檔案而已，沒有特別的意義。</p><p>如果你實際使用之後發現數量、測試案例與我不同，這是很正常的，因為 AI 具有隨機性，每次生出來的案例數本來就不會一樣，只是我們盡可能透過 SPEC.md 以及 Prompt 去限制它的行為，讓它生出來的案例是我們要求的邊界範圍。</p><h2 id="看懂測試案例">看懂測試案例</h2><p>儘管測試案例是給 AI 撰寫，但...你也是要稍微看懂他的測試案例在測什麼、寫什麼，不然你怎麼知道它寫的測試案例是對的？</p><p>但基本上測試案例相較於程式碼算是好懂很多，因為大多都是「給什麼東西進去，就期待什麼東西出來」，所以你只要看懂它在測什麼就好。</p><p>這邊我就隨機挑一個我這邊的範本（<code>src/utils/format.test.js</code>）給你看：</p><pre className="language-js shiki shiki-themes github-light github-light github-dark-high-contrast" code="describe('formatAmount', () =&gt; {
+</span></span></code></pre><p>這邊就可以讓你想想甚至請 AI 參考去怎麼寫成測試案例，而不是讓 AI 自己去腦補，這也是為什麼我會在前面章節花了很多時間介紹 SPEC.md 的重要性，因為它就是你跟 AI 的合約（當然你也可以去翻 <code>docs/plans</code> 看當初的計畫）。</p><p>接著它會裝 Vitest、生出測試檔，接著會跟你講結果：</p><p><img alt="安裝測試以及測試結果" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260915101258.png"></p><p>你可以看到我的 AI 產出了三個測試檔案，並且寫了 57 個案例，你會發現它寫的量遠比你想像的還要多。</p><p>你如果去翻一下測試檔案（*.test.js），你會發現 <code>stats.test.js</code>、<code>format.test.js</code> 以及 <code>useRecords.test.js</code> 都有測到，這三個檔案分別對應到算錢、格式化以及資料篩選的邏輯。</p><p>通常測試檔案都會加上 <code>.test</code> 這是一個慣例，有些也會放在 <code>src/__tests__</code> 這個資料夾裡，這些都是為了開發者快速辨識這個檔案是測試檔案而已，沒有特別的意義。</p><p>如果你實際使用之後發現數量、測試案例與我不同，這是很正常的，因為 AI 具有隨機性，每次生出來的案例數本來就不會一樣，只是我們盡可能透過 SPEC.md 以及 Prompt 去限制它的行為，讓它生出來的案例是我們要求的邊界範圍。</p><h2 id="看懂測試案例">看懂測試案例</h2><p>儘管測試案例是給 AI 撰寫，但...你也是要稍微看懂他的測試案例在測什麼、寫什麼，不然你怎麼知道它寫的測試案例是對的？</p><p>但基本上測試案例相較於程式碼算是好懂很多，因為大多都是「給什麼東西進去，就期待什麼東西出來」，所以你只要看懂它在測什麼就好。</p><p>這邊我就隨機挑一個我這邊的範本（<code>src/utils/format.test.js</code>）給你看：</p><pre className="language-js shiki shiki-themes github-light github-light github-dark-high-contrast" code="describe('formatAmount', () =&gt; {
   it('0 顯示成 $0', () =&gt; {
     expect(formatAmount(0)).toBe('$0')
   })
@@ -267,12 +516,12 @@ try {
 </span></span></code></pre><h2 id="結語">結語</h2><p>那這章節也介紹差不多了，也一樣總結一下吧！</p><ul><li>Hook 是掛在 AI 生命週期上的機關，事件一發生就執行、不經過 AI 判斷，CLAUDE.md 是拜託你做、Hook 是強制你做。</li><li>Hook 的設定寫在 <code>settings.json</code> 的 <code>hooks</code> 區塊，共享的放專案的 <code>.claude/settings.json</code> 會跟著 commit，個人的（像桌面通知）放 <code>.claude/settings.local.json</code>，記得自己加進 <code>.gitignore</code>。</li><li><code>matcher</code> 決定哪些工具會觸發，這次只盯 Edit 跟 Write，所以 AI 用 Bash 寫檔是不會觸發的。</li><li>Hook 是強制的，指令寫錯每次觸發都會爆一次，所以先在終端機測過再掛上去。</li></ul><p>那明天我們就來聊測試，Day 14 說過「錯了不痛可以先放生」的那些 code，該有人幫你盯著了。</p><p>希望這一篇有讓你對 Hook 有更進一步的認識哩～</p><p>我們明天 Day 23 見囉～</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sOudu, html code.shiki .sOudu{--shiki-light:#D73A49;--shiki-default:#D73A49;--shiki-dark:#FF9492}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .scAaK, html code.shiki .scAaK{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#DBB7FF}html pre.shiki code .sWTrB, html code.shiki .sWTrB{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#72F088}html pre.shiki code .sbsOT, html code.shiki .sbsOT{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#FF9492}]]></content>
   </entry>
   <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 21：Week 3 收尾之所以 Skills、Subagents、MCP 怎麼選</title>
+    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 21：Week 3 收尾之 Skills、Subagents、MCP 怎麼選</title>
     <link href="https://israynotarray.com/ai/20261004/skills-subagents-mcp-how-to-choose/"/>
     <id>https://israynotarray.com/ai/20261004/skills-subagents-mcp-how-to-choose/</id>
     <published>2026-10-04T01:00:00.000Z</published>
     <updated>2026-10-04T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 21：Week 3 收尾——Skills、Subagents、MCP 怎麼選" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-21-cover.png"></p><h2 id="前言">前言</h2><p>不知不覺我們也到了 Week3 的收尾篇了。</p><p>那這一週算是把前面介紹的 SKILL、SubAgent、MCP 這三種擴充強化 AI 的方式做一個總結收斂，減少大家在實務上使用時的疑惑。</p><h2 id="各自的定位">各自的定位</h2><p>前面我們分別認識到 SKILL、SubAgent、MCP 這三種方式，而這各自都有屬於它的定位點：</p><ul><li><strong>Skill</strong>： 教 AI 方法/流程，讓 AI 可以符合你預期的做事方式，例如前面章節所使用的 commit-message skill 一樣，我們教 AI commit 訊息該怎麼寫、套入 Frontend Design 的規則，讓 AI 知道前端畫面該怎麼設計。</li><li><strong>SubAgent</strong>： 花錢（Token）請一位專人去處理特定事情，例如前面章節所使用的 code-reviewer SubAgent 一樣，我們請一位專人去審查我們的程式碼，並回報給我們結果。</li><li><strong>MCP</strong>： 讓 AI 可以與外部專案溝通的萬能轉接頭，就像使用了 Context7 MCP 一樣，我們讓 AI 可以直接去查詢官方文件，或是去接上 GitHub、Figma 等外部工具，讓 AI 可以直接與外部專案溝通。</li></ul><p>同時，我也把這件事情製作成表格給你做一個比較：</p><table><thead><tr><th></th><th>Skill</th><th>SubAgent</th><th>MCP</th></tr></thead><tbody><tr><td>它是什麼</td><td>一份教 AI 方法/流程的文件</td><td>一個有獨立 Context 的 AI 分身</td><td>一個接外部服務的轉接頭</td></tr><tr><td>什麼時候載入</td><td>需要用到才展開全文</td><td>派出去才會開新房間</td><td>接上就先佔一塊桌面，真的用到才展開完整定義</td></tr><tr><td>Context 成本</td><td>低，平常只佔一行 description</td><td>主 Agent 低，過程都關在分身自己的房間裡（但分身本身還是會花 Token）</td><td>相對高，工具名稱常駐桌面，抓回來的內容也會吃 Token</td></tr><tr><td>適合什麼</td><td>同一套做法要重複用</td><td>可以外包出去、只拿結論的工作</td><td>要碰專案資料夾以外的東西</td></tr></tbody></table><p>那這邊也有件事情要特別強調一下，這三個東西並非互斥，是可以相輔相成的，不是說選了 SKILL 就不能用 MCP，或是選了 SubAgent 就不能用 SKILL，千萬不要忘記前面的 Context7 MCP 例子，裡面就同時使用了 SKILL 跟 Rule，MCP 負責去查文件，SKILL 跟 Rule 負責告訴 AI 什麼時候該去查，這就是多個東西疊在一起的實際案例。</p><h2 id="何時該用">何時該用？</h2><p>認識了各自定位之後，當然要來了解一下我們該如何選擇。</p><p>基本上你可以參考底下三個問題來決定何時該用什麼：</p><ol><li><strong>這件事情是不是同一套做法會重複用？</strong> 是就寫成 SKILL，每次都一定要做的事情就可以寫成 SKILL，像是 commit 訊息格式、前端畫面設計規則、查官方文件的步驟等等。</li><li><strong>這個工作適不適合外包出去、只拿結論回來？</strong> 是就建一個 SubAgent，像是 Code Review、研究資料、大範圍掃描專案這種高度佔用 Context 的工作就很適合建 SubAgent，讓它去做完再回報結果給你。</li><li><strong>需不需要碰專案資料夾以外的東西？</strong> 是就接 MCP，像是瀏覽器、內部資料庫、Figma、GitHub 等等，這些都屬於專案資料夾以外的世界，這時候就要接 MCP 了。</li></ol><p>這邊我們也看一下流程圖，方便你更容易理解彼此使用時機：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
+    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 21：Week 3 收尾之 Skills、Subagents、MCP 怎麼選" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/vibe-coding-day-21-cover.png"></p><h2 id="前言">前言</h2><p>不知不覺我們也到了 Week3 的收尾篇了。</p><p>那這一週算是把前面介紹的 SKILL、SubAgent、MCP 這三種擴充強化 AI 的方式做一個總結收斂，減少大家在實務上使用時的疑惑。</p><h2 id="各自的定位">各自的定位</h2><p>前面我們分別認識到 SKILL、SubAgent、MCP 這三種方式，而這各自都有屬於它的定位點：</p><ul><li><strong>Skill</strong>： 教 AI 方法/流程，讓 AI 可以符合你預期的做事方式，例如前面章節所使用的 commit-message skill 一樣，我們教 AI commit 訊息該怎麼寫、套入 Frontend Design 的規則，讓 AI 知道前端畫面該怎麼設計。</li><li><strong>SubAgent</strong>： 花錢（Token）請一位專人去處理特定事情，例如前面章節所使用的 code-reviewer SubAgent 一樣，我們請一位專人去審查我們的程式碼，並回報給我們結果。</li><li><strong>MCP</strong>： 讓 AI 可以與外部專案溝通的萬能轉接頭，就像使用了 Context7 MCP 一樣，我們讓 AI 可以直接去查詢官方文件，或是去接上 GitHub、Figma 等外部工具，讓 AI 可以直接與外部專案溝通。</li></ul><p>同時，我也把這件事情製作成表格給你做一個比較：</p><table><thead><tr><th></th><th>Skill</th><th>SubAgent</th><th>MCP</th></tr></thead><tbody><tr><td>它是什麼</td><td>一份教 AI 方法/流程的文件</td><td>一個有獨立 Context 的 AI 分身</td><td>一個接外部服務的轉接頭</td></tr><tr><td>什麼時候載入</td><td>需要用到才展開全文</td><td>派出去才會開新房間</td><td>接上就先佔一塊桌面，真的用到才展開完整定義</td></tr><tr><td>Context 成本</td><td>低，平常只佔一行 description</td><td>主 Agent 低，過程都關在分身自己的房間裡（但分身本身還是會花 Token）</td><td>相對高，工具名稱常駐桌面，抓回來的內容也會吃 Token</td></tr><tr><td>適合什麼</td><td>同一套做法要重複用</td><td>可以外包出去、只拿結論的工作</td><td>要碰專案資料夾以外的東西</td></tr></tbody></table><p>那這邊也有件事情要特別強調一下，這三個東西並非互斥，是可以相輔相成的，不是說選了 SKILL 就不能用 MCP，或是選了 SubAgent 就不能用 SKILL，千萬不要忘記前面的 Context7 MCP 例子，裡面就同時使用了 SKILL 跟 Rule，MCP 負責去查文件，SKILL 跟 Rule 負責告訴 AI 什麼時候該去查，這就是多個東西疊在一起的實際案例。</p><h2 id="何時該用">何時該用？</h2><p>認識了各自定位之後，當然要來了解一下我們該如何選擇。</p><p>基本上你可以參考底下三個問題來決定何時該用什麼：</p><ol><li><strong>這件事情是不是同一套做法會重複用？</strong> 是就寫成 SKILL，每次都一定要做的事情就可以寫成 SKILL，像是 commit 訊息格式、前端畫面設計規則、查官方文件的步驟等等。</li><li><strong>這個工作適不適合外包出去、只拿結論回來？</strong> 是就建一個 SubAgent，像是 Code Review、研究資料、大範圍掃描專案這種高度佔用 Context 的工作就很適合建 SubAgent，讓它去做完再回報結果給你。</li><li><strong>需不需要碰專案資料夾以外的東西？</strong> 是就接 MCP，像是瀏覽器、內部資料庫、Figma、GitHub 等等，這些都屬於專案資料夾以外的世界，這時候就要接 MCP 了。</li></ol><p>這邊我們也看一下流程圖，方便你更容易理解彼此使用時機：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
     A{&quot;同一套做法會重複用？&quot;} --&gt;|&quot;是&quot;| B[&quot;寫 SKILL&quot;]
     A --&gt;|&quot;否&quot;| C{&quot;適合外包出去&lt;br&gt;只拿結論？&quot;}
     C --&gt;|&quot;是&quot;| D[&quot;建 SubAgent&quot;]
@@ -311,9 +560,9 @@ description: This skill should be used when the user asks about libraries, frame
 </span></span><span class="line" line="2"><span class="s8XSl">name: context7-mcp
 </span></span><span class="line" line="3"><span class="s8XSl">description: This skill should be used when the user asks about libraries, frameworks, API references, or needs code examples. Activates for setup questions, code generation involving libraries, or mentions of specific frameworks like React, Vue, Next.js, Prisma, Supabase, etc.
 </span></span><span class="line" line="4"><span class="sjWgA">---
-</span></span></code></pre><p><code>description</code> 就是在講「如果使用者問到套件、框架、API 參考，或是需要程式碼範例，就啟動這個 SKILL」，而這個 SKILL 的內容就是告訴 Claude 要怎麼去查 Context7 MCP。</p><p>當然，不是只有這邊而已，還有 Rule 也有告訴 Claude 遇到套件問題要去查 Context7 MCP，Rule 也是差不多的內容「只要問到套件、框架、SDK 的用法或設定，就先用 Context7 查最新文件再回答，就算你覺得自己會也一樣」，而這些東西的放在這邊：</p><ul><li><strong>Rule：</strong> <code>~/.claude/rules/context7.md</code>，這個資料夾我們還沒聊過，裡面的 .md 跟 CLAUDE.md 是同一種東西，Claude Code 啟動時會一起讀進來，而且全部專案通用。</li><li><strong>Skill：</strong> <code>~/.claude/skills/context7-mcp/SKILL.md</code>，裡面寫的是查文件的步驟，先用 resolve-library-id 找到正確的套件、再用 query-docs 抓對應的段落。</li></ul><p>那如果它沒有使用 context7 呢？其實也很簡單，直接指名使用 <code>context7</code> 也可以。</p><p>之所以 Context7 MCP 會順手裝一個 SKILL 跟 Rule，是因為這樣可以讓 Claude 更主動，遇到套件問題就會自己去查，而不是等你點名它才去查。</p><h2 id="mcp-不是免費的">MCP 不是免費的</h2><p>最後這邊也要提醒一下，使用 MCP 是有代價的。</p><p>什麼代價呢？儘管 MCP 是一個標準的轉接頭，但它背後是一個後端應用程式，像 Context7 這種遠端的 server 是跑在遠端的伺服器上，所以會需要登入授權。</p><p>當然，你也是可以把 MCP 起在自己的電腦上，這樣就不用登入授權了，但這樣就要自己維護 MCP server 的程式碼、更新以及伺服器環境等等，對普通使用者來講，我認為相對麻煩很多。</p><p>接著 MCP 對於 Context 的佔用其實也很大，以前面的範例來講，Context7 MCP 每抓一次文件，那些內容都會被一次性丟進對話裡面，這些內容就很容易大幅度佔用 Context，接著你的 AI 就很容易遺忘之前的對話內容，這也是為什麼 MCP 不是免費的，它是有代價的。</p><p>而且不只是抓回來的內容而已，光是接上就會先佔一塊桌面，還記得 Day 6 的 <code>/context</code> 嗎？你可以試著輸入看看</p><p><img alt="/context 畫面，看得到 MCP tools 那一行的佔用" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260913121456.png"></p><p>你會看到多了一行 MCP tools，這是因為接上 MCP 之後，這些工具的名字會先被放到桌面上，讓 Claude 知道自己有哪些工具可以用，至於每個工具的完整定義則是真的用到才會展開來。</p><p>所以以我自己的習慣來講會是 <strong>需要的時候才接，用不到的時候就關掉</strong>**。</p><p>如果你是想要移除整個 Context7 的話你可以輸入以下指令，它會一起把 MCP 與 SKILL 等都移除：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="npx ctx7 remove --mcp --claude
+</span></span></code></pre><p><code>description</code> 就是在講「如果使用者問到套件、框架、API 參考，或是需要程式碼範例，就啟動這個 SKILL」，而這個 SKILL 的內容就是告訴 Claude 要怎麼去查 Context7 MCP。</p><p>當然，不是只有這邊而已，還有 Rule 也有告訴 Claude 遇到套件問題要去查 Context7 MCP，Rule 也是差不多的內容「只要問到套件、框架、SDK 的用法或設定，就先用 Context7 查最新文件再回答，就算你覺得自己會也一樣」，而這些東西的放在這邊：</p><ul><li><strong>Rule：</strong> <code>~/.claude/rules/context7.md</code>，這個資料夾我們還沒聊過，裡面的 .md 跟 CLAUDE.md 是同一種東西，Claude Code 啟動時會一起讀進來，而且全部專案通用。</li><li><strong>Skill：</strong> <code>~/.claude/skills/context7-mcp/SKILL.md</code>，裡面寫的是查文件的步驟，先用 resolve-library-id 找到正確的套件、再用 query-docs 抓對應的段落。</li></ul><p>那如果它沒有使用 context7 呢？其實也很簡單，直接指名使用 <code>context7</code> 也可以。</p><p>之所以 Context7 MCP 會順手裝一個 SKILL 跟 Rule，是因為這樣可以讓 Claude 更主動，遇到套件問題就會自己去查，而不是等你點名它才去查。</p><h2 id="mcp-不是免費的">MCP 不是免費的</h2><p>最後這邊也要提醒一下，使用 MCP 是有代價的。</p><p>什麼代價呢？儘管 MCP 是一個標準的轉接頭，但它背後是一個後端應用程式，像 Context7 這種遠端的 server 是跑在遠端的伺服器上，所以會需要登入授權。</p><p>當然，你也是可以把 MCP 起在自己的電腦上，這樣就不用登入授權了，但這樣就要自己維護 MCP server 的程式碼、更新以及伺服器環境等等，對普通使用者來講，我認為相對麻煩很多。</p><p>接著 MCP 對於 Context 的佔用其實也很大，以前面的範例來講，Context7 MCP 每抓一次文件，那些內容都會被一次性丟進對話裡面，這些內容就很容易大幅度佔用 Context，接著你的 AI 就很容易遺忘之前的對話內容，這也是為什麼 MCP 不是免費的，它是有代價的。</p><p>而且不只是抓回來的內容而已，光是接上就會先佔一塊桌面，還記得 Day 6 的 <code>/context</code> 嗎？你可以試著輸入看看</p><p><img alt="/context 畫面，看得到 MCP tools 那一行的佔用" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260913121456.png"></p><p>你會看到多了一行 MCP tools，這是因為接上 MCP 之後，這些工具的名字會先被放到桌面上，讓 Claude 知道自己有哪些工具可以用，至於每個工具的完整定義則是真的用到才會展開來。</p><p>所以以我自己的習慣來講會是 <strong>需要的時候才接，用不到的時候就關掉</strong>。</p><p>如果你是想要移除整個 Context7 的話你可以輸入以下指令，它會一起把 MCP 與 SKILL 等都移除：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="npx ctx7 remove --mcp --claude
 " language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">npx</span><span class="sWayO"> ctx7</span><span class="sWayO"> remove</span><span class="stw71"> --mcp</span><span class="stw71"> --claude
-</span></span></code></pre><p>如果你對於其他 MCP 有興趣的話，也可以去看看 <a href="https://modelcontextprotocol.io/" rel="nofollow">modelcontextprotocol.io</a> 這邊有相當多的 MCP server 可以使用（如：Figma、GitHub 等等）。</p><h2 id="結語">結語</h2><p>寫到這邊也差不多了，相信你對於 MCP 已經有一個基本概念，這邊最後也幫你總結一下相關的知識吧。</p><ul><li>MCP 類似一個轉接頭，讓 AI 可以用同一種方式接上外部的工具或服務。</li><li>輸入 <code>/mcp</code> 可以看到目前已經接上了哪些 MCP server、各自帶了幾個工具。</li><li>MCP server 接上之後，AI 會照工具的說明自己決定要不要用，Context7 還順便安裝規則跟 SKILL 讓它更主動，真的沒動你再點名它。</li><li>接了 MCP 就會佔桌面，所以需要時再打開，不需要就關閉或移除，減少 Context 的佔用。</li></ul><p>我們就到這邊結束，我們下一篇見。</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .sjWgA, html code.shiki .sjWgA{--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-default:#005CC5;--shiki-default-font-weight:bold;--shiki-dark:#91CBFF;--shiki-dark-font-weight:bold}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}]]></content>
+</span></span></code></pre><p>如果你對於其他 MCP 有興趣的話，也可以去看看 <a href="https://modelcontextprotocol.io/" rel="nofollow">modelcontextprotocol.io</a> 這邊有相當多的 MCP server 可以使用（如：Figma、GitHub 等等）。</p><h2 id="結語">結語</h2><p>寫到這邊也差不多了，相信你對於 MCP 已經有一個基本概念，這邊最後也幫你總結一下相關的知識吧。</p><ul><li>MCP 類似一個轉接頭，讓 AI 可以用同一種方式接上外部的工具或服務。</li><li>輸入 <code>/mcp</code> 可以看到目前已經接上了哪些 MCP server、各自帶了幾個工具。</li><li>MCP server 接上之後，AI 會照工具的說明自己決定要不要用，Context7 還順便安裝規則跟 SKILL 讓它更主動，真的沒動你再點名它。</li><li>接了 MCP 就會佔桌面，所以需要時再打開，不需要就關閉或移除，減少 Context 的佔用。</li></ul><p>我們就到這邊結束，我們下一篇見。</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sjWgA, html code.shiki .sjWgA{--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-default:#005CC5;--shiki-default-font-weight:bold;--shiki-dark:#91CBFF;--shiki-dark-font-weight:bold}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}]]></content>
   </entry>
   <entry>
     <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 19：Subagents 之來請一個 Code Review 副手</title>
@@ -730,7 +979,7 @@ v1 完成的定義：
 </span></span><span class="line" line="16"><span class="syBk-">11.</span><span class="s8XSl"> 在統計頁切換月份，三個數字與圓餅圖同步換成該月；切分頁不會把月份重置回本月
 </span></span></code></pre><p>你可能會認為感覺我們畫面不怎麼樣、功能也沒什麼特色諸如此類的，但實際上我們這邊是驗收「核心 MVP」的功能。</p><p>什麼是「核心 MVP」呢？其實就是一個記帳軟體最基本最基本的功能</p><ul><li>新增、修改、刪除支出</li><li>切換月份、統計各分類佔比</li><li>資料保存（關掉重開資料還在）</li></ul><p>這些都是一個記帳軟體最基本的功能，沒有這些就不能算是「能用的記帳軟體」，所以這邊把它定義為「核心 MVP」。</p><p>但這個核心 MVP 並不代表旅程到此為止，而是我們後面要搭配一些東西，如視覺規範等，讓整體看起來更像一個產品，這些會在後面兩週補齊。</p><h2 id="看看你的一週軌跡git-log-就是你的進度條">看看你的一週軌跡：<code>git log</code> 就是你的進度條</h2><p>你可以在終端機輸入以下：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="git log --oneline
 " language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">git</span><span class="sWayO"> log</span><span class="stw71"> --oneline
-</span></span></code></pre><p><img alt="git log --oneline 輸出，看得到一週以來的 commit 紀錄" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260816161845.png"></p><p>這邊截圖只是示範而已，並不是你專案的實際輸出，請自己在專案裡跑 <code>git log --oneline</code> 看看。</p><p>當然，你也可以直接叫 AI 幫你跑。</p><p>透過 Git，你可以看到你整個 Vibe Coding 的軌跡，當專案越來越大後，這些軌跡會越來越有價值（當初出事時，你可以回到某個 commit 重新開始，或是把某個 commit 的程式碼拿出來當作範例），所以每次 commit 都要寫清楚訊息，這樣才有意義。</p><h2 id="大哉問ai-寫的-code-要不要看">大哉問：AI 寫的 code 要不要看？</h2><p>我想差不多該來回答「AI 寫的 code 要不要看」這個問題了，畢竟經歷了前面那幾天之後，其實應該滿多人都會對這件事情充滿疑惑。</p><p>我直接講一個結論：</p><blockquote><p>要看，但這個「看」不是逐行逐字看。</p></blockquote><p>畢竟你可能連 <code>computed</code>、<code>console.log</code> 或 <code>ref</code> 等這些語法都不知道，硬要你一行一行閱讀根本就是折磨、拷刑一樣，可是如果跟你說，你可以完全不看這樣也不對，這樣就跟開一台沒有儀表板的汽車一樣，現在油箱多少、時速多少通通都不知道，接著遇到警察時，警察把你攔下來問：「你剛剛開多少你知不知道？」你會連這種基本問題都回答不出來。</p><p>所以這邊所謂的 <strong>「看」</strong> 是至少你可以用白話講出這段程式碼在幹嘛，像是...</p><ul><li>資料存在哪裡</li><li>格式長怎樣</li><li>從使用者按下「記一筆」到畫面更新，中間經過哪些檔案</li></ul><p>這些你都是可以理解的，但不是要你把程式碼每個細節、每個字的實作細節全部看懂。</p><p><img alt="AI 寫的程式碼不需要逐行看，但至少要知道他在幹嘛" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8823%E6%97%A5%20%E4%B8%8A%E5%8D%8811_59_10.png"></p><p>那...所以有哪些要講得出來、哪些可以放過呢？</p><p>這邊我用兩個問題來區分：</p><ol><li>這段程式碼（功能）錯了痛不痛？</li><li>你看不看得懂？</li></ol><p>剛好這兩個問題可以形成一個四象限：</p><table><thead><tr><th></th><th>看得懂</th><th>看不懂</th></tr></thead><tbody><tr><td>錯了會痛（金額算錯、資料不見、不該刪的刪了）</td><td><strong>自己看一遍</strong>。例如：錢怎麼算、折扣怎麼打。</td><td><strong>叫 AI 解釋一次，解釋到到你能理解為止</strong>。例如：資料存在哪？怎麼存跟讀的？</td></tr><tr><td>錯了不痛（醜、歪、文案怪）</td><td><strong>快速掃過去就好</strong>。例如：按鈕上的字、提示訊息的文案、配色</td><td><strong>不用看，交給之後的測試跟 Code Review 就好</strong>。例如：樣式設定、套件的初始化設定、設定檔等。</td></tr></tbody></table><p>剛開始 Vibe Coding 的人，手上的程式碼大多都是在右邊那兩格（看不懂那一格），因此：</p><ul><li><strong>錯了會痛的叫它解釋給你聽</strong>，直到你能理解為止。</li><li><strong>錯了不痛先放生</strong>，反正後面在請 AI 協助調整。</li></ul><p>因此隨著時間迭代，你的知識跟認知就會慢慢往左邊區塊（看得懂）去，所以一開始並不用太擔心。</p><p>「痛與不痛」的門檻是基於專案大小而變的。
+</span></span></code></pre><p><img alt="git log --oneline 輸出，看得到一週以來的 commit 紀錄" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260816161845.png"></p><p>這邊截圖只是示範而已，並不是你專案的實際輸出，請自己在專案裡跑 <code>git log --oneline</code> 看看。</p><p>當然，你也可以直接叫 AI 幫你跑。</p><p>透過 Git，你可以看到你整個 Vibe Coding 的軌跡，當專案越來越大後，這些軌跡會越來越有價值（當初出事時，你可以回到某個 commit 重新開始，或是把某個 commit 的程式碼拿出來當作範例），所以每次 commit 都要寫清楚訊息，這樣才有意義。</p><h2 id="大哉問ai-寫的-code-要不要看">大哉問：AI 寫的 code 要不要看？</h2><p>我想差不多該來回答「AI 寫的 code 要不要看」這個問題了，畢竟經歷了前面那幾天之後，其實應該滿多人都會對這件事情充滿疑惑。</p><p>我直接講一個結論：</p><blockquote><p>要看，但這個「看」不是逐行逐字看。</p></blockquote><p>畢竟你可能連 <code>computed</code>、<code>console.log</code> 或 <code>ref</code> 等這些語法都不知道，硬要你一行一行閱讀根本就是折磨、酷刑一樣，可是如果跟你說，你可以完全不看這樣也不對，這樣就跟開一台沒有儀表板的汽車一樣，現在油箱多少、時速多少通通都不知道，接著遇到警察時，警察把你攔下來問：「你剛剛開多少你知不知道？」你會連這種基本問題都回答不出來。</p><p>所以這邊所謂的 <strong>「看」</strong> 是至少你可以用白話講出這段程式碼在幹嘛，像是...</p><ul><li>資料存在哪裡</li><li>格式長怎樣</li><li>從使用者按下「記一筆」到畫面更新，中間經過哪些檔案</li></ul><p>這些你都是可以理解的，但不是要你把程式碼每個細節、每個字的實作細節全部看懂。</p><p><img alt="AI 寫的程式碼不需要逐行看，但至少要知道他在幹嘛" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8823%E6%97%A5%20%E4%B8%8A%E5%8D%8811_59_10.png"></p><p>那...所以有哪些要講得出來、哪些可以放過呢？</p><p>這邊我用兩個問題來區分：</p><ol><li>這段程式碼（功能）錯了痛不痛？</li><li>你看不看得懂？</li></ol><p>剛好這兩個問題可以形成一個四象限：</p><table><thead><tr><th></th><th>看得懂</th><th>看不懂</th></tr></thead><tbody><tr><td>錯了會痛（金額算錯、資料不見、不該刪的刪了）</td><td><strong>自己看一遍</strong>。例如：錢怎麼算、折扣怎麼打。</td><td><strong>叫 AI 解釋一次，解釋到你能理解為止</strong>。例如：資料存在哪？怎麼存跟讀的？</td></tr><tr><td>錯了不痛（醜、歪、文案怪）</td><td><strong>快速掃過去就好</strong>。例如：按鈕上的字、提示訊息的文案、配色</td><td><strong>不用看，交給之後的測試跟 Code Review 就好</strong>。例如：樣式設定、套件的初始化設定、設定檔等。</td></tr></tbody></table><p>剛開始 Vibe Coding 的人，手上的程式碼大多都是在右邊那兩格（看不懂那一格），因此：</p><ul><li><strong>錯了會痛的叫它解釋給你聽</strong>，直到你能理解為止。</li><li><strong>錯了不痛先放生</strong>，反正後面再請 AI 協助調整。</li></ul><p>因此隨著時間迭代，你的知識跟認知就會慢慢往左邊區塊（看得懂）去，所以一開始並不用太擔心。</p><p>「痛與不痛」的門檻是基於專案大小而變的。
 如果你只是想快速驗證一個想法、做完就丟，那就不需要太擔心，可是如果這個東西你會一直用且開放給別人用，或是你想從這之中學東西，那這個門檻就會拉高許多。</p><h2 id="week-2-動手檢查清單">Week 2 動手檢查清單</h2><p>接下來 Week2 的結尾也提供一份動手檢查的清單給你，讓你試著檢查一次：</p><ul className="contains-task-list"><li className="task-list-item"> SPEC.md 的核心驗收標準逐條通過，MVP 跑得起來。</li><li className="task-list-item"> git log 看得到一週的 commit 軌跡。</li><li className="task-list-item"> 能簡單用白話文解釋出自己記帳資料存在哪裡。</li><li className="task-list-item"> 經歷過至少一次：計畫打回、用除錯三劍客回報 bug。</li><li className="task-list-item"> <code>npm run build</code> 成功（也可以請 AI 幫你跑）。</li></ul><h2 id="結語">結語</h2><p>時間也差不多了，我們 Week2 就到這邊收工啦～</p><p>我們用一週的時間將一份 SPEC.md 快速轉換成一個能用的 MVP，雖然畫面還很陽春，但至少功能上是完整的，這就是我們這週的成果：</p><ul><li>把流程跑順：
 <ul><li>從規格 → 打地基 → 規劃計畫 → 小步功能迭代 → 建立 Debug 流程 → 跑驗收，且每步都要有 commit。</li></ul></li><li>程式碼不需要逐行看，但至少要知道他在幹嘛。</li></ul><p>那麼希望這一篇對你有幫助，我們下一篇見～</p>html pre.shiki code .sjWgA, html code.shiki .sjWgA{--shiki-light:#005CC5;--shiki-light-font-weight:bold;--shiki-default:#005CC5;--shiki-default-font-weight:bold;--shiki-dark:#91CBFF;--shiki-dark-font-weight:bold}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .syBk-, html code.shiki .syBk-{--shiki-light:#E36209;--shiki-default:#E36209;--shiki-dark:#FFB757}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html pre.shiki code .s7cdV, html code.shiki .s7cdV{--shiki-light:#24292E;--shiki-light-font-weight:bold;--shiki-default:#24292E;--shiki-default-font-weight:bold;--shiki-dark:#F0F3F6;--shiki-dark-font-weight:bold}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}]]></content>
   </entry>
@@ -1080,530 +1329,5 @@ git commit -m &quot;功能名稱：簡短描述&quot;
 </span></span><span class="line" line="3"><span class="syBk-">-</span><span class="s8XSl"> 每個功能驗收完就 commit 一次，commit message 以「功能名稱：簡短描述」為格式
 </span></span><span class="line" line="4"><span class="syBk-">-</span><span class="s8XSl"> commit message 請使用繁體中文
 </span></span></code></pre><p><img alt="CLAUDE.md 加入開發規則的對話截圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260809173928.png"></p><h2 id="今天小挑戰">今天小挑戰</h2><p>一樣今天有個小挑戰要給你，試著去確認以下幾件事情：</p><ul><li><code>node -v</code>、<code>npm -v</code>、<code>git --version</code> 都可以看到版本號。</li><li>請 AI 啟動伺服器，並且可以在瀏覽器看到畫面而非「無法連上這個網站」或是錯誤畫面。</li><li><code>SPEC.md</code> 與 <code>CLAUDE.md</code> 都在 <code>money-note/</code> 根目錄</li></ul><p>很簡單吧？如果有問題的話，你都可以反覆往前觀看的章節，或是把畫面截圖丟給 AI 問它，通常它都可以幫你解決。</p><h2 id="結語">結語</h2><p>最後總結一下我們今天做的事情。</p><p>基本上就跟打木樁一樣，做了三件重點事情：</p><ol><li>技術選型：AI 替你選的也要攤開來比較、聽懂理由再補拍板；夠主流對 Vibe Coding 是加分項。</li><li><code>git init</code>：是很重要的後悔藥、時光機。</li><li>CLAUDE.md：專案憲法，把無法透過閱讀程式碼就知道的規則寫進去，並且每次對話都會自動載入。</li></ol><p>那麼我們今天就到這邊結束，剩下的明天見～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .syBk-, html code.shiki .syBk-{--shiki-light:#E36209;--shiki-default:#E36209;--shiki-dark:#FFB757}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}]]></content>
-  </entry>
-  <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 8：把想法變規格跟著 AI 一起寫 SPEC.md</title>
-    <link href="https://israynotarray.com/ai/20260921/write-spec-md-with-claude-code/"/>
-    <id>https://israynotarray.com/ai/20260921/write-spec-md-with-claude-code/</id>
-    <published>2026-09-21T01:00:00.000Z</published>
-    <updated>2026-09-21T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 8：把想法變規格——跟 AI 一起寫 SPEC.md" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8802_42_08.png"></p><h2 id="前言">前言</h2><p>今天開始我們差不多要來準備動工了，畢竟前面已經把 AI 相關觀念以及 Claude Code 的一些操作小細節都搞清楚了，那當然就是準備介入實作階段啦～</p><p>但！雖然是準備進入實作階段，只是我們目前還是一行程式都不會寫，因為 Vibe Coding 的第一步並不是叫 AI 寫程式，而是先學會把需求講清楚。</p><p>透過把 <strong>「需求」</strong> 講清楚這件事情，我們可以把腦中模糊的想法，轉化成一份具體的規格文件 SPEC.md，可是該怎麼把需求講清楚卻又是另外一回事了，所以這一篇將會介紹一些技巧方式，讓你可以盡可能把腦中模糊的想法逼成一份具體的規格文件 SPEC.md，AI 才不會自己腦補，最後做出一個方向不明的成品。</p><h2 id="ai-會放大你的模糊">AI 會放大你的模糊</h2><p>首先，我認為你必須要先認知道一件事情：</p><blockquote><p>儘管 AI 非常方便，但如果沒有把需求講清楚，隨著模型差異就會有明顯腦補差異。</p></blockquote><p>模型隨著訓練資料、訓練方式、模型大小、參數不同，對於同一個 prompt 的理解就會有差異，甚至同一個模型在不同時間點的表現也會有差異。</p><p>這邊我們就舉例一個後面要製作的記帳小工具（預計專案資料夾會叫 <code>money-note</code>）吧！</p><p>假設你只是跟 AI 說「幫我做一個記帳 App」，那麼你是否有想過 AI 會怎麼理解？</p><ul><li>需要轉帳功能嗎？</li><li>需要雲端共用嗎？</li><li>資料要存在哪？</li><li>要不要登入功能？</li><li>需不需要儲存使用者資料？</li></ul><p>儘管 AI 遇到不確定的需求時，就會跳出像下面這種選擇題畫面來反問你：</p><p><img alt="AI 跳出選擇題反問需求的畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260723220646.png"></p><p>而會出現這些選擇題就代表著 AI 它對於這個需求感到非常不明確，所以 AI 就會問自己「我覺得我應該要問一下使用者的需求」，然後就拋出了這些選擇題給你，讓你去選擇你想要的功能。</p><p>如果你留給它腦補的空間越大，那麼最後的成品絕對會跟你想像的差很多，甚至可能會出現你根本不想要的功能，這就是為什麼我們要先把需求講清楚，讓 AI 不要自己腦補。</p><p>就跟你在跟工程師溝通一樣，如果你只是說「幫我做一個記帳 App」，那麼工程師也會問你很多問題，因為他們也不清楚你的需求。</p><h2 id="讓-ai-引導你建立規格">讓 AI 引導你建立規格</h2><p>講了那麼多，不知道你有沒有想過 <strong>「規格」</strong> 到底是什麼呢？</p><p>所謂的規格簡單來講就是一份 <strong>產品規格文件</strong> ，裡面會詳盡列出你想要做的功能、你不想要做的功能，以及怎麼驗收這個專案才算是結案。</p><p>但問題來了，對於我這種小新手來講，規格到底該怎麼寫呢？畢竟我們又不是相關背景，甚至不是 Product Manager（產品經理/產品管理人），對於這些需求的釐清，肯定是會感覺到吃力。</p><p>所以這邊我們就需要利用與 AI 協作的能力，讓它來協助幫助我們把腦中模糊的想法，轉化成一份具體的規格文件 SPEC.md。</p><p>首先，請你先打開終端機，並輸入以下指令來建立專案資料夾（跟之前的 <code>claude-playground</code> 一樣：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="mkdir money-note # 建立專案資料夾
-cd money-note # 進入專案資料夾
-claude # 啟動 Claude Code
-" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="smYoP">mkdir</span><span class="sWayO"> money-note</span><span class="sGBqm"> # 建立專案資料夾
-</span></span><span class="line" line="2"><span class="stw71">cd</span><span class="sWayO"> money-note</span><span class="sGBqm"> # 進入專案資料夾
-</span></span><span class="line" line="3"><span class="smYoP">claude</span><span class="sGBqm"> # 啟動 Claude Code
-</span></span></code></pre><p>進入 Claude Code 之後（別忘記先切換到 Shift+ Tab 切換到 manual mode，預設模式），我們要用的方式是我稱為 <strong>「訪談式 prompt」</strong> 的問法，這個 Prompt 的重點有三個：</p><ol><li>明確告訴 AI 先不要寫程式，避免它太雞婆直接動工。</li><li>一次只問你一個問題，避免它一次丟十個問題問倒你，相信我，這樣真的比較好(過來人經驗，菸...)。</li><li>問到 AI 覺得足夠具體之後，再請它整理成 SPEC.md。</li></ol><p>所以接下來，請你把下方 Prompt 複製貼上到 Claude Code 的輸入框，並按下 Enter：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="我想做一個記帳的小工具，先不要寫任何程式。
-請你當我的產品顧問，一次問我一個問題，把需求釐清。
-問到你覺得足夠具體之後，跟我說可以整理成 SPEC.md，並請我確認。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>我想做一個記帳的小工具，先不要寫任何程式。
-</span></span><span class="line" line="2"><span>請你當我的產品顧問，一次問我一個問題，把需求釐清。
-</span></span><span class="line" line="3"><span>問到你覺得足夠具體之後，跟我說可以整理成 SPEC.md，並請我確認。
-</span></span></code></pre><p><img alt="下訪談式 prompt 後，它反問需求問題的對話畫面" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260807104720.png"></p><p>請記住 AI 具有隨機性，你的畫面內容跟選項可能會跟我這邊的畫面不一樣，但大致上都會圍繞在「使用者、功能範圍、資料保存」這三個面向。</p><p>接下來大概就是一大串的拷問時間，大致上範圍可能會涵蓋這些</p><ul><li>動機是什麼？（我想要快速記帳，並隨時知道這個月花了多少）</li><li>誰用？（就我自己，單人）</li><li>記收入還是支出？（我當下回答「只記支出就好」，先記住這個回答，Day 10 它會回來咬我一口）</li><li>需要哪些欄位？（金額、分類、日期、備註）</li><li>資料要存哪？換裝置要同步嗎？（存本機就好，不用同步）</li><li>想看什麼統計？（這個月花多少、各分類占比）</li></ul><p>...等等。</p><p>這個過程你應該會發現有某些問題你可能連想都沒想過，而這就是「訪談式」的價值存在。</p><p>透過訪談式 Prompt 可以把你腦中那些還沒成形的決定一個一個逼出來，最後你會得到一份完整的需求摘要，這時候如果你看一看沒問題就可以請它整理成 SPEC.md 並儲存下來。</p><p><img alt="整理出的需求摘要" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260723222812.png"></p><p>這時候你應該會覺得很好奇，<strong>「訪談式 Prompt」</strong> 跟 <code>Plan Mode</code> 有什麼差別呢？其實兩者的差別在於：</p><ul><li><strong><code>Plan Mode</code>：</strong> 是以規劃完畢就<strong>開工</strong>為導向，它會產出一份實作計畫（要動哪些檔案、步驟怎麼走），然後問你要不要照著做，雖然遇到模糊的地方也會反問你，但問的目的都是「為了把計畫定下來並開始實作」所需要的事。</li><li><strong>訪談式 Prompt：</strong> 是以 <strong>釐清需求</strong> 為導向，它不以動工為目標，所以主要是產出一份需求規格書，先搞清楚 <strong>what（要做什麼）</strong> 就好，至於 <strong>how（怎麼做）</strong> 那是之後 Plan Mode 的事，而且這個提問的節奏是在你手上的，畢竟你規定它一次一題慢慢挖，而不是讓它自己決定問夠了沒。</li></ul><p>那實際上產出來是如何呢？底下這邊也給你看一下我產出的 SPEC.md：</p><ul><li>GitHub 專案連結：<a href="https://github.com/hsiangfeng/ithelp-2026-vibe-coding/blob/main/day-8/money-note/SPEC.md" rel="nofollow">day-8#SPEC.md</a></li></ul><p>那這一份 SPEC.md 裡面有幾個重要的點，分別是「明確不做」跟「要做的功能」，這兩個是非常重要的範圍界定，如果沒有這個範圍界定，你有很高的機會範圍爆炸，導致系統永遠都無法搶第一上線。</p><p>所謂的範圍爆炸意思是避免想到什麼就做什麼，第一版還沒出來之前就胎死腹中了，做產品最需要的就是搶 <strong>「市場先機」</strong>。</p><p>最後這邊還是要提醒一下</p><blockquote><p>規格不是聖旨、也不是一成不變的。</p></blockquote><p>它是一份活的文件，隨著開發過程中你對專案的理解越來越清楚，這份文件也會跟著更新，但基本上會控制在既定的範圍內，如果有想要增加或刪除的功能就先放到未來擴充中，然後同時更新 SPEC.md，讓文件跟現實保持同步。</p><h2 id="開工前做一次範圍核對">開工前做一次範圍核對</h2><p>接下來，請你不要急著拿這一份 SPEC.md 去請 AI 開發，因為目前這個 SPEC.md 只是你跟 AI 一問一答生出來的，這個過程其實你們兩個都建立在 <strong>「趕快收斂」</strong> 的情緒上，這種時候直接實作的話，非常很容易漏掉東西，所以我們還要另外請 AI 做一次「範圍核對」。</p><p>這時候我們要輸入 <code>/clear</code> or <code>/new</code> 清空前面的對話內容，把它頭上原本戴的 <strong>「產品顧問」</strong> 帽子換成 <strong>「檢查員」</strong> 帽子，從第三者的角度把這份規格掃一遍，檢查三件事：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請讀 SPEC.md，先不要改任何檔案，幫我檢查三件事：
-
-1. 「要做」清單裡有沒有哪一條寫得太模糊、沒辦法驗收的？
-2. 「要做」跟「不做」有沒有互相矛盾或重疊的項目？
-3. 有沒有哪個功能是內文提到、但沒出現在要做清單裡的？
-
-只回報結果，不要動檔案。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請讀 SPEC.md，先不要改任何檔案，幫我檢查三件事：
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span>1. 「要做」清單裡有沒有哪一條寫得太模糊、沒辦法驗收的？
-</span></span><span class="line" line="4"><span>2. 「要做」跟「不做」有沒有互相矛盾或重疊的項目？
-</span></span><span class="line" line="5"><span>3. 有沒有哪個功能是內文提到、但沒出現在要做清單裡的？
-</span></span><span class="line" line="6"><span emptyLinePlaceholder>
-</span></span><span class="line" line="7"><span>只回報結果，不要動檔案。
-</span></span></code></pre><p><img alt="範圍核對" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260807113831.png"></p><p>你會發現它抓出了一堆還沒拍板的問題，其中有些是你可能看得懂（吧？），例如這一條：</p><pre className="language-md shiki shiki-themes github-light github-light github-dark-high-contrast" code="SPEC.md:112 寫「不限制可切到多久以前或以後」，但畫面上沒有「回到本月」的入口。使用者手滑切到 2019 年，要按 80 幾次 ▶ 才回得來。要嘛加一顆「本月」按鈕，要嘛在規格裡註明接受這個代價。
-" language="md" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="s8XSl">SPEC.md:112 寫「不限制可切到多久以前或以後」，但畫面上沒有「回到本月」的入口。使用者手滑切到 2019 年，要按 80 幾次 ▶ 才回得來。要嘛加一顆「本月」按鈕，要嘛在規格裡註明接受這個代價。
-</span></span></code></pre><p>以我來講，我認為加一顆「本月」按鈕就可以解決了</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請你把「月曆切換」加一顆「回到本月」按鈕，並補進「要做」清單跟驗收條件。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請你把「月曆切換」加一顆「回到本月」按鈕，並補進「要做」清單跟驗收條件。
-</span></span></code></pre><p>這個就是你剛好沒想到，AI 也沒想到的地方，這就是為什麼要做一次範圍核對，因為你們兩個都在趕快收斂的情緒下，很多細節都沒注意到。</p><p><img alt="範圍核對後的修正" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260807131633.png"></p><p>解決前面之後，但...如果是有些是你看不懂的呢？該怎麼辦呢？例如：</p><pre className="language-md shiki shiki-themes github-light github-light github-dark-high-contrast" code="SPEC.md:54 的範例資料自相矛盾：date: &quot;2026-08-07&quot;，但 createdAt: 1754534400000 換算是 2025-08-07。差一年。這種範例常被直接照抄進測試資料或 seed。
-" language="md" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="s8XSl">SPEC.md:54 的範例資料自相矛盾：date: &quot;2026-08-07&quot;，但 createdAt: 1754534400000 換算是 2025-08-07。差一年。這種範例常被直接照抄進測試資料或 seed。
-</span></span></code></pre><p>這邊你看不懂沒關係，但千萬不要因為看不懂就跳過假裝沒看到，你可以直接請 AI 解釋：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="另外，我看不懂「SPEC.md:54 的範例資料自相矛盾：date: &quot;2026-08-07&quot;，但 createdAt: 1754534400000 換算是 2025-08-07。差一年。」這一條，可以用白話解釋給我聽，並推薦一個正確的範例嗎？
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>另外，我看不懂「SPEC.md:54 的範例資料自相矛盾：date: &quot;2026-08-07&quot;，但 createdAt: 1754534400000 換算是 2025-08-07。差一年。」這一條，可以用白話解釋給我聽，並推薦一個正確的範例嗎？
-</span></span></code></pre><p>它就會用白話告訴你 createdAt 是「時間戳記」（電腦記時間的一種方式），範例裡那串數字換算回來是 2025 年，跟上面的 2026 年差了一年，接著給你一組修正後的數值。</p><p><img alt="白話文解釋" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260807131807.png"></p><p>基本上到這邊為止，我們假設都沒問題了，那麼就會跟 AI 拍板這樣說：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請依照這些結論更新 SPEC.md，其他內容不要動。
-
-最後請在文件末端加一節「決策紀錄」，把這次拍板的結論條列下來。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請依照這些結論更新 SPEC.md，其他內容不要動。
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span>最後請在文件末端加一節「決策紀錄」，把這次拍板的結論條列下來。
-</span></span></code></pre><p><img alt="決策紀錄" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260807132110.png"></p><p>相信我，保留決策記錄會非常重要，因為幾天後你一定會忘記自己當初為什麼這樣決定，到時候翻這一節就好，不用重新想一遍。</p><p>到目前為止，接下來就輪到你自己了，你可以試著反覆跟 AI 討論釐清，體驗一下「訪談式 Prompt」的威力，直到你覺得 SPEC.md 裡面所有的功能都可以被驗收、沒有矛盾、也沒有遺漏的項目。</p><p>這樣之後輪到你製作你自己想要的專案時，這些流程都是一樣的：</p><ul><li>把核對抓到的點逐一拍板</li><li>請 AI 更新 SPEC.md，更新完再跑一次上面那段核對 prompt</li></ul><p>直到三題都回你「沒有」為止，這份規格才算定稿。</p><p>這整套流程我也畫成一張圖給你參考：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
-    A[&quot;訪談式 Prompt&lt;br&gt;一次一題把需求問清楚&quot;] --&gt; B[&quot;產出第一版 SPEC.md&quot;]
-    B --&gt; C[&quot;/clear 換上檢查員帽子&lt;br&gt;跑一次範圍核對 Prompt&quot;]
-    C --&gt; D{&quot;有抓到問題嗎？&quot;}
-    D --&gt;|&quot;有，而且看得懂&quot;| E[&quot;直接拍板&lt;br&gt;告訴它你的決定&quot;]
-    D --&gt;|&quot;有，但看不懂&quot;| F[&quot;請 AI 白話解釋&lt;br&gt;聽懂之後再拍板&quot;]
-    E --&gt; G[&quot;請 AI 更新 SPEC.md&lt;br&gt;並補上決策紀錄&quot;]
-    F --&gt; G
-    G --&gt; C
-    D --&gt;|&quot;三題都回「沒有」&quot;| H[&quot;SPEC.md 定稿&lt;br&gt;可以準備開工了&quot;]
-" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TD
-</span></span><span class="line" line="2"><span>    A[&quot;訪談式 Prompt&lt;br&gt;一次一題把需求問清楚&quot;] --&gt; B[&quot;產出第一版 SPEC.md&quot;]
-</span></span><span class="line" line="3"><span>    B --&gt; C[&quot;/clear 換上檢查員帽子&lt;br&gt;跑一次範圍核對 Prompt&quot;]
-</span></span><span class="line" line="4"><span>    C --&gt; D{&quot;有抓到問題嗎？&quot;}
-</span></span><span class="line" line="5"><span>    D --&gt;|&quot;有，而且看得懂&quot;| E[&quot;直接拍板&lt;br&gt;告訴它你的決定&quot;]
-</span></span><span class="line" line="6"><span>    D --&gt;|&quot;有，但看不懂&quot;| F[&quot;請 AI 白話解釋&lt;br&gt;聽懂之後再拍板&quot;]
-</span></span><span class="line" line="7"><span>    E --&gt; G[&quot;請 AI 更新 SPEC.md&lt;br&gt;並補上決策紀錄&quot;]
-</span></span><span class="line" line="8"><span>    F --&gt; G
-</span></span><span class="line" line="9"><span>    G --&gt; C
-</span></span><span class="line" line="10"><span>    D --&gt;|&quot;三題都回「沒有」&quot;| H[&quot;SPEC.md 定稿&lt;br&gt;可以準備開工了&quot;]
-</span></span></code></pre><p><img alt="流程圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8820%E6%97%A5%20%E4%B8%8B%E5%8D%8802_46_48.png"></p><p>那麼這邊也出一個功課給你；</p><ul><li>跟著上面的流程，建立一份 SPEC.md，裡面必須有「要做／不做／驗收」三區塊。</li><li>登入帳號、預算提醒、雲端同步這些，必須明確列在不做清單。</li></ul><p>這個過程其實就是在逼你把事情想清楚，不然等到真的開工後，那些沒想清楚的模糊地帶就會一個一個回來討債，範圍爆炸就是這樣來的（這也是為什麼工程師總是靠北 PM 總是沒有把需求釐清的原因）。</p><h2 id="結語">結語</h2><p>ok，時間差不多了，這邊也來總結一下吧。</p><p>雖然今天一行程式碼都沒有寫到，但其實反而我們正在準備最重要的事情，也就是 <strong>「把想法變成規格」</strong>，這件事情就是所謂的打地基。</p><p>從什麼都不知道，到有一個模糊的想法，再到有一份具體的規格文件，在早期我們可能需要花上好幾天，甚至需要找相關人員來幫忙進行需求訪談，但現在有了 AI 的協助，我們可以在短時間內把腦中模糊的想法逼成一份具體的規格文件。</p><p>如果看到這邊沒問題的話，我們下一篇見～</p>html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .sGBqm, html code.shiki .sGBqm{--shiki-light:#6A737D;--shiki-default:#6A737D;--shiki-dark:#BDC4CC}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}]]></content>
-  </entry>
-  <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 7：Week 1 收尾之新手最常踩的 5 個雷</title>
-    <link href="https://israynotarray.com/ai/20260920/claude-code-beginner-mistakes/"/>
-    <id>https://israynotarray.com/ai/20260920/claude-code-beginner-mistakes/</id>
-    <published>2026-09-20T01:00:00.000Z</published>
-    <updated>2026-09-20T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 7：Week 1 收尾——新手最常踩的 5 個雷" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8818%E6%97%A5%20%E4%B8%8A%E5%8D%8810_43_57.png"></p><h2 id="前言">前言</h2><p>終於來到我們第一週的結尾，這一週我們一路從...</p><ul><li>Vibe Coding 是什麼（Day 2）</li><li>安裝 AI Agent 跟挑訂閱方案（Day 3）</li><li>第一個任務：看 diff、用 <code>/rewind</code> 反悔（Day 4）</li><li>權限機制跟 Plan Mode（Day 5）</li><li>Context 跟 Token（Day 6）</li></ul><p>這些知識點都是我認為你在開始 Vibe Coding 之前非常需要理解的點。</p><p>而今天我們會稍微輕鬆一點，替前面六天做個總結收尾，我會列出新手 Vibe Coding 最常見的五個雷點，讓你可以對照檢查自己有沒有踩到，這樣未來你實戰才不會又踩同樣的坑。</p><h2 id="雷點行為-1-什麼都按-yes從來不看內容">雷點行為 #1： 什麼都按 Yes，從來不看內容</h2><p>這個不管是 Vibe Coding 老手或新手，基本上都會踩到的雷點，而且我認為是第一名 xD。</p><p>畢竟人類的天性就是懶惰，反射性看到 <strong>Yes</strong> 就一路 Yes Yes Yes 下去。</p><p><img alt="跳出的權限確認視窗就一直 YES...YES...YES" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/jotaro-kujo-yes.gif"></p><p>接著過三天之後自己也不知道 AI 幫你改了什麼，甚至連專案裡發生過什麼事都不知道，導致你遇到 Bug 也無從解起，只好再浪費 Token 繼續問 AI「為什麼壞了？」，然後又踩到同樣的坑。</p><p>所以這該怎麼避免呢？</p><p>其實就養成習慣而已，用 Day 4 教過的方式好好閱讀 diff 畫面，確認每一次的變更都是你想要的，才按 Yes；如果沒有信心，就先按 No，然後告訴它你希望改成什麼樣子。</p><h2 id="雷點行為-2-一個對話視窗從早聊到晚">雷點行為 #2： 一個對話視窗從早聊到晚</h2><p>接下來這個雷點也應該是一個新手會一直遇到的，一直在同一個 Context Windows 做超級多事情，完全沒有理會 Context 上限/限制，一直讓 AI 觸發自動壓縮機制。</p><p>避免的心得技巧也很簡單：</p><ul><li>一個任務一個對話，做完就 <code>/clear</code>，把桌面清空。</li><li>養成注意 Context 的習慣，偶爾開一下 <code>/context</code> 看看桌面佔用，建立自己的體感。
-<ul><li>如果任務還沒做完，可以使用 <code>/compact [保留重點]</code> 來壓縮桌面，保留重點，釋放空間給新的任務</li></ul></li></ul><p>這邊你可以搭配 <a href="https://israynotarray.com/ai/20260326/1431610072/" rel="nofollow">Claude Code Status Line 設定教學：在終端機即時監控 Context 用量與 Rate Limit</a> 去即時監控 Context 用量，這樣就不會等到桌面滿了才發現，當然其他 AI 服務其實也有類似功能。</p><h2 id="雷點行為-3-git-比你想像還重要">雷點行為 #3： Git 比你想像還重要</h2><p>雖然前面章節中，並沒有特別介紹道 Git，這是因為如果在前面就把 Git 的概念講進來，我認為會讓想 Vibe Coding 的新手更混亂更痛苦，畢竟光基本概念就要認知不少，如果在搭配 Git 的話，估計到一半就不想讀了吧？畢竟 Git 本身有一些概念要理解（儘管都是給 AI 操作指令）。</p><p>但你必須要先知道未來實際開發上 Git 是必備的東西，尤其你想要做一個落地產品，那麼 Git 就是你最重要的安全網，因為你不可能每次都能確定 AI 會幫你做出正確的變更。</p><p>所以基於前面課剛的規劃，才會取而代之先介紹 <code>/rewind</code>，這個指令可以讓你回復到上一次的狀態。</p><p>但它的限制也請不要忘記了：</p><p>它只能回復檔案編輯工具做的變更，透過 Bash 指令造成的變更不在範圍內。</p><h2 id="雷點行為-4-一句話就想做出一個-facebook">雷點行為 #4： 一句話就想做出一個 Facebook</h2><p>你如果腦袋是用這種想法去看待 Vibe Coding 的話，那麼你就跟這張梗圖沒什麼兩樣：</p><p><img alt="客戶預算 meme" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/202608051036.png"></p><p>這大概是很多新手最常發生的誤解，認為只要跟 AI 講一句 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我製作一個 Facebook
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我製作一個 Facebook
-</span></span></code></pre><p>或者是</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="幫我做一個記帳 App，要能記帳、有統計、有圖表、可以匯出、還要好看。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>幫我做一個記帳 App，要能記帳、有統計、有圖表、可以匯出、還要好看。
-</span></span></code></pre><p>確實 AI 是有可能做出來的，你只要 Auto Mode 下去、<code>claude --permission-mode bypassPermissions</code> 開下去，確實是有可能一次性做完。</p><p>但...你該怎麼驗收？</p><p>一個沒辦法驗收的產品，你要怎麼維護？出錯了要從哪裡找起？甚至你怎麼確定它做出來的就是你心中想要的呢？更不用說「落地」這件事情。</p><p>所以後面的實戰章節就會帶領你體驗這件事情，讓你的 Vibe Coding 產品可以 <strong>「被驗收」</strong>。</p><h2 id="雷點行為-5做完從不驗收">雷點行為 #5：做完從不驗收</h2><p>這真的不得不說是個大雷點，依照我教學到現在，很多人使用 AI 的習慣就是...</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="&gt; Claude Code：我完成你的需求了。
-
-（使用者關掉視窗）
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>&gt; Claude Code：我完成你的需求了。
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span>（使用者關掉視窗）
-</span></span></code></pre><p>對，真的很多都這樣，連看都不看就直接關掉，然後過了幾天要使用的時候才發現這顆按鈕、功能根本有問題或新功能把舊功能改壞了。</p><p>這些其實都是因為你沒有進行驗收導致，這邊所謂的驗收並不是單純看看程式碼、看看畫面而已，而是你要親手操作過一次才對，確認它真的符合你的需求。</p><p>當然後面章節也會介紹一些自動化驗收的方式，讓你不用每次都親手操作，但至少在前期，親手走過一次還是必要的。</p><h2 id="week-1-動手檢查清單">Week 1 動手檢查清單</h2><p>前面雷點都講完了，接著這邊也給你一份第一週的動手檢查清單，你可以逐條對照自己有沒有真的做過：</p><ul className="contains-task-list"><li className="task-list-item"> 想過 Day 2 的驗收題：幫「新增支出」列出三～四條看得到的驗收條件（Day 2）</li><li className="task-list-item"> 裝好 Claude Code，<code>claude --version</code> 跟 <code>claude doctor</code> 都能正常顯示（Day 3）</li><li className="task-list-item"> 建好 <code>claude-playground</code> 資料夾，進去啟動 <code>claude</code> 看到歡迎畫面、<code>/help</code> 打得開（Day 3）</li><li className="task-list-item"> 跑過「幫我把這個頁面做得更好看」那句模糊 Prompt，體會過什麼叫無法驗收（Day 4）</li><li className="task-list-item"> 用 <code>/rewind</code>（或 Esc 連按兩下）把模糊 Prompt 的修改拉回來過（Day 4）</li><li className="task-list-item"> 跑過隨機換背景色按鈕這個可驗收小任務，看懂 diff 跟三個選項的差別（Day 4）</li><li className="task-list-item"> 用 Shift+Tab 切過權限模式，在 Plan Mode 讓它交過一次計畫（Day 5）</li><li className="task-list-item"> 把第一版計畫打回去過，確認「不會做的事」真的出現在第二版計畫裡（Day 5）</li><li className="task-list-item"> 用 <code>/context</code> 看過桌面佔用，跑過 <code>/compact</code> 跟 <code>/clear</code> 的實驗，知道兩者差別（Day 6）</li></ul><p><img alt="Claude 示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719142320.png"></p><h2 id="結語">結語</h2><p>最後的最後，這邊我們也總結一下吧：</p><ul><li>diff 掃一眼再按 Yes，不要盲同意</li><li>一個任務一個對話，不要從早聊到晚</li><li>Git 才是真正的安全網，<code>/rewind</code> 只能救一半</li><li>大目標切成小步驟，不要一句話就想做出 Facebook</li><li>驗收永遠是你的工作，AI 說完成不算完成</li></ul><p>那麼第一週就到這邊結束啦～</p><p>我們明天見～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
-  </entry>
-  <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 6：Context 與 Token —— AI 為什麼越聊越笨</title>
-    <link href="https://israynotarray.com/ai/20260919/claude-code-clear-vs-compact/"/>
-    <id>https://israynotarray.com/ai/20260919/claude-code-clear-vs-compact/</id>
-    <published>2026-09-19T01:00:00.000Z</published>
-    <updated>2026-09-19T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 6：Context 與 Token——AI 為什麼越聊越笨" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8817%E6%97%A5%20%E4%B8%8B%E5%8D%8811_20_27.png"></p><h2 id="前言">前言</h2><p>當你開始使用 AI 做一些事情之後，你會開始發生一些奇奇怪怪的事情，像是明明有講一些規則，但它好像忘了、答非所問、甚至把改好的東西又改回去。</p><p>大多數人對於這種狀況的第一直覺就是...</p><blockquote><p>「AI 它是不是變笨了？
-「是不是 AI 廠商偷偷降低 AI 智商？」</p></blockquote><p>但其實很多時候，真正的問題是在於 <strong>Context Window</strong> 中的 Context 已經爆滿了，導致 AI 無法正常運作。</p><p>而講到 Context 就沒辦法不一起介紹 Token，畢竟這兩個東西是息息相關的。</p><p>了解這件事情之後，你也會理解為什麼 AI 聊久了會變笨，為什麼常用 AI 的人會建議你一個任務開一個新對話視窗。</p><h2 id="tokenai-世界的積木">Token：AI 世界的積木</h2><p>在開始介紹 Context 之前，我們先來認識一下 AI 世界中最重要的東西，也就是 <strong>Token</strong>，它同時也是 AI 的計價單位。</p><p>經過前面幾天的實作，你應該已經很習慣「下指令（Prompt） =&gt;  AI 回覆結果」這個流程了，但你有想過 AI 是怎麼 <strong>「讀」</strong> 你打的這些字的嗎？</p><p>其實 AI 並不是像我們一樣一個字一個字讀下去，而是會先把你傳的文字拆成一小塊一小塊的單位再去運算，這個單位就叫做 Token。</p><p>你可以把 Token 想像成樂高積木，你傳給 AI 的整段話，會先被拆成一顆一顆的小積木，AI 拿到積木之後就在思考，你後面到底是想要接什麼樣的積木，然後再一個一個地把積木拼出來給你丟給你。</p><p>假設來講，你傳給了 AI 這段文字：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="你好！
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>你好！
-</span></span></code></pre><p>AI 收到之後，會先把它拆成：</p><ul><li>「你」</li><li>「好」</li><li>「！」三個積木</li></ul><p>接著根據這三個積木去推測你可能想要什麼接什麼積木。</p><p>不同模型拆 Token 的方式可能會不一樣，但大致上都是以「字」或「詞」為單位去拆。</p><p>而你可以想像成 AI 手上有一大堆積木這些積木都有做分類，例如...</p><ul><li>日常對話相關的積木收納箱</li><li>程式碼相關的積木收納箱</li><li>各種檔案格式相關的積木收納箱</li></ul><p>諸如此類，然後每一個都拿來跟你丟給它的積木做比對，而這個比對的過程我們就稱為 <strong>「算力」</strong>，比對完畢後再將結果拼成一個新的積木丟給你。</p><p><img alt="AI 怎麼把 Token 拼成回覆給你" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8817%E6%97%A5%20%E4%B8%8B%E5%8D%8811_23_54.png"></p><p>所以這一段你只要記住兩件事情就好：</p><ul><li>你傳的文字越多，Token 就越多，AI 需要消耗的算力也就越大。</li><li>不是只有你傳的字算 Token，AI 回覆你的每一個字也都是 Token。</li></ul><p>所以講到這邊，你還記得前面開頭我說「Token 也是計價單位」嗎？也就是說你跟 AI 的每一次一來一往，都是在消耗 Token，而 AI 廠商就是照你用掉多少 Token 來收錢的。</p><p>這也是為什麼普遍不建議新手直接使用「用多少付多少」的 API 計費方式，因為你根本抓不準自己會用掉多少 Token，一不小心帳單爆掉 <del>（賣屁股）</del> ，因此大多數的情況下，使用訂閱方案就已經非常足夠了。</p><p>那 Token 跟越聊越笨到底有什麼關係呢？先別著急，這就要講到下一位主角 Context Window 了。</p><h2 id="context-window一張有極限的桌子">Context Window：一張有極限的桌子</h2><p>講完了 Token 之後，接著我們來認識一下 Context Window，中文就叫「上下文視窗」，簡單來講就是 AI 單次能「看見」的所有內容的總上限。</p><p>應該滿難理解的，這邊讓我拿一張桌子來舉例好了。</p><p>假設 Context Window 代表的是一張桌子，然後是 100x100 公分的桌子（如同 Claude Code 標注的 100k Token），那麼你跟 AI 講的每一句話、它讀進來的每一個檔案、每一次指令執行的輸出等等，這些都是放在桌面上的東西。</p><p><img alt="一張有極限的桌子" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8817%E6%97%A5%20%E4%B8%8B%E5%8D%8811_27_07.png"></p><p>當你跟 AI 對話的時候，AI 都會先把桌面上的東西看一遍，然後再回覆你，這個過程就像是你跟朋友聊天，只是你這位朋友聽到你的問題後，會先看一看桌面的內容，再去思考你要什麼、該怎麼回覆你，然後要回覆你之前會把這些內容寫到一張紙上，最後再把紙上的內容放在桌面上，接著在回覆你。</p><p>「為什麼 AI 要先寫到紙上再放回桌面呢？」</p><p>你就想像 AI 是一個記憶力很差的朋友，如果它沒有先把要回覆你的內容寫到紙上，它就會忘記自己要回覆什麼，然後就會開始亂講。</p><p>那麼隨著你問的問題越來越多，桌面當然會越來越滿，這時候就會發生一個問題...</p><blockquote><p>桌面上已經快要沒有空間可以放新的東西了！</p></blockquote><p>當這個桌面快要滿到沒地方放東西的時候，AI 就會開始自作主張去把桌面上的東西整理一下，這個過程中，它會自己去挑出「自認為」重要的東西，然後把它濃縮成一張小抄，剩下的東西就直接丟掉，這個過程就叫做「自動壓縮（Auto compact）」。</p><p>而這個自動壓縮的過程是完全不可控，你無法知道它會把哪些東西丟掉、哪些東西留下來，這也是為什麼你明明有講一些規則，但它好像忘了、答非所問、甚至把改好的東西又改回去的原因。</p><p>所以想跟 AI 長久相處，學會管好這張桌子就是你的日常功課（就跟你開一大堆 Chrome 分頁卻都不關掉一樣），後面我也會教你怎麼管。</p><h2 id="越聊越笨的真相">越聊越笨的真相</h2><p>理解了 Token 跟 Context Window 的概念之後，你就會發現「越聊越笨」這件事情其實一點都不神秘。</p><p>你可以試想一個情境，當你今天跟 AI 聊了一整個下午，你這個桌面（Context Window）上會怎麼樣呢？上面可是充斥著各種 AI 接收到你的 Prompt 後寫下來的小抄，像是：</p><ul><li>你跟 AI 的對話紀錄</li><li>AI 讀進來的檔案內容</li><li>AI 執行指令後的輸出結果</li></ul><p>所以當桌面快要滿的時候，不論是哪一套 AI Agent 都會做一樣的事情，自己很雞婆的把前面的對話濃縮成摘要、其餘的直接丟掉，騰出更多桌面空間給新的內容，而這個壓縮過程本身就是 <strong>「有損的」</strong>，也就是說細節會不見。</p><p>就像是你一開始跟 AI 定義的規則：</p><blockquote><p>請使用繁體中文，回覆我。</p></blockquote><p>當 AI 開始進行桌面清理（壓縮對話）時，它會認為這並不是什麼重要的事情，然後壓縮過程就把這條規則給丟掉了，導致你後續的對話中，它就開始講英文了。</p><h2 id="context-看你的桌面現在多亂"><code>/context</code>： 看你的桌面現在多亂</h2><p>接下來我們要來實際看一個例子，這邊你可以先抓範例檔案 <a href="https://github.com/hsiangfeng/ithelp-2026-vibe-coding/tree/main/day-6/claude-playground" rel="nofollow">GitHub #day-6</a> 然後進去到 <code>claude-playground</code> 啟動 Claude Code，並在輸入框輸入 <code>/context</code> 指令，這個指令可以讓你看到你目前桌面佔用的狀況，像是...</p><ul><li>System Prompt 佔了多少</li><li>System Tools 佔了多少</li><li>Skills 佔了多少</li></ul><p><img alt="輸入 /context 後的視覺化畫面，看得到各區塊占用比例" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804233928.png"></p><p>你電腦內看到的 Context 跟我上方圖片的 Context 可能會不一樣，因為每個人對話的內容不同、預設載入的 Skills、以及工具也都不同，因此會有一定的差異。</p><p>一開始我會建議要養成看 context 的習慣，因為你會親眼看到桌面佔用的狀況，這個體感比任何文章都有說服力，底下就是一個剛啟動、什麼都還沒做的畫面：</p><p><img alt="對話剛開始的 /context 畫面，桌面空空如也" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260720221433.png"></p><p>接著我們來實驗一下，讓你看到 Context 被佔用的狀況：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請讀取 index.html，然後一行一行解釋每一段程式碼在做什麼，接著給我五個可以改善這個頁面的建議，最後把改善後的完整程式碼直接貼在對話中給我看，先不要動檔案
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請讀取 index.html，然後一行一行解釋每一段程式碼在做什麼，接著給我五個可以改善這個頁面的建議，最後把改善後的完整程式碼直接貼在對話中給我看，先不要動檔案
-</span></span></code></pre><p>這一段 Prompt 會讓 AI 一口氣做三件很佔桌面的事情：把整份 <code>index.html</code> 讀進來（檔案內容上桌）、輸出一大段逐行解釋（它回你的每個字都是 Token）、最後還把整份程式碼重新貼一次給你（又是一大疊紙上桌）。</p><p>等它回覆完之後，再輸入一次 <code>/context</code>，你就會看到桌面佔用的狀況變成這樣：</p><p><img alt="對話用量偏高時的 /context 畫面，跟上一張對比" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260805002151.png"></p><p>你可以看到 29.3k 跳到了 49.5k，然後 <code>messages</code> 從佔用一個變成了佔用五個，這個就是你跟 AI 聊久了之後，桌面被佔用的狀況。</p><h2 id="clear-跟-compact換桌子-vs-整理桌面"><code>/clear</code> 跟 <code>/compact</code>：換桌子 vs 整理桌面</h2><p>我相信你看完前面之後，應該會冒出一個想法：</p><p>「如果我不想要觸發『自動壓縮』的話，有其他方式可以解決嗎？」</p><p>當然有方式可以解決，所以這邊也要來介紹兩個 AI 開發時，必須知道的指令，也就是 <code>/clear</code> 與 <code>/compact</code>。</p><p>前面我們先來介紹一下 <code>/clear</code>（或 <code>/new</code>），這個指令的概念很簡單，就是直接把桌子上面的東西通通丟掉，然後重新開始。</p><p>雖然是講通通丟掉，但在後面章節會補充說明該怎麼樣讓每次丟掉後，可以讓 AI 回到原本的桌面狀態。</p><p>而 <code>/compact</code> 其實就跟自動壓縮概念雷同，但是這個指令可以加上 **「保留重點」**的指示，什麼意思呢？簡單來講，原本的自動壓縮是由 AI 自己去判斷哪些是重點，但透過 <code>/compact</code> 指令，你可以直接指定哪些是重點，像是 AI 可能會認為「請你使用繁體中文回覆我」這件事情不重要，但你可以透過 <code>/compact</code> 指令告訴它這是重點你不能丟掉，這樣它在整理桌面時就會繼續保留這件事。</p><p>使用方式也非常簡單：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="/compact 保留目前功能的需求跟還沒解決的問題，其他可以丟
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>/compact 保留目前功能的需求跟還沒解決的問題，其他可以丟
-</span></span></code></pre><p>這樣 AI 在進行壓縮時，就會很清楚哪些是重點、哪些是可以丟掉的。</p><p>不過這邊我還是要提醒一下，<code>/compact</code> 並不是萬能的，只是在實務開發上會建議在 Context 約 60~70% 的時候就使用 <code>/compact</code> 來整理桌面，畢竟整理的過程也是需要佔用桌面空間的，如果你等到 Context 滿到 90% 才整理桌面，那你有很高的機會失去一些你認為是重點的東西。</p><p>那麼這兩個指令都有各自適合的時機與場景，這邊我也提供一張圖給你參考：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
-    A{&quot;桌面快滿了，現在的任務？&quot;} --&gt;|&quot;已經做完&quot;| B[&quot;/clear 換一張新桌子&quot;]
-    A --&gt;|&quot;做到一半，脈絡不能遺失&quot;| C[&quot;/compact 整理桌面&lt;br&gt;可帶指示指定保留重點&quot;]
-    B --&gt; D[&quot;CLAUDE.md 與記憶&lt;br&gt;自動回到新桌上&quot;]
-    C --&gt; E[&quot;騰出空間，繼續同一個任務&quot;]
-" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TD
-</span></span><span class="line" line="2"><span>    A{&quot;桌面快滿了，現在的任務？&quot;} --&gt;|&quot;已經做完&quot;| B[&quot;/clear 換一張新桌子&quot;]
-</span></span><span class="line" line="3"><span>    A --&gt;|&quot;做到一半，脈絡不能遺失&quot;| C[&quot;/compact 整理桌面&lt;br&gt;可帶指示指定保留重點&quot;]
-</span></span><span class="line" line="4"><span>    B --&gt; D[&quot;CLAUDE.md 與記憶&lt;br&gt;自動回到新桌上&quot;]
-</span></span><span class="line" line="5"><span>    C --&gt; E[&quot;騰出空間，繼續同一個任務&quot;]
-</span></span></code></pre><p><img alt="圖片參考" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8817%E6%97%A5%20%E4%B8%8B%E5%8D%8811_32_44.png"></p><p>所以以我個人的心法來講就是：</p><ul><li>一個任務做完就換一張新桌子（<code>/clear</code>）。</li><li>如果 Context Window 到達 60~70% 左右就先整理桌面（<code>/compact</code>），然後再繼續同一個任務。</li></ul><p>基本上這樣的控制就可以讓你在使用 AI 的過程中，避免 <strong>「越聊越笨」</strong> 的狀況發生，搭配正確的使用 <code>/compact</code> 的時機，你就可以在同一個任務中，保留你想要保留的重點。</p><p>這邊還是提醒一下，如果是因為 AI 廠商算力而不足的變笨，那這種狀況跟 Context Window 滿了是兩回事，這邊的重點是要讓你知道，Context Window 滿了會導致 AI 變笨，而不是因為算力不足。
-如果你是想追蹤 AI 是否有變笨，那你可以參考我之前寫的這一篇 <a href="https://israynotarray.com/ai/20260616/3947261580/" rel="nofollow">AI 是不是偷偷變笨了？AIStupidLevel：24 小時監測 AI 模型退化的評測網站</a> 文章，或許會有幫助。</p><h2 id="試著觀察-context-window-的變化吧">試著觀察 Context Window 的變化吧！</h2><p>那麼我們一樣回到 <code>claude-playground</code> 做個小實驗吧！</p><p>如果你前面 <code>/context</code> 那節的對話還開著，直接沿用那個對話就好，如果已經關掉了，請重新啟動 Claude Code，並重新輸入以下：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請讀取 index.html，然後一行一行解釋每一段程式碼在做什麼，接著給我五個可以改善這個頁面的建議，最後把改善後的完整程式碼直接貼在對話中給我看，先不要動檔案
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請讀取 index.html，然後一行一行解釋每一段程式碼在做什麼，接著給我五個可以改善這個頁面的建議，最後把改善後的完整程式碼直接貼在對話中給我看，先不要動檔案
-</span></span></code></pre><p>先讓整個桌面盡可能堆滿一些東西（這邊你可以嘗試 <code>/context</code> 看看桌面佔用的狀況），再繼續往下。</p><p>準備好之後，請你跟著以下流程操作，觀察一下 Context Window 的變化：</p><ol><li>輸入 <code>/compact 只保留目前頁面的功能與尚未完成的事</code></li><li>再輸入一次 <code>/context</code>，比較桌面佔用是不是變小了</li><li>問它「你剛剛給的五個改善建議是哪五個？」，看看它還記得多少</li><li>再問它「目前頁面有哪些功能？」，這題它應該答得出來</li><li>輸入 <code>/clear</code>，然後再問一次「目前頁面有哪些功能？」</li></ol><p>第三點是要讓你親眼看到壓縮是「有損的」，因為我們在 <code>/compact</code> 時只叫它保留功能跟未完成的事，沒叫它保留那五個建議，所以它很可能會漏掉或講不完整。</p><p>而第四、五點是同一個問題問兩次：<code>/clear</code> 之前它答得出來，因為這正是我們指定保留的重點；<code>/clear</code> 之後連這題都答不出來必須要重新再讀檔案，因為桌面已經被清空了。</p><p>當然有可能它會答得出來，因為 AI 裡面有一個 Auto Memory（自動記憶）的功能，會自己去判斷哪些東西是重要的，然後就把內容給自動記錄下來。</p><h2 id="結語">結語</h2><p>最後也簡單總結一下重點：</p><ul><li>Token 就像樂高積木一樣，而 Context window 則是一張有極限的桌子，桌面上堆滿了你跟 AI 的對話、它讀的檔案、指令輸出等等。</li><li>越聊越笨不一定是 AI 算力不足或變笨，可能是桌面太滿、重點被壓縮稀釋了。</li><li><code>/context</code> 看桌面、<code>/clear</code> 清理桌面、<code>/compact</code> 整理桌面。</li><li>核心心法：一個任務一個對話，透過 <code>/compact [保留重點]</code> 來指定保留關鍵重點。</li></ul><p>那麼這一天也差不多了，我們明天見囉。</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}]]></content>
-  </entry>
-  <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 5：Permission 跟 Plan Mode 之不要什麼都按 Yes</title>
-    <link href="https://israynotarray.com/ai/20260918/claude-code-permission-plan-mode/"/>
-    <id>https://israynotarray.com/ai/20260918/claude-code-permission-plan-mode/</id>
-    <published>2026-09-18T01:00:00.000Z</published>
-    <updated>2026-09-18T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 5：Permission 跟 Plan Mode，不要什麼都按 Yes" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8809_46_13.png"></p><h2 id="前言">前言</h2><p>昨天嘗試了第一個小練習之後，你應該有被 AI 詢問你一些問題，並且問過你一次「可以改嗎？」，然後由你決定是否按下「Yes」同意它改檔案。</p><p>但...用久之後，你應該會發現 AI 的確認視窗出現得很頻繁，然後人類的天性就會發作「開始無腦」按 Yes，一路按到最後，然後你就會發現「啊！我不小心把整個專案都改壞了！」。</p><p>所以這邊我們要來把這個 「Permission」的機制好好講清楚，讓你知道哪些操作會被詢問、哪些不會被詢問，然後你就可以在不被煩死的情況下，還能保護你的專案不被亂改。</p><h2 id="ai-的門禁機制">AI 的門禁機制</h2><p>還記得昨天這張圖嗎？</p><p><img alt="Claude Code 改完後在瀏覽器打開 index.html 的結果示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260803233713.png"></p><p>可以看到儘管是我們自己要求 AI 幫忙打開瀏覽器，它依然會詢問你：「你同意我打開瀏覽器嗎？」。</p><p>奇怪，明明是我們自己下這個 Prompt：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我開啟 index.html，我想使用瀏覽器看看結果。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我開啟 index.html，我想使用瀏覽器看看結果。
-</span></span></code></pre><p>為什麼它還要問我們？這就是這章節要介紹的「Permission」機制，也就是權限機制。</p><p>這個機制並不侷限於 Claude Code，其他 AI Agent 工具都有相似的機制，而這個機制將會決定哪些操作會被允許，哪些操作需要經過使用者的確認，而且這並不是隨機性的。</p><h2 id="permission-核心機制">Permission 核心機制</h2><p>Permission 核心機制其實很簡單，主要是依照操作是否會在你的電腦上留下痕跡來決定，其實就是兩種操作：</p><ul><li>會留下痕跡（記錄）的操作</li><li>不會留下痕跡（記錄）的操作</li></ul><p>什麼意思呢？你可以想像成 AI 在做每一件事情之前都會先問過自己一次一個問題</p><p>「我做這件事情，會不會在這台電腦上留下痕跡？如果會，我就要停下來問使用者是否同意。」</p><p>反之，如果只是單純 <strong>看/讀取</strong> 檔案或是 <strong>搜尋</strong> 這種大多都不會詢問你。</p><p>但！如果是改檔案、建立/新增檔案等操作，這些操作只要會在電腦上留下痕跡（記錄）的行為，那麼預設情況下，就會停下腳步讓你知道它即將做什麼事情。</p><p><img alt="Permission 什麼時候會問你" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8809_53_44.png"></p><p>好吧，我知道你看到這邊可能覺得文謅謅了，那就記住這句話就好：</p><blockquote><p>看不用問，動才要問。</p></blockquote><p><img alt="Claude Code 詢問權限示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260718134442.png"></p><p>理解這個門禁機制的大概念之後，你才會知道 AI 詢問這些並不是一個擾人擾民的行為，而是它正在做一些 <strong>「可能」</strong> 會在你的電腦上留下痕跡的事情，所以它才會停下來問你這句話：</p><p>「我可以這樣做嗎？」</p><p><img alt="我可以這樣做嗎？" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804115446.png"></p><p>這邊要注意一下，同一個指令沒被詢問權限並不代表以後都不會問，也不代表它就是絕對的安全，這些基本上都跟你目前的模式、之前核准過的規則有關。</p><h2 id="搞懂六種權限模式">搞懂六種權限模式</h2><p>搞懂最基本的門禁機制概念之後，接下來就要在深入了解一下權限模式。</p><p>首先，我們先做一點小實驗，請你跟昨天一樣進到 <code>claude-playground</code> 資料夾啟動 Claude Code，接著試著在畫面上按幾下 Shift+Tab，你會看到輸入框附近的模式會一直輪流切換以下：</p><ol><li>manual mode on</li><li>accept edits on</li><li>plan mode on</li><li>auto mode on（不一定每個人都有，等等會解釋）</li></ol><p><img alt="按 Shift+Tab 循環切換權限模式" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719224935.png"></p><p>這幾個就是你平常使用 AI 會用到的權限模式（記得切回 <code>manual mode on</code>）。</p><p>這邊也特別補充一個有趣的事情，如果你有特別去翻官方文件（<a href="https://code.claude.com/docs/en/permission-modes" rel="nofollow">Permission modes（官方文件）</a>）的話，你會發現跟你畫面上看到的名稱不太一樣，例如...官方文件的 <code>default</code> 模式，其實對應的是 <code>manual mode on</code>，所以底下這邊我也幫你組合起來：</p><table><thead><tr><th>畫面標示</th><th>文件裡的名字</th><th>行為</th></tr></thead><tbody><tr><td>manual mode on</td><td>default</td><td>動的操作每次都問</td></tr><tr><td>accept edits on</td><td>acceptEdits</td><td>常見的檔案編輯與檔案系統指令自動通過，其他操作一樣會問</td></tr><tr><td>plan mode on</td><td>plan</td><td>研究模式，先研究再問你是否允許執行計畫</td></tr><tr><td>auto mode on</td><td>auto</td><td>基本上就是全部允許了，但背後會有一些安全機制幫你把關，大幅減少詢問次數</td></tr></tbody></table><p>這邊要把 <code>accept edits on</code>（acceptEdits）特別拉出來解釋一下，基本上這個模式下，它會把常見的檔案編輯與檔案系統指令自動放行，例如...</p><ul><li>建立資料夾（<code>mkdir</code>）</li><li>搬移（<code>mv</code>）</li><li>刪除（<code>rm</code>）</li></ul><p>諸如此類這種類似的指令都變成預設同意，這樣就不用每次都問你「可以嗎？」，但你還是要養成習慣看清楚 AI 打算幹嘛，因為我就曾遇過 AI 把我的專案資料夾整個搬到別的地方一度找不到東西。</p><p>接著稍微講一下官方文件的部分，官方文件裡面有列出來的權限模式總共六種，除去上面介紹的四種之外，還有另外兩種模式，分別是：</p><ul><li><strong><code>dontAsk</code>：</strong> 這個模式下只要出現會詢問權限的一律都會拒絕，只跑你預先允許過的操作，這個很適合給自動化腳本（讓程式自己跑 AI Agent 的場景）用的，所以它不會出現在 Shift+Tab 中。</li><li><strong><code>bypassPermissions</code>：</strong> 不問你任何權限問題，直接允許通通通過，但我個人非常不建議你隨便使用，這個模式基本上是給沙盒（Sandbox, 一種跟你電腦隔離開的環境）用的，如果你隨便在自己的電腦上開這個模式，那就等同於把自家鑰匙直接交出去大門敞開，這個模式也不會出現在 Shift+Tab 中，是需要特別在啟動指令上加參數才會出現的。</li></ul><p>所以額外的 <code>dontAsk</code> 跟 <code>bypassPermissions</code> 這兩個模式，是必須搭配啟動指令的參數才會出現的，平常你是切不到的，啟動方式我也提供給你參考（請不要隨便拿來用）：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="# 啟動 dontAsk 模式
-claude --permission-mode dontAsk
-# 啟動 bypassPermissions 模式
-claude --permission-mode bypassPermissions
-" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="sGBqm"># 啟動 dontAsk 模式
-</span></span><span class="line" line="2"><span class="smYoP">claude</span><span class="stw71"> --permission-mode</span><span class="sWayO"> dontAsk
-</span></span><span class="line" line="3"><span class="sGBqm"># 啟動 bypassPermissions 模式
-</span></span><span class="line" line="4"><span class="smYoP">claude</span><span class="stw71"> --permission-mode</span><span class="sWayO"> bypassPermissions
-</span></span></code></pre><p><code>bypassPermissions</code> 如果要使用，請務必確認你正在處於隔離環境（Sandbox）中，<del>否則你某天就會成為社群上的災難故事主角</del>。</p><h2 id="plan-mode計畫模式">Plan Mode（計畫模式）</h2><p>Plan Mode 這個模式非常推薦使用，也是我個人最常使用的模式，也就是先計畫、先思考，再來決定是否動手。</p><p>開啟 Plan Mode 之後，AI 會變成唯讀狀態，它只能讀取你的專案、做研究，但一個檔案都改不了。</p><p>我們講了那麼多，不如實際嘗試一下，還記得昨天我們的練習檔做到哪裡嗎？你應該會停留在這個需求：</p><blockquote><p>按鈕的文字是「更改背景顏色」，而不是「按我」</p></blockquote><p>如果找不到或者沒有的話，你也可以透過 <a href="https://github.com/hsiangfeng/ithelp-2026-vibe-coding/tree/main/day-5/claude-playground" rel="nofollow">GitHub #day5</a> 找到相關的練習檔案。</p><p>今天我們要來嘗試使用 Plan Mode 替這個練習頁增加一些東西，讓它變成一頁簡單的個人簡介，剛好這個簡介需要一次加入三個區塊，很適合拿來練 Plan Mode。</p><p>所以請你啟動 <code>claude</code> 進入 Claude Code 後，並對著終端機輸入框按 Shift+Tab 切換到 plan 模式</p><p><img alt="按 Shift+Tab 切換到 plan 模式" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804145314.png"></p><p>確認已經切換到 <code>plan mode on</code> 後，接著請你在輸入框裡面複製貼上以下文字：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="我想在 index.html 這個頁面加上三個區塊：自我介紹、技能清單、聯絡方式。
-原本的標題跟「更改背景顏色」按鈕都要保留。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>我想在 index.html 這個頁面加上三個區塊：自我介紹、技能清單、聯絡方式。
-</span></span><span class="line" line="2"><span>原本的標題跟「更改背景顏色」按鈕都要保留。
-</span></span></code></pre><p>為了避免 AI 沒有與你建立資訊對等，所以記得先跟 AI 說 <code>這個資料夾裡面有什麼？index.html 裡面有什麼東西？</code>，再接著說上面這段文字，這樣它才會知道你希望它做什麼事情。</p><p>接著你應該會有滿高機率看到這個畫面：</p><p><img alt="AI 詢問問題" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804150238.png"></p><p>為什麼會問這些呢？畢竟我們要求的任務（Prompt）就是有空洞，所以才會出選項題給你，盡可能減少 AI 做出不符合你預期的修改。</p><p>接下來你會看到 AI 給你一大串資訊，這個就是 Plan Mode 的精髓所在，它會先研究你的專案，然後交出一份計畫給你，讓你決定要不要同意它執行，底下我也貼上完整的計畫內容給你參考：</p><pre className="language-md shiki shiki-themes github-light github-light github-dark-high-contrast" code="Ready to code?
-
-Here is Claude's plan:
-在 index.html 加上三個區塊
-
-Context
-
-day-5/claude-playground/index.html 目前只有 17 行：一個 &lt;h1&gt;、一句「目前這裡什麼都還沒有。」、一個外部連結，以及一顆會隨機換背景色的按鈕。這是 vibe coding 練習頁，內容還沒長出來。
-
-這次要補上自我介紹、技能清單、聯絡方式三個區塊，並保留原本的標題與換背景色按鈕。內容先用中性的範例文字（不編造個人資訊），之後由 Ray 自己替換；同時加一小段 inline CSS，讓多了三個區塊之後的頁面仍然好讀。
-
-沿用現在的單檔風格：不引入外部字型、不做深色模式、不拆檔案。
-
-要改的檔案
-
-只有一個：day-5/claude-playground/index.html
-
-具體做法
-
-1. 保留不動的東西
-
-- &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt; — 原字不動
-- 按鈕 &lt;button type=&quot;button&quot; id=&quot;bgBtn&quot;&gt;隨機換背景色&lt;/button&gt; 與底部那段 &lt;script&gt; — 完全不動，包含 id=&quot;bgBtn&quot;
-
-2. 兩處會調整（請在核准時確認）
-
-- 第 8 行「目前這裡什麼都還沒有。」：加了三個區塊之後這句話就不成立了，建議換成一句簡短的開場白（範例文字）。若想留著，說一聲即可。
-- 第 9 行 israynotarray.com 連結：建議搬進「聯絡方式」區塊，避免它孤零零卡在標題和區塊之間。連結本身與 target=&quot;_blank&quot; 保留，順手補上 rel=&quot;noopener noreferrer&quot;。
-
-3. 新增結構
-
-在標題之下、按鈕之上，放一個 &lt;main&gt;，內含三個 &lt;section&gt;，各自以 &lt;h2&gt; 開頭：
-
-┌──────────┬─────────────────────┬───────────────────────────────────────────────────────┐
-│   區塊   │      標籤結構       │                       範例內容                        │
-├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-│ 自我介紹 │ &lt;h2&gt; + 一到兩段 &lt;p&gt; │ 「我是 OOO，目前主要做前端開發⋯⋯」這類中性敘述        │
-├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-│ 技能清單 │ &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;     │ HTML / CSS / JavaScript / Git 等，附一句簡短說明      │
-├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-│ 聯絡方式 │ &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;     │ Email（mailto: 佔位字串）、部落格連結、其他社群留一項 │
-└──────────┴─────────────────────┴───────────────────────────────────────────────────────┘
-
-每個範例值旁邊放一則簡短 HTML 註解標示「改這裡」，方便日後替換。
-
-同時在 &lt;head&gt; 補一行 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; — 加了版面寬度限制之後，手機上沒有這行會被縮放。
-
-4. CSS 範圍
-
-寫在 &lt;head&gt; 的一段 inline &lt;style&gt;，只做四件事：
-
-- body：系統字型堆疊、line-height: 1.7、max-width 約 40rem 置中、內距
-- section：區塊之間的上下間距
-- ul：清單項目間距
-- button：一點內距與 cursor: pointer
-
-關鍵限制：不要對 body 以外的元素設定 background。按鈕的 JS 是把顏色寫進 document.body.style.backgroundColor（inline style），只要 section / main 沒有自己的底色，換背景色的效果就會照常穿透整頁。body 本身可以給預設底色，inline style 優先度更高，不會互相打架。
-
-不加：外部字型、深色模式、favicon、動畫、CSS 變數。
-
-驗證
-
-1. 直接用瀏覽器開啟 day-5/claude-playground/index.html
-2. 確認三個區塊都在，標題文字沒被改掉，版面在桌機與窄視窗下都好讀
-3. 點「隨機換背景色」數次 — 整頁底色要跟著變，三個區塊不能出現白色色塊蓋住背景
-4. 開 DevTools Console 確認沒有錯誤（getElementById('bgBtn') 不能變成 null）
-" language="md" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="s8XSl">Ready to code?
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span class="s8XSl">Here is Claude's plan:
-</span></span><span class="line" line="4"><span class="s8XSl">在 index.html 加上三個區塊
-</span></span><span class="line" line="5"><span emptyLinePlaceholder>
-</span></span><span class="line" line="6"><span class="s8XSl">Context
-</span></span><span class="line" line="7"><span emptyLinePlaceholder>
-</span></span><span class="line" line="8"><span class="s8XSl">day-5/claude-playground/index.html 目前只有 17 行：一個 &lt;h1&gt;、一句「目前這裡什麼都還沒有。」、一個外部連結，以及一顆會隨機換背景色的按鈕。這是 vibe coding 練習頁，內容還沒長出來。
-</span></span><span class="line" line="9"><span emptyLinePlaceholder>
-</span></span><span class="line" line="10"><span class="s8XSl">這次要補上自我介紹、技能清單、聯絡方式三個區塊，並保留原本的標題與換背景色按鈕。內容先用中性的範例文字（不編造個人資訊），之後由 Ray 自己替換；同時加一小段 inline CSS，讓多了三個區塊之後的頁面仍然好讀。
-</span></span><span class="line" line="11"><span emptyLinePlaceholder>
-</span></span><span class="line" line="12"><span class="s8XSl">沿用現在的單檔風格：不引入外部字型、不做深色模式、不拆檔案。
-</span></span><span class="line" line="13"><span emptyLinePlaceholder>
-</span></span><span class="line" line="14"><span class="s8XSl">要改的檔案
-</span></span><span class="line" line="15"><span emptyLinePlaceholder>
-</span></span><span class="line" line="16"><span class="s8XSl">只有一個：day-5/claude-playground/index.html
-</span></span><span class="line" line="17"><span emptyLinePlaceholder>
-</span></span><span class="line" line="18"><span class="s8XSl">具體做法
-</span></span><span class="line" line="19"><span emptyLinePlaceholder>
-</span></span><span class="line" line="20"><span class="syBk-">1.</span><span class="s8XSl"> 保留不動的東西
-</span></span><span class="line" line="21"><span emptyLinePlaceholder>
-</span></span><span class="line" line="22"><span class="syBk-">-</span><span class="s8XSl"> &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt; — 原字不動
-</span></span><span class="line" line="23"><span class="syBk-">-</span><span class="s8XSl"> 按鈕 &lt;button type=&quot;button&quot; id=&quot;bgBtn&quot;&gt;隨機換背景色&lt;/button&gt; 與底部那段 &lt;script&gt; — 完全不動，包含 id=&quot;bgBtn&quot;
-</span></span><span class="line" line="24"><span emptyLinePlaceholder>
-</span></span><span class="line" line="25"><span class="syBk-">2.</span><span class="s8XSl"> 兩處會調整（請在核准時確認）
-</span></span><span class="line" line="26"><span emptyLinePlaceholder>
-</span></span><span class="line" line="27"><span class="syBk-">-</span><span class="s8XSl"> 第 8 行「目前這裡什麼都還沒有。」：加了三個區塊之後這句話就不成立了，建議換成一句簡短的開場白（範例文字）。若想留著，說一聲即可。
-</span></span><span class="line" line="28"><span class="syBk-">-</span><span class="s8XSl"> 第 9 行 israynotarray.com 連結：建議搬進「聯絡方式」區塊，避免它孤零零卡在標題和區塊之間。連結本身與 target=&quot;_blank&quot; 保留，順手補上 rel=&quot;noopener noreferrer&quot;。
-</span></span><span class="line" line="29"><span emptyLinePlaceholder>
-</span></span><span class="line" line="30"><span class="syBk-">3.</span><span class="s8XSl"> 新增結構
-</span></span><span class="line" line="31"><span emptyLinePlaceholder>
-</span></span><span class="line" line="32"><span class="s8XSl">在標題之下、按鈕之上，放一個 &lt;main&gt;，內含三個 &lt;section&gt;，各自以 &lt;h2&gt; 開頭：
-</span></span><span class="line" line="33"><span emptyLinePlaceholder>
-</span></span><span class="line" line="34"><span class="s8XSl">┌──────────┬─────────────────────┬───────────────────────────────────────────────────────┐
-</span></span><span class="line" line="35"><span class="s8XSl">│   區塊   │      標籤結構       │                       範例內容                        │
-</span></span><span class="line" line="36"><span class="s8XSl">├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-</span></span><span class="line" line="37"><span class="s8XSl">│ 自我介紹 │ &lt;h2&gt; + 一到兩段 &lt;p&gt; │ 「我是 OOO，目前主要做前端開發⋯⋯」這類中性敘述        │
-</span></span><span class="line" line="38"><span class="s8XSl">├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-</span></span><span class="line" line="39"><span class="s8XSl">│ 技能清單 │ &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;     │ HTML / CSS / JavaScript / Git 等，附一句簡短說明      │
-</span></span><span class="line" line="40"><span class="s8XSl">├──────────┼─────────────────────┼───────────────────────────────────────────────────────┤
-</span></span><span class="line" line="41"><span class="s8XSl">│ 聯絡方式 │ &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;     │ Email（mailto: 佔位字串）、部落格連結、其他社群留一項 │
-</span></span><span class="line" line="42"><span class="s8XSl">└──────────┴─────────────────────┴───────────────────────────────────────────────────────┘
-</span></span><span class="line" line="43"><span emptyLinePlaceholder>
-</span></span><span class="line" line="44"><span class="s8XSl">每個範例值旁邊放一則簡短 HTML 註解標示「改這裡」，方便日後替換。
-</span></span><span class="line" line="45"><span emptyLinePlaceholder>
-</span></span><span class="line" line="46"><span class="s8XSl">同時在 &lt;head&gt; 補一行 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; — 加了版面寬度限制之後，手機上沒有這行會被縮放。
-</span></span><span class="line" line="47"><span emptyLinePlaceholder>
-</span></span><span class="line" line="48"><span class="syBk-">4.</span><span class="s8XSl"> CSS 範圍
-</span></span><span class="line" line="49"><span emptyLinePlaceholder>
-</span></span><span class="line" line="50"><span class="s8XSl">寫在 &lt;head&gt; 的一段 inline &lt;style&gt;，只做四件事：
-</span></span><span class="line" line="51"><span emptyLinePlaceholder>
-</span></span><span class="line" line="52"><span class="syBk-">-</span><span class="s8XSl"> body：系統字型堆疊、line-height: 1.7、max-width 約 40rem 置中、內距
-</span></span><span class="line" line="53"><span class="syBk-">-</span><span class="s8XSl"> section：區塊之間的上下間距
-</span></span><span class="line" line="54"><span class="syBk-">-</span><span class="s8XSl"> ul：清單項目間距
-</span></span><span class="line" line="55"><span class="syBk-">-</span><span class="s8XSl"> button：一點內距與 cursor: pointer
-</span></span><span class="line" line="56"><span emptyLinePlaceholder>
-</span></span><span class="line" line="57"><span class="s8XSl">關鍵限制：不要對 body 以外的元素設定 background。按鈕的 JS 是把顏色寫進 document.body.style.backgroundColor（inline style），只要 section / main 沒有自己的底色，換背景色的效果就會照常穿透整頁。body 本身可以給預設底色，inline style 優先度更高，不會互相打架。
-</span></span><span class="line" line="58"><span emptyLinePlaceholder>
-</span></span><span class="line" line="59"><span class="s8XSl">不加：外部字型、深色模式、favicon、動畫、CSS 變數。
-</span></span><span class="line" line="60"><span emptyLinePlaceholder>
-</span></span><span class="line" line="61"><span class="s8XSl">驗證
-</span></span><span class="line" line="62"><span emptyLinePlaceholder>
-</span></span><span class="line" line="63"><span class="syBk-">1.</span><span class="s8XSl"> 直接用瀏覽器開啟 day-5/claude-playground/index.html
-</span></span><span class="line" line="64"><span class="syBk-">2.</span><span class="s8XSl"> 確認三個區塊都在，標題文字沒被改掉，版面在桌機與窄視窗下都好讀
-</span></span><span class="line" line="65"><span class="syBk-">3.</span><span class="s8XSl"> 點「隨機換背景色」數次 — 整頁底色要跟著變，三個區塊不能出現白色色塊蓋住背景
-</span></span><span class="line" line="66"><span class="syBk-">4.</span><span class="s8XSl"> 開 DevTools Console 確認沒有錯誤（getElementById('bgBtn') 不能變成 null）
-</span></span></code></pre><p><img alt="Plan Mode 產出的計畫內容，最後有同意執行的選項" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804150600.png"></p><p>Plan 的計畫出來之後，下面會出現一些選項，分別是：</p><ul><li>Yes, and use auto mode（同意執行，並切換到 auto mode）</li><li>Yes, manually approve edits（同意執行，並切換到 manual mode）</li><li>Tell Claude what to change（不同意執行，並告訴 Claude Code 要修改的地方）</li></ul><p>選項的文字依版本可能會略有不同，意思對得上就好，但請你先 <strong>不要按下 Yes, and use auto mode</strong>，而是先按下 Esc 鍵離開選單，因為我們只是先體驗一下 Plan Mode 的流程而已。</p><p>體驗之後，我們回來繼續講一下 Plan Mode 的一些重點，在 Plan Mode 下我會非常建議你好好閱讀計畫內容，像是...</p><ul><li>它打算動/改哪些檔案（有沒有超出你的預期範圍？）</li><li>步驟的順序合不合理？</li></ul><p>如果你擔心 AI 講的話你都無法看懂（如一堆技術術語），你可以在「Tell Claude what to change」裡面要求它用更簡單的方式解釋，這也是一種有效理解它要做什麼事情的方式技巧之一。</p><p>這樣才不會讓你有一種 <strong>「它做了什麼我都不知道」</strong> 的感覺，因為這個模式就是要讓你先看計畫、再決定要不要動手。</p><h2 id="可控失敗練習修改剛剛的-plan-mode-計畫">可控失敗練習：修改剛剛的 Plan Mode 計畫</h2><p>認識完這些之後，我們要來嘗試與體驗 Plan Mode 的另一個重點：修改計畫。</p><p>以剛剛來講，我們已經按 Esc 離開選單並回到一開始的輸入框了，但其實我們的對話視窗中前面一樣包含剛剛的計畫內容</p><p><img alt="Plan Mode 計畫內容還在對話視窗中" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804151205.png"></p><p>這時候我們要來嘗試修改計畫，請你在輸入框裡面複製貼上以下文字：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="這份計畫先不要執行，請修正後再給我一次：
-
-1. 聯絡方式不要放 email，改成 GitHub 和 Threads 連結。
-2. 只改 index.html，不新增套件或其他檔案。
-3. 幫我把名字補上連結，連結是「https://israynotarray.com/」，並且 target=&quot;_blank&quot;。
-
-除此之外，也請你在新版計畫最前面列出「不會做的事」。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>這份計畫先不要執行，請修正後再給我一次：
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span>1. 聯絡方式不要放 email，改成 GitHub 和 Threads 連結。
-</span></span><span class="line" line="4"><span>2. 只改 index.html，不新增套件或其他檔案。
-</span></span><span class="line" line="5"><span>3. 幫我把名字補上連結，連結是「https://israynotarray.com/」，並且 target=&quot;_blank&quot;。
-</span></span><span class="line" line="6"><span emptyLinePlaceholder>
-</span></span><span class="line" line="7"><span>除此之外，也請你在新版計畫最前面列出「不會做的事」。
-</span></span></code></pre><p>接著你就會得到這一大串的計劃書內容：</p><pre className="language-md shiki shiki-themes github-light github-light github-dark-high-contrast" code="Ready to code?
-
-Here is Claude's plan:
-
-index.html 加上三個區塊（修正版）
-
-不會做的事
-
-- 不新增任何檔案：不建 style.css、script.js、README，也不動 day-4 或其他資料夾
-- 不安裝任何套件：沒有 npm、沒有 build 工具、沒有 package.json
-- 不引入外部資源：不載 Google Fonts、不載 CDN、不加 favicon、不放圖片
-- 不放 email：聯絡方式只有 GitHub 與 Threads 兩個連結，不出現 mailto:
-- 不動按鈕與那段 JS：id=&quot;bgBtn&quot; 與換背景色的 &lt;script&gt; 原封不動
-- 不改 &lt;h1&gt; 標題文字
-- 不做多餘設計：不加深色模式、CSS 變數、動畫、RWD 斷點
-
-Context
-
-day-5/claude-playground/index.html 目前 17 行：一個 &lt;h1&gt;、一句「目前這裡什麼都還沒有。」、一個外部連結、一顆隨機換背景色的按鈕。
-
-次要補上自我介紹、技能清單、聯絡方式三個區塊，保留原本的標題與按鈕。內容用中性範例文字（不編造個人資訊），日後自行替換；同時加一小段 inline CSS 讓版面好讀。全部改動都在同一個檔案內。
-
-改的檔案
-
-day-5/claude-playground/index.html — 僅此一個。
-
-體做法
-1. 保留不動
-
-- &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt; 
-- &lt;button type=&quot;button&quot; id=&quot;bgBtn&quot;&gt;隨機換背景色&lt;/button&gt; 與底部整段 &lt;script&gt;
-
-2. 兩處調整
-
-- 第 8 行「目前這裡什麼都還沒有。」：三個區塊補上之後這句就不成立了，改成一句簡短開場白（範例文字）。想留著的話說一聲。
-- 第 9 行原本孤立的 israynotarray.com 連結：移除。它的角色由下面「自我介紹」裡的名字連結接手，避免同一個網址在頁面上出現兩次。
-
-3. 三個區塊
-
-在標題之下、按鈕之上放一個 &lt;main&gt;，內含三個 &lt;section&gt;，各以 &lt;h2&gt; 開頭：
-
-自我介紹 — &lt;h2&gt; + 一到兩段 &lt;p&gt;。名字要做成連結：
-
-&lt;p&gt;我是 &lt;a href=&quot;https://israynotarray.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;是 Ray 不是 Array&lt;/a&gt;，目前主要做前端開發⋯⋯&lt;/p&gt;
-
-顯示文字之後可自行改成想用的名字，href 固定為 https://israynotarray.com/。rel=&quot;noopener noreferrer&quot; 是搭配 target=&quot;_blank&quot; 的安全慣例，順手補上。
-
-技能清單 — &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;，列 HTML / CSS / JavaScript / Git 等，每項附一句短說明。
-
-聯絡方式 — &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;，兩個項目：
-
-┌─────────┬──────────────────────────────────────┬────────────────────────────────────────────────────────┐
-│  項目   │                 href                 │                          備註                          │
-├─────────┼──────────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ GitHub  │ https://github.com/hsiangfeng        │ 從這個 repo 的 git user 推測，請核對；不對就直接改字串 │
-├─────────┼──────────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ Threads │ https://www.threads.net/@ + 佔位帳號 │ 我不知道帳號，先留佔位並標註 TODO                      │
-└─────────┴──────────────────────────────────────┴────────────────────────────────────────────────────────┘
-
-兩個都加 target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;。
-
-每個要替換的範例值旁放一則短 HTML 註解標示「改這裡」。
-
-另外在 &lt;head&gt; 補一行 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; — 加了寬度限制後，手機上少這行會被縮放。
-
-4. CSS 範圍
-
-&lt;head&gt; 內一段 inline &lt;style&gt;，只做四件事：
-
-- body：系統字型堆疊、line-height: 1.7、max-width 約 40rem 置中、內距
-- section：區塊上下間距
-- ul：項目間距
-- button：內距與 cursor: pointer
-
-關鍵限制：除了 body 之外，任何元素都不設 background。按鈕的 JS 是把顏色寫進 document.body.style.backgroundColor（inline style），只要 main / section沒有自己的底色，換色效果就會照常穿透整頁。
-
-驗證
-
-1. 瀏覽器直接開 day-5/claude-playground/index.html
-2. 三個區塊都在，&lt;h1&gt; 文字沒被改動，桌機與窄視窗下都好讀
-3. 點「隨機換背景色」數次 — 整頁底色跟著變，區塊不能出現白色色塊蓋住背景
-4. 三個連結（名字、GitHub、Threads）都會開新分頁，網址正確
-5. DevTools Console 無錯誤（getElementById('bgBtn') 不可為 null）
-6. git status 只該顯示 index.html 一個檔案被修改
-" language="md" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="s8XSl">Ready to code?
-</span></span><span class="line" line="2"><span emptyLinePlaceholder>
-</span></span><span class="line" line="3"><span class="s8XSl">Here is Claude's plan:
-</span></span><span class="line" line="4"><span emptyLinePlaceholder>
-</span></span><span class="line" line="5"><span class="s8XSl">index.html 加上三個區塊（修正版）
-</span></span><span class="line" line="6"><span emptyLinePlaceholder>
-</span></span><span class="line" line="7"><span class="s8XSl">不會做的事
-</span></span><span class="line" line="8"><span emptyLinePlaceholder>
-</span></span><span class="line" line="9"><span class="syBk-">-</span><span class="s8XSl"> 不新增任何檔案：不建 style.css、script.js、README，也不動 day-4 或其他資料夾
-</span></span><span class="line" line="10"><span class="syBk-">-</span><span class="s8XSl"> 不安裝任何套件：沒有 npm、沒有 build 工具、沒有 package.json
-</span></span><span class="line" line="11"><span class="syBk-">-</span><span class="s8XSl"> 不引入外部資源：不載 Google Fonts、不載 CDN、不加 favicon、不放圖片
-</span></span><span class="line" line="12"><span class="syBk-">-</span><span class="s8XSl"> 不放 email：聯絡方式只有 GitHub 與 Threads 兩個連結，不出現 mailto:
-</span></span><span class="line" line="13"><span class="syBk-">-</span><span class="s8XSl"> 不動按鈕與那段 JS：id=&quot;bgBtn&quot; 與換背景色的 &lt;script&gt; 原封不動
-</span></span><span class="line" line="14"><span class="syBk-">-</span><span class="s8XSl"> 不改 &lt;h1&gt; 標題文字
-</span></span><span class="line" line="15"><span class="syBk-">-</span><span class="s8XSl"> 不做多餘設計：不加深色模式、CSS 變數、動畫、RWD 斷點
-</span></span><span class="line" line="16"><span emptyLinePlaceholder>
-</span></span><span class="line" line="17"><span class="s8XSl">Context
-</span></span><span class="line" line="18"><span emptyLinePlaceholder>
-</span></span><span class="line" line="19"><span class="s8XSl">day-5/claude-playground/index.html 目前 17 行：一個 &lt;h1&gt;、一句「目前這裡什麼都還沒有。」、一個外部連結、一顆隨機換背景色的按鈕。
-</span></span><span class="line" line="20"><span emptyLinePlaceholder>
-</span></span><span class="line" line="21"><span class="s8XSl">次要補上自我介紹、技能清單、聯絡方式三個區塊，保留原本的標題與按鈕。內容用中性範例文字（不編造個人資訊），日後自行替換；同時加一小段 inline CSS 讓版面好讀。全部改動都在同一個檔案內。
-</span></span><span class="line" line="22"><span emptyLinePlaceholder>
-</span></span><span class="line" line="23"><span class="s8XSl">改的檔案
-</span></span><span class="line" line="24"><span emptyLinePlaceholder>
-</span></span><span class="line" line="25"><span class="s8XSl">day-5/claude-playground/index.html — 僅此一個。
-</span></span><span class="line" line="26"><span emptyLinePlaceholder>
-</span></span><span class="line" line="27"><span class="s8XSl">體做法
-</span></span><span class="line" line="28"><span class="syBk-">1.</span><span class="s8XSl"> 保留不動
-</span></span><span class="line" line="29"><span emptyLinePlaceholder>
-</span></span><span class="line" line="30"><span class="syBk-">-</span><span class="s8XSl"> &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt; 
-</span></span><span class="line" line="31"><span class="syBk-">-</span><span class="s8XSl"> &lt;button type=&quot;button&quot; id=&quot;bgBtn&quot;&gt;隨機換背景色&lt;/button&gt; 與底部整段 &lt;script&gt;
-</span></span><span class="line" line="32"><span emptyLinePlaceholder>
-</span></span><span class="line" line="33"><span class="syBk-">2.</span><span class="s8XSl"> 兩處調整
-</span></span><span class="line" line="34"><span emptyLinePlaceholder>
-</span></span><span class="line" line="35"><span class="syBk-">-</span><span class="s8XSl"> 第 8 行「目前這裡什麼都還沒有。」：三個區塊補上之後這句就不成立了，改成一句簡短開場白（範例文字）。想留著的話說一聲。
-</span></span><span class="line" line="36"><span class="syBk-">-</span><span class="s8XSl"> 第 9 行原本孤立的 israynotarray.com 連結：移除。它的角色由下面「自我介紹」裡的名字連結接手，避免同一個網址在頁面上出現兩次。
-</span></span><span class="line" line="37"><span emptyLinePlaceholder>
-</span></span><span class="line" line="38"><span class="syBk-">3.</span><span class="s8XSl"> 三個區塊
-</span></span><span class="line" line="39"><span emptyLinePlaceholder>
-</span></span><span class="line" line="40"><span class="s8XSl">在標題之下、按鈕之上放一個 &lt;main&gt;，內含三個 &lt;section&gt;，各以 &lt;h2&gt; 開頭：
-</span></span><span class="line" line="41"><span emptyLinePlaceholder>
-</span></span><span class="line" line="42"><span class="s8XSl">自我介紹 — &lt;h2&gt; + 一到兩段 &lt;p&gt;。名字要做成連結：
-</span></span><span class="line" line="43"><span emptyLinePlaceholder>
-</span></span><span class="line" line="44"><span class="s8XSl">&lt;p&gt;我是 &lt;a href=&quot;https://israynotarray.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;是 Ray 不是 Array&lt;/a&gt;，目前主要做前端開發⋯⋯&lt;/p&gt;
-</span></span><span class="line" line="45"><span emptyLinePlaceholder>
-</span></span><span class="line" line="46"><span class="s8XSl">顯示文字之後可自行改成想用的名字，href 固定為 https://israynotarray.com/。rel=&quot;noopener noreferrer&quot; 是搭配 target=&quot;_blank&quot; 的安全慣例，順手補上。
-</span></span><span class="line" line="47"><span emptyLinePlaceholder>
-</span></span><span class="line" line="48"><span class="s8XSl">技能清單 — &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;，列 HTML / CSS / JavaScript / Git 等，每項附一句短說明。
-</span></span><span class="line" line="49"><span emptyLinePlaceholder>
-</span></span><span class="line" line="50"><span class="s8XSl">聯絡方式 — &lt;h2&gt; + &lt;ul&gt;&lt;li&gt;，兩個項目：
-</span></span><span class="line" line="51"><span emptyLinePlaceholder>
-</span></span><span class="line" line="52"><span class="s8XSl">┌─────────┬──────────────────────────────────────┬────────────────────────────────────────────────────────┐
-</span></span><span class="line" line="53"><span class="s8XSl">│  項目   │                 href                 │                          備註                          │
-</span></span><span class="line" line="54"><span class="s8XSl">├─────────┼──────────────────────────────────────┼────────────────────────────────────────────────────────┤
-</span></span><span class="line" line="55"><span class="s8XSl">│ GitHub  │ https://github.com/hsiangfeng        │ 從這個 repo 的 git user 推測，請核對；不對就直接改字串 │
-</span></span><span class="line" line="56"><span class="s8XSl">├─────────┼──────────────────────────────────────┼────────────────────────────────────────────────────────┤
-</span></span><span class="line" line="57"><span class="s8XSl">│ Threads │ https://www.threads.net/@ + 佔位帳號 │ 我不知道帳號，先留佔位並標註 TODO                      │
-</span></span><span class="line" line="58"><span class="s8XSl">└─────────┴──────────────────────────────────────┴────────────────────────────────────────────────────────┘
-</span></span><span class="line" line="59"><span emptyLinePlaceholder>
-</span></span><span class="line" line="60"><span class="s8XSl">兩個都加 target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;。
-</span></span><span class="line" line="61"><span emptyLinePlaceholder>
-</span></span><span class="line" line="62"><span class="s8XSl">每個要替換的範例值旁放一則短 HTML 註解標示「改這裡」。
-</span></span><span class="line" line="63"><span emptyLinePlaceholder>
-</span></span><span class="line" line="64"><span class="s8XSl">另外在 &lt;head&gt; 補一行 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; — 加了寬度限制後，手機上少這行會被縮放。
-</span></span><span class="line" line="65"><span emptyLinePlaceholder>
-</span></span><span class="line" line="66"><span class="syBk-">4.</span><span class="s8XSl"> CSS 範圍
-</span></span><span class="line" line="67"><span emptyLinePlaceholder>
-</span></span><span class="line" line="68"><span class="s8XSl">&lt;head&gt; 內一段 inline &lt;style&gt;，只做四件事：
-</span></span><span class="line" line="69"><span emptyLinePlaceholder>
-</span></span><span class="line" line="70"><span class="syBk-">-</span><span class="s8XSl"> body：系統字型堆疊、line-height: 1.7、max-width 約 40rem 置中、內距
-</span></span><span class="line" line="71"><span class="syBk-">-</span><span class="s8XSl"> section：區塊上下間距
-</span></span><span class="line" line="72"><span class="syBk-">-</span><span class="s8XSl"> ul：項目間距
-</span></span><span class="line" line="73"><span class="syBk-">-</span><span class="s8XSl"> button：內距與 cursor: pointer
-</span></span><span class="line" line="74"><span emptyLinePlaceholder>
-</span></span><span class="line" line="75"><span class="s8XSl">關鍵限制：除了 body 之外，任何元素都不設 background。按鈕的 JS 是把顏色寫進 document.body.style.backgroundColor（inline style），只要 main / section沒有自己的底色，換色效果就會照常穿透整頁。
-</span></span><span class="line" line="76"><span emptyLinePlaceholder>
-</span></span><span class="line" line="77"><span class="s8XSl">驗證
-</span></span><span class="line" line="78"><span emptyLinePlaceholder>
-</span></span><span class="line" line="79"><span class="syBk-">1.</span><span class="s8XSl"> 瀏覽器直接開 day-5/claude-playground/index.html
-</span></span><span class="line" line="80"><span class="syBk-">2.</span><span class="s8XSl"> 三個區塊都在，&lt;h1&gt; 文字沒被改動，桌機與窄視窗下都好讀
-</span></span><span class="line" line="81"><span class="syBk-">3.</span><span class="s8XSl"> 點「隨機換背景色」數次 — 整頁底色跟著變，區塊不能出現白色色塊蓋住背景
-</span></span><span class="line" line="82"><span class="syBk-">4.</span><span class="s8XSl"> 三個連結（名字、GitHub、Threads）都會開新分頁，網址正確
-</span></span><span class="line" line="83"><span class="syBk-">5.</span><span class="s8XSl"> DevTools Console 無錯誤（getElementById('bgBtn') 不可為 null）
-</span></span><span class="line" line="84"><span class="syBk-">6.</span><span class="s8XSl"> git status 只該顯示 index.html 一個檔案被修改
-</span></span></code></pre><p><img alt="Plan Mode 修正計畫" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260804151816.png"></p><p>這一次的計畫裡面清楚的包含幾個東西：</p><ul><li>不會做的事：沒有 email、沒有新套件、只動一個檔案</li><li>會做的事：三個區塊、保留原本標題跟按鈕、按鈕功能還在</li></ul><p>只要裡面多或少，你就可以在「Tell Claude What to Change」裡面要求它修改，一直把它打回去，直到它完全符合你的需求為止，而這過程就是在強迫你養成「先看計畫、再動手」的習慣。</p><p>當計畫改到你滿意之後，這一次才是真的可以按下「Yes, manually approve edits」。</p><p>請注意，這邊我是講「Yes, manually approve edits」，而不是「Yes, and use auto mode」，因為我希望 AI 修改的每一步都會經過你的眼睛，避免它做出你不想要的結果，同意之後它會離開 Plan Mode、開始動工。</p><p>完成之後別忘了驗收結果，像是...</p><ul><li>沒有多出奇怪的檔案。</li><li>用瀏覽器看看結果，確認三個區塊跟兩個社群連結有沒有都在。</li><li>按一下「更改背景顏色」按鈕，確認原本的功能是否還活著。</li></ul><p>最後一點格外重要，我們必須確保 AI 新增或修改功能後，舊有的功能不受影響，而這個習慣就是要你趁這個機會開始養成。</p><p>Plan Mode 以我自己的使用時機大多是在牽涉到多個檔案的大改動（約兩個以上），或者是我不熟悉的專案、我沒有任何想法時，我就會去跑 Plan Mode，而這部份其實也格外節省成本（後面章節會介紹 Token）。</p><p>這邊我也把這個判斷流程畫成圖讓你參考：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
-    A{&quot;要動兩個以上檔案、不熟這個專案&lt;br&gt;或你自己也還沒想法？&quot;} --&gt;|&quot;是&quot;| B[&quot;切到 plan mode on&lt;br&gt;先看計畫，不滿意就打回去&quot;]
-    B --&gt; C[&quot;計畫 OK 之後選&lt;br&gt;Yes, manually approve edits&quot;]
-    A --&gt;|&quot;否&quot;| D[&quot;留在 manual mode on&lt;br&gt;直接開工，每一步自己確認&quot;]
-    C --&gt; D
-" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TD
-</span></span><span class="line" line="2"><span>    A{&quot;要動兩個以上檔案、不熟這個專案&lt;br&gt;或你自己也還沒想法？&quot;} --&gt;|&quot;是&quot;| B[&quot;切到 plan mode on&lt;br&gt;先看計畫，不滿意就打回去&quot;]
-</span></span><span class="line" line="3"><span>    B --&gt; C[&quot;計畫 OK 之後選&lt;br&gt;Yes, manually approve edits&quot;]
-</span></span><span class="line" line="4"><span>    A --&gt;|&quot;否&quot;| D[&quot;留在 manual mode on&lt;br&gt;直接開工，每一步自己確認&quot;]
-</span></span><span class="line" line="5"><span>    C --&gt; D
-</span></span></code></pre><p><img alt="流程圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8809_56_59.png"></p><h2 id="結語">結語</h2><p>最後一樣總結一下今天的重點吧～</p><ul><li>基本門禁概念建立在「看不用問，動才要問」上。</li><li>核心使用模式為：
-<ul><li>manual mode on（default）：每次動作都問</li><li>accept edits on（acceptEdits）：常見的檔案編輯與檔案系統指令自動放行，其他操作仍會問</li><li>plan mode on（plan）：先研究再問你是否允許執行計畫</li><li>auto mode on（auto）：全部允許，但背後有安全機制幫你把關</li></ul></li><li>可以使用 Shift+Tab 切換模式</li><li>Plan 不滿意就打回，先計畫好再做事情會更好</li></ul><p>希望這一篇有讓你對 Permission 跟 Plan Mode 有更近一步的認識。</p><p>那麼如果沒問題的話，我們明天見哩～</p>html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sGBqm, html code.shiki .sGBqm{--shiki-light:#6A737D;--shiki-default:#6A737D;--shiki-dark:#BDC4CC}html pre.shiki code .smYoP, html code.shiki .smYoP{--shiki-light:#6F42C1;--shiki-default:#6F42C1;--shiki-dark:#FFB757}html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html pre.shiki code .s8XSl, html code.shiki .s8XSl{--shiki-light:#24292E;--shiki-default:#24292E;--shiki-dark:#F0F3F6}html pre.shiki code .syBk-, html code.shiki .syBk-{--shiki-light:#E36209;--shiki-default:#E36209;--shiki-dark:#FFB757}]]></content>
-  </entry>
-  <entry>
-    <title>老闆不會教你的 Vibe Coding 實戰 30 天｜Day 4：第一個任務——改 code 的最小流程</title>
-    <link href="https://israynotarray.com/ai/20260917/claude-code-first-task-read-diff/"/>
-    <id>https://israynotarray.com/ai/20260917/claude-code-first-task-read-diff/</id>
-    <published>2026-09-17T01:00:00.000Z</published>
-    <updated>2026-09-17T01:00:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img alt="老闆不會教你的 Vibe Coding 實戰 30 天｜Day 4：第一個任務——改 code 的最小流程" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8809_39_40.png"></p><h2 id="前言">前言</h2><p>看到這章節的你，我相信你已經把 Claude Code 安裝好了，因為接下來我們會需要來做一點點實作。</p><p>但今天的目標很小，試著用一個很小的練習跑完一次「叫它做事 → 看它做了什麼 → 決定要不要 → 反悔了拉回來」的循環。</p><p>你千萬別小看這個循環，因為後面進行記帳 App 開發時會一直圍繞著這個流程與觀念。</p><h2 id="建立你的第一個練習檔案">建立你的第一個練習檔案</h2><p>首先我們開始之前，先來稍微練習一下，請你打開終端機，並拖曳專案資料夾 <code>claude-playground</code> 進去，或是終端機直接輸入指令方式進入：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="cd claude-playground
-" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="stw71">cd</span><span class="sWayO"> claude-playground
-</span></span></code></pre><p>接著請你複製貼上以下指令，快速建立你的第一個 index.html 練習檔：</p><pre className="language-bash shiki shiki-themes github-light github-light github-dark-high-contrast" code="echo '&lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-Hant&quot;&gt;
-&lt;head&gt;
-  &lt;meta charset=&quot;UTF-8&quot;&gt;
-  &lt;title&gt;我的練習頁（是 Ray 不是 Array）&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt;
-  &lt;p&gt;目前這裡什麼都還沒有。&lt;/p&gt;
-  &lt;a href=&quot;https://israynotarray.com/&quot; target=&quot;_blank&quot;&gt;是 Ray 不是 Array&lt;/a&gt;
-&lt;/body&gt;&lt;/html&gt;' &gt; index.html
-" language="bash" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span class="stw71">echo</span><span class="sWayO"> '&lt;!DOCTYPE html&gt;&lt;html lang=&quot;zh-Hant&quot;&gt;
-</span></span><span class="line" line="2"><span class="sWayO">&lt;head&gt;
-</span></span><span class="line" line="3"><span class="sWayO">  &lt;meta charset=&quot;UTF-8&quot;&gt;
-</span></span><span class="line" line="4"><span class="sWayO">  &lt;title&gt;我的練習頁（是 Ray 不是 Array）&lt;/title&gt;
-</span></span><span class="line" line="5"><span class="sWayO">&lt;/head&gt;
-</span></span><span class="line" line="6"><span class="sWayO">&lt;body&gt;
-</span></span><span class="line" line="7"><span class="sWayO">  &lt;h1&gt;Hello，這是我的 Vibe Coding 練習頁&lt;/h1&gt;
-</span></span><span class="line" line="8"><span class="sWayO">  &lt;p&gt;目前這裡什麼都還沒有。&lt;/p&gt;
-</span></span><span class="line" line="9"><span class="sWayO">  &lt;a href=&quot;https://israynotarray.com/&quot; target=&quot;_blank&quot;&gt;是 Ray 不是 Array&lt;/a&gt;
-</span></span><span class="line" line="10"><span class="sWayO">&lt;/body&gt;&lt;/html&gt;'</span><span class="sOudu"> &gt;</span><span class="sWayO"> index.html
-</span></span></code></pre><p><img alt="建立 index.html 的終端機畫面示意" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260718132607.png"></p><p>內容其實非常簡單，就只是一些很基本的標題、文字與連結而已，東西越簡單，你越能專心看 Claude Code 的行為本身，而不是被程式碼的複雜度干擾。</p><p>如果建立過程非常不順利，你可以直接透過這個連結下載完整範例檔案：<a href="https://github.com/hsiangfeng/ithelp-2026-vibe-coding" rel="nofollow">https://github.com/hsiangfeng/ithelp-2026-vibe-coding</a>，只需要點一下 「Code → Download ZIP」就可以取得練習檔案了。</p><h2 id="先問問題再改東西">先問問題再改東西</h2><p>前面準備好後，接著請你在終端機輸入 <code>claude</code> 啟動 Claude Code，輸入 <code>claude</code> 之前請務必確認自己已經在 <code>claude-playground</code> 目錄下，否則你可能會出現一些奇怪的問題。</p><p>除此之外，我們的權限模式應該會是預設的「manual mode on」（也就是官方文件說的 default），每次要動你的檔案之前，它都會先停下來問你，細節我們 Day 5 再聊。</p><p><img alt="Claude Code 預設權限示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719145106.png"></p><p>那這邊一開始我們並不會馬上叫 AI 改東西，而是會請它先確認一下「它目前能看到什麼、能理解什麼」，例如：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="這個資料夾裡面有什麼？index.html 裡面有什麼東西？
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>這個資料夾裡面有什麼？index.html 裡面有什麼東西？
-</span></span></code></pre><p>許多人看到這邊就會感到好奇：「為什麼要這樣做？」</p><p>其實原因有兩個：</p><ol><li>確認 Claude Code 看到的檔案跟你一樣，也可以避免自己沒有正確進入到 <code>claude-playground</code> 目錄，或是檔案沒有存好、存錯地方的情況。</li><li>讓 Claude Code 先讀懂現況，避免你下任何文字時，它理解錯誤而做出不符合你預期的修改。</li></ol><p><img alt="回覆檔案內容示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260718133804.png"></p><p>基本上內容只要跟我上面類似或相同，其實就代表你跟我當前的操作是一致的，那你就可以繼續往下操作了。</p><p>當然，就算你沒跟 AI 說「這個資料夾裡面有什麼？index.html 裡面有什麼東西？」，它也會自己去讀檔案，只是依照我個人習慣來講，我會先跟他確認一下它能看到什麼，這樣可以避免一些不必要的誤會。</p><h2 id="可控失敗練習故意下一個模糊的指令">可控失敗練習：故意下一個模糊的指令</h2><p>一開始我們先不示範一次做到對的「正確答案」，我認為你應該先親身體會一次錯誤的做法，之後才會知道正確做法好在哪。</p><p>所以請你在 Claude Code 的輸入框裡複製貼上以下文字：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="幫我把這個頁面做得更好看，你自己決定。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>幫我把這個頁面做得更好看，你自己決定。
-</span></span></code></pre><p>別怕！請你安心且大膽送出去這句話吧！這只是一個練習檔案而已，而且 Claude Code 每收到一句指令，都會自動存一個還原點（這個機制叫 checkpoint），等等玩壞了也救得回來。</p><p>這句話「幫我把這個頁面做得更好看，你自己決定。」其實我們會稱為是指令（下 Prompt），你送出的任何文字都可以稱為 Prompt，也就是你希望 Claude Code 做的事情，這件事情請務必記著。</p><p>這過程中，它可能會詢問你一些權限上的問題，視窗中間那塊紅紅綠綠的就是它打算做的修改（紅色是要刪的、綠色是要加的，等等後面會專門教你看），你可以現在先掃一眼有個印象，接著你會看到三個選項，分別是：</p><ul><li>Yes</li><li>Yes, allow all edits during this session (shift+tab)</li><li>No</li></ul><p><img alt="Claude Code 詢問權限示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260803233457.png"></p><p>這邊請選擇 <strong>「Yes」</strong>，代表你同意它這一次的修改，接著它就會開始改檔案（請不要選「Yes, allow all edits during this session (shift+tab)」，因為這個選項會讓它之後的修改都自動放行，對新手來說非常不安全）。</p><p>接著 Claude Code 就會跟你說它改了什麼做了什麼：</p><p><img alt="Claude Code 回覆修改內容示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260803233627.png"></p><p>那這時候該怎麼看結果呢？很簡單，你可以跟它說：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我開啟 index.html，我想使用瀏覽器看看結果。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我開啟 index.html，我想使用瀏覽器看看結果。
-</span></span></code></pre><p>如果跳出以下權限也不用擔心，允許就對了：</p><p><img alt="Claude Code 詢問權限示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260718134816.png"></p><p>這時候你應該可以看到以下這個畫面，而且每個人應該都不太一樣：</p><p><img alt="Claude Code 改完後在瀏覽器打開 index.html 的結果示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260803233713.png"></p><p>很有趣吧？同一句 Prompt 可能有各種不同的結果，這就是所謂的 AI 隨機性，就是這個隨機性讓你無法掌握它到底會改成什麼樣子，也就導致了「無法驗收」的問題。</p><p>說不定你會覺得現在設計的畫面還滿漂亮的，但你可能會想「這哪裡失敗了？」。</p><p>這邊只要請你試著回答三個問題：</p><ol><li>它總共改了哪些地方？</li><li>為什麼是改成這個樣子，而不是別的樣子？</li><li>這樣算「做對了」嗎？你判斷的標準是什麼？</li></ol><p>是不是稍微有點難思考呢？一點也沒錯，這個就是第一個重點「無法掌握」，就如同前面一樣，同樣一句話「幫我把這個頁面做得更好看，你自己決定。」對不同的人、不同的模型、甚至同一個人丟兩次，都可能得到完全不同的結果。</p><p>因為你沒有定義驗收標準、跟它講清楚你想要什麼樣的風格，所以 AI 就只能自己去腦補所謂的 <strong>「好看」</strong> 這個定義的空白，而你也無法判斷它到底做對了還是做錯了，這也就導致了同樣一句話再丟一次，可能得到完全不同的結果。</p><p>因此，畫面漂不漂亮是其次，真正的問題是你失去了「驗收」的能力，你說不出這次的結果是對還是錯，只能說喜歡 or 不喜歡。</p><p>如果只是想做一個自己玩的玩具是無所謂，但如果你想做出一個真正能用的東西，「無法驗收」這件事情就變得很嚴重，因為你根本不知道現在離目標還有多遠，也不知道下一步該怎麼走。</p><h3 id="用-rewind-拉回來">用 <code>/rewind</code> 拉回來</h3><p>體驗了前面第一個任務之後，我們要來把剛剛的失敗拉回來，這邊就要用到我們前面提到的 checkpoint 機制。</p><p>請你在輸入框輸入 <code>/rewind</code>，或在輸入框是空的時候連按兩下 <code>Esc</code>，這也會叫出恢復選單，接著你應該會看到歷史對話，你只需要找到「幫我把這個頁面做得更好看，你自己決定。」這句話，並選擇他。</p><p><img alt="Rewind 示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260803234155.png"></p><p>選單會先列出你這個對話中下過的指令，先選你要回到哪一句（這邊選「幫我把這個頁面做得更好看，你自己決定。」這句），接著視窗應該會出現以下選擇：</p><ol><li>Restore code and conversation（恢復程式碼與對話）</li><li>Restore conversation（只恢復對話，程式碼保留）</li><li>Restore code（只恢復程式碼，對話保留）</li><li>Summarize from here（從這裡開始把對話壓縮成摘要）</li><li>Summarize up to here（把這裡之前的對話壓縮成摘要）</li><li>Never mind（算了）</li></ol><p>這邊請選擇「Restore code and conversation（恢復程式碼與對話）」，這樣程式碼跟對話就會一起回到你下那句模糊指令之前的狀態，而且剛剛的指令也會停在文字輸入框裡，讓你可以快速修改。</p><p>注意一下 <code>/rewind</code> 只會恢復使用 Claude Code 的編輯工具做的變更，如果你在這個過程中有用 <code>Bash</code> 指令去刪除或搬移檔案，那就會無法恢復，所以正式專案通常是一定會搭配 Git（一個能幫你保存各種版本的工具，後面章節會正式介紹）會比較保險。</p><p>看到這邊你應該會發現「走歪了再拉回來」這件事情很重要，也同時是 Vibe Coding 的關鍵技巧之一，走歪本身不是問題，回不來才是。</p><h2 id="下一個可驗收的小任務">下一個可驗收的小任務</h2><p>接下來要來示範一個可以被驗收的小任務（真的很小），請你把原本在輸入框的「幫我把這個頁面做得更好看，你自己決定。」刪除並改成以下文字：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="幫我在頁面加一個按鈕，按下去會隨機更換整個頁面的背景顏色
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>幫我在頁面加一個按鈕，按下去會隨機更換整個頁面的背景顏色
-</span></span></code></pre><p>小技巧，只要再輸入框按下 Ctrl + C 就可以快速清空整個輸入框，這樣就不用一個字一個字刪掉，但也要注意如果 AI 思考過程中，你按下這個快捷鍵就會中斷它的思考，所以要在它回覆完之後再按。</p><p>這邊你可能會充滿問號，這句話哪邊可以驗收？其實有：</p><ul><li>頁面上有沒有按鈕，一看就知道。</li><li>點下去背景有沒有變色，一點就知道。</li></ul><p>這些對錯一翻兩瞪眼。</p><p>至於按鈕要長什麼樣子、放哪裡、用什麼顏色，我們讓 AI 自己決定就好，因為它們不是這次的驗收重點，重點是「有沒有按鈕、按下去會不會變色」，這就是可驗收的小任務。</p><p>送出後，不要急著看結果，先看它的回覆，通常它會先跟你說它做了什麼修改、用了什麼工具，然後再問你要不要開啟瀏覽器看結果。</p><p><img alt="Claude Code 呼叫寫入工具" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719151833.png"></p><p>Read、Edit、Bash 這些是 Claude Code 的內建工具，也是新手最常看到的三個：讀檔、改檔、執行指令。
-它會依任務自己決定用哪些工具，現在先認得這三個工具就夠了。</p><p>理論上你這時候應該會打開瀏覽器，如果瀏覽器沒打開的話，你可以跟 AI 說：</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="請幫我開啟 index.html，我想使用瀏覽器看看結果。
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>請幫我開啟 index.html，我想使用瀏覽器看看結果。
-</span></span></code></pre><p>恭喜你，你已經做到描述一個「可以驗收」的最小任務了。</p><h2 id="看懂-diff紅的刪綠的加">看懂 diff：紅的刪、綠的加</h2><p>前面那些紅色、綠色是有一個專業名詞的，它就叫做 <strong>diff</strong>，它的意思是「差異」，也就是程式碼修改前後的差異。</p><p>這功能會是你追蹤 Claude Code 做了什麼的最重要依據，這也是你決定要不要收下修改的依據。</p><p>請記住以下：</p><ul><li>紅色是它要刪掉的行（通常是 <code>-</code> 開頭）</li><li>綠色是它要加上的行（通常是 <code>+</code> 開頭）</li></ul><p>請養成習慣： <strong>至少掃一眼它動了哪裡，跟你的預期有沒有對上</strong>，再按下 Yes。</p><p><img alt="diff 確認畫面，紅色刪除綠色新增" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719152237.png"></p><p>然後底下基本上會有三個選項：</p><table><thead><tr><th>選項</th><th>意思</th><th>什麼時候用</th></tr></thead><tbody><tr><td>Yes</td><td>只同意這一次</td><td>前期建議都用這個</td></tr><tr><td>Yes, allow all edits during this session</td><td>這個對話接下來的編輯都自動放行</td><td>你已經信任這次任務的方向時</td></tr><tr><td>No, and tell Claude what to do differently</td><td>拒絕，並告訴它怎麼改</td><td>方向不對、想換做法時</td></tr></tbody></table><p>選項的文字依版本可能會略有不同，以你畫面上看到的為準。</p><p>第三個選項必須特別解釋一下，這個選項它不是單純的取消，你可以接著用一句話把它導回正軌，例如「按鈕的文字是『更改背景顏色』，而不是『按我』」</p><pre className="language-txt shiki shiki-themes github-light github-light github-dark-high-contrast" code="按鈕的文字是「更改背景顏色」，而不是「按我」
-" language="txt" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>按鈕的文字是「更改背景顏色」，而不是「按我」
-</span></span></code></pre><p>這樣它就會重新修改，然後再給你 diff 讓你確認。</p><p><img alt="diff 確認畫面，紅色刪除綠色新增" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/20260719152529.png"></p><p>這邊我就不特別示範第三個選項了，你可以自行體驗看看。</p><h2 id="結語">結語</h2><p>最後總結一下今天的最小循環，這邊搭配一下圖你應該會更清楚整體流程：</p><pre className="language-mermaid shiki shiki-themes github-light github-light github-dark-high-contrast" code="flowchart TD
-    A[&quot;你下指令&quot;] --&gt; B[&quot;Claude 讀檔案、分析&quot;]
-    B --&gt; C[&quot;提出修改：diff 給你過目&quot;]
-    C --&gt; D{&quot;你審核&quot;}
-    D --&gt;|&quot;Yes&quot;| E[&quot;完成修改&quot;]
-    D --&gt;|&quot;No：直接告訴它怎麼改&quot;| B
-    E --&gt; F[&quot;你驗收結果&quot;]
-    F --&gt;|&quot;OK&quot;| G[&quot;完成，進下一個任務&quot;]
-    F --&gt;|&quot;不對勁&quot;| H[&quot;/rewind 回復&quot;]
-    H --&gt; A
-" language="mermaid" meta="" style=""><code __ignoreMap=""><span class="line" line="1"><span>flowchart TD
-</span></span><span class="line" line="2"><span>    A[&quot;你下指令&quot;] --&gt; B[&quot;Claude 讀檔案、分析&quot;]
-</span></span><span class="line" line="3"><span>    B --&gt; C[&quot;提出修改：diff 給你過目&quot;]
-</span></span><span class="line" line="4"><span>    C --&gt; D{&quot;你審核&quot;}
-</span></span><span class="line" line="5"><span>    D --&gt;|&quot;Yes&quot;| E[&quot;完成修改&quot;]
-</span></span><span class="line" line="6"><span>    D --&gt;|&quot;No：直接告訴它怎麼改&quot;| B
-</span></span><span class="line" line="7"><span>    E --&gt; F[&quot;你驗收結果&quot;]
-</span></span><span class="line" line="8"><span>    F --&gt;|&quot;OK&quot;| G[&quot;完成，進下一個任務&quot;]
-</span></span><span class="line" line="9"><span>    F --&gt;|&quot;不對勁&quot;| H[&quot;/rewind 回復&quot;]
-</span></span><span class="line" line="10"><span>    H --&gt; A
-</span></span></code></pre><p><img alt="Claude Code 最小循環示意圖" src="https://images.israynotarray.com/blog/ai/ithome-2026-vibe-coding/Codex%20%E5%9C%96%E5%83%8F%202026%E5%B9%B49%E6%9C%8815%E6%97%A5%20%E4%B8%8B%E5%8D%8809_42_39.png"></p><ul><li>先問再改：問問題零風險，讓它讀懂現況、你確認它沒理解歪。</li><li>下具體的小任務，過程中看它的工具訊息，知道它動了什麼。</li><li>diff 至少掃一眼再按 Yes，方向不對就用第三個選項直接導正。</li><li>後悔用 <code>/rewind</code>（或是 Esc 按兩下），要注意它救不了 Bash 造成的變更。</li><li>刻意讓模糊 prompt 失敗了一次，失敗的不是畫面醜，而是「說不出對錯」，然後我們用「回復 → 改寫需求 → 重新驗收」把方向拉回來。</li></ul><p>那麼這一篇就到這邊結束了，我們明天見。</p>html pre.shiki code .stw71, html code.shiki .stw71{--shiki-light:#005CC5;--shiki-default:#005CC5;--shiki-dark:#91CBFF}html pre.shiki code .sWayO, html code.shiki .sWayO{--shiki-light:#032F62;--shiki-default:#032F62;--shiki-dark:#ADDCFF}html .light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html.light .shiki span {color: var(--shiki-light);background: var(--shiki-light-bg);font-style: var(--shiki-light-font-style);font-weight: var(--shiki-light-font-weight);text-decoration: var(--shiki-light-text-decoration);}html .default .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .shiki span {color: var(--shiki-default);background: var(--shiki-default-bg);font-style: var(--shiki-default-font-style);font-weight: var(--shiki-default-font-weight);text-decoration: var(--shiki-default-text-decoration);}html .dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html.dark .shiki span {color: var(--shiki-dark);background: var(--shiki-dark-bg);font-style: var(--shiki-dark-font-style);font-weight: var(--shiki-dark-font-weight);text-decoration: var(--shiki-dark-text-decoration);}html pre.shiki code .sOudu, html code.shiki .sOudu{--shiki-light:#D73A49;--shiki-default:#D73A49;--shiki-dark:#FF9492}]]></content>
   </entry>
 </feed>
